@@ -9,38 +9,104 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedGarageRouteImport } from './routes/_authenticated/garage'
+import { Route as AuthenticatedSetupsSetupIdRouteImport } from './routes/_authenticated/setups.$setupId'
+import { Route as AuthenticatedCarsCarIdRouteImport } from './routes/_authenticated/cars.$carId'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedGarageRoute = AuthenticatedGarageRouteImport.update({
+  id: '/garage',
+  path: '/garage',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSetupsSetupIdRoute =
+  AuthenticatedSetupsSetupIdRouteImport.update({
+    id: '/setups/$setupId',
+    path: '/setups/$setupId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedCarsCarIdRoute = AuthenticatedCarsCarIdRouteImport.update({
+  id: '/cars/$carId',
+  path: '/cars/$carId',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/garage': typeof AuthenticatedGarageRoute
+  '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
+  '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/garage': typeof AuthenticatedGarageRoute
+  '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
+  '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/garage': typeof AuthenticatedGarageRoute
+  '/_authenticated/cars/$carId': typeof AuthenticatedCarsCarIdRoute
+  '/_authenticated/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/auth' | '/garage' | '/cars/$carId' | '/setups/$setupId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/auth' | '/garage' | '/cars/$carId' | '/setups/$setupId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/garage'
+    | '/_authenticated/cars/$carId'
+    | '/_authenticated/setups/$setupId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +114,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/garage': {
+      id: '/_authenticated/garage'
+      path: '/garage'
+      fullPath: '/garage'
+      preLoaderRoute: typeof AuthenticatedGarageRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/setups/$setupId': {
+      id: '/_authenticated/setups/$setupId'
+      path: '/setups/$setupId'
+      fullPath: '/setups/$setupId'
+      preLoaderRoute: typeof AuthenticatedSetupsSetupIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/cars/$carId': {
+      id: '/_authenticated/cars/$carId'
+      path: '/cars/$carId'
+      fullPath: '/cars/$carId'
+      preLoaderRoute: typeof AuthenticatedCarsCarIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedGarageRoute: typeof AuthenticatedGarageRoute
+  AuthenticatedCarsCarIdRoute: typeof AuthenticatedCarsCarIdRoute
+  AuthenticatedSetupsSetupIdRoute: typeof AuthenticatedSetupsSetupIdRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedGarageRoute: AuthenticatedGarageRoute,
+  AuthenticatedCarsCarIdRoute: AuthenticatedCarsCarIdRoute,
+  AuthenticatedSetupsSetupIdRoute: AuthenticatedSetupsSetupIdRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
