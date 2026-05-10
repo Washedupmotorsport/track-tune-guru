@@ -9,9 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { DISCIPLINES } from "@/lib/disciplines";
-import { Plus, Car, ChevronRight, Trash2 } from "lucide-react";
+import { Plus, Car, ChevronRight, Trash2, Users, Share2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ShareDialog } from "@/components/share-dialog";
 
 export const Route = createFileRoute("/_authenticated/garage")({
   component: Garage,
@@ -103,27 +104,72 @@ function Garage() {
       {carsQ.isLoading ? (
         <div className="text-muted-foreground">Loading…</div>
       ) : carsQ.data && carsQ.data.length > 0 ? (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {carsQ.data.map((c) => (
-            <div key={c.id} className="group rounded-lg border border-border bg-card p-5 shadow-card hover:border-primary transition-colors">
-              <div className="flex items-start justify-between">
-                <Car className="w-5 h-5 text-primary" />
-                <button onClick={() => { if (confirm("Delete this car and all its setups?")) del.mutate(c.id); }}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="font-mono text-xs uppercase tracking-widest text-primary mt-3">{c.discipline}</div>
-              <div className="font-display text-2xl font-bold mt-1">{c.name}</div>
-              <div className="text-sm text-muted-foreground">
-                {[c.year, c.make, c.model].filter(Boolean).join(" ") || "—"}
-              </div>
-              <Link to="/cars/$carId" params={{ carId: c.id }} className="mt-4 inline-flex items-center text-sm text-accent hover:text-primary">
-                Open setups <ChevronRight className="w-4 h-4 ml-1" />
-              </Link>
-            </div>
-          ))}
-        </div>
+        <>
+          {(() => {
+            const owned = carsQ.data!.filter((c) => c.user_id === user!.id);
+            const shared = carsQ.data!.filter((c) => c.user_id !== user!.id);
+            return (
+              <>
+                {owned.length > 0 && (
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {owned.map((c) => (
+                      <div key={c.id} className="group rounded-lg border border-border bg-card p-5 shadow-card hover:border-primary transition-colors">
+                        <div className="flex items-start justify-between">
+                          <Car className="w-5 h-5 text-primary" />
+                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <ShareDialog carId={c.id} carName={c.name}
+                              trigger={<button className="text-muted-foreground hover:text-primary p-1"><Share2 className="w-4 h-4" /></button>} />
+                            <button onClick={() => { if (confirm("Delete this car and all its setups?")) del.mutate(c.id); }}
+                              className="text-muted-foreground hover:text-destructive p-1">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="font-mono text-xs uppercase tracking-widest text-primary mt-3">{c.discipline}</div>
+                        <div className="font-display text-2xl font-bold mt-1">{c.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {[c.year, c.make, c.model].filter(Boolean).join(" ") || "—"}
+                        </div>
+                        <Link to="/cars/$carId" params={{ carId: c.id }} className="mt-4 inline-flex items-center text-sm text-accent hover:text-primary">
+                          Open setups <ChevronRight className="w-4 h-4 ml-1" />
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {shared.length > 0 && (
+                  <div className="mt-10">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Users className="w-4 h-4 text-accent" />
+                      <h2 className="font-display text-xl font-bold uppercase tracking-wider">Shared with you</h2>
+                    </div>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {shared.map((c) => (
+                        <div key={c.id} className="rounded-lg border border-accent/40 bg-card p-5 shadow-card hover:border-accent transition-colors">
+                          <div className="flex items-start justify-between">
+                            <Car className="w-5 h-5 text-accent" />
+                            <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded bg-accent/20 text-accent">Shared</span>
+                          </div>
+                          <div className="font-mono text-xs uppercase tracking-widest text-accent mt-3">{c.discipline}</div>
+                          <div className="font-display text-2xl font-bold mt-1">{c.name}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {[c.year, c.make, c.model].filter(Boolean).join(" ") || "—"}
+                          </div>
+                          <Link to="/cars/$carId" params={{ carId: c.id }} className="mt-4 inline-flex items-center text-sm text-accent hover:text-primary">
+                            Open setups <ChevronRight className="w-4 h-4 ml-1" />
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {owned.length === 0 && shared.length === 0 && <EmptyState />}
+              </>
+            );
+          })()}
+        </>
       ) : (
         <div className="rounded-lg border border-dashed border-border p-12 text-center">
           <Car className="w-10 h-10 mx-auto text-muted-foreground" />
@@ -131,6 +177,16 @@ function Garage() {
           <p className="text-sm text-muted-foreground">Add your first car to start tracking setups.</p>
         </div>
       )}
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="rounded-lg border border-dashed border-border p-12 text-center">
+      <Car className="w-10 h-10 mx-auto text-muted-foreground" />
+      <h3 className="mt-4 font-display text-xl font-semibold">No cars yet</h3>
+      <p className="text-sm text-muted-foreground">Add your first car to start tracking setups.</p>
     </div>
   );
 }
