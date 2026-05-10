@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      car_shares: {
+        Row: {
+          car_id: string
+          created_at: string
+          id: string
+          owner_id: string
+          role: Database["public"]["Enums"]["share_role"]
+          shared_with_user_id: string
+        }
+        Insert: {
+          car_id: string
+          created_at?: string
+          id?: string
+          owner_id: string
+          role?: Database["public"]["Enums"]["share_role"]
+          shared_with_user_id: string
+        }
+        Update: {
+          car_id?: string
+          created_at?: string
+          id?: string
+          owner_id?: string
+          role?: Database["public"]["Enums"]["share_role"]
+          shared_with_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "car_shares_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "cars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cars: {
         Row: {
           created_at: string
@@ -201,10 +236,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_id_by_email: { Args: { _email: string }; Returns: string }
+      has_car_access: {
+        Args: {
+          _car_id: string
+          _min_role: Database["public"]["Enums"]["share_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_car_owner: {
+        Args: { _car_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      share_role: "viewer" | "editor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -331,6 +378,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      share_role: ["viewer", "editor"],
+    },
   },
 } as const
