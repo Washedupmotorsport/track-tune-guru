@@ -53,6 +53,78 @@ export type Database = {
         }
         Relationships: []
       }
+      laps: {
+        Row: {
+          car_id: string
+          conditions: string | null
+          created_at: string
+          fuel_load: number | null
+          id: string
+          lap_number: number | null
+          lap_time_ms: number
+          notes: string | null
+          recorded_at: string
+          sector_1_ms: number | null
+          sector_2_ms: number | null
+          sector_3_ms: number | null
+          setup_id: string
+          tire_set: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          conditions?: string | null
+          created_at?: string
+          fuel_load?: number | null
+          id?: string
+          lap_number?: number | null
+          lap_time_ms: number
+          notes?: string | null
+          recorded_at?: string
+          sector_1_ms?: number | null
+          sector_2_ms?: number | null
+          sector_3_ms?: number | null
+          setup_id: string
+          tire_set?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          conditions?: string | null
+          created_at?: string
+          fuel_load?: number | null
+          id?: string
+          lap_number?: number | null
+          lap_time_ms?: number
+          notes?: string | null
+          recorded_at?: string
+          sector_1_ms?: number | null
+          sector_2_ms?: number | null
+          sector_3_ms?: number | null
+          setup_id?: string
+          tire_set?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "laps_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "cars"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "laps_setup_id_fkey"
+            columns: ["setup_id"]
+            isOneToOne: false
+            referencedRelation: "setups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
