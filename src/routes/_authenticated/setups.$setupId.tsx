@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,6 @@ type SetupRow = {
 function SetupDetail() {
   const { setupId } = Route.useParams();
   const qc = useQueryClient();
-  const navigate = useNavigate();
 
   const setupQ = useQuery({
     queryKey: ["setup", setupId],
@@ -141,8 +140,6 @@ function SetupDetail() {
         </Button>
       </div>
 
-      {/* Suppress navigate unused */}
-      <span className="hidden">{String(!!navigate)}</span>
     </div>
   );
 }
