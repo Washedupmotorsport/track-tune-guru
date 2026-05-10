@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { LogOut, Calculator } from "lucide-react";
+import { LogOut, Calculator, Wand2 } from "lucide-react";
 import type { ReactNode } from "react";
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -16,6 +16,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             APEX<span className="text-primary">SETUP</span>
           </Link>
           <div className="flex items-center gap-3">
+            <Link to="/baseline" className="hidden sm:inline-flex items-center text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
+              <Wand2 className="w-4 h-4 mr-1" /> Baseline
+            </Link>
             <Link to="/calculators" className="hidden sm:inline-flex items-center text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
               <Calculator className="w-4 h-4 mr-1" /> Calculators
             </Link>
