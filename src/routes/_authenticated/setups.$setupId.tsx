@@ -14,6 +14,7 @@ import { getSetupAdvice, type AdvisorResult } from "@/lib/advisor.functions";
 import { useAuth } from "@/lib/auth-context";
 import { parseLapTime, formatLapTime } from "@/lib/lap-time";
 import { exportSetupPdf } from "@/lib/setup-pdf";
+import { useCarAccess, canEdit } from "@/lib/use-car-access";
 
 export const Route = createFileRoute("/_authenticated/setups/$setupId")({
   component: SetupDetail,
@@ -48,6 +49,18 @@ function SetupDetail() {
       return data as unknown as SetupRow;
     },
   });
+  const carQ = useQuery({
+    queryKey: ["car-owner", setupQ.data?.car_id],
+    enabled: !!setupQ.data,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("cars").select("user_id").eq("id", setupQ.data!.car_id).single();
+      if (error) throw error;
+      return data;
+    },
+  });
+  const accessQ = useCarAccess(setupQ.data?.car_id, carQ.data?.user_id);
+  const writable = canEdit(accessQ.data);
+  const role = accessQ.data;
 
   const [meta, setMeta] = useState({ name: "", track: "", conditions: "", notes: "" });
   const [data, setData] = useState<Record<string, string>>({});
@@ -101,13 +114,20 @@ function SetupDetail() {
 
       <div className="mt-4 flex items-end justify-between flex-wrap gap-4">
         <div>
-          <div className="font-mono text-xs uppercase tracking-widest text-primary">{disc.label} setup</div>
-          <Input value={meta.name} onChange={(e) => setMeta({ ...meta, name: e.target.value })}
+          <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-2">
+            {disc.label} setup
+            {role && role !== "owner" && (
+              <span className="text-[10px] px-2 py-0.5 rounded bg-accent/20 text-accent">{role}</span>
+            )}
+          </div>
+          <Input value={meta.name} readOnly={!writable} onChange={(e) => setMeta({ ...meta, name: e.target.value })}
             className="mt-1 font-display !text-3xl font-bold !h-auto !py-2 !px-3 bg-transparent border-transparent hover:border-border focus-visible:border-primary" />
         </div>
-        <Button onClick={() => save.mutate()} disabled={save.isPending} className="shadow-glow">
-          {save.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />} Save
-        </Button>
+        {writable && (
+          <Button onClick={() => save.mutate()} disabled={save.isPending} className="shadow-glow">
+            {save.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />} Save
+          </Button>
+        )}
       </div>
 
       <div className="mt-4 flex justify-end">
@@ -129,9 +149,9 @@ function SetupDetail() {
       </div>
 
       <div className="mt-6 grid md:grid-cols-3 gap-4 rounded-lg border border-border bg-card p-5">
-        <div><Label>Track</Label><Input value={meta.track} onChange={(e) => setMeta({ ...meta, track: e.target.value })} /></div>
-        <div><Label>Conditions</Label><Input value={meta.conditions} onChange={(e) => setMeta({ ...meta, conditions: e.target.value })} /></div>
-        <div className="md:col-span-1"><Label>Notes</Label><Input value={meta.notes} onChange={(e) => setMeta({ ...meta, notes: e.target.value })} placeholder="Lap times, feel…" /></div>
+        <div><Label>Track</Label><Input readOnly={!writable} value={meta.track} onChange={(e) => setMeta({ ...meta, track: e.target.value })} /></div>
+        <div><Label>Conditions</Label><Input readOnly={!writable} value={meta.conditions} onChange={(e) => setMeta({ ...meta, conditions: e.target.value })} /></div>
+        <div className="md:col-span-1"><Label>Notes</Label><Input readOnly={!writable} value={meta.notes} onChange={(e) => setMeta({ ...meta, notes: e.target.value })} placeholder="Lap times, feel…" /></div>
       </div>
 
       <div className="mt-6 space-y-6">
@@ -151,6 +171,7 @@ function SetupDetail() {
                   <Input
                     type={f.type === "number" ? "number" : "text"}
                     step="any"
+                    readOnly={!writable}
                     value={data[f.key] ?? ""}
                     onChange={(e) => setData({ ...data, [f.key]: e.target.value })}
                     className="mt-1 font-mono"
@@ -163,11 +184,11 @@ function SetupDetail() {
 
         <div className="rounded-lg border border-border bg-card p-5">
           <Label>Session notes</Label>
-          <Textarea rows={4} value={meta.notes} onChange={(e) => setMeta({ ...meta, notes: e.target.value })}
+          <Textarea rows={4} readOnly={!writable} value={meta.notes} onChange={(e) => setMeta({ ...meta, notes: e.target.value })}
             placeholder="What changed, what felt better, next steps…" />
         </div>
 
-        <LapLog setupId={setupId} carId={setupQ.data.car_id} userId={user?.id ?? ""} defaultConditions={meta.conditions} />
+        <LapLog setupId={setupId} carId={setupQ.data.car_id} userId={user?.id ?? ""} defaultConditions={meta.conditions} canEdit={writable} />
 
         <div className="rounded-lg border border-primary/40 bg-card p-5 shadow-card">
           <div className="flex items-center gap-2 mb-1">
@@ -240,9 +261,11 @@ function SetupDetail() {
       </div>
 
       <div className="mt-6 flex justify-end">
-        <Button onClick={() => save.mutate()} disabled={save.isPending} className="shadow-glow">
-          {save.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />} Save setup
-        </Button>
+        {writable && (
+          <Button onClick={() => save.mutate()} disabled={save.isPending} className="shadow-glow">
+            {save.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />} Save setup
+          </Button>
+        )}
       </div>
 
     </div>
@@ -263,8 +286,8 @@ type Lap = {
   recorded_at: string;
 };
 
-function LapLog({ setupId, carId, userId, defaultConditions }: {
-  setupId: string; carId: string; userId: string; defaultConditions: string;
+function LapLog({ setupId, carId, userId, defaultConditions, canEdit }: {
+  setupId: string; carId: string; userId: string; defaultConditions: string; canEdit: boolean;
 }) {
   const qc = useQueryClient();
   const [form, setForm] = useState({
@@ -341,6 +364,8 @@ function LapLog({ setupId, carId, userId, defaultConditions }: {
         Log laps against this setup. Format: <span className="font-mono text-foreground">1:23.456</span> or <span className="font-mono text-foreground">83.456</span>.
       </p>
 
+      {canEdit && (
+      <>
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         <div>
           <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Lap #</Label>
@@ -384,6 +409,8 @@ function LapLog({ setupId, carId, userId, defaultConditions }: {
           {add.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Plus className="w-4 h-4 mr-1" />} Log lap
         </Button>
       </div>
+      </>
+      )}
 
       {laps.length > 0 && (
         <>
@@ -420,9 +447,11 @@ function LapLog({ setupId, carId, userId, defaultConditions }: {
                     <td className="py-2 pr-3 text-muted-foreground">{l.conditions ?? "—"}</td>
                     <td className="py-2 pr-3 text-muted-foreground">{l.notes ?? "—"}</td>
                     <td className="py-2 text-right">
-                      <button onClick={() => { if (confirm("Delete lap?")) del.mutate(l.id); }} className="text-muted-foreground hover:text-destructive">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      {canEdit && (
+                        <button onClick={() => { if (confirm("Delete lap?")) del.mutate(l.id); }} className="text-muted-foreground hover:text-destructive">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
