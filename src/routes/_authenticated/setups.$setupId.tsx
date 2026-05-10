@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/setups/$setupId")({
 
 type SetupRow = {
   id: string; name: string; track: string | null; conditions: string | null;
-  notes: string | null; discipline: string; car_id: string;
+  notes: string | null; discipline: string; car_id: string; updated_at: string;
   setup_data: Record<string, string | number | null>;
 };
 
