@@ -148,6 +148,8 @@ function SetupDetail() {
             placeholder="What changed, what felt better, next steps…" />
         </div>
 
+        <LapLog setupId={setupId} carId={setupQ.data.car_id} userId={user?.id ?? ""} defaultConditions={meta.conditions} />
+
         <div className="rounded-lg border border-primary/40 bg-card p-5 shadow-card">
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="w-5 h-5 text-primary" />
