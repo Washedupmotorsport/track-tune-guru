@@ -184,11 +184,11 @@ function SetupDetail() {
 
         <div className="rounded-lg border border-border bg-card p-5">
           <Label>Session notes</Label>
-          <Textarea rows={4} value={meta.notes} onChange={(e) => setMeta({ ...meta, notes: e.target.value })}
+          <Textarea rows={4} readOnly={!writable} value={meta.notes} onChange={(e) => setMeta({ ...meta, notes: e.target.value })}
             placeholder="What changed, what felt better, next steps…" />
         </div>
 
-        <LapLog setupId={setupId} carId={setupQ.data.car_id} userId={user?.id ?? ""} defaultConditions={meta.conditions} />
+        <LapLog setupId={setupId} carId={setupQ.data.car_id} userId={user?.id ?? ""} defaultConditions={meta.conditions} canEdit={writable} />
 
         <div className="rounded-lg border border-primary/40 bg-card p-5 shadow-card">
           <div className="flex items-center gap-2 mb-1">
