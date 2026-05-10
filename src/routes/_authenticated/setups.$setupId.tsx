@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Loader2, Sparkles, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Sparkles, AlertTriangle, Timer, Trash2, Plus, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getDiscipline } from "@/lib/disciplines";
 import { getSetupAdvice, type AdvisorResult } from "@/lib/advisor.functions";
+import { useAuth } from "@/lib/auth-context";
+import { parseLapTime, formatLapTime } from "@/lib/lap-time";
 
 export const Route = createFileRoute("/_authenticated/setups/$setupId")({
   component: SetupDetail,
@@ -25,6 +27,7 @@ type SetupRow = {
 function SetupDetail() {
   const { setupId } = Route.useParams();
   const qc = useQueryClient();
+  const { user } = useAuth();
   const adviseFn = useServerFn(getSetupAdvice);
 
   const [advisor, setAdvisor] = useState({ weather: "", goal: "", driverNotes: "" });
@@ -145,6 +148,8 @@ function SetupDetail() {
             placeholder="What changed, what felt better, next steps…" />
         </div>
 
+        <LapLog setupId={setupId} carId={setupQ.data.car_id} userId={user?.id ?? ""} defaultConditions={meta.conditions} />
+
         <div className="rounded-lg border border-primary/40 bg-card p-5 shadow-card">
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="w-5 h-5 text-primary" />
@@ -221,6 +226,192 @@ function SetupDetail() {
         </Button>
       </div>
 
+    </div>
+  );
+}
+
+type Lap = {
+  id: string;
+  lap_number: number | null;
+  lap_time_ms: number;
+  sector_1_ms: number | null;
+  sector_2_ms: number | null;
+  sector_3_ms: number | null;
+  conditions: string | null;
+  tire_set: string | null;
+  fuel_load: number | null;
+  notes: string | null;
+  recorded_at: string;
+};
+
+function LapLog({ setupId, carId, userId, defaultConditions }: {
+  setupId: string; carId: string; userId: string; defaultConditions: string;
+}) {
+  const qc = useQueryClient();
+  const [form, setForm] = useState({
+    lap_number: "", lap_time: "", s1: "", s2: "", s3: "",
+    conditions: "", tire_set: "", fuel_load: "", notes: "",
+  });
+
+  const lapsQ = useQuery({
+    queryKey: ["laps", setupId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("laps")
+        .select("*")
+        .eq("setup_id", setupId)
+        .order("recorded_at", { ascending: true });
+      if (error) throw error;
+      return data as Lap[];
+    },
+  });
+
+  const add = useMutation({
+    mutationFn: async () => {
+      const ms = parseLapTime(form.lap_time);
+      if (ms == null) throw new Error("Bad lap time. Use 1:23.456 or 83.456");
+      const s1 = form.s1 ? parseLapTime(form.s1) : null;
+      const s2 = form.s2 ? parseLapTime(form.s2) : null;
+      const s3 = form.s3 ? parseLapTime(form.s3) : null;
+      const fuel = form.fuel_load ? parseFloat(form.fuel_load) : null;
+      const lapNum = form.lap_number ? parseInt(form.lap_number, 10) : null;
+      const { error } = await supabase.from("laps").insert({
+        user_id: userId,
+        setup_id: setupId,
+        car_id: carId,
+        lap_number: lapNum,
+        lap_time_ms: ms,
+        sector_1_ms: s1,
+        sector_2_ms: s2,
+        sector_3_ms: s3,
+        conditions: form.conditions || defaultConditions || null,
+        tire_set: form.tire_set || null,
+        fuel_load: fuel,
+        notes: form.notes || null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Lap logged");
+      setForm({ ...form, lap_time: "", s1: "", s2: "", s3: "", notes: "",
+        lap_number: form.lap_number ? String(parseInt(form.lap_number, 10) + 1) : "" });
+      qc.invalidateQueries({ queryKey: ["laps", setupId] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const del = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("laps").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["laps", setupId] }),
+  });
+
+  const laps = lapsQ.data ?? [];
+  const best = laps.reduce<number | null>((b, l) => (b == null || l.lap_time_ms < b ? l.lap_time_ms : b), null);
+  const avg = laps.length > 0 ? Math.round(laps.reduce((s, l) => s + l.lap_time_ms, 0) / laps.length) : null;
+
+  return (
+    <div className="rounded-lg border border-border bg-card p-5 shadow-card">
+      <div className="flex items-center gap-2 mb-1">
+        <Timer className="w-5 h-5 text-primary" />
+        <h2 className="font-display text-lg font-bold uppercase tracking-wider">Lap Log</h2>
+      </div>
+      <p className="text-sm text-muted-foreground mb-4">
+        Log laps against this setup. Format: <span className="font-mono text-foreground">1:23.456</span> or <span className="font-mono text-foreground">83.456</span>.
+      </p>
+
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+        <div>
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Lap #</Label>
+          <Input value={form.lap_number} onChange={(e) => setForm({ ...form, lap_number: e.target.value })} className="font-mono mt-1" placeholder="1" />
+        </div>
+        <div>
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Lap time *</Label>
+          <Input value={form.lap_time} onChange={(e) => setForm({ ...form, lap_time: e.target.value })} className="font-mono mt-1" placeholder="1:23.456" />
+        </div>
+        <div>
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">S1</Label>
+          <Input value={form.s1} onChange={(e) => setForm({ ...form, s1: e.target.value })} className="font-mono mt-1" placeholder="optional" />
+        </div>
+        <div>
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">S2</Label>
+          <Input value={form.s2} onChange={(e) => setForm({ ...form, s2: e.target.value })} className="font-mono mt-1" />
+        </div>
+        <div>
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">S3</Label>
+          <Input value={form.s3} onChange={(e) => setForm({ ...form, s3: e.target.value })} className="font-mono mt-1" />
+        </div>
+        <div>
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Fuel (L)</Label>
+          <Input value={form.fuel_load} onChange={(e) => setForm({ ...form, fuel_load: e.target.value })} className="font-mono mt-1" type="number" step="any" />
+        </div>
+        <div className="md:col-span-2">
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Conditions</Label>
+          <Input value={form.conditions} onChange={(e) => setForm({ ...form, conditions: e.target.value })} className="mt-1" placeholder={defaultConditions || "Dry, 22°C"} />
+        </div>
+        <div className="md:col-span-2">
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Tire set</Label>
+          <Input value={form.tire_set} onChange={(e) => setForm({ ...form, tire_set: e.target.value })} className="mt-1" placeholder="Set A, 3 heat cycles" />
+        </div>
+        <div className="md:col-span-2">
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Notes</Label>
+          <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="mt-1" placeholder="Locked rears at T3" />
+        </div>
+      </div>
+      <div className="mt-3 flex justify-end">
+        <Button size="sm" onClick={() => add.mutate()} disabled={add.isPending || !form.lap_time}>
+          {add.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Plus className="w-4 h-4 mr-1" />} Log lap
+        </Button>
+      </div>
+
+      {laps.length > 0 && (
+        <>
+          <div className="mt-6 flex flex-wrap gap-6 text-sm">
+            <div><span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Laps:</span> <span className="font-display font-bold">{laps.length}</span></div>
+            <div className="flex items-center gap-1"><Trophy className="w-4 h-4 text-primary" /><span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Best:</span> <span className="font-display font-bold">{formatLapTime(best)}</span></div>
+            <div><span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Avg:</span> <span className="font-display font-bold">{formatLapTime(avg)}</span></div>
+          </div>
+
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-xs font-mono uppercase tracking-widest text-muted-foreground border-b border-border">
+                  <th className="py-2 pr-3">#</th>
+                  <th className="py-2 pr-3">Lap</th>
+                  <th className="py-2 pr-3">S1</th>
+                  <th className="py-2 pr-3">S2</th>
+                  <th className="py-2 pr-3">S3</th>
+                  <th className="py-2 pr-3">Fuel</th>
+                  <th className="py-2 pr-3">Conditions</th>
+                  <th className="py-2 pr-3">Notes</th>
+                  <th className="py-2"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {laps.map((l) => (
+                  <tr key={l.id} className="border-b border-border/50">
+                    <td className="py-2 pr-3 font-mono">{l.lap_number ?? "—"}</td>
+                    <td className={"py-2 pr-3 font-mono " + (l.lap_time_ms === best ? "text-primary font-bold" : "")}>{formatLapTime(l.lap_time_ms)}</td>
+                    <td className="py-2 pr-3 font-mono text-muted-foreground">{formatLapTime(l.sector_1_ms)}</td>
+                    <td className="py-2 pr-3 font-mono text-muted-foreground">{formatLapTime(l.sector_2_ms)}</td>
+                    <td className="py-2 pr-3 font-mono text-muted-foreground">{formatLapTime(l.sector_3_ms)}</td>
+                    <td className="py-2 pr-3 font-mono text-muted-foreground">{l.fuel_load ?? "—"}</td>
+                    <td className="py-2 pr-3 text-muted-foreground">{l.conditions ?? "—"}</td>
+                    <td className="py-2 pr-3 text-muted-foreground">{l.notes ?? "—"}</td>
+                    <td className="py-2 text-right">
+                      <button onClick={() => { if (confirm("Delete lap?")) del.mutate(l.id); }} className="text-muted-foreground hover:text-destructive">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   );
 }
