@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Loader2, Sparkles, AlertTriangle, Timer, Trash2, Plus, Trophy } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Sparkles, AlertTriangle, Timer, Trash2, Plus, Trophy, Download } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getDiscipline } from "@/lib/disciplines";
 import { getSetupAdvice, type AdvisorResult } from "@/lib/advisor.functions";
 import { useAuth } from "@/lib/auth-context";
 import { parseLapTime, formatLapTime } from "@/lib/lap-time";
+import { exportSetupPdf } from "@/lib/setup-pdf";
 
 export const Route = createFileRoute("/_authenticated/setups/$setupId")({
   component: SetupDetail,
@@ -20,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/setups/$setupId")({
 
 type SetupRow = {
   id: string; name: string; track: string | null; conditions: string | null;
-  notes: string | null; discipline: string; car_id: string;
+  notes: string | null; discipline: string; car_id: string; updated_at: string;
   setup_data: Record<string, string | number | null>;
 };
 
@@ -106,6 +107,24 @@ function SetupDetail() {
         </div>
         <Button onClick={() => save.mutate()} disabled={save.isPending} className="shadow-glow">
           {save.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />} Save
+        </Button>
+      </div>
+
+      <div className="mt-4 flex justify-end">
+        <Button variant="outline" size="sm" onClick={async () => {
+          try {
+            const { data: car } = await supabase.from("cars").select("name, make, model, year").eq("id", setupQ.data!.car_id).single();
+            const { data: laps } = await supabase.from("laps").select("lap_number, lap_time_ms, sector_1_ms, sector_2_ms, sector_3_ms, conditions, notes").eq("setup_id", setupId).order("recorded_at");
+            exportSetupPdf({
+              setup: { ...setupQ.data!, ...meta, setup_data: data, updated_at: setupQ.data!.updated_at ?? new Date().toISOString() } as Parameters<typeof exportSetupPdf>[0]["setup"],
+              car: car ?? null,
+              laps: laps ?? [],
+            });
+          } catch (e) {
+            toast.error(e instanceof Error ? e.message : "Export failed");
+          }
+        }}>
+          <Download className="w-4 h-4 mr-1" /> Export PDF
         </Button>
       </div>
 
