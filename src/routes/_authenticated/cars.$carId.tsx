@@ -10,6 +10,8 @@ import { Plus, ArrowLeft, FileText, ChevronRight, Trash2, Copy } from "lucide-re
 import { useState } from "react";
 import { toast } from "sonner";
 import { getDiscipline } from "@/lib/disciplines";
+import { ShareDialog } from "@/components/share-dialog";
+import { useCarAccess, canEdit } from "@/lib/use-car-access";
 
 export const Route = createFileRoute("/_authenticated/cars/$carId")({
   component: CarDetail,
@@ -30,6 +32,10 @@ function CarDetail() {
       if (error) throw error; return data;
     },
   });
+  const accessQ = useCarAccess(carId, carQ.data?.user_id);
+  const access = accessQ.data;
+  const isOwner = access === "owner";
+  const writable = canEdit(access);
   const setupsQ = useQuery({
     queryKey: ["setups", carId],
     queryFn: async () => {
@@ -90,13 +96,21 @@ function CarDetail() {
       </Link>
       <div className="mt-4 flex items-end justify-between flex-wrap gap-4">
         <div>
-          <div className="font-mono text-xs uppercase tracking-widest text-primary">{disc.label} · {disc.tagline}</div>
+          <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-2">
+            {disc.label} · {disc.tagline}
+            {access && access !== "owner" && (
+              <span className="text-[10px] px-2 py-0.5 rounded bg-accent/20 text-accent">{access}</span>
+            )}
+          </div>
           <h1 className="font-display text-4xl font-bold mt-1">{carQ.data.name}</h1>
           <div className="text-muted-foreground">
             {[carQ.data.year, carQ.data.make, carQ.data.model].filter(Boolean).join(" ")}
           </div>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <div className="flex gap-2">
+          {isOwner && <ShareDialog carId={carId} carName={carQ.data.name} />}
+          {writable && (
+          <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="shadow-glow"><Plus className="w-4 h-4 mr-1" /> New setup</Button>
           </DialogTrigger>
@@ -111,7 +125,9 @@ function CarDetail() {
               <Button onClick={() => create.mutate()} disabled={!form.name || create.isPending}>Create</Button>
             </DialogFooter>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+          )}
+        </div>
       </div>
 
       <div className="mt-8">
@@ -123,10 +139,12 @@ function CarDetail() {
               <div key={s.id} className="group rounded-lg border border-border bg-card p-5 shadow-card hover:border-primary transition-colors">
                 <div className="flex items-start justify-between">
                   <FileText className="w-5 h-5 text-primary" />
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => cloneSetup.mutate(s.id)} className="text-muted-foreground hover:text-accent p-1"><Copy className="w-4 h-4" /></button>
-                    <button onClick={() => { if (confirm("Delete this setup?")) del.mutate(s.id); }} className="text-muted-foreground hover:text-destructive p-1"><Trash2 className="w-4 h-4" /></button>
-                  </div>
+                  {writable && (
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => cloneSetup.mutate(s.id)} className="text-muted-foreground hover:text-accent p-1"><Copy className="w-4 h-4" /></button>
+                      <button onClick={() => { if (confirm("Delete this setup?")) del.mutate(s.id); }} className="text-muted-foreground hover:text-destructive p-1"><Trash2 className="w-4 h-4" /></button>
+                    </div>
+                  )}
                 </div>
                 <div className="font-display text-xl font-bold mt-3">{s.name}</div>
                 <div className="text-sm text-muted-foreground">{[s.track, s.conditions].filter(Boolean).join(" · ") || "—"}</div>
