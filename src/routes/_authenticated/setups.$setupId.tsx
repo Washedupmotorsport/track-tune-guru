@@ -14,6 +14,7 @@ import { getSetupAdvice, type AdvisorResult } from "@/lib/advisor.functions";
 import { useAuth } from "@/lib/auth-context";
 import { parseLapTime, formatLapTime } from "@/lib/lap-time";
 import { exportSetupPdf } from "@/lib/setup-pdf";
+import { useCarAccess, canEdit } from "@/lib/use-car-access";
 
 export const Route = createFileRoute("/_authenticated/setups/$setupId")({
   component: SetupDetail,
@@ -48,6 +49,18 @@ function SetupDetail() {
       return data as unknown as SetupRow;
     },
   });
+  const carQ = useQuery({
+    queryKey: ["car-owner", setupQ.data?.car_id],
+    enabled: !!setupQ.data,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("cars").select("user_id").eq("id", setupQ.data!.car_id).single();
+      if (error) throw error;
+      return data;
+    },
+  });
+  const accessQ = useCarAccess(setupQ.data?.car_id, carQ.data?.user_id);
+  const writable = canEdit(accessQ.data);
+  const role = accessQ.data;
 
   const [meta, setMeta] = useState({ name: "", track: "", conditions: "", notes: "" });
   const [data, setData] = useState<Record<string, string>>({});
