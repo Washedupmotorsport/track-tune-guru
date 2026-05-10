@@ -114,13 +114,20 @@ function SetupDetail() {
 
       <div className="mt-4 flex items-end justify-between flex-wrap gap-4">
         <div>
-          <div className="font-mono text-xs uppercase tracking-widest text-primary">{disc.label} setup</div>
-          <Input value={meta.name} onChange={(e) => setMeta({ ...meta, name: e.target.value })}
+          <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-2">
+            {disc.label} setup
+            {role && role !== "owner" && (
+              <span className="text-[10px] px-2 py-0.5 rounded bg-accent/20 text-accent">{role}</span>
+            )}
+          </div>
+          <Input value={meta.name} readOnly={!writable} onChange={(e) => setMeta({ ...meta, name: e.target.value })}
             className="mt-1 font-display !text-3xl font-bold !h-auto !py-2 !px-3 bg-transparent border-transparent hover:border-border focus-visible:border-primary" />
         </div>
-        <Button onClick={() => save.mutate()} disabled={save.isPending} className="shadow-glow">
-          {save.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />} Save
-        </Button>
+        {writable && (
+          <Button onClick={() => save.mutate()} disabled={save.isPending} className="shadow-glow">
+            {save.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />} Save
+          </Button>
+        )}
       </div>
 
       <div className="mt-4 flex justify-end">
@@ -142,9 +149,9 @@ function SetupDetail() {
       </div>
 
       <div className="mt-6 grid md:grid-cols-3 gap-4 rounded-lg border border-border bg-card p-5">
-        <div><Label>Track</Label><Input value={meta.track} onChange={(e) => setMeta({ ...meta, track: e.target.value })} /></div>
-        <div><Label>Conditions</Label><Input value={meta.conditions} onChange={(e) => setMeta({ ...meta, conditions: e.target.value })} /></div>
-        <div className="md:col-span-1"><Label>Notes</Label><Input value={meta.notes} onChange={(e) => setMeta({ ...meta, notes: e.target.value })} placeholder="Lap times, feel…" /></div>
+        <div><Label>Track</Label><Input readOnly={!writable} value={meta.track} onChange={(e) => setMeta({ ...meta, track: e.target.value })} /></div>
+        <div><Label>Conditions</Label><Input readOnly={!writable} value={meta.conditions} onChange={(e) => setMeta({ ...meta, conditions: e.target.value })} /></div>
+        <div className="md:col-span-1"><Label>Notes</Label><Input readOnly={!writable} value={meta.notes} onChange={(e) => setMeta({ ...meta, notes: e.target.value })} placeholder="Lap times, feel…" /></div>
       </div>
 
       <div className="mt-6 space-y-6">
@@ -164,6 +171,7 @@ function SetupDetail() {
                   <Input
                     type={f.type === "number" ? "number" : "text"}
                     step="any"
+                    readOnly={!writable}
                     value={data[f.key] ?? ""}
                     onChange={(e) => setData({ ...data, [f.key]: e.target.value })}
                     className="mt-1 font-mono"
