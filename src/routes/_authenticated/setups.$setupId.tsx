@@ -261,9 +261,11 @@ function SetupDetail() {
       </div>
 
       <div className="mt-6 flex justify-end">
-        <Button onClick={() => save.mutate()} disabled={save.isPending} className="shadow-glow">
-          {save.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />} Save setup
-        </Button>
+        {writable && (
+          <Button onClick={() => save.mutate()} disabled={save.isPending} className="shadow-glow">
+            {save.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />} Save setup
+          </Button>
+        )}
       </div>
 
     </div>
@@ -284,8 +286,8 @@ type Lap = {
   recorded_at: string;
 };
 
-function LapLog({ setupId, carId, userId, defaultConditions }: {
-  setupId: string; carId: string; userId: string; defaultConditions: string;
+function LapLog({ setupId, carId, userId, defaultConditions, canEdit }: {
+  setupId: string; carId: string; userId: string; defaultConditions: string; canEdit: boolean;
 }) {
   const qc = useQueryClient();
   const [form, setForm] = useState({
@@ -362,6 +364,8 @@ function LapLog({ setupId, carId, userId, defaultConditions }: {
         Log laps against this setup. Format: <span className="font-mono text-foreground">1:23.456</span> or <span className="font-mono text-foreground">83.456</span>.
       </p>
 
+      {canEdit && (
+      <>
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         <div>
           <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Lap #</Label>
@@ -405,6 +409,8 @@ function LapLog({ setupId, carId, userId, defaultConditions }: {
           {add.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Plus className="w-4 h-4 mr-1" />} Log lap
         </Button>
       </div>
+      </>
+      )}
 
       {laps.length > 0 && (
         <>
@@ -441,9 +447,11 @@ function LapLog({ setupId, carId, userId, defaultConditions }: {
                     <td className="py-2 pr-3 text-muted-foreground">{l.conditions ?? "—"}</td>
                     <td className="py-2 pr-3 text-muted-foreground">{l.notes ?? "—"}</td>
                     <td className="py-2 text-right">
-                      <button onClick={() => { if (confirm("Delete lap?")) del.mutate(l.id); }} className="text-muted-foreground hover:text-destructive">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      {canEdit && (
+                        <button onClick={() => { if (confirm("Delete lap?")) del.mutate(l.id); }} className="text-muted-foreground hover:text-destructive">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
