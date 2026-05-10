@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedGarageRouteImport } from './routes/_authenticated/garage'
 import { Route as AuthenticatedCalculatorsRouteImport } from './routes/_authenticated/calculators'
+import { Route as AuthenticatedBaselineRouteImport } from './routes/_authenticated/baseline'
 import { Route as AuthenticatedSetupsSetupIdRouteImport } from './routes/_authenticated/setups.$setupId'
 import { Route as AuthenticatedCarsCarIdRouteImport } from './routes/_authenticated/cars.$carId'
 
@@ -42,6 +43,11 @@ const AuthenticatedCalculatorsRoute =
     path: '/calculators',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedBaselineRoute = AuthenticatedBaselineRouteImport.update({
+  id: '/baseline',
+  path: '/baseline',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedSetupsSetupIdRoute =
   AuthenticatedSetupsSetupIdRouteImport.update({
     id: '/setups/$setupId',
@@ -57,6 +63,7 @@ const AuthenticatedCarsCarIdRoute = AuthenticatedCarsCarIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/baseline': typeof AuthenticatedBaselineRoute
   '/calculators': typeof AuthenticatedCalculatorsRoute
   '/garage': typeof AuthenticatedGarageRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/baseline': typeof AuthenticatedBaselineRoute
   '/calculators': typeof AuthenticatedCalculatorsRoute
   '/garage': typeof AuthenticatedGarageRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/baseline': typeof AuthenticatedBaselineRoute
   '/_authenticated/calculators': typeof AuthenticatedCalculatorsRoute
   '/_authenticated/garage': typeof AuthenticatedGarageRoute
   '/_authenticated/cars/$carId': typeof AuthenticatedCarsCarIdRoute
@@ -85,6 +94,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/baseline'
     | '/calculators'
     | '/garage'
     | '/cars/$carId'
@@ -93,6 +103,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/baseline'
     | '/calculators'
     | '/garage'
     | '/cars/$carId'
@@ -102,6 +113,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/baseline'
     | '/_authenticated/calculators'
     | '/_authenticated/garage'
     | '/_authenticated/cars/$carId'
@@ -151,6 +163,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCalculatorsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/baseline': {
+      id: '/_authenticated/baseline'
+      path: '/baseline'
+      fullPath: '/baseline'
+      preLoaderRoute: typeof AuthenticatedBaselineRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/setups/$setupId': {
       id: '/_authenticated/setups/$setupId'
       path: '/setups/$setupId'
@@ -169,6 +188,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedBaselineRoute: typeof AuthenticatedBaselineRoute
   AuthenticatedCalculatorsRoute: typeof AuthenticatedCalculatorsRoute
   AuthenticatedGarageRoute: typeof AuthenticatedGarageRoute
   AuthenticatedCarsCarIdRoute: typeof AuthenticatedCarsCarIdRoute
@@ -176,6 +196,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedBaselineRoute: AuthenticatedBaselineRoute,
   AuthenticatedCalculatorsRoute: AuthenticatedCalculatorsRoute,
   AuthenticatedGarageRoute: AuthenticatedGarageRoute,
   AuthenticatedCarsCarIdRoute: AuthenticatedCarsCarIdRoute,
