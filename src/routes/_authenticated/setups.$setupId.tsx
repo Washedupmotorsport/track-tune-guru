@@ -1,14 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Sparkles, AlertTriangle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getDiscipline } from "@/lib/disciplines";
+import { getSetupAdvice, type AdvisorResult } from "@/lib/advisor.functions";
 
 export const Route = createFileRoute("/_authenticated/setups/$setupId")({
   component: SetupDetail,
@@ -23,6 +25,16 @@ type SetupRow = {
 function SetupDetail() {
   const { setupId } = Route.useParams();
   const qc = useQueryClient();
+  const adviseFn = useServerFn(getSetupAdvice);
+
+  const [advisor, setAdvisor] = useState({ weather: "", goal: "", driverNotes: "" });
+  const [advice, setAdvice] = useState<AdvisorResult | null>(null);
+
+  const advise = useMutation({
+    mutationFn: async () => adviseFn({ data: { setupId, ...advisor } }),
+    onSuccess: (r) => setAdvice(r),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Advisor failed"),
+  });
 
   const setupQ = useQuery({
     queryKey: ["setup", setupId],
@@ -131,6 +143,75 @@ function SetupDetail() {
           <Label>Session notes</Label>
           <Textarea rows={4} value={meta.notes} onChange={(e) => setMeta({ ...meta, notes: e.target.value })}
             placeholder="What changed, what felt better, next steps…" />
+        </div>
+
+        <div className="rounded-lg border border-primary/40 bg-card p-5 shadow-card">
+          <div className="flex items-center gap-2 mb-1">
+            <Sparkles className="w-5 h-5 text-primary" />
+            <h2 className="font-display text-lg font-bold uppercase tracking-wider">Setup Advisor</h2>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            AI race engineer. Tell it the weather and what you're trying to improve.
+          </p>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div>
+              <Label>Weather / track</Label>
+              <Input value={advisor.weather} onChange={(e) => setAdvisor({ ...advisor, weather: e.target.value })}
+                placeholder="Wet, 14°C, falling temp" />
+            </div>
+            <div>
+              <Label>Goal</Label>
+              <Input value={advisor.goal} onChange={(e) => setAdvisor({ ...advisor, goal: e.target.value })}
+                placeholder="Less mid-corner understeer" />
+            </div>
+            <div>
+              <Label>Driver notes</Label>
+              <Input value={advisor.driverNotes} onChange={(e) => setAdvisor({ ...advisor, driverNotes: e.target.value })}
+                placeholder="Pushes wide on entry, snappy on throttle" />
+            </div>
+          </div>
+          <div className="mt-4 flex justify-end">
+            <Button onClick={() => advise.mutate()} disabled={advise.isPending} className="shadow-glow">
+              {advise.isPending
+                ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Analyzing…</>
+                : <><Sparkles className="w-4 h-4 mr-1" /> Get recommendations</>}
+            </Button>
+          </div>
+
+          {advice && (
+            <div className="mt-6 space-y-4">
+              {advice.summary && (
+                <div className="rounded-md border border-border bg-background/50 p-4">
+                  <div className="text-xs font-mono uppercase tracking-widest text-primary mb-1">Summary</div>
+                  <p className="text-sm">{advice.summary}</p>
+                </div>
+              )}
+              <div className="space-y-2">
+                {advice.recommendations.length === 0 && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <AlertTriangle className="w-4 h-4" /> No specific recommendations.
+                  </div>
+                )}
+                {advice.recommendations.map((r, i) => (
+                  <div key={i} className="rounded-md border border-border bg-background/50 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="font-display font-bold text-sm uppercase tracking-wider">{r.area}</div>
+                      <span className={
+                        "text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded " +
+                        (r.priority === "high"
+                          ? "bg-destructive/20 text-destructive"
+                          : r.priority === "medium"
+                            ? "bg-primary/20 text-primary"
+                            : "bg-muted text-muted-foreground")
+                      }>{r.priority}</span>
+                    </div>
+                    <div className="mt-2 text-sm font-mono text-foreground">{r.change}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">{r.reason}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
