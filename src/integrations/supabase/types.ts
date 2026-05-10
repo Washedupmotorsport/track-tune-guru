@@ -14,7 +14,116 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cars: {
+        Row: {
+          created_at: string
+          discipline: string
+          id: string
+          make: string | null
+          model: string | null
+          name: string
+          notes: string | null
+          updated_at: string
+          user_id: string
+          year: number | null
+        }
+        Insert: {
+          created_at?: string
+          discipline?: string
+          id?: string
+          make?: string | null
+          model?: string | null
+          name: string
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+          year?: number | null
+        }
+        Update: {
+          created_at?: string
+          discipline?: string
+          id?: string
+          make?: string | null
+          model?: string | null
+          name?: string
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      setups: {
+        Row: {
+          car_id: string
+          conditions: string | null
+          created_at: string
+          discipline: string
+          id: string
+          name: string
+          notes: string | null
+          setup_data: Json
+          track: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          conditions?: string | null
+          created_at?: string
+          discipline?: string
+          id?: string
+          name: string
+          notes?: string | null
+          setup_data?: Json
+          track?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          conditions?: string | null
+          created_at?: string
+          discipline?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          setup_data?: Json
+          track?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "setups_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "cars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
