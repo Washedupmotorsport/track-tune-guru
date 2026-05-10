@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Loader2, Sparkles, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Sparkles, AlertTriangle, Timer, Trash2, Plus, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getDiscipline } from "@/lib/disciplines";
 import { getSetupAdvice, type AdvisorResult } from "@/lib/advisor.functions";
+import { useAuth } from "@/lib/auth-context";
+import { parseLapTime, formatLapTime } from "@/lib/lap-time";
 
 export const Route = createFileRoute("/_authenticated/setups/$setupId")({
   component: SetupDetail,
@@ -25,6 +27,7 @@ type SetupRow = {
 function SetupDetail() {
   const { setupId } = Route.useParams();
   const qc = useQueryClient();
+  const { user } = useAuth();
   const adviseFn = useServerFn(getSetupAdvice);
 
   const [advisor, setAdvisor] = useState({ weather: "", goal: "", driverNotes: "" });
