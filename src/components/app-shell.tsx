@@ -13,7 +13,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
           <Link to="/garage" className="flex items-center gap-2 font-display font-bold">
             <span className="inline-block w-2 h-6 bg-primary shadow-glow" />
-            APEX<span className="text-primary">SETUP</span>
+            SUMMIT<span className="text-primary">RACING</span>
           </Link>
           <div className="flex items-center gap-3">
             <Link to="/baseline" className="hidden sm:inline-flex items-center text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">

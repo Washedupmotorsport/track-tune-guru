@@ -49,7 +49,7 @@ export function exportSetupPdf({ setup, car, laps }: { setup: Setup; car: Car | 
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(20);
-  doc.text("APEX SETUP", margin, 35);
+  doc.text("SUMMIT RACING", margin, 35);
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(200, 200, 200);
@@ -123,7 +123,7 @@ export function exportSetupPdf({ setup, car, laps }: { setup: Setup; car: Car | 
         const pageH = doc.internal.pageSize.getHeight();
         doc.setFontSize(8);
         doc.setTextColor(...MUTED);
-        doc.text("Apex Setup — " + setup.name, margin, pageH - 20);
+        doc.text("Summit Racing — " + setup.name, margin, pageH - 20);
         doc.text(`Page ${doc.getNumberOfPages()}`, pageW - margin, pageH - 20, { align: "right" });
       },
     });
@@ -177,5 +177,5 @@ export function exportSetupPdf({ setup, car, laps }: { setup: Setup; car: Car | 
   }
 
   const safeName = setup.name.replace(/[^a-z0-9-_]+/gi, "_").toLowerCase() || "setup";
-  doc.save(`apex_${safeName}.pdf`);
+  doc.save(`summit_${safeName}.pdf`);
 }
