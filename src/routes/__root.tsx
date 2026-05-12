@@ -74,10 +74,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Apex Setup — Race Car Setup Manager" },
+      { title: "Summit Racing — Race Car Setup Manager" },
       { name: "description", content: "Manage race car setups across circuit, drift, drag and more. Track changes, conditions and notes for every session." },
-      { name: "author", content: "Apex Setup" },
-      { property: "og:title", content: "Apex Setup — Race Car Setup Manager" },
+      { name: "author", content: "Summit Racing" },
+      { property: "og:title", content: "Summit Racing — Race Car Setup Manager" },
       { property: "og:description", content: "Your digital pit garage. Save, compare and dial in setups for every car and discipline." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
