@@ -68,34 +68,39 @@ export function WavingFlags({ className = "w-12 h-12", ...overrides }: Props) {
       </defs>
 
       {/* Crossed flagpoles forming an X */}
-      {/* Pole leaning right (bottom-left to top-right), drawn behind */}
-      <line x1="10" y1="58" x2="46" y2="12" stroke={s.poleColor} strokeWidth="2" strokeLinecap="round" />
-      {/* Pole leaning left (bottom-right to top-left), drawn in front */}
-      <line x1="54" y1="58" x2="18" y2="12" stroke={s.poleColor} strokeWidth="2" strokeLinecap="round" />
+      {/* Pole leaning right (bottom-left to top-right) */}
+      <line x1="8" y1="58" x2="40" y2="16" stroke={s.poleColor} strokeWidth="2" strokeLinecap="round" />
+      {/* Pole leaning left (bottom-right to top-left) */}
+      <line x1="56" y1="58" x2="24" y2="16" stroke={s.poleColor} strokeWidth="2" strokeLinecap="round" />
 
-      {/* Right flag flies right from (46,12) */}
-      <path
-        d="M46 12 C52 10, 56 14, 62 12 L62 30 C56 32, 52 28, 46 30 Z"
-        fill={`url(#${patternId})`}
-        stroke={s.darkColor}
-        strokeWidth="0.5"
-        style={{
-          transformOrigin: "46px 21px",
-          animation: `flagWaveRight ${s.speed}s ease-in-out infinite`,
-        }}
-      />
+      {/* Right flag — hoist edge sits along right-leaning pole at its top, flies up-right.
+          Static rotation -37° aligns the hoist with the pole; inner path waves around the attach point. */}
+      <g transform="rotate(-37 40 16)">
+        <path
+          d="M40 16 C46 14, 50 18, 56 16 L56 30 C50 32, 46 28, 40 30 Z"
+          fill={`url(#${patternId})`}
+          stroke={s.darkColor}
+          strokeWidth="0.5"
+          style={{
+            transformOrigin: "40px 16px",
+            animation: `flagWaveRight ${s.speed}s ease-in-out infinite`,
+          }}
+        />
+      </g>
 
-      {/* Left flag flies left from (18,12) */}
-      <path
-        d="M18 12 C12 10, 8 14, 2 12 L2 30 C8 32, 12 28, 18 30 Z"
-        fill={`url(#${patternId})`}
-        stroke={s.darkColor}
-        strokeWidth="0.5"
-        style={{
-          transformOrigin: "18px 21px",
-          animation: `flagWaveLeft ${s.speed}s ease-in-out infinite`,
-        }}
-      />
+      {/* Left flag — hoist along left-leaning pole, flies up-left. */}
+      <g transform="rotate(37 24 16)">
+        <path
+          d="M24 16 C18 14, 14 18, 8 16 L8 30 C14 32, 18 28, 24 30 Z"
+          fill={`url(#${patternId})`}
+          stroke={s.darkColor}
+          strokeWidth="0.5"
+          style={{
+            transformOrigin: "24px 16px",
+            animation: `flagWaveLeft ${s.speed}s ease-in-out infinite`,
+          }}
+        />
+      </g>
 
       <style>{`
         @keyframes flagWaveLeft {
