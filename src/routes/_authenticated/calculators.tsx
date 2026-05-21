@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Calculator, Gauge, Cog, Ruler, Scale, GitCommit, ArrowLeft } from "lucide-react";
+import { Calculator, Gauge, Cog, Ruler, Scale, GitCommit, ArrowLeft, ArrowLeftRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/calculators")({
@@ -81,12 +81,14 @@ function CalculatorsPage() {
           <TabsTrigger value="ride"><Ruler className="w-4 h-4 mr-1" /> Ride height</TabsTrigger>
           <TabsTrigger value="cg"><Scale className="w-4 h-4 mr-1" /> CG</TabsTrigger>
           <TabsTrigger value="antisquat"><GitCommit className="w-4 h-4 mr-1" /> Anti-squat</TabsTrigger>
+          <TabsTrigger value="balance"><ArrowLeftRight className="w-4 h-4 mr-1" /> Balance</TabsTrigger>
         </TabsList>
         <TabsContent value="tires"><TirePressureCalc /></TabsContent>
         <TabsContent value="gears"><GearRatioCalc /></TabsContent>
         <TabsContent value="ride"><RideHeightCalc /></TabsContent>
         <TabsContent value="cg"><CenterOfGravityCalc /></TabsContent>
         <TabsContent value="antisquat"><AntiSquatCalc /></TabsContent>
+        <TabsContent value="balance"><BalanceCalc /></TabsContent>
       </Tabs>
     </div>
   );
@@ -184,6 +186,193 @@ function TirePressureCalc() {
         <ResultRow label="Cold P scaled to track temp" value={fmt(adjForTrack)} unit="psi" />
         <p className="text-xs text-muted-foreground mt-3">
           Negative adjustment = bleed pressure. Positive = add. Scale assumes a 20°C reference morning.
+        </p>
+      </Section>
+    </div>
+  );
+}
+
+/* ---------- 6. Car balance (understeer / oversteer) ---------- */
+
+function BalanceCalc() {
+  // Weight & geometry
+  const [totalWeight, setTotalWeight] = useState("1300");
+  const [frontBias, setFrontBias] = useState("55");
+  const [cgHeight, setCgHeight] = useState("500");
+  const [trackWidth, setTrackWidth] = useState("1580");
+
+  // Suspension
+  const [springF, setSpringF] = useState("80");
+  const [springR, setSpringR] = useState("70");
+  const [arbF, setArbF] = useState("25");
+  const [arbR, setArbR] = useState("18");
+  const [mrF, setMrF] = useState("1.0");
+  const [mrR, setMrR] = useState("1.0");
+
+  // Aero
+  const [aeroF, setAeroF] = useState("40");
+  const [aeroR, setAeroR] = useState("60");
+
+  // Symptom (drives recommendations)
+  const [symptom, setSymptom] = useState<"understeer_entry" | "understeer_mid" | "understeer_exit" | "oversteer_entry" | "oversteer_mid" | "oversteer_exit" | "neutral">("understeer_mid");
+
+  const tw = num(totalWeight);
+  const fbPct = num(frontBias);
+  const hCG = num(cgHeight);
+  const tr = num(trackWidth);
+
+  // Wheel rates (N/mm) — spring × MR² + ARB (already as wheel-rate equivalent)
+  const sF = num(springF), sR = num(springR);
+  const aF = num(arbF), aR = num(arbR);
+  const rF = num(mrF), rR = num(mrR);
+  const wheelRateF = sF * rF * rF + aF;
+  const wheelRateR = sR * rR * rR + aR;
+  // Roll stiffness ∝ wheelRate × track² / 2 (same track F/R assumed)
+  const rollF = wheelRateF;
+  const rollR = wheelRateR;
+  const totalRoll = rollF + rollR;
+  const trtdF = totalRoll > 0 ? (rollF / totalRoll) * 100 : NaN; // % roll resistance front
+
+  // Lateral load transfer distribution sensitivity
+  // Higher front roll % → more LLT at front → reduces front grip → understeer.
+  // Static front weight % already biases this. We compare TRTD vs static.
+  const trtdDelta = trtdF - fbPct; // + = front-biased relative to weight (understeer trend)
+
+  // Aero balance
+  const aF_ = num(aeroF), aR_ = num(aeroR);
+  const aeroTotal = aF_ + aR_;
+  const aeroFrontPct = aeroTotal > 0 ? (aF_ / aeroTotal) * 100 : NaN;
+  const aeroDelta = aeroFrontPct - fbPct; // + = aero pushes front, reduces understeer at speed
+
+  // Composite balance index: positive = understeer tendency, negative = oversteer
+  // Roll-distribution dominates low-speed; aero counter-acts at speed.
+  const balanceIdx = trtdDelta - 0.4 * aeroDelta;
+
+  const verdict = (() => {
+    if (!Number.isFinite(balanceIdx)) return "—";
+    if (balanceIdx > 6) return "Strong understeer bias";
+    if (balanceIdx > 2) return "Mild understeer bias";
+    if (balanceIdx >= -2) return "Near neutral";
+    if (balanceIdx >= -6) return "Mild oversteer bias";
+    return "Strong oversteer bias";
+  })();
+
+  // Magic number (load transfer per g, kg)
+  const lateralLT = tr > 0 && Number.isFinite(tw) && Number.isFinite(hCG) ? (tw * hCG) / tr : NaN;
+
+  // Recommendations from symptom
+  const recs = (() => {
+    const map: Record<typeof symptom, string[]> = {
+      understeer_entry: [
+        "Soften front ARB or front compression damping",
+        "Add 1–2 psi to rear tires, drop 1–2 psi front",
+        "Move brake bias 1–2% rearward",
+        "Add front toe-out (~0.1°) for sharper turn-in",
+      ],
+      understeer_mid: [
+        "Soften front springs or stiffen rear ARB",
+        "Add more negative front camber (−0.3 to −0.5°)",
+        "Increase rear ride height slightly (more front load)",
+        "Reduce rear wing / increase front splitter angle",
+      ],
+      understeer_exit: [
+        "Reduce diff power-side ramp / locking on power",
+        "Stiffen rear ARB to free rotation under throttle",
+        "Soften rear rebound damping",
+        "Check front camber gain — too much can scrub on exit",
+      ],
+      oversteer_entry: [
+        "Stiffen front ARB or front compression damping",
+        "Add brake bias forward 1–2%",
+        "Soften rear rebound (rear stays planted under trail-brake)",
+        "Reduce front toe-out",
+      ],
+      oversteer_mid: [
+        "Soften rear ARB or stiffen front springs",
+        "Add 1 psi front, drop 1 psi rear",
+        "Add rear toe-in (~0.1°) for stability",
+        "Add rear downforce / lower rear ride height",
+      ],
+      oversteer_exit: [
+        "Increase diff locking on power (preload or power ramp)",
+        "Soften rear ARB to plant inside rear",
+        "Stiffen rear compression damping",
+        "Smooth throttle application — check tire temps for overheating",
+      ],
+      neutral: ["Car is balanced — focus on driver consistency and tire management."],
+    };
+    return map[symptom];
+  })();
+
+  return (
+    <div className="grid lg:grid-cols-2 gap-4 mt-4">
+      <Section title="Car & suspension">
+        <div className="grid grid-cols-2 gap-4">
+          <NumField label="Total weight" unit="kg" value={totalWeight} onChange={setTotalWeight} />
+          <NumField label="Front weight bias" unit="%" value={frontBias} onChange={setFrontBias} />
+          <NumField label="CG height" unit="mm" value={cgHeight} onChange={setCgHeight} />
+          <NumField label="Track width" unit="mm" value={trackWidth} onChange={setTrackWidth} />
+        </div>
+        <div className="mt-5 grid grid-cols-2 gap-4">
+          <NumField label="Spring F" unit="N/mm" value={springF} onChange={setSpringF} />
+          <NumField label="Spring R" unit="N/mm" value={springR} onChange={setSpringR} />
+          <NumField label="ARB F (wheel)" unit="N/mm" value={arbF} onChange={setArbF} />
+          <NumField label="ARB R (wheel)" unit="N/mm" value={arbR} onChange={setArbR} />
+          <NumField label="Motion ratio F" value={mrF} onChange={setMrF} />
+          <NumField label="Motion ratio R" value={mrR} onChange={setMrR} />
+        </div>
+        <div className="mt-5 grid grid-cols-2 gap-4">
+          <NumField label="Front downforce" unit="kg @ ref" value={aeroF} onChange={setAeroF} />
+          <NumField label="Rear downforce" unit="kg @ ref" value={aeroR} onChange={setAeroR} />
+        </div>
+        <p className="text-xs text-muted-foreground mt-3">
+          ARB values are wheel-rate equivalent. Aero values are downforce at a reference speed — only the ratio matters.
+        </p>
+      </Section>
+
+      <Section title="Balance analysis">
+        <ResultRow label="Front weight" value={fmt(fbPct, 1)} unit="%" />
+        <ResultRow label="Front roll stiffness" value={fmt(trtdF, 1)} unit="%" />
+        <ResultRow label="Roll vs weight Δ" value={(trtdDelta >= 0 ? "+" : "") + fmt(trtdDelta, 1)} unit="%" />
+        <ResultRow label="Aero front" value={fmt(aeroFrontPct, 1)} unit="%" />
+        <ResultRow label="Lateral load transfer / g" value={fmt(lateralLT, 0)} unit="kg" />
+        <ResultRow label="Balance index" value={(balanceIdx >= 0 ? "+" : "") + fmt(balanceIdx, 1)} />
+        <div className="mt-3 rounded border border-border bg-background/50 p-3">
+          <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Verdict</div>
+          <div className="font-display text-lg font-bold mt-1">{verdict}</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            + = understeer tendency · − = oversteer tendency · target ±2 for neutral.
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Symptom">
+        <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">What is the car doing?</Label>
+        <Select value={symptom} onValueChange={(v) => setSymptom(v as typeof symptom)}>
+          <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="understeer_entry">Understeer — corner entry</SelectItem>
+            <SelectItem value="understeer_mid">Understeer — mid-corner</SelectItem>
+            <SelectItem value="understeer_exit">Understeer — on throttle / exit</SelectItem>
+            <SelectItem value="oversteer_entry">Oversteer — corner entry / trail-brake</SelectItem>
+            <SelectItem value="oversteer_mid">Oversteer — mid-corner</SelectItem>
+            <SelectItem value="oversteer_exit">Oversteer — on throttle / exit</SelectItem>
+            <SelectItem value="neutral">Neutral / balanced</SelectItem>
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground mt-3">
+          Pick the phase where the car misbehaves most. Recommendations are ordered cheapest-first.
+        </p>
+      </Section>
+
+      <Section title="Suggested adjustments">
+        <ol className="space-y-2 list-decimal list-inside">
+          {recs.map((r, i) => (
+            <li key={i} className="text-sm">{r}</li>
+          ))}
+        </ol>
+        <p className="text-xs text-muted-foreground mt-4">
+          Change one thing at a time. Re-test before stacking changes — chassis tuning is additive and easy to over-correct.
         </p>
       </Section>
     </div>
