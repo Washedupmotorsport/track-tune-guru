@@ -88,6 +88,57 @@ export type Database = {
         }
         Relationships: []
       }
+      driver_notes: {
+        Row: {
+          body: string | null
+          car_id: string | null
+          created_at: string
+          id: string
+          setup_id: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          car_id?: string | null
+          created_at?: string
+          id?: string
+          setup_id?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          car_id?: string | null
+          created_at?: string
+          id?: string
+          setup_id?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_notes_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "cars"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_notes_setup_id_fkey"
+            columns: ["setup_id"]
+            isOneToOne: false
+            referencedRelation: "setups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       laps: {
         Row: {
           car_id: string
