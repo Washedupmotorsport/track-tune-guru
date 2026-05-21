@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { LogOut, Calculator, Wand2 } from "lucide-react";
+import { LogOut, Calculator, Wand2, NotebookPen } from "lucide-react";
 import type { ReactNode } from "react";
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -21,6 +21,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
             <Link to="/calculators" className="hidden sm:inline-flex items-center text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
               <Calculator className="w-4 h-4 mr-1" /> Calculators
+            </Link>
+            <Link to="/notes" className="hidden sm:inline-flex items-center text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
+              <NotebookPen className="w-4 h-4 mr-1" /> Notes
             </Link>
             <span className="hidden sm:block text-xs font-mono uppercase tracking-widest text-muted-foreground">
               {user?.email}
