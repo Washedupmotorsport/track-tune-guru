@@ -60,60 +60,40 @@ export function WavingFlags({ className = "w-12 h-12", ...overrides }: Props) {
   return (
     <svg viewBox="0 0 64 64" className={className} xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <pattern id={patternId} width="8" height="8" patternUnits="userSpaceOnUse">
-          <rect width="8" height="8" fill={s.lightColor} />
-          <rect width="4" height="4" fill={s.darkColor} />
-          <rect x="4" y="4" width="4" height="4" fill={s.darkColor} />
+        <pattern id={patternId} width="6" height="6" patternUnits="userSpaceOnUse">
+          <rect width="6" height="6" fill={s.lightColor} />
+          <rect width="3" height="3" fill={s.darkColor} />
+          <rect x="3" y="3" width="3" height="3" fill={s.darkColor} />
         </pattern>
+        <filter id={`wave-${patternId}`} x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="turbulence" baseFrequency="0.03 0.05" numOctaves="2" seed="3" result="turb">
+            <animate
+              attributeName="baseFrequency"
+              dur={`${s.speed * 3}s`}
+              values="0.03 0.05;0.05 0.03;0.03 0.05"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="turb" scale={s.waveAmount * 0.5} />
+        </filter>
       </defs>
 
-      {/* Crossed flagpoles forming an X */}
-      {/* Pole leaning right (bottom-left to top-right) */}
-      <line x1="8" y1="58" x2="40" y2="16" stroke={s.poleColor} strokeWidth="2" strokeLinecap="round" />
-      {/* Pole leaning left (bottom-right to top-left) */}
-      <line x1="56" y1="58" x2="24" y2="16" stroke={s.poleColor} strokeWidth="2" strokeLinecap="round" />
+      {/* Flagpole on the left */}
+      <line x1="9" y1="60" x2="9" y2="4" stroke={s.poleColor} strokeWidth="2" strokeLinecap="round" />
+      <circle cx="9" cy="4" r="1.8" fill={s.poleColor} />
 
-      {/* Right flag — hoist edge sits along right-leaning pole at its top, flies up-right.
-          Static rotation -37° aligns the hoist with the pole; inner path waves around the attach point. */}
-      <g transform="rotate(-37 40 16)">
-        <path
-          d="M40 16 C46 14, 50 18, 56 16 L56 30 C50 32, 46 28, 40 30 Z"
+      {/* Big waving flag */}
+      <g filter={`url(#wave-${patternId})`}>
+        <rect
+          x="10"
+          y="8"
+          width="50"
+          height="34"
           fill={`url(#${patternId})`}
           stroke={s.darkColor}
-          strokeWidth="0.5"
-          style={{
-            transformOrigin: "40px 16px",
-            animation: `flagWaveRight ${s.speed}s ease-in-out infinite`,
-          }}
+          strokeWidth="0.6"
         />
       </g>
-
-      {/* Left flag — hoist along left-leaning pole, flies up-left. */}
-      <g transform="rotate(37 24 16)">
-        <path
-          d="M24 16 C18 14, 14 18, 8 16 L8 30 C14 32, 18 28, 24 30 Z"
-          fill={`url(#${patternId})`}
-          stroke={s.darkColor}
-          strokeWidth="0.5"
-          style={{
-            transformOrigin: "24px 16px",
-            animation: `flagWaveLeft ${s.speed}s ease-in-out infinite`,
-          }}
-        />
-      </g>
-
-      <style>{`
-        @keyframes flagWaveLeft {
-          0%, 100% { transform: rotate(0deg); }
-          25% { transform: rotate(${s.waveAmount}deg); }
-          75% { transform: rotate(${-s.waveAmount / 2}deg); }
-        }
-        @keyframes flagWaveRight {
-          0%, 100% { transform: rotate(0deg); }
-          25% { transform: rotate(${-s.waveAmount}deg); }
-          75% { transform: rotate(${s.waveAmount / 2}deg); }
-        }
-      `}</style>
     </svg>
   );
 }
