@@ -33,9 +33,21 @@ function Landing() {
       </header>
 
       <section className="relative overflow-hidden">
+        {/* Checkered flag backdrop */}
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage:
+              "linear-gradient(45deg, hsl(var(--foreground)) 25%, transparent 25%), linear-gradient(-45deg, hsl(var(--foreground)) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, hsl(var(--foreground)) 75%), linear-gradient(-45deg, transparent 75%, hsl(var(--foreground)) 75%)",
+            backgroundSize: "48px 48px",
+            backgroundPosition: "0 0, 0 24px, 24px -24px, -24px 0px",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/30 to-background" />
         <img src={heroCar} alt="Race car at night" width={1920} height={1080}
-          className="absolute inset-0 w-full h-full object-cover opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background" />
+          className="absolute inset-0 w-full h-full object-cover opacity-90 mix-blend-screen" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background" />
         <div className="relative mx-auto max-w-6xl px-6 pt-24 pb-32">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs font-mono uppercase tracking-widest text-muted-foreground">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" /> Pit-lane ready
