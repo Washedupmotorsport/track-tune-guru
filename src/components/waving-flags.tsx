@@ -67,20 +67,13 @@ export function WavingFlags({ className = "w-12 h-12", ...overrides }: Props) {
         </pattern>
       </defs>
 
-      <rect x="10" y="8" width="2" height="48" rx="1" fill={s.poleColor} />
-      <rect x="52" y="8" width="2" height="48" rx="1" fill={s.poleColor} />
+      {/* Crossed flagpoles forming an X. Left pole goes bottom-left → top-right; right pole goes bottom-right → top-left. */}
+      {/* Right-leaning pole (behind) */}
+      <line x1="14" y1="58" x2="54" y2="8" stroke={s.poleColor} strokeWidth="2" strokeLinecap="round" />
+      {/* Left-leaning pole (in front) */}
+      <line x1="50" y1="58" x2="10" y2="8" stroke={s.poleColor} strokeWidth="2" strokeLinecap="round" />
 
-      <path
-        d="M12 8 C22 6, 28 10, 36 8 L36 28 C28 30, 22 26, 12 28 Z"
-        fill={`url(#${patternId})`}
-        stroke={s.darkColor}
-        strokeWidth="0.5"
-        style={{
-          transformOrigin: "12px 18px",
-          animation: `flagWaveLeft ${s.speed}s ease-in-out infinite`,
-        }}
-      />
-
+      {/* Flag on right-leaning pole, hangs to the right of the top tip (54,8) */}
       <path
         d="M54 8 C44 6, 38 10, 30 8 L30 28 C38 30, 44 26, 54 28 Z"
         fill={`url(#${patternId})`}
@@ -89,6 +82,19 @@ export function WavingFlags({ className = "w-12 h-12", ...overrides }: Props) {
         style={{
           transformOrigin: "54px 18px",
           animation: `flagWaveRight ${s.speed}s ease-in-out infinite`,
+        }}
+      />
+
+      {/* Flag on left-leaning pole, hangs to the left of the top tip (10,8) */}
+      <path
+        d="M10 8 C20 6, 26 10, 34 8 L34 28 C26 30, 20 26, 10 28 Z"
+        fill={`url(#${patternId})`}
+        stroke={s.darkColor}
+        strokeWidth="0.5"
+        transform="translate(20 0) scale(-1 1) translate(-24 0)"
+        style={{
+          transformOrigin: "10px 18px",
+          animation: `flagWaveLeft ${s.speed}s ease-in-out infinite`,
         }}
       />
 
