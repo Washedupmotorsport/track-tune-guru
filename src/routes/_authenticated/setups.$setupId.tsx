@@ -15,6 +15,7 @@ import { useAuth } from "@/lib/auth-context";
 import { parseLapTime, formatLapTime } from "@/lib/lap-time";
 import { exportSetupPdf } from "@/lib/setup-pdf";
 import { useCarAccess, canEdit } from "@/lib/use-car-access";
+import { LapImportDialog } from "@/components/lap-import-dialog";
 
 export const Route = createFileRoute("/_authenticated/setups/$setupId")({
   component: SetupDetail,
@@ -359,6 +360,11 @@ function LapLog({ setupId, carId, userId, defaultConditions, canEdit }: {
       <div className="flex items-center gap-2 mb-1">
         <Timer className="w-5 h-5 text-primary" />
         <h2 className="font-display text-lg font-bold uppercase tracking-wider">Lap Log</h2>
+        {canEdit && (
+          <div className="ml-auto">
+            <LapImportDialog setupId={setupId} carId={carId} userId={userId} defaultConditions={defaultConditions} />
+          </div>
+        )}
       </div>
       <p className="text-sm text-muted-foreground mb-4">
         Log laps against this setup. Format: <span className="font-mono text-foreground">1:23.456</span> or <span className="font-mono text-foreground">83.456</span>.
