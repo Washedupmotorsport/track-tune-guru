@@ -79,10 +79,12 @@ function CalculatorsPage() {
           <TabsTrigger value="tires"><Gauge className="w-4 h-4 mr-1" /> Tire pressure</TabsTrigger>
           <TabsTrigger value="gears"><Cog className="w-4 h-4 mr-1" /> Gear ratios</TabsTrigger>
           <TabsTrigger value="ride"><Ruler className="w-4 h-4 mr-1" /> Ride height</TabsTrigger>
+          <TabsTrigger value="cg"><Scale className="w-4 h-4 mr-1" /> CG</TabsTrigger>
         </TabsList>
         <TabsContent value="tires"><TirePressureCalc /></TabsContent>
         <TabsContent value="gears"><GearRatioCalc /></TabsContent>
         <TabsContent value="ride"><RideHeightCalc /></TabsContent>
+        <TabsContent value="cg"><CenterOfGravityCalc /></TabsContent>
       </Tabs>
     </div>
   );
