@@ -67,33 +67,32 @@ export function WavingFlags({ className = "w-12 h-12", ...overrides }: Props) {
         </pattern>
       </defs>
 
-      {/* Crossed flagpoles forming an X. Left pole goes bottom-left → top-right; right pole goes bottom-right → top-left. */}
-      {/* Right-leaning pole (behind) */}
-      <line x1="14" y1="58" x2="54" y2="8" stroke={s.poleColor} strokeWidth="2" strokeLinecap="round" />
-      {/* Left-leaning pole (in front) */}
-      <line x1="50" y1="58" x2="10" y2="8" stroke={s.poleColor} strokeWidth="2" strokeLinecap="round" />
+      {/* Crossed flagpoles forming an X */}
+      {/* Pole leaning right (bottom-left to top-right), drawn behind */}
+      <line x1="10" y1="58" x2="46" y2="12" stroke={s.poleColor} strokeWidth="2" strokeLinecap="round" />
+      {/* Pole leaning left (bottom-right to top-left), drawn in front */}
+      <line x1="54" y1="58" x2="18" y2="12" stroke={s.poleColor} strokeWidth="2" strokeLinecap="round" />
 
-      {/* Flag on right-leaning pole, hangs to the right of the top tip (54,8) */}
+      {/* Right flag flies right from (46,12) */}
       <path
-        d="M54 8 C44 6, 38 10, 30 8 L30 28 C38 30, 44 26, 54 28 Z"
+        d="M46 12 C52 10, 56 14, 62 12 L62 30 C56 32, 52 28, 46 30 Z"
         fill={`url(#${patternId})`}
         stroke={s.darkColor}
         strokeWidth="0.5"
         style={{
-          transformOrigin: "54px 18px",
+          transformOrigin: "46px 21px",
           animation: `flagWaveRight ${s.speed}s ease-in-out infinite`,
         }}
       />
 
-      {/* Flag on left-leaning pole, hangs to the left of the top tip (10,8) */}
+      {/* Left flag flies left from (18,12) */}
       <path
-        d="M10 8 C20 6, 26 10, 34 8 L34 28 C26 30, 20 26, 10 28 Z"
+        d="M18 12 C12 10, 8 14, 2 12 L2 30 C8 32, 12 28, 18 30 Z"
         fill={`url(#${patternId})`}
         stroke={s.darkColor}
         strokeWidth="0.5"
-        transform="translate(20 0) scale(-1 1) translate(-24 0)"
         style={{
-          transformOrigin: "10px 18px",
+          transformOrigin: "18px 21px",
           animation: `flagWaveLeft ${s.speed}s ease-in-out infinite`,
         }}
       />
