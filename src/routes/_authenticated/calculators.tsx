@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Calculator, Gauge, Cog, Ruler, Scale, GitCommit, ArrowLeft } from "lucide-react";
+import { Calculator, Gauge, Cog, Ruler, Scale, GitCommit, ArrowLeft, ArrowLeftRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/calculators")({
@@ -81,12 +81,14 @@ function CalculatorsPage() {
           <TabsTrigger value="ride"><Ruler className="w-4 h-4 mr-1" /> Ride height</TabsTrigger>
           <TabsTrigger value="cg"><Scale className="w-4 h-4 mr-1" /> CG</TabsTrigger>
           <TabsTrigger value="antisquat"><GitCommit className="w-4 h-4 mr-1" /> Anti-squat</TabsTrigger>
+          <TabsTrigger value="balance"><ArrowLeftRight className="w-4 h-4 mr-1" /> Balance</TabsTrigger>
         </TabsList>
         <TabsContent value="tires"><TirePressureCalc /></TabsContent>
         <TabsContent value="gears"><GearRatioCalc /></TabsContent>
         <TabsContent value="ride"><RideHeightCalc /></TabsContent>
         <TabsContent value="cg"><CenterOfGravityCalc /></TabsContent>
         <TabsContent value="antisquat"><AntiSquatCalc /></TabsContent>
+        <TabsContent value="balance"><BalanceCalc /></TabsContent>
       </Tabs>
     </div>
   );
