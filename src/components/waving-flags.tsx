@@ -86,9 +86,9 @@ export function WavingFlags({ className = "w-12 h-12", ...overrides }: Props) {
       <g filter={`url(#wave-${patternId})`}>
         <rect
           x="10"
-          y="8"
-          width="50"
-          height="34"
+          y="10"
+          width="38"
+          height="26"
           fill={`url(#${patternId})`}
           stroke={s.darkColor}
           strokeWidth="0.6"
