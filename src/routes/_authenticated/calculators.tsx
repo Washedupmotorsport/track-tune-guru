@@ -461,3 +461,161 @@ function CenterOfGravityCalc() {
     </div>
   );
 }
+
+/* ---------- 5. Anti-squat ---------- */
+
+function AntiSquatCalc() {
+  const [method, setMethod] = useState<"direct" | "links">("direct");
+
+  // Shared inputs
+  const [wheelbase, setWheelbase] = useState("2650");
+  const [cgHeight, setCgHeight] = useState("300");
+  const [frontBias, setFrontBias] = useState("55");
+
+  // Direct IC inputs
+  const [icHeight, setIcHeight] = useState("120");
+  const [icFromRear, setIcFromRear] = useState("1200");
+
+  // 4-link inputs (rear axle at x=0, ground at y=0, positive x forward, positive y up)
+  const [ufX, setUfX] = useState("400");   // upper frame mount x (forward of axle)
+  const [ufY, setUfY] = useState("450");   // upper frame mount y (height)
+  const [uaY, setUaY] = useState("350");   // upper axle mount y (height)
+  const [lfX, setLfX] = useState("600");   // lower frame mount x
+  const [lfY, setLfY] = useState("220");   // lower frame mount y
+  const [laY, setLaY] = useState("150");   // lower axle mount y
+
+  const wb = num(wheelbase);
+  const hCG = num(cgHeight);
+  const fb = num(frontBias) / 100;
+  const b = wb * (1 - fb); // distance from rear axle to CG
+
+  // ---- Direct method ----
+  const hIC_direct = num(icHeight);
+  const icRear = num(icFromRear);
+
+  // ---- From links method ----
+  // Line slopes: m = (y_axle - y_frame) / (0 - x_frame)
+  const x_uf = num(ufX), y_uf = num(ufY), y_ua = num(uaY);
+  const x_lf = num(lfX), y_lf = num(lfY), y_la = num(laY);
+
+  const m1 = x_uf !== 0 ? (y_ua - y_uf) / (-x_uf) : NaN;
+  const m2 = x_lf !== 0 ? (y_la - y_lf) / (-x_lf) : NaN;
+
+  let icX_links = NaN;
+  let icY_links = NaN;
+  if (Number.isFinite(m1) && Number.isFinite(m2) && Math.abs(m1 - m2) > 1e-9) {
+    icX_links = (y_la - y_ua) / (m1 - m2);
+    icY_links = m1 * icX_links + y_ua;
+  }
+
+  // Choose active IC based on method
+  const activeIcHeight = method === "direct" ? hIC_direct : icY_links;
+  const activeIcFromRear = method === "direct" ? icRear : icX_links;
+
+  // Anti-squat % = (h_IC / h_CG) * (L / b) * 100
+  const antiSquatPct = hCG > 0 && b > 0 && Number.isFinite(activeIcHeight) && activeIcHeight > 0
+    ? (activeIcHeight / hCG) * (wb / b) * 100
+    : NaN;
+
+  // Neutral IC height for 100% anti-squat
+  const neutralIcHeight = hCG > 0 && b > 0 ? hCG * (b / wb) : NaN;
+
+  // Interpretation
+  const interp = (() => {
+    if (!Number.isFinite(antiSquatPct)) return "Enter valid numbers to see result.";
+    if (antiSquatPct < 0) return "Negative anti-squat — the car will squat heavily under acceleration.";
+    if (antiSquatPct < 50) return "Low anti-squat — expect noticeable rear squat under hard acceleration.";
+    if (antiSquatPct < 90) return "Moderate anti-squat — some squat remains, balanced traction feel.";
+    if (antiSquatPct <= 110) return "Near-neutral — minimal squat or rise. Good for consistent launch behavior.";
+    if (antiSquatPct <= 150) return "High anti-squat — the rear may rise under acceleration. Can unload the tire.";
+    return "Very high anti-squat — strong rise tendency. May reduce rear grip and feel nervous.";
+  })();
+
+  return (
+    <div className="grid lg:grid-cols-2 gap-4 mt-4">
+      <Section title="Method">
+        <div className="flex gap-2 mb-4">
+          <button
+            type="button"
+            onClick={() => setMethod("direct")}
+            className={`flex-1 py-2 text-xs font-mono uppercase tracking-widest rounded border transition-colors ${
+              method === "direct"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card text-muted-foreground border-border hover:text-foreground"
+            }`}
+          >
+            Direct IC
+          </button>
+          <button
+            type="button"
+            onClick={() => setMethod("links")}
+            className={`flex-1 py-2 text-xs font-mono uppercase tracking-widest rounded border transition-colors ${
+              method === "links"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card text-muted-foreground border-border hover:text-foreground"
+            }`}
+          >
+            From 4-link
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <NumField label="Wheelbase" unit="mm" value={wheelbase} onChange={setWheelbase} />
+          <NumField label="CG height" unit="mm" value={cgHeight} onChange={setCgHeight} />
+          <NumField label="Front weight bias" unit="%" value={frontBias} onChange={setFrontBias} />
+        </div>
+
+        {method === "direct" ? (
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <NumField label="IC height" unit="mm" value={icHeight} onChange={setIcHeight} />
+            <NumField label="IC from rear axle" unit="mm" value={icFromRear} onChange={setIcFromRear}
+              placeholder="forward = positive" />
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <NumField label="Upper frame x" unit="mm" value={ufX} onChange={setUfX}
+                placeholder="forward of axle" />
+              <NumField label="Upper frame y" unit="mm" value={ufY} onChange={setUfY}
+                placeholder="height" />
+              <NumField label="Upper axle y" unit="mm" value={uaY} onChange={setUaY}
+                placeholder="height" />
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <NumField label="Lower frame x" unit="mm" value={lfX} onChange={setLfX}
+                placeholder="forward of axle" />
+              <NumField label="Lower frame y" unit="mm" value={lfY} onChange={setLfY}
+                placeholder="height" />
+              <NumField label="Lower axle y" unit="mm" value={laY} onChange={setLaY}
+                placeholder="height" />
+            </div>
+          </>
+        )}
+
+        <p className="text-xs text-muted-foreground mt-3">
+          {method === "direct"
+            ? "Enter the instant-center position directly (from suspension software or measurement)."
+            : "Enter 4-link bar mount coordinates. Rear axle center is x=0, ground is y=0. Positive x = forward."}
+        </p>
+      </Section>
+
+      <Section title="Anti-squat">
+        {method === "links" && (
+          <>
+            <ResultRow label="Computed IC height" value={fmt(icY_links)} unit="mm" />
+            <ResultRow label="IC from rear axle" value={fmt(icX_links)} unit="mm" />
+          </>
+        )}
+        <ResultRow label="CG to rear axle" value={fmt(b)} unit="mm" />
+        <ResultRow label="Anti-squat" value={fmt(antiSquatPct, 1)} unit="%" />
+        <ResultRow label="Neutral IC height" value={fmt(neutralIcHeight)} unit="mm" />
+        <div className="mt-3 text-xs text-muted-foreground">
+          {interp}
+        </div>
+        <p className="text-xs text-muted-foreground mt-2">
+          %AS = (h<sub>IC</sub> / h<sub>CG</sub>) × (L / b) × 100. &lt;100% = squat. &gt;100% = rise. 100% = neutral.
+        </p>
+      </Section>
+    </div>
+  );
+}
