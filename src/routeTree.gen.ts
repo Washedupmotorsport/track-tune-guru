@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedGarageRouteImport } from './routes/_authenticated/garage'
+import { Route as AuthenticatedFlagsRouteImport } from './routes/_authenticated/flags'
 import { Route as AuthenticatedCalculatorsRouteImport } from './routes/_authenticated/calculators'
 import { Route as AuthenticatedBaselineRouteImport } from './routes/_authenticated/baseline'
 import { Route as AuthenticatedSetupsSetupIdRouteImport } from './routes/_authenticated/setups.$setupId'
@@ -35,6 +36,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedGarageRoute = AuthenticatedGarageRouteImport.update({
   id: '/garage',
   path: '/garage',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedFlagsRoute = AuthenticatedFlagsRouteImport.update({
+  id: '/flags',
+  path: '/flags',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedCalculatorsRoute =
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/baseline': typeof AuthenticatedBaselineRoute
   '/calculators': typeof AuthenticatedCalculatorsRoute
+  '/flags': typeof AuthenticatedFlagsRoute
   '/garage': typeof AuthenticatedGarageRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/baseline': typeof AuthenticatedBaselineRoute
   '/calculators': typeof AuthenticatedCalculatorsRoute
+  '/flags': typeof AuthenticatedFlagsRoute
   '/garage': typeof AuthenticatedGarageRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/baseline': typeof AuthenticatedBaselineRoute
   '/_authenticated/calculators': typeof AuthenticatedCalculatorsRoute
+  '/_authenticated/flags': typeof AuthenticatedFlagsRoute
   '/_authenticated/garage': typeof AuthenticatedGarageRoute
   '/_authenticated/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/_authenticated/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/baseline'
     | '/calculators'
+    | '/flags'
     | '/garage'
     | '/cars/$carId'
     | '/setups/$setupId'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/baseline'
     | '/calculators'
+    | '/flags'
     | '/garage'
     | '/cars/$carId'
     | '/setups/$setupId'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/baseline'
     | '/_authenticated/calculators'
+    | '/_authenticated/flags'
     | '/_authenticated/garage'
     | '/_authenticated/cars/$carId'
     | '/_authenticated/setups/$setupId'
@@ -156,6 +168,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGarageRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/flags': {
+      id: '/_authenticated/flags'
+      path: '/flags'
+      fullPath: '/flags'
+      preLoaderRoute: typeof AuthenticatedFlagsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/calculators': {
       id: '/_authenticated/calculators'
       path: '/calculators'
@@ -190,6 +209,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedBaselineRoute: typeof AuthenticatedBaselineRoute
   AuthenticatedCalculatorsRoute: typeof AuthenticatedCalculatorsRoute
+  AuthenticatedFlagsRoute: typeof AuthenticatedFlagsRoute
   AuthenticatedGarageRoute: typeof AuthenticatedGarageRoute
   AuthenticatedCarsCarIdRoute: typeof AuthenticatedCarsCarIdRoute
   AuthenticatedSetupsSetupIdRoute: typeof AuthenticatedSetupsSetupIdRoute
@@ -198,6 +218,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedBaselineRoute: AuthenticatedBaselineRoute,
   AuthenticatedCalculatorsRoute: AuthenticatedCalculatorsRoute,
+  AuthenticatedFlagsRoute: AuthenticatedFlagsRoute,
   AuthenticatedGarageRoute: AuthenticatedGarageRoute,
   AuthenticatedCarsCarIdRoute: AuthenticatedCarsCarIdRoute,
   AuthenticatedSetupsSetupIdRoute: AuthenticatedSetupsSetupIdRoute,
