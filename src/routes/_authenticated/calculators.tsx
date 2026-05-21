@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Calculator, Gauge, Cog, Ruler, ArrowLeft } from "lucide-react";
+import { Calculator, Gauge, Cog, Ruler, Scale, ArrowLeft } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/calculators")({
@@ -79,10 +79,12 @@ function CalculatorsPage() {
           <TabsTrigger value="tires"><Gauge className="w-4 h-4 mr-1" /> Tire pressure</TabsTrigger>
           <TabsTrigger value="gears"><Cog className="w-4 h-4 mr-1" /> Gear ratios</TabsTrigger>
           <TabsTrigger value="ride"><Ruler className="w-4 h-4 mr-1" /> Ride height</TabsTrigger>
+          <TabsTrigger value="cg"><Scale className="w-4 h-4 mr-1" /> CG</TabsTrigger>
         </TabsList>
         <TabsContent value="tires"><TirePressureCalc /></TabsContent>
         <TabsContent value="gears"><GearRatioCalc /></TabsContent>
         <TabsContent value="ride"><RideHeightCalc /></TabsContent>
+        <TabsContent value="cg"><CenterOfGravityCalc /></TabsContent>
       </Tabs>
     </div>
   );
@@ -326,6 +328,134 @@ function RideHeightCalc() {
         <ResultRow label="Static sag" value={fmt(sag)} unit="mm" />
         <ResultRow label="Free ride target" value={fmt(num(chassisFront) + sag)} unit="mm" />
       </Section>
+    </div>
+  );
+}
+
+/* ---------- 4. Center of gravity ---------- */
+
+function CenterOfGravityCalc() {
+  const [method, setMethod] = useState<"distribution" | "lift">("distribution");
+
+  // Distribution method inputs
+  const [totalWeight, setTotalWeight] = useState("1200");
+  const [frontWeight, setFrontWeight] = useState("660");
+  const [leftWeight, setLeftWeight] = useState("580");
+  const [wheelbase, setWheelbase] = useState("2650");
+  const [trackWidth, setTrackWidth] = useState("1580");
+
+  // Lift method inputs
+  const [wfLevel, setWfLevel] = useState("600");
+  const [wfLifted, setWfLifted] = useState("645");
+  const [liftHeight, setLiftHeight] = useState("500");
+
+  const tw = num(totalWeight);
+  const fw = num(frontWeight);
+  const lw = num(leftWeight);
+  const wb = num(wheelbase);
+  const tr = num(trackWidth);
+
+  const rw = tw - fw;
+  const rgtW = tw - lw;
+
+  // CG longitudinal from front axle
+  const cgFromFront = tw > 0 ? wb * (rw / tw) : NaN;
+  // CG from left edge (using left side weight)
+  const cgFromLeft = tw > 0 ? tr * (rgtW / tw) : NaN;
+  // CG from centerline (positive = right bias)
+  const cgFromCenter = tw > 0 ? tr * ((rgtW - lw) / (2 * tw)) : NaN;
+
+  // Front weight %
+  const frontPct = tw > 0 ? (fw / tw) * 100 : NaN;
+  const leftPct = tw > 0 ? (lw / tw) * 100 : NaN;
+
+  // Lift method
+  const wfl = num(wfLevel);
+  const wfh = num(wfLifted);
+  const lh = num(liftHeight);
+  const deltaW = wfh - wfl;
+
+  // angle theta from lifting rear: sin(theta) = liftHeight / sqrt(wheelbase^2 + liftHeight^2)
+  const hypot = Math.sqrt(wb * wb + lh * lh);
+  const sinTheta = hypot > 0 ? lh / hypot : NaN;
+  const tanTheta = wb > 0 ? lh / wb : NaN;
+  // CG height = (wheelbase * deltaFrontWeight) / (totalWeight * sin(theta))
+  const cgHeight = sinTheta > 0 && tw > 0 ? (wb * deltaW) / (tw * sinTheta) : NaN;
+  // Alternative formula using tan: h = (wheelbase * deltaW) / (totalWeight * tan(theta))
+  // Both give same result for small angles.
+
+  return (
+    <div className="grid lg:grid-cols-2 gap-4 mt-4">
+      <Section title="Method">
+        <div className="flex gap-2 mb-4">
+          <button
+            type="button"
+            onClick={() => setMethod("distribution")}
+            className={`flex-1 py-2 text-xs font-mono uppercase tracking-widest rounded border transition-colors ${
+              method === "distribution"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card text-muted-foreground border-border hover:text-foreground"
+            }`}
+          >
+            Weight distribution
+          </button>
+          <button
+            type="button"
+            onClick={() => setMethod("lift")}
+            className={`flex-1 py-2 text-xs font-mono uppercase tracking-widest rounded border transition-colors ${
+              method === "lift"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card text-muted-foreground border-border hover:text-foreground"
+            }`}
+          >
+            Lift method
+          </button>
+        </div>
+
+        {method === "distribution" ? (
+          <div className="grid grid-cols-2 gap-4">
+            <NumField label="Total weight" unit="kg" value={totalWeight} onChange={setTotalWeight} />
+            <NumField label="Front axle weight" unit="kg" value={frontWeight} onChange={setFrontWeight} />
+            <NumField label="Left side weight" unit="kg" value={leftWeight} onChange={setLeftWeight} />
+            <NumField label="Wheelbase" unit="mm" value={wheelbase} onChange={setWheelbase} />
+            <NumField label="Track width" unit="mm" value={trackWidth} onChange={setTrackWidth} />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <NumField label="Front weight (level)" unit="kg" value={wfLevel} onChange={setWfLevel} />
+            <NumField label="Front weight (lifted)" unit="kg" value={wfLifted} onChange={setWfLifted} />
+            <NumField label="Lift height" unit="mm" value={liftHeight} onChange={setLiftHeight} />
+            <NumField label="Wheelbase" unit="mm" value={wheelbase} onChange={setWheelbase} />
+          </div>
+        )}
+        <p className="text-xs text-muted-foreground mt-3">
+          {method === "distribution"
+            ? "Corner-weight method: weigh each axle or corner to find CG position in plan view."
+            : "Lift method: raise the rear, re-weigh the front. The weight shift reveals CG height."}
+        </p>
+      </Section>
+
+      {method === "distribution" ? (
+        <Section title="CG position">
+          <ResultRow label="Front weight bias" value={fmt(frontPct, 1)} unit="%" />
+          <ResultRow label="Left weight bias" value={fmt(leftPct, 1)} unit="%" />
+          <ResultRow label="CG from front axle" value={fmt(cgFromFront)} unit="mm" />
+          <ResultRow label="CG from left edge" value={fmt(cgFromLeft)} unit="mm" />
+          <ResultRow label="CG offset from centerline" value={(cgFromCenter >= 0 ? "+" : "") + fmt(cgFromCenter)} unit="mm" />
+          <p className="text-xs text-muted-foreground mt-3">
+            CG offset positive = biased to the right side. For a symmetrical car, aim for near-zero.
+          </p>
+        </Section>
+      ) : (
+        <Section title="CG height">
+          <ResultRow label="Front weight change" value={(deltaW >= 0 ? "+" : "") + fmt(deltaW)} unit="kg" />
+          <ResultRow label="Lift angle" value={fmt(Math.asin(sinTheta) * 180 / Math.PI, 2)} unit="°" />
+          <ResultRow label="CG height" value={fmt(cgHeight)} unit="mm" />
+          <p className="text-xs text-muted-foreground mt-3">
+            Raise the rear by the lift height, re-weigh the front axle. The weight transfer is proportional to CG height.
+          </p>
+        </Section>
+      )}
     </div>
   );
 }
