@@ -36,13 +36,21 @@ const HEADER_MAP: Record<string, keyof ParsedLap | "skip"> = {};
 const add = (k: keyof ParsedLap | "skip", ...names: string[]) => {
   for (const n of names) HEADER_MAP[normalize(n)] = k;
 };
-add("lap_number", "lap", "lapnumber", "lap#", "#", "lapno", "no", "num");
-add("lap_time_ms", "laptime", "time", "lap", "totaltime", "duration");
-add("sector_1_ms", "s1", "sector1", "sect1", "sec1");
-add("sector_2_ms", "s2", "sector2", "sect2", "sec2");
-add("sector_3_ms", "s3", "sector3", "sect3", "sec3");
-add("conditions", "conditions", "weather", "condition");
-add("notes", "notes", "comment", "comments", "note");
+add("lap_number", "lap", "lapnumber", "lap#", "#", "lapno", "no", "num", "lapindex", "lapidx", "index", "tour", "round");
+add(
+  "lap_time_ms",
+  "laptime", "time", "lap", "totaltime", "duration",
+  "laptimes", "lap time", "lap-time", "lap_time",
+  "elapsed", "elapsedtime", "elapsed time",
+  "racetime", "race time", "finishtime", "finish time",
+  "besttime", "best time", "besttimeofday",
+  "t", "tlap", "tlap_s", "tlaps",
+);
+add("sector_1_ms", "s1", "sector1", "sect1", "sec1", "sector 1", "sector-1", "sector_1", "split1", "split 1", "splits1", "t1", "sectortime1", "sector1time");
+add("sector_2_ms", "s2", "sector2", "sect2", "sec2", "sector 2", "sector-2", "sector_2", "split2", "split 2", "splits2", "t2", "sectortime2", "sector2time");
+add("sector_3_ms", "s3", "sector3", "sect3", "sec3", "sector 3", "sector-3", "sector_3", "split3", "split 3", "splits3", "t3", "sectortime3", "sector3time");
+add("conditions", "conditions", "weather", "condition", "track", "trackconditions", "track condition", "trackcondition", "wx");
+add("notes", "notes", "comment", "comments", "note", "remarks", "remark", "description", "desc");
 
 // "lap" is ambiguous — prefer time only if no other time column exists
 export type ParseResult = {
