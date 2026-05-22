@@ -346,7 +346,122 @@ function TyreComparePage() {
           </table>
         </div>
       </div>
+
+      <div className="mt-8">
+        <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
+          <Thermometer className="w-3 h-3" /> Track temp sweep
+        </div>
+        <h2 className="font-display text-2xl font-bold mt-1">Grip vs track temperature</h2>
+        <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+          Effective grip for each compound across a range of track temps. Solid lines = dry running, dashed = wet running. The vertical marker is your current track temp.
+        </p>
+
+        <div className="mt-4 grid sm:grid-cols-3 gap-3 rounded-lg border border-border bg-card p-5 shadow-card">
+          <div>
+            <Label>Sweep min (°C)</Label>
+            <Input type="number" inputMode="decimal" value={sweepMinC} onChange={(e) => setSweepMinC(e.target.value)} className="font-mono" />
+          </div>
+          <div>
+            <Label>Sweep max (°C)</Label>
+            <Input type="number" inputMode="decimal" value={sweepMaxC} onChange={(e) => setSweepMaxC(e.target.value)} className="font-mono" />
+          </div>
+          <div>
+            <Label>Show</Label>
+            <Select value={sweepCondition} onValueChange={(v) => setSweepCondition(v as typeof sweepCondition)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="both">Dry + Wet</SelectItem>
+                <SelectItem value="dry">Dry only</SelectItem>
+                <SelectItem value="wet">Wet only</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-lg border border-border bg-card p-5 shadow-card">
+          <SweepChart
+            temps={sweep.temps}
+            lo={sweep.lo}
+            hi={sweep.hi}
+            currentC={parseFloat(trackC) || 0}
+            showDry={sweepCondition !== "wet"}
+            showWet={sweepCondition !== "dry"}
+          />
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs font-mono">
+            {COMPOUNDS.map((c) => (
+              <div key={c.key} className="flex items-center gap-2">
+                <span className="inline-block w-3 h-0.5" style={{ background: COMPOUND_COLORS[c.key] }} />
+                <span className="uppercase tracking-widest text-muted-foreground">{c.label}</span>
+                <span className="text-muted-foreground">· peak {c.peakTempC + (c.wetOk ? -5 : -30)}°C track</span>
+              </div>
+            ))}
+            <div className="flex items-center gap-3 ml-auto text-muted-foreground">
+              <span className="flex items-center gap-1"><span className="inline-block w-4 h-px bg-foreground" /> dry</span>
+              <span className="flex items-center gap-1"><span className="inline-block w-4 border-t border-dashed border-foreground" /> wet</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  );
+}
+
+function SweepChart({
+  temps, lo, hi, currentC, showDry, showWet,
+}: {
+  temps: number[]; lo: number; hi: number; currentC: number; showDry: boolean; showWet: boolean;
+}) {
+  const W = 720, H = 240, PL = 36, PR = 12, PT = 12, PB = 28;
+  const innerW = W - PL - PR, innerH = H - PT - PB;
+  const x = (t: number) => PL + ((t - lo) / (hi - lo || 1)) * innerW;
+  const y = (g: number) => PT + (1 - g / 100) * innerH;
+
+  const buildPath = (c: Compound, condition: "dry" | "wet") =>
+    temps
+      .map((t, i) => `${i === 0 ? "M" : "L"} ${x(t).toFixed(1)} ${y(effectiveGripAt(c, t, condition)).toFixed(1)}`)
+      .join(" ");
+
+  const tempTicks = 6;
+  const tickTemps = Array.from({ length: tempTicks + 1 }, (_, i) => lo + ((hi - lo) * i) / tempTicks);
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" role="img" aria-label="Grip vs track temperature">
+      {/* y gridlines */}
+      {[0, 25, 50, 75, 100].map((g) => (
+        <g key={g}>
+          <line x1={PL} x2={W - PR} y1={y(g)} y2={y(g)} stroke="hsl(var(--border))" strokeWidth={0.5} />
+          <text x={PL - 6} y={y(g) + 3} fontSize="9" textAnchor="end" fill="hsl(var(--muted-foreground))" fontFamily="monospace">{g}</text>
+        </g>
+      ))}
+      {/* x ticks */}
+      {tickTemps.map((t) => (
+        <g key={t}>
+          <line x1={x(t)} x2={x(t)} y1={H - PB} y2={H - PB + 4} stroke="hsl(var(--border))" />
+          <text x={x(t)} y={H - PB + 14} fontSize="9" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontFamily="monospace">{t.toFixed(0)}°</text>
+        </g>
+      ))}
+      {/* current temp marker */}
+      {currentC >= lo && currentC <= hi && (
+        <g>
+          <line x1={x(currentC)} x2={x(currentC)} y1={PT} y2={H - PB} stroke="hsl(var(--primary))" strokeWidth={1} strokeDasharray="3 3" />
+          <text x={x(currentC) + 4} y={PT + 10} fontSize="9" fill="hsl(var(--primary))" fontFamily="monospace">now {currentC.toFixed(0)}°</text>
+        </g>
+      )}
+      {/* lines */}
+      {COMPOUNDS.map((c) => (
+        <g key={c.key}>
+          {showDry && (
+            <path d={buildPath(c, "dry")} fill="none" stroke={COMPOUND_COLORS[c.key]} strokeWidth={2} />
+          )}
+          {showWet && (
+            <path d={buildPath(c, "wet")} fill="none" stroke={COMPOUND_COLORS[c.key]} strokeWidth={1.5} strokeDasharray="5 4" opacity={0.85} />
+          )}
+        </g>
+      ))}
+      {/* axis labels */}
+      <text x={PL} y={H - 4} fontSize="9" fill="hsl(var(--muted-foreground))" fontFamily="monospace">Track temp (°C)</text>
+      <text x={W - PR} y={H - 4} fontSize="9" textAnchor="end" fill="hsl(var(--muted-foreground))" fontFamily="monospace">Effective grip (0–100)</text>
+    </svg>
   );
 }
 
