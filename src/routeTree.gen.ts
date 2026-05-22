@@ -19,6 +19,7 @@ import { Route as AuthenticatedMaintenanceRouteImport } from './routes/_authenti
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedGarageRouteImport } from './routes/_authenticated/garage'
 import { Route as AuthenticatedFlagsRouteImport } from './routes/_authenticated/flags'
+import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
 import { Route as AuthenticatedCalculatorsRouteImport } from './routes/_authenticated/calculators'
 import { Route as AuthenticatedBaselineRouteImport } from './routes/_authenticated/baseline'
 import { Route as AuthenticatedSetupsSetupIdRouteImport } from './routes/_authenticated/setups.$setupId'
@@ -75,6 +76,11 @@ const AuthenticatedFlagsRoute = AuthenticatedFlagsRouteImport.update({
   path: '/flags',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedCalculatorsRoute =
   AuthenticatedCalculatorsRouteImport.update({
     id: '/calculators',
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/baseline': typeof AuthenticatedBaselineRoute
   '/calculators': typeof AuthenticatedCalculatorsRoute
+  '/calendar': typeof AuthenticatedCalendarRoute
   '/flags': typeof AuthenticatedFlagsRoute
   '/garage': typeof AuthenticatedGarageRoute
   '/inventory': typeof AuthenticatedInventoryRoute
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/baseline': typeof AuthenticatedBaselineRoute
   '/calculators': typeof AuthenticatedCalculatorsRoute
+  '/calendar': typeof AuthenticatedCalendarRoute
   '/flags': typeof AuthenticatedFlagsRoute
   '/garage': typeof AuthenticatedGarageRoute
   '/inventory': typeof AuthenticatedInventoryRoute
@@ -143,6 +151,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/baseline': typeof AuthenticatedBaselineRoute
   '/_authenticated/calculators': typeof AuthenticatedCalculatorsRoute
+  '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/flags': typeof AuthenticatedFlagsRoute
   '/_authenticated/garage': typeof AuthenticatedGarageRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/baseline'
     | '/calculators'
+    | '/calendar'
     | '/flags'
     | '/garage'
     | '/inventory'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/baseline'
     | '/calculators'
+    | '/calendar'
     | '/flags'
     | '/garage'
     | '/inventory'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/baseline'
     | '/_authenticated/calculators'
+    | '/_authenticated/calendar'
     | '/_authenticated/flags'
     | '/_authenticated/garage'
     | '/_authenticated/inventory'
@@ -284,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFlagsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/calendar': {
+      id: '/_authenticated/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof AuthenticatedCalendarRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/calculators': {
       id: '/_authenticated/calculators'
       path: '/calculators'
@@ -338,6 +357,7 @@ const AuthenticatedSessionsRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedBaselineRoute: typeof AuthenticatedBaselineRoute
   AuthenticatedCalculatorsRoute: typeof AuthenticatedCalculatorsRoute
+  AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedFlagsRoute: typeof AuthenticatedFlagsRoute
   AuthenticatedGarageRoute: typeof AuthenticatedGarageRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
@@ -352,6 +372,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedBaselineRoute: AuthenticatedBaselineRoute,
   AuthenticatedCalculatorsRoute: AuthenticatedCalculatorsRoute,
+  AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedFlagsRoute: AuthenticatedFlagsRoute,
   AuthenticatedGarageRoute: AuthenticatedGarageRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
