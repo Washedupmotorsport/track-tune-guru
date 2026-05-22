@@ -66,7 +66,7 @@ export function IncidentLog({ sessionId, carId }: { sessionId: string; carId: st
       </div>
       <div className="grid grid-cols-2 md:grid-cols-6 gap-2 mb-3">
         <Select value={flag} onValueChange={setFlag}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectTrigger aria-label="Flag type"><SelectValue /></SelectTrigger>
           <SelectContent>{Object.keys(FLAGS).map((f) => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent>
         </Select>
         <Input placeholder="Lap #" value={lap} onChange={(e) => setLap(e.target.value)} className="font-mono" />
@@ -83,7 +83,13 @@ export function IncidentLog({ sessionId, carId }: { sessionId: string; carId: st
               {i.lap_number != null && <span className="font-mono text-xs text-muted-foreground">L{i.lap_number}</span>}
               <span className="flex-1 truncate">{i.description ?? "—"}</span>
               <span className="text-xs text-muted-foreground font-mono">{new Date(i.occurred_at).toLocaleTimeString()}</span>
-              <button onClick={() => del.mutate(i.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="w-3 h-3" /></button>
+              <button
+                onClick={() => del.mutate(i.id)}
+                aria-label={`Delete ${i.flag} flag incident`}
+                className="text-muted-foreground hover:text-destructive"
+              >
+                <Trash2 className="w-3 h-3" />
+              </button>
             </li>
           ))}
         </ul>

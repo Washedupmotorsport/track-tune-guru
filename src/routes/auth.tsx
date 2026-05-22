@@ -11,6 +11,16 @@ import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
+  head: () => ({
+    meta: [
+      { title: "Sign in — My Race Engineer" },
+      { name: "description", content: "Sign in or create your My Race Engineer account to start logging setups, sessions, and laps." },
+      { property: "og:title", content: "Sign in — My Race Engineer" },
+      { property: "og:description", content: "Sign in or create your account to start logging setups, sessions, and laps." },
+      { property: "og:url", content: "/auth" },
+    ],
+    links: [{ rel: "canonical", href: "/auth" }],
+  }),
 });
 
 function AuthPage() {
@@ -67,7 +77,7 @@ function AuthPage() {
           <span className="inline-block w-2 h-6 bg-primary shadow-glow" />MY RACE<span className="text-primary">ENGINEER</span>
         </Link>
         <div>
-          <h2 className="font-display text-4xl font-bold leading-tight">Your pit garage,<br /><span className="text-primary">always with you</span>.</h2>
+          <p className="font-display text-4xl font-bold leading-tight">Your pit garage,<br /><span className="text-primary">always with you</span>.</p>
           <p className="mt-4 text-muted-foreground max-w-sm">Save setups for every car you race. Recall the winning sheet on a wet Sunday at midnight.</p>
         </div>
         <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Sector 1 // Login</div>

@@ -7,6 +7,17 @@ import { Trophy, Cloud, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/share/session/$token")({
   component: PublicSessionView,
+  head: ({ params }) => ({
+    meta: [
+      { title: "Shared session — My Race Engineer" },
+      { name: "description", content: "View shared race session data: laps, sectors, weather and conditions." },
+      { property: "og:title", content: "Shared session — My Race Engineer" },
+      { property: "og:description", content: "View shared race session data: laps, sectors, weather and conditions." },
+      { property: "og:url", content: `/share/session/${params.token}` },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: `/share/session/${params.token}` }],
+  }),
   notFoundComponent: () => (
     <div className="min-h-screen flex items-center justify-center text-muted-foreground">
       This share link is invalid or has been revoked.

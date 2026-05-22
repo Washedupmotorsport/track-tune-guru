@@ -1,0 +1,9 @@
+# My Race Engineer
+
+> Digital pit garage for managing race car setups, sessions, and lap analysis across every motorsport discipline.
+
+My Race Engineer helps racing drivers and engineers save setup sheets, log session conditions, capture laps, and compare baselines for circuit, drift, drag, autocross, rally, and oval racing.
+
+## Pages
+
+- [Home](/): Landing page with overview and supported disciplines.
