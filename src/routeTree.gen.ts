@@ -16,6 +16,7 @@ import { Route as AuthenticatedTiresRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
 import { Route as AuthenticatedMaintenanceRouteImport } from './routes/_authenticated/maintenance'
+import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedGarageRouteImport } from './routes/_authenticated/garage'
 import { Route as AuthenticatedFlagsRouteImport } from './routes/_authenticated/flags'
 import { Route as AuthenticatedCalculatorsRouteImport } from './routes/_authenticated/calculators'
@@ -59,6 +60,11 @@ const AuthenticatedMaintenanceRoute =
     path: '/maintenance',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedInventoryRoute = AuthenticatedInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedGarageRoute = AuthenticatedGarageRouteImport.update({
   id: '/garage',
   path: '/garage',
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/calculators': typeof AuthenticatedCalculatorsRoute
   '/flags': typeof AuthenticatedFlagsRoute
   '/garage': typeof AuthenticatedGarageRoute
+  '/inventory': typeof AuthenticatedInventoryRoute
   '/maintenance': typeof AuthenticatedMaintenanceRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/calculators': typeof AuthenticatedCalculatorsRoute
   '/flags': typeof AuthenticatedFlagsRoute
   '/garage': typeof AuthenticatedGarageRoute
+  '/inventory': typeof AuthenticatedInventoryRoute
   '/maintenance': typeof AuthenticatedMaintenanceRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
@@ -137,6 +145,7 @@ export interface FileRoutesById {
   '/_authenticated/calculators': typeof AuthenticatedCalculatorsRoute
   '/_authenticated/flags': typeof AuthenticatedFlagsRoute
   '/_authenticated/garage': typeof AuthenticatedGarageRoute
+  '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
   '/_authenticated/maintenance': typeof AuthenticatedMaintenanceRoute
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRouteWithChildren
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '/calculators'
     | '/flags'
     | '/garage'
+    | '/inventory'
     | '/maintenance'
     | '/notes'
     | '/sessions'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/calculators'
     | '/flags'
     | '/garage'
+    | '/inventory'
     | '/maintenance'
     | '/notes'
     | '/sessions'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/_authenticated/calculators'
     | '/_authenticated/flags'
     | '/_authenticated/garage'
+    | '/_authenticated/inventory'
     | '/_authenticated/maintenance'
     | '/_authenticated/notes'
     | '/_authenticated/sessions'
@@ -249,6 +261,13 @@ declare module '@tanstack/react-router' {
       path: '/maintenance'
       fullPath: '/maintenance'
       preLoaderRoute: typeof AuthenticatedMaintenanceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/inventory': {
+      id: '/_authenticated/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof AuthenticatedInventoryRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/garage': {
@@ -321,6 +340,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCalculatorsRoute: typeof AuthenticatedCalculatorsRoute
   AuthenticatedFlagsRoute: typeof AuthenticatedFlagsRoute
   AuthenticatedGarageRoute: typeof AuthenticatedGarageRoute
+  AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
   AuthenticatedMaintenanceRoute: typeof AuthenticatedMaintenanceRoute
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRouteWithChildren
@@ -334,6 +354,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCalculatorsRoute: AuthenticatedCalculatorsRoute,
   AuthenticatedFlagsRoute: AuthenticatedFlagsRoute,
   AuthenticatedGarageRoute: AuthenticatedGarageRoute,
+  AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
   AuthenticatedMaintenanceRoute: AuthenticatedMaintenanceRoute,
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRouteWithChildren,
