@@ -27,6 +27,7 @@ import { Route as AuthenticatedAnalysisRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSetupsSetupIdRouteImport } from './routes/_authenticated/setups.$setupId'
 import { Route as AuthenticatedSessionsSessionIdRouteImport } from './routes/_authenticated/sessions.$sessionId'
 import { Route as AuthenticatedCarsCarIdRouteImport } from './routes/_authenticated/cars.$carId'
+import { Route as AuthenticatedSessionsSessionIdPitboardRouteImport } from './routes/_authenticated/sessions.$sessionId.pitboard'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -121,6 +122,12 @@ const AuthenticatedCarsCarIdRoute = AuthenticatedCarsCarIdRouteImport.update({
   path: '/cars/$carId',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSessionsSessionIdPitboardRoute =
+  AuthenticatedSessionsSessionIdPitboardRouteImport.update({
+    id: '/pitboard',
+    path: '/pitboard',
+    getParentRoute: () => AuthenticatedSessionsSessionIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -138,8 +145,9 @@ export interface FileRoutesByFullPath {
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/tires': typeof AuthenticatedTiresRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
-  '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRoute
+  '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRouteWithChildren
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
+  '/sessions/$sessionId/pitboard': typeof AuthenticatedSessionsSessionIdPitboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -157,8 +165,9 @@ export interface FileRoutesByTo {
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/tires': typeof AuthenticatedTiresRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
-  '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRoute
+  '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRouteWithChildren
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
+  '/sessions/$sessionId/pitboard': typeof AuthenticatedSessionsSessionIdPitboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -178,8 +187,9 @@ export interface FileRoutesById {
   '/_authenticated/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/_authenticated/tires': typeof AuthenticatedTiresRoute
   '/_authenticated/cars/$carId': typeof AuthenticatedCarsCarIdRoute
-  '/_authenticated/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRoute
+  '/_authenticated/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRouteWithChildren
   '/_authenticated/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
+  '/_authenticated/sessions/$sessionId/pitboard': typeof AuthenticatedSessionsSessionIdPitboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -201,6 +211,7 @@ export interface FileRouteTypes {
     | '/cars/$carId'
     | '/sessions/$sessionId'
     | '/setups/$setupId'
+    | '/sessions/$sessionId/pitboard'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -220,6 +231,7 @@ export interface FileRouteTypes {
     | '/cars/$carId'
     | '/sessions/$sessionId'
     | '/setups/$setupId'
+    | '/sessions/$sessionId/pitboard'
   id:
     | '__root__'
     | '/'
@@ -240,6 +252,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cars/$carId'
     | '/_authenticated/sessions/$sessionId'
     | '/_authenticated/setups/$setupId'
+    | '/_authenticated/sessions/$sessionId/pitboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -376,15 +389,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCarsCarIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/sessions/$sessionId/pitboard': {
+      id: '/_authenticated/sessions/$sessionId/pitboard'
+      path: '/pitboard'
+      fullPath: '/sessions/$sessionId/pitboard'
+      preLoaderRoute: typeof AuthenticatedSessionsSessionIdPitboardRouteImport
+      parentRoute: typeof AuthenticatedSessionsSessionIdRoute
+    }
   }
 }
 
+interface AuthenticatedSessionsSessionIdRouteChildren {
+  AuthenticatedSessionsSessionIdPitboardRoute: typeof AuthenticatedSessionsSessionIdPitboardRoute
+}
+
+const AuthenticatedSessionsSessionIdRouteChildren: AuthenticatedSessionsSessionIdRouteChildren =
+  {
+    AuthenticatedSessionsSessionIdPitboardRoute:
+      AuthenticatedSessionsSessionIdPitboardRoute,
+  }
+
+const AuthenticatedSessionsSessionIdRouteWithChildren =
+  AuthenticatedSessionsSessionIdRoute._addFileChildren(
+    AuthenticatedSessionsSessionIdRouteChildren,
+  )
+
 interface AuthenticatedSessionsRouteChildren {
-  AuthenticatedSessionsSessionIdRoute: typeof AuthenticatedSessionsSessionIdRoute
+  AuthenticatedSessionsSessionIdRoute: typeof AuthenticatedSessionsSessionIdRouteWithChildren
 }
 
 const AuthenticatedSessionsRouteChildren: AuthenticatedSessionsRouteChildren = {
-  AuthenticatedSessionsSessionIdRoute: AuthenticatedSessionsSessionIdRoute,
+  AuthenticatedSessionsSessionIdRoute:
+    AuthenticatedSessionsSessionIdRouteWithChildren,
 }
 
 const AuthenticatedSessionsRouteWithChildren =

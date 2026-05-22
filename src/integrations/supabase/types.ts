@@ -277,6 +277,45 @@ export type Database = {
         }
         Relationships: []
       }
+      incidents: {
+        Row: {
+          car_id: string
+          created_at: string
+          description: string | null
+          flag: string
+          id: string
+          lap_id: string | null
+          lap_number: number | null
+          occurred_at: string
+          session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          created_at?: string
+          description?: string | null
+          flag?: string
+          id?: string
+          lap_id?: string | null
+          lap_number?: number | null
+          occurred_at?: string
+          session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          created_at?: string
+          description?: string | null
+          flag?: string
+          id?: string
+          lap_id?: string | null
+          lap_number?: number | null
+          occurred_at?: string
+          session_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       laps: {
         Row: {
           car_id: string
