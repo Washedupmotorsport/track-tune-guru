@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedTiresRouteImport } from './routes/_authenticated/tires'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
 import { Route as AuthenticatedGarageRouteImport } from './routes/_authenticated/garage'
@@ -35,6 +36,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedTiresRoute = AuthenticatedTiresRouteImport.update({
+  id: '/tires',
+  path: '/tires',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
   id: '/sessions',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/garage': typeof AuthenticatedGarageRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
+  '/tires': typeof AuthenticatedTiresRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRoute
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/garage': typeof AuthenticatedGarageRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
+  '/tires': typeof AuthenticatedTiresRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRoute
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   '/_authenticated/garage': typeof AuthenticatedGarageRoute
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRouteWithChildren
+  '/_authenticated/tires': typeof AuthenticatedTiresRoute
   '/_authenticated/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/_authenticated/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRoute
   '/_authenticated/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/garage'
     | '/notes'
     | '/sessions'
+    | '/tires'
     | '/cars/$carId'
     | '/sessions/$sessionId'
     | '/setups/$setupId'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/garage'
     | '/notes'
     | '/sessions'
+    | '/tires'
     | '/cars/$carId'
     | '/sessions/$sessionId'
     | '/setups/$setupId'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/_authenticated/garage'
     | '/_authenticated/notes'
     | '/_authenticated/sessions'
+    | '/_authenticated/tires'
     | '/_authenticated/cars/$carId'
     | '/_authenticated/sessions/$sessionId'
     | '/_authenticated/setups/$setupId'
@@ -197,6 +209,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/tires': {
+      id: '/_authenticated/tires'
+      path: '/tires'
+      fullPath: '/tires'
+      preLoaderRoute: typeof AuthenticatedTiresRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/sessions': {
       id: '/_authenticated/sessions'
@@ -284,6 +303,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedGarageRoute: typeof AuthenticatedGarageRoute
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRouteWithChildren
+  AuthenticatedTiresRoute: typeof AuthenticatedTiresRoute
   AuthenticatedCarsCarIdRoute: typeof AuthenticatedCarsCarIdRoute
   AuthenticatedSetupsSetupIdRoute: typeof AuthenticatedSetupsSetupIdRoute
 }
@@ -295,6 +315,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedGarageRoute: AuthenticatedGarageRoute,
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRouteWithChildren,
+  AuthenticatedTiresRoute: AuthenticatedTiresRoute,
   AuthenticatedCarsCarIdRoute: AuthenticatedCarsCarIdRoute,
   AuthenticatedSetupsSetupIdRoute: AuthenticatedSetupsSetupIdRoute,
 }
@@ -311,3 +332,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
