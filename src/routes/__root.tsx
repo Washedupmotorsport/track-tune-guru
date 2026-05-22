@@ -11,6 +11,7 @@ import {
 import appCss from "../styles.css?url";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/lib/auth-context";
+import { UnitsProvider } from "@/lib/units";
 import { useEffect } from "react";
 
 function NotFoundComponent() {
@@ -127,8 +128,10 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Outlet />
-        <Toaster theme="dark" position="top-center" />
+        <UnitsProvider>
+          <Outlet />
+          <Toaster theme="dark" position="top-center" />
+        </UnitsProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

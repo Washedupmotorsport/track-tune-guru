@@ -11,10 +11,12 @@ import {
   DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { CommandPalette } from "@/components/command-palette";
+import { useUnits } from "@/lib/units";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { system, toggle } = useUnits();
   return (
     <div className="min-h-screen text-foreground">
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
@@ -31,6 +33,16 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               <Search className="w-3.5 h-3.5" /> Search
               <span className="ml-2 text-[10px] opacity-70">⌘K</span>
+            </button>
+            <button
+              onClick={toggle}
+              title="Toggle metric / imperial"
+              aria-label="Toggle units"
+              className="inline-flex items-center rounded-md border border-border bg-muted/30 px-2 py-1.5 text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40"
+            >
+              <span className={system === "metric" ? "text-primary" : ""}>SI</span>
+              <span className="mx-1 opacity-40">/</span>
+              <span className={system === "imperial" ? "text-primary" : ""}>US</span>
             </button>
             <Link to="/sessions" className="hidden lg:inline-flex items-center text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
               <Timer className="w-4 h-4 mr-1" /> Sessions

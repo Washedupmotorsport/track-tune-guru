@@ -15,6 +15,7 @@ import { getDebrief, type DebriefResult } from "@/lib/debrief.functions";
 import { VoiceRecorder } from "@/components/voice-recorder";
 import { PhotoAttachments } from "@/components/photo-attachments";
 import { getCurrentWeather } from "@/lib/weather";
+import { useUnits } from "@/lib/units";
 import { exportSessionPDF } from "@/lib/pdf-export";
 import { LapTimer } from "@/components/lap-timer";
 import { IncidentLog } from "@/components/incident-log";
@@ -122,11 +123,16 @@ function SessionDetail() {
   });
 
   const [weatherLoading, setWeatherLoading] = useState(false);
+  const units = useUnits();
   const fetchWeather = async () => {
     setWeatherLoading(true);
     try {
       const w = await getCurrentWeather();
-      setMeta((m) => ({ ...m, weather: `${w.weather} (wind ${w.wind_kph} kph)`, air_temp_c: w.air_temp_c }));
+      setMeta((m) => ({
+        ...m,
+        weather: `${w.weather} (wind ${units.toDisplaySpeed(w.wind_kph)} ${units.speedUnit})`,
+        air_temp_c: w.air_temp_c,
+      }));
       toast.success("Weather updated — remember to save");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Weather failed");
@@ -191,8 +197,26 @@ function SessionDetail() {
         <div><Label>Track</Label><Input value={meta.track ?? ""} onChange={(e) => setMeta({ ...meta, track: e.target.value })} /></div>
         <div><Label>Driver</Label><Input value={meta.driver ?? ""} onChange={(e) => setMeta({ ...meta, driver: e.target.value })} /></div>
         <div><Label>Weather</Label><Input value={meta.weather ?? ""} onChange={(e) => setMeta({ ...meta, weather: e.target.value })} /></div>
-        <div><Label>Air °C</Label><Input type="number" step="any" value={meta.air_temp_c ?? ""} onChange={(e) => setMeta({ ...meta, air_temp_c: e.target.value ? Number(e.target.value) : null })} /></div>
-        <div><Label>Track °C</Label><Input type="number" step="any" value={meta.track_temp_c ?? ""} onChange={(e) => setMeta({ ...meta, track_temp_c: e.target.value ? Number(e.target.value) : null })} /></div>
+        <div>
+          <Label>Air {units.tempUnit}</Label>
+          <Input type="number" step="any"
+            value={units.toDisplayTemp(meta.air_temp_c) ?? ""}
+            onChange={(e) => {
+              const v = e.target.value;
+              const c = v === "" ? null : units.fromDisplayTemp(Number(v));
+              setMeta({ ...meta, air_temp_c: c == null ? null : Math.round(c * 10) / 10 });
+            }} />
+        </div>
+        <div>
+          <Label>Track {units.tempUnit}</Label>
+          <Input type="number" step="any"
+            value={units.toDisplayTemp(meta.track_temp_c) ?? ""}
+            onChange={(e) => {
+              const v = e.target.value;
+              const c = v === "" ? null : units.fromDisplayTemp(Number(v));
+              setMeta({ ...meta, track_temp_c: c == null ? null : Math.round(c * 10) / 10 });
+            }} />
+        </div>
         <div className="grid grid-cols-2 gap-2">
           <div><Label>Fuel start L</Label><Input type="number" step="any" value={meta.fuel_start_l ?? ""} onChange={(e) => setMeta({ ...meta, fuel_start_l: e.target.value ? Number(e.target.value) : null })} /></div>
           <div><Label>Fuel end L</Label><Input type="number" step="any" value={meta.fuel_end_l ?? ""} onChange={(e) => setMeta({ ...meta, fuel_end_l: e.target.value ? Number(e.target.value) : null })} /></div>
