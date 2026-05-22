@@ -4,9 +4,9 @@
   "description": "Race car setup, sessions, telemetry and trackside companion.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f7f7f5",
-  "theme_color": "#f7f7f5",
+  "background_color": "#1a3a5c",
+  "theme_color": "#1a3a5c",
   "icons": [
-    { "src": "/favicon.ico", "sizes": "any", "type": "image/x-icon" }
+    { "src": "/app-icon.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any maskable" }
   ]
 }
