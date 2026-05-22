@@ -65,10 +65,17 @@ function TyreComparePage() {
   const [sweepMinC, setSweepMinC] = useState("5");
   const [sweepMaxC, setSweepMaxC] = useState("50");
   const [sweepCondition, setSweepCondition] = useState<"both" | "dry" | "wet">("both");
+  const [gripW, setGripW] = useState("50");
+  const [warmupW, setWarmupW] = useState("25");
+  const [longevityW, setLongevityW] = useState("25");
 
   const rows = useMemo(() => {
     const track = parseFloat(trackC);
     const laps = Math.max(0, parseFloat(stintLaps) || 0);
+    const gw = Math.max(0, parseFloat(gripW) || 0);
+    const ww = Math.max(0, parseFloat(warmupW) || 0);
+    const lw = Math.max(0, parseFloat(longevityW) || 0);
+    const totalW = gw + ww + lw || 1;
     return COMPOUNDS.map((c) => {
       // Estimate tread temp ~ track + 30°C on dry running. For wet, much cooler.
       const treadC = (isNaN(track) ? 25 : track) + (condition === "wet" ? 5 : 30);
@@ -82,9 +89,11 @@ function TyreComparePage() {
       // Wear scales with grip pressure (hot tread) and laps.
       const wearMm = c.wearMmPerLap * laps * (1 + Math.max(0, treadC - c.peakTempC) * 0.01);
       const stintLifeLaps = Math.round((4 / c.wearMmPerLap) * (condition === "wet" && !c.wetOk ? 0.6 : 1));
-      return { c, treadC, effectiveGrip, inWindow, wearMm, stintLifeLaps };
+      // Weighted score: normalize each attribute to 0-100 then apply weights.
+      const score = (effectiveGrip * gw + c.warmup * ww + c.longevity * lw) / totalW;
+      return { c, treadC, effectiveGrip, inWindow, wearMm, stintLifeLaps, score };
     });
-  }, [trackC, stintLaps, condition]);
+  }, [trackC, stintLaps, condition, gripW, warmupW, longevityW]);
 
   // Per-corner wear bias. Multipliers sum roughly to 4 so total wear ≈ wearMm * 4.
   // Layout: right-handed circuits load fronts & left-side tyres more, etc.
@@ -132,6 +141,7 @@ function TyreComparePage() {
       `Circuit layout: ${layout}`,
       `Car balance: ${balance}`,
       `New tread: ${newMm.toFixed(2)} mm`,
+      `Priority: grip ${gripW}% / warm-up ${warmupW}% / longevity ${longevityW}%`,
     ];
     inputs.forEach((t) => { doc.text(t, M, y); y += 13; });
     y += 8;
@@ -139,14 +149,15 @@ function TyreComparePage() {
     doc.setFont("helvetica", "bold"); doc.setFontSize(12);
     doc.text("Compound summary", M, y); y += 14;
     doc.setFontSize(9);
-    const headers = ["Compound", "Eff. grip", "Raw grip", "Longev.", "Tread °C", "In win.", "Wear/stint", "Stint life"];
-    const colX = [M, M+90, M+150, M+205, M+260, M+315, M+365, M+435];
+    const headers = ["Compound", "Score", "Eff. grip", "Raw grip", "Longev.", "Tread °C", "In win.", "Wear/stint", "Stint life"];
+    const colX = [M, M+60, M+110, M+170, M+225, M+280, M+335, M+385, M+455];
     headers.forEach((h, i) => doc.text(h, colX[i], y));
     y += 4; doc.line(M, y, W - M, y); y += 12;
     doc.setFont("helvetica", "normal");
     rows.forEach((r) => {
       const vals = [
         r.c.label,
+        r.score.toFixed(1),
         r.effectiveGrip.toFixed(0),
         r.c.grip.toFixed(0),
         r.c.longevity.toFixed(0),
@@ -189,7 +200,7 @@ function TyreComparePage() {
     doc.save(`tyre-compare-${condition}-${ts}.pdf`);
   };
 
-  const best = rows.reduce((b, r) => (r.effectiveGrip > b.effectiveGrip ? r : b), rows[0]);
+  const best = rows.reduce((b, r) => (r.score > b.score ? r : b), rows[0]);
 
   return (
     <div>
@@ -234,18 +245,80 @@ function TyreComparePage() {
         </div>
       </div>
 
+      <div className="mt-4 rounded-lg border border-border bg-card p-5 shadow-card">
+        <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">Balance priority</div>
+        <div className="grid sm:grid-cols-3 gap-4">
+          <div>
+            <div className="flex justify-between text-xs font-mono mb-1">
+              <span>Grip</span>
+              <span className="text-primary">{gripW}%</span>
+            </div>
+            <input
+              type="range" min={0} max={100} value={gripW}
+              onChange={(e) => setGripW(e.target.value)}
+              className="w-full accent-[hsl(var(--primary))]"
+            />
+          </div>
+          <div>
+            <div className="flex justify-between text-xs font-mono mb-1">
+              <span>Warm-up</span>
+              <span className="text-primary">{warmupW}%</span>
+            </div>
+            <input
+              type="range" min={0} max={100} value={warmupW}
+              onChange={(e) => setWarmupW(e.target.value)}
+              className="w-full accent-[hsl(var(--primary))]"
+            />
+          </div>
+          <div>
+            <div className="flex justify-between text-xs font-mono mb-1">
+              <span>Longevity</span>
+              <span className="text-primary">{longevityW}%</span>
+            </div>
+            <input
+              type="range" min={0} max={100} value={longevityW}
+              onChange={(e) => setLongevityW(e.target.value)}
+              className="w-full accent-[hsl(var(--primary))]"
+            />
+          </div>
+        </div>
+      </div>
+
+      {best && (
+        <div className="mt-6 rounded-lg border border-primary/30 bg-primary/5 p-5 flex items-center gap-4">
+          <div className="flex-1">
+            <div className="font-mono text-[10px] uppercase tracking-widest text-primary">Recommended compound</div>
+            <div className="font-display text-2xl font-bold mt-1">{best.c.label} — {best.score.toFixed(1)} pts</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Best balanced choice for grip {gripW}% · warm-up {warmupW}% · longevity {longevityW}%
+            </p>
+          </div>
+          <div className="hidden sm:grid grid-cols-3 gap-3 text-xs font-mono">
+            <Stat k="Eff. grip" v={`${best.effectiveGrip.toFixed(0)}`} />
+            <Stat k="Warm-up" v={`${best.c.warmup}`} />
+            <Stat k="Longevity" v={`${best.c.longevity}`} />
+          </div>
+        </div>
+      )}
+
       <div className="mt-6 grid md:grid-cols-2 xl:grid-cols-4 gap-4">
         {rows.map((r) => {
-          const isBest = r === best && r.effectiveGrip > 0;
+          const isBest = r === best && r.score > 0;
           return (
             <div
               key={r.c.key}
-              className={`rounded-lg border p-5 shadow-card bg-card ${isBest ? "border-primary/60" : "border-border"}`}
+              className={`rounded-lg border p-5 shadow-card bg-card relative overflow-hidden ${isBest ? "border-primary/60 ring-1 ring-primary/20" : "border-border"}`}
             >
+              {isBest && (
+                <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[9px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-bl-md">
+                  Best pick
+                </div>
+              )}
               <div className="flex items-baseline justify-between">
                 <h2 className="font-display text-xl font-bold uppercase tracking-wider">{r.c.label}</h2>
-                {isBest && <span className="font-mono text-[10px] uppercase tracking-widest text-primary">Best pick</span>}
+                <span className="font-mono text-sm font-bold text-primary">{r.score.toFixed(1)}</span>
               </div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Weighted score</div>
               <Bar label="Effective grip" value={r.effectiveGrip} max={100} accent />
               <Bar label="Raw grip" value={r.c.grip} max={100} />
               <Bar label="Warm-up" value={r.c.warmup} max={100} />
