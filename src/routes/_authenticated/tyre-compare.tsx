@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, GitCompare } from "lucide-react";
+import { ArrowLeft, GitCompare, Grid2x2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -38,6 +38,9 @@ function TyreComparePage() {
   const [trackC, setTrackC] = useState("28");
   const [stintLaps, setStintLaps] = useState("20");
   const [condition, setCondition] = useState<"dry" | "wet">("dry");
+  const [layout, setLayout] = useState<"balanced" | "left" | "right">("right");
+  const [balance, setBalance] = useState<"neutral" | "understeer" | "oversteer">("neutral");
+  const [newTreadMm, setNewTreadMm] = useState("4");
 
   const rows = useMemo(() => {
     const track = parseFloat(trackC);
@@ -58,6 +61,21 @@ function TyreComparePage() {
       return { c, treadC, effectiveGrip, inWindow, wearMm, stintLifeLaps };
     });
   }, [trackC, stintLaps, condition]);
+
+  // Per-corner wear bias. Multipliers sum roughly to 4 so total wear ≈ wearMm * 4.
+  // Layout: right-handed circuits load fronts & left-side tyres more, etc.
+  // Balance: understeer eats fronts, oversteer eats rears.
+  const cornerBias = useMemo(() => {
+    const base = { FL: 1, FR: 1, RL: 1, RR: 1 };
+    if (layout === "right") { base.FL *= 1.20; base.RL *= 1.15; base.FR *= 0.90; base.RR *= 0.85; }
+    if (layout === "left")  { base.FR *= 1.20; base.RR *= 1.15; base.FL *= 0.90; base.RL *= 0.85; }
+    if (balance === "understeer") { base.FL *= 1.15; base.FR *= 1.15; base.RL *= 0.92; base.RR *= 0.92; }
+    if (balance === "oversteer")  { base.RL *= 1.15; base.RR *= 1.15; base.FL *= 0.92; base.FR *= 0.92; }
+    return base;
+  }, [layout, balance]);
+
+  const newMm = Math.max(0.1, parseFloat(newTreadMm) || 4);
+  const corners: Array<"FL" | "FR" | "RL" | "RR"> = ["FL", "FR", "RL", "RR"];
 
   const best = rows.reduce((b, r) => (r.effectiveGrip > b.effectiveGrip ? r : b), rows[0]);
 
@@ -124,6 +142,90 @@ function TyreComparePage() {
             </div>
           );
         })}
+      </div>
+
+      <div className="mt-8">
+        <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
+          <Grid2x2 className="w-3 h-3" /> Per-corner wear forecast
+        </div>
+        <h2 className="font-display text-2xl font-bold mt-1">Wear per corner × compound</h2>
+        <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+          Predicted tread loss at each corner over the planned stint, biased by circuit layout and car balance. Remaining tread assumes a fresh tyre at the depth below.
+        </p>
+
+        <div className="mt-4 grid sm:grid-cols-3 gap-3 rounded-lg border border-border bg-card p-5 shadow-card">
+          <div>
+            <Label>Circuit layout</Label>
+            <Select value={layout} onValueChange={(v) => setLayout(v as typeof layout)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="balanced">Balanced</SelectItem>
+                <SelectItem value="right">Right-handed (CW)</SelectItem>
+                <SelectItem value="left">Left-handed (CCW)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Car balance</Label>
+            <Select value={balance} onValueChange={(v) => setBalance(v as typeof balance)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="neutral">Neutral</SelectItem>
+                <SelectItem value="understeer">Understeer</SelectItem>
+                <SelectItem value="oversteer">Oversteer</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>New tread (mm)</Label>
+            <Input type="number" inputMode="decimal" value={newTreadMm} onChange={(e) => setNewTreadMm(e.target.value)} className="font-mono" />
+          </div>
+        </div>
+
+        <div className="mt-4 overflow-x-auto rounded-lg border border-border bg-card shadow-card">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/30 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              <tr>
+                <th className="text-left px-4 py-2">Compound</th>
+                {corners.map((k) => (
+                  <th key={k} className="text-right px-4 py-2">{k}</th>
+                ))}
+                <th className="text-right px-4 py-2">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => {
+                const perCorner = corners.map((k) => {
+                  const wear = r.wearMm * cornerBias[k];
+                  const remaining = Math.max(0, newMm - wear);
+                  const pctLeft = Math.max(0, Math.min(100, (remaining / newMm) * 100));
+                  return { k, wear, remaining, pctLeft };
+                });
+                const total = perCorner.reduce((s, p) => s + p.wear, 0);
+                return (
+                  <tr key={r.c.key} className="border-t border-border">
+                    <td className="px-4 py-3 font-display font-bold uppercase tracking-wider">{r.c.label}</td>
+                    {perCorner.map((p) => (
+                      <td key={p.k} className="px-4 py-3 text-right font-mono">
+                        <div className={p.remaining <= 0.5 ? "text-chart-1" : p.pctLeft < 40 ? "text-chart-5" : "text-foreground"}>
+                          {p.wear.toFixed(2)} mm
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">{p.remaining.toFixed(2)} mm left</div>
+                        <div className="mt-1 h-1 rounded-full bg-muted overflow-hidden">
+                          <div
+                            className={`h-full ${p.pctLeft < 25 ? "bg-chart-1" : p.pctLeft < 50 ? "bg-chart-5" : "bg-primary"}`}
+                            style={{ width: `${100 - p.pctLeft}%` }}
+                          />
+                        </div>
+                      </td>
+                    ))}
+                    <td className="px-4 py-3 text-right font-mono">{total.toFixed(2)} mm</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
