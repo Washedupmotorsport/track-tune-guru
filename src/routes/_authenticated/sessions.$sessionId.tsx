@@ -7,11 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, AlertTriangle, Cloud, FileDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { parseLapTime, formatLapTime } from "@/lib/lap-time";
 import { getDebrief, type DebriefResult } from "@/lib/debrief.functions";
+import { VoiceRecorder } from "@/components/voice-recorder";
+import { PhotoAttachments } from "@/components/photo-attachments";
+import { getCurrentWeather } from "@/lib/weather";
+import { exportSessionPDF } from "@/lib/pdf-export";
 
 export const Route = createFileRoute("/_authenticated/sessions/$sessionId")({ component: SessionDetail });
 
@@ -113,6 +117,18 @@ function SessionDetail() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Debrief failed"),
   });
 
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const fetchWeather = async () => {
+    setWeatherLoading(true);
+    try {
+      const w = await getCurrentWeather();
+      setMeta((m) => ({ ...m, weather: `${w.weather} (wind ${w.wind_kph} kph)`, air_temp_c: w.air_temp_c }));
+      toast.success("Weather updated — remember to save");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Weather failed");
+    } finally { setWeatherLoading(false); }
+  };
+
   if (sessionQ.isLoading || !sessionQ.data) return <div className="text-muted-foreground">Loading…</div>;
 
   const laps = lapsQ.data ?? [];
@@ -134,9 +150,17 @@ function SessionDetail() {
           <Input value={meta.name ?? ""} onChange={(e) => setMeta({ ...meta, name: e.target.value })}
             className="mt-1 font-display !text-3xl font-bold !h-auto !py-2 !px-3 bg-transparent border-transparent hover:border-border focus-visible:border-primary" />
         </div>
-        <Button onClick={() => save.mutate()} disabled={save.isPending} className="shadow-glow">
-          {save.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />} Save
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={fetchWeather} disabled={weatherLoading}>
+            {weatherLoading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Cloud className="w-4 h-4 mr-1" />} Weather
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => exportSessionPDF(sessionQ.data!, laps)} disabled={laps.length === 0}>
+            <FileDown className="w-4 h-4 mr-1" /> PDF
+          </Button>
+          <Button onClick={() => save.mutate()} disabled={save.isPending} className="shadow-glow">
+            {save.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />} Save
+          </Button>
+        </div>
       </div>
 
       <div className="mt-6 grid md:grid-cols-3 gap-4 rounded-lg border border-border bg-card p-5">
@@ -201,9 +225,16 @@ function SessionDetail() {
       )}
 
       <div className="mt-6 rounded-lg border border-border bg-card p-5">
-        <Label>Session notes</Label>
+        <div className="flex items-center justify-between mb-1">
+          <Label>Session notes</Label>
+          <VoiceRecorder onTranscript={(t) => setMeta((m) => ({ ...m, notes: ((m.notes ?? "") + (m.notes ? "\n" : "") + t).trim() }))} />
+        </div>
         <Textarea rows={3} value={meta.notes ?? ""} onChange={(e) => setMeta({ ...meta, notes: e.target.value })}
           placeholder="Driver feedback, observations, plan for next session…" />
+      </div>
+
+      <div className="mt-6 rounded-lg border border-border bg-card p-5">
+        <PhotoAttachments carId={sessionQ.data.car_id} scope="session_id" scopeId={sessionId} />
       </div>
 
       <div className="mt-6 rounded-lg border border-primary/40 bg-card p-5 shadow-card">
