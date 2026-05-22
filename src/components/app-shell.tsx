@@ -11,12 +11,13 @@ import {
   DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { CommandPalette } from "@/components/command-palette";
-import { useUnits } from "@/lib/units";
+import { useUnits, CURRENCIES, type CurrencyCode } from "@/lib/units";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const { system, toggle } = useUnits();
+  const { system, toggle, currency, setCurrency } = useUnits();
   return (
     <div className="min-h-screen text-foreground">
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
@@ -44,6 +45,21 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className="mx-1 opacity-40">/</span>
               <span className={system === "imperial" ? "text-primary" : ""}>US</span>
             </button>
+            <Select value={currency} onValueChange={(v) => setCurrency(v as CurrencyCode)}>
+              <SelectTrigger
+                aria-label="Currency"
+                className="h-[34px] w-[78px] rounded-md border border-border bg-muted/30 px-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CURRENCIES.map((c) => (
+                  <SelectItem key={c.code} value={c.code} className="font-mono text-xs">
+                    {c.code} <span className="text-muted-foreground ml-2">{c.symbol}</span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Link to="/sessions" className="hidden lg:inline-flex items-center text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
               <Timer className="w-4 h-4 mr-1" /> Sessions
             </Link>
