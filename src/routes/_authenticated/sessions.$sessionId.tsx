@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, AlertTriangle, Cloud, FileDown, Monitor } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, AlertTriangle, Cloud, FileDown, Monitor, Table as TableIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { parseLapTime, formatLapTime } from "@/lib/lap-time";
@@ -18,6 +18,8 @@ import { getCurrentWeather } from "@/lib/weather";
 import { exportSessionPDF } from "@/lib/pdf-export";
 import { LapTimer } from "@/components/lap-timer";
 import { IncidentLog } from "@/components/incident-log";
+import { SessionShareDialog } from "@/components/session-share-dialog";
+import { toCSV, downloadCSV } from "@/lib/csv";
 
 export const Route = createFileRoute("/_authenticated/sessions/$sessionId")({ component: SessionDetail });
 
@@ -162,6 +164,23 @@ function SessionDetail() {
           <Button variant="outline" size="sm" onClick={() => exportSessionPDF(sessionQ.data!, laps)} disabled={laps.length === 0}>
             <FileDown className="w-4 h-4 mr-1" /> PDF
           </Button>
+          <Button variant="outline" size="sm" disabled={laps.length === 0} onClick={() => {
+            const rows = laps.map((l) => ({
+              lap_number: l.lap_number ?? "",
+              lap_time_ms: l.lap_time_ms,
+              lap_time: formatLapTime(l.lap_time_ms),
+              s1_ms: l.sector_1_ms ?? "",
+              s2_ms: l.sector_2_ms ?? "",
+              s3_ms: l.sector_3_ms ?? "",
+              conditions: l.conditions ?? "",
+              notes: l.notes ?? "",
+              recorded_at: l.recorded_at,
+            }));
+            downloadCSV(`${sessionQ.data!.name.replace(/\s+/g, "_")}_laps.csv`, toCSV(rows));
+          }}>
+            <TableIcon className="w-4 h-4 mr-1" /> CSV
+          </Button>
+          <SessionShareDialog sessionId={sessionId} carId={sessionQ.data.car_id} />
           <Button onClick={() => save.mutate()} disabled={save.isPending} className="shadow-glow">
             {save.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />} Save
           </Button>
