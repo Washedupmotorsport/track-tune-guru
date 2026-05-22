@@ -50,10 +50,13 @@ export function PhotoAttachments({ carId, scope, scopeId }: { carId: string; sco
         const path = `${user.id}/${carId}/${crypto.randomUUID()}.${ext}`;
         const up = await supabase.storage.from("photos").upload(path, file, { contentType: file.type });
         if (up.error) throw up.error;
-        const { error } = await supabase.from("attachments").insert({
+        const row: Record<string, unknown> = {
           user_id: user.id, car_id: carId, storage_path: path, file_name: file.name,
-          mime_type: file.type, size_bytes: file.size, [scope]: scopeId,
-        });
+          mime_type: file.type, size_bytes: file.size,
+        };
+        row[scope] = scopeId;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await supabase.from("attachments").insert(row as any);
         if (error) throw error;
       }
     },
