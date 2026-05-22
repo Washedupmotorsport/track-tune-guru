@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Disc, Plus, ArrowLeft, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { PressureCalculator } from "@/components/pressure-calculator";
 
 export const Route = createFileRoute("/_authenticated/tires")({ component: TiresPage });
 
@@ -135,6 +136,7 @@ function TiresPage() {
       </div>
 
       <div className="mt-6 space-y-3">
+        <PressureCalculator />
         {logsQ.isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
         {!logsQ.isLoading && (logsQ.data ?? []).length === 0 && (
           <div className="rounded-lg border border-dashed border-border p-10 text-center">
