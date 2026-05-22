@@ -136,6 +136,7 @@ function TiresPage() {
       </div>
 
       <div className="mt-6 space-y-3">
+        <PressureCalculator />
         {logsQ.isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
         {!logsQ.isLoading && (logsQ.data ?? []).length === 0 && (
           <div className="rounded-lg border border-dashed border-border p-10 text-center">
