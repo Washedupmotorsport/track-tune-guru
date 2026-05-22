@@ -49,6 +49,8 @@ export type ParseResult = {
   laps: ParsedLap[];
   errors: { row: number; reason: string }[];
   headersUsed: Partial<Record<keyof ParsedLap, string>>;
+  unrecognizedHeaders: string[];
+  rawHeaders: string[];
 };
 
 export function parseLapCsv(text: string): ParseResult {
