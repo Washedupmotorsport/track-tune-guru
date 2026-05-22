@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, GitCompare, Grid2x2 } from "lucide-react";
+import { ArrowLeft, GitCompare, Grid2x2, Download } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import jsPDF from "jspdf";
 
 export const Route = createFileRoute("/_authenticated/tyre-compare")({
   component: TyreComparePage,
@@ -77,6 +79,85 @@ function TyreComparePage() {
   const newMm = Math.max(0.1, parseFloat(newTreadMm) || 4);
   const corners: Array<"FL" | "FR" | "RL" | "RR"> = ["FL", "FR", "RL", "RR"];
 
+  const downloadReport = () => {
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const W = doc.internal.pageSize.getWidth();
+    const M = 40;
+    let y = M;
+
+    doc.setFont("helvetica", "bold"); doc.setFontSize(18);
+    doc.text("Tyre Compound Comparison", M, y); y += 22;
+    doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(110);
+    doc.text(`Generated ${new Date().toLocaleString()}`, M, y); y += 18;
+    doc.setTextColor(0);
+
+    doc.setFont("helvetica", "bold"); doc.setFontSize(12);
+    doc.text("Inputs", M, y); y += 14;
+    doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+    const inputs = [
+      `Track temp: ${trackC} °C`,
+      `Planned stint: ${stintLaps} laps`,
+      `Condition: ${condition}`,
+      `Circuit layout: ${layout}`,
+      `Car balance: ${balance}`,
+      `New tread: ${newMm.toFixed(2)} mm`,
+    ];
+    inputs.forEach((t) => { doc.text(t, M, y); y += 13; });
+    y += 8;
+
+    doc.setFont("helvetica", "bold"); doc.setFontSize(12);
+    doc.text("Compound summary", M, y); y += 14;
+    doc.setFontSize(9);
+    const headers = ["Compound", "Eff. grip", "Raw grip", "Longev.", "Tread °C", "In win.", "Wear/stint", "Stint life"];
+    const colX = [M, M+90, M+150, M+205, M+260, M+315, M+365, M+435];
+    headers.forEach((h, i) => doc.text(h, colX[i], y));
+    y += 4; doc.line(M, y, W - M, y); y += 12;
+    doc.setFont("helvetica", "normal");
+    rows.forEach((r) => {
+      const vals = [
+        r.c.label,
+        r.effectiveGrip.toFixed(0),
+        r.c.grip.toFixed(0),
+        r.c.longevity.toFixed(0),
+        r.treadC.toFixed(0),
+        r.inWindow ? "yes" : "no",
+        `${r.wearMm.toFixed(2)} mm`,
+        `${r.stintLifeLaps} laps`,
+      ];
+      vals.forEach((v, i) => doc.text(v, colX[i], y));
+      y += 13;
+    });
+    y += 12;
+
+    doc.setFont("helvetica", "bold"); doc.setFontSize(12);
+    doc.text("Per-corner wear forecast (mm worn / mm remaining)", M, y); y += 14;
+    doc.setFontSize(9);
+    const wHeaders = ["Compound", "FL", "FR", "RL", "RR", "Total"];
+    const wColX = [M, M+110, M+190, M+270, M+350, M+430];
+    wHeaders.forEach((h, i) => doc.text(h, wColX[i], y));
+    y += 4; doc.line(M, y, W - M, y); y += 12;
+    doc.setFont("helvetica", "normal");
+    rows.forEach((r) => {
+      const perCorner = corners.map((k) => {
+        const wear = r.wearMm * cornerBias[k];
+        return { k, wear, remaining: Math.max(0, newMm - wear) };
+      });
+      const total = perCorner.reduce((s, p) => s + p.wear, 0);
+      doc.text(r.c.label, wColX[0], y);
+      perCorner.forEach((p, i) => {
+        doc.text(`${p.wear.toFixed(2)} / ${p.remaining.toFixed(2)}`, wColX[i + 1], y);
+      });
+      doc.text(`${total.toFixed(2)} mm`, wColX[5], y);
+      y += 13;
+    });
+    y += 10;
+    doc.setFontSize(8); doc.setTextColor(110);
+    doc.text("Estimates based on baseline compound model; tune against your own stint data for accuracy.", M, y);
+
+    const ts = new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-");
+    doc.save(`tyre-compare-${condition}-${ts}.pdf`);
+  };
+
   const best = rows.reduce((b, r) => (r.effectiveGrip > b.effectiveGrip ? r : b), rows[0]);
 
   return (
@@ -85,13 +166,20 @@ function TyreComparePage() {
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
       <div className="mt-4">
-        <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
-          <GitCompare className="w-3 h-3" /> Compare
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
+              <GitCompare className="w-3 h-3" /> Compare
+            </div>
+            <h1 className="font-display text-4xl font-bold mt-1">Compound Comparison</h1>
+            <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+              See how each available compound trades grip for longevity at your conditions, plus where each one sits versus its ideal tread-temperature window.
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={downloadReport} className="shrink-0">
+            <Download className="w-4 h-4 mr-1" /> Download PDF
+          </Button>
         </div>
-        <h1 className="font-display text-4xl font-bold mt-1">Compound Comparison</h1>
-        <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-          See how each available compound trades grip for longevity at your conditions, plus where each one sits versus its ideal tread-temperature window.
-        </p>
       </div>
 
       <div className="mt-6 grid sm:grid-cols-3 gap-3 rounded-lg border border-border bg-card p-5 shadow-card">
