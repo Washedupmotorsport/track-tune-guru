@@ -257,3 +257,15 @@ function SelField({ label, value, onChange, options }: {
     </div>
   );
 }
+
+function displayRow(value: string, unit: string | undefined, units: ReturnType<typeof useUnits>) {
+  if (!unit) return <>{value}</>;
+  const n = parseFloat(value);
+  if (isNaN(n)) {
+    return <>{value}<span className="text-primary text-xs font-mono ml-1">{unit}</span></>;
+  }
+  if (unit === "mm") {
+    return <>{units.toDisplayLengthShort(n)}<span className="text-primary text-xs font-mono ml-1">{units.lengthShortUnit}</span></>;
+  }
+  return <>{value}<span className="text-primary text-xs font-mono ml-1">{unit}</span></>;
+}
