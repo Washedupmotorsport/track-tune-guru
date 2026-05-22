@@ -3,7 +3,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
   LogOut, Calculator, Wand2, NotebookPen, Timer, Disc, Wrench,
-  Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon,
+  Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon, Gauge,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
