@@ -514,6 +514,36 @@ export type Database = {
         }
         Relationships: []
       }
+      session_shares: {
+        Row: {
+          car_id: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          session_id: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          session_id: string
+          token: string
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          session_id?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sessions: {
         Row: {
           air_temp_c: number | null
