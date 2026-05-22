@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, GitCompare, Grid2x2, Download } from "lucide-react";
+import { ArrowLeft, GitCompare, Grid2x2, Download, Thermometer } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -36,6 +36,25 @@ const COMPOUNDS: Compound[] = [
   { key: "wet",    label: "Wet",    grip: 60, warmup: 95, longevity: 50, peakTempC: 55,  tempWindowC: 20, wetOk: true,  wearMmPerLap: 0.07 },
 ];
 
+const COMPOUND_COLORS: Record<string, string> = {
+  soft: "hsl(var(--chart-1))",
+  medium: "hsl(var(--chart-2))",
+  hard: "hsl(var(--chart-3))",
+  wet: "hsl(var(--chart-4))",
+};
+
+// Effective grip for a compound at a given track temp + condition. Mirrors the row calc.
+function effectiveGripAt(c: Compound, trackTempC: number, condition: "dry" | "wet") {
+  const treadC = trackTempC + (condition === "wet" ? 5 : 30);
+  const dist = Math.abs(treadC - c.peakTempC);
+  const inWindow = dist <= c.tempWindowC;
+  const tempPenalty = inWindow ? 0 : Math.min(40, (dist - c.tempWindowC) * 1.8);
+  let g = Math.max(0, c.grip - tempPenalty);
+  if (condition === "wet" && !c.wetOk) g = Math.max(5, g * 0.25);
+  if (condition === "dry" && c.wetOk) g = Math.max(10, g * 0.5);
+  return g;
+}
+
 function TyreComparePage() {
   const [trackC, setTrackC] = useState("28");
   const [stintLaps, setStintLaps] = useState("20");
@@ -43,6 +62,9 @@ function TyreComparePage() {
   const [layout, setLayout] = useState<"balanced" | "left" | "right">("right");
   const [balance, setBalance] = useState<"neutral" | "understeer" | "oversteer">("neutral");
   const [newTreadMm, setNewTreadMm] = useState("4");
+  const [sweepMinC, setSweepMinC] = useState("5");
+  const [sweepMaxC, setSweepMaxC] = useState("50");
+  const [sweepCondition, setSweepCondition] = useState<"both" | "dry" | "wet">("both");
 
   const rows = useMemo(() => {
     const track = parseFloat(trackC);
@@ -78,6 +100,15 @@ function TyreComparePage() {
 
   const newMm = Math.max(0.1, parseFloat(newTreadMm) || 4);
   const corners: Array<"FL" | "FR" | "RL" | "RR"> = ["FL", "FR", "RL", "RR"];
+
+  // Temperature sweep: effective grip per compound across a range of track temps.
+  const sweep = useMemo(() => {
+    const lo = Math.min(parseFloat(sweepMinC) || 5, parseFloat(sweepMaxC) || 50);
+    const hi = Math.max(parseFloat(sweepMinC) || 5, parseFloat(sweepMaxC) || 50);
+    const steps = 28;
+    const temps = Array.from({ length: steps + 1 }, (_, i) => lo + ((hi - lo) * i) / steps);
+    return { lo, hi, temps };
+  }, [sweepMinC, sweepMaxC]);
 
   const downloadReport = () => {
     const doc = new jsPDF({ unit: "pt", format: "a4" });
