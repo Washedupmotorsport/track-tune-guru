@@ -267,5 +267,8 @@ function displayRow(value: string, unit: string | undefined, units: ReturnType<t
   if (unit === "mm") {
     return <>{units.toDisplayLengthShort(n)}<span className="text-primary text-xs font-mono ml-1">{units.lengthShortUnit}</span></>;
   }
+  if (unit === "psi") {
+    return <>{units.toDisplayPressure(n)}<span className="text-primary text-xs font-mono ml-1">{units.pressureUnit}</span></>;
+  }
   return <>{value}<span className="text-primary text-xs font-mono ml-1">{unit}</span></>;
 }
