@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Disc, Gauge } from "lucide-react";
+import { ArrowLeft, Disc, Gauge, Thermometer } from "lucide-react";
 import { useUnits } from "@/lib/units";
 
 export const Route = createFileRoute("/_authenticated/tyre-setup")({
