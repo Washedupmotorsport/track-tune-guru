@@ -1,9 +1,27 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Upload, Loader2 } from "lucide-react";
+import { Upload, Loader2, Download } from "lucide-react";
 import { parseLapCsv, type ParsedLap } from "@/lib/lap-csv";
 import { supabase } from "@/integrations/supabase/client";
+
+const TEMPLATE_CSV = `Lap,Lap Time,S1,S2,S3,Conditions,Notes
+1,1:23.456,28.123,27.890,27.443,Dry,Out lap
+2,1:21.234,27.456,26.987,26.791,Dry,Clean lap
+3,1:20.987,27.301,26.842,26.844,Dry,New PB
+4,1:22.105,27.612,27.103,27.390,Dry,Slight lockup T3
+5,1:21.998,27.501,27.012,27.485,Damp,Light rain starting
+`;
+
+function downloadTemplate() {
+  const blob = new Blob([TEMPLATE_CSV], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "lap-log-template.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -60,12 +78,17 @@ export function LapImportDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          <input
-            type="file"
-            accept=".csv,text/csv"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }}
-            className="block w-full text-sm file:mr-3 file:py-2 file:px-3 file:rounded-md file:border file:border-border file:bg-muted file:text-foreground file:font-mono file:text-xs file:uppercase file:tracking-widest hover:file:bg-muted/70"
-          />
+          <div className="flex items-center justify-between gap-2">
+            <input
+              type="file"
+              accept=".csv,text/csv"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }}
+              className="block w-full text-sm file:mr-3 file:py-2 file:px-3 file:rounded-md file:border file:border-border file:bg-muted file:text-foreground file:font-mono file:text-xs file:uppercase file:tracking-widest hover:file:bg-muted/70"
+            />
+            <Button type="button" variant="ghost" size="sm" onClick={downloadTemplate} className="shrink-0">
+              <Download className="w-4 h-4 mr-1" /> Template
+            </Button>
+          </div>
 
           {preview && (
             <div className="rounded-md border border-border bg-card p-3 text-sm">
