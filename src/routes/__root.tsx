@@ -12,6 +12,7 @@ import appCss from "../styles.css?url";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/lib/auth-context";
 import { UnitsProvider } from "@/lib/units";
+import { ThemeProvider } from "@/lib/theme";
 import { useEffect } from "react";
 
 function NotFoundComponent() {
@@ -135,12 +136,14 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <UnitsProvider>
-          <Outlet />
-          <Toaster theme="light" position="top-center" />
-        </UnitsProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <UnitsProvider>
+            <Outlet />
+            <Toaster position="top-center" />
+          </UnitsProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
