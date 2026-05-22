@@ -51,7 +51,7 @@ export function ShareDialog({ carId, carName, trigger }: { carId: string; carNam
       if (!/^\S+@\S+\.\S+$/.test(trimmed)) throw new Error("Enter a valid email");
       const { data: lookup, error: lookupErr } = await supabase.rpc("get_user_id_by_email", { _email: trimmed });
       if (lookupErr) throw lookupErr;
-      if (!lookup) throw new Error("No Summit Racing user with that email");
+      if (!lookup) throw new Error("No My Race Engineer user with that email");
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not signed in");
       if (lookup === user.id) throw new Error("That's you");
@@ -116,7 +116,7 @@ export function ShareDialog({ carId, carName, trigger }: { carId: string; carNam
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            They must already have a Summit Racing account. Editors can change setups & log laps; viewers are read-only.
+            They must already have a My Race Engineer account. Editors can change setups & log laps; viewers are read-only.
           </p>
         </div>
 
