@@ -5,14 +5,30 @@ import { Upload, Loader2, Download, AlertTriangle } from "lucide-react";
 import { parseLapCsv, type ParsedLap } from "@/lib/lap-csv";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { useQuery } from "@tanstack/react-query";
 
-const TEMPLATE_CSV = `Lap,Lap Time,S1,S2,S3,Conditions,Notes
+const TEMPLATE_BODY = `Lap,Lap Time,S1,S2,S3,Conditions,Notes
 1,1:23.456,28.123,27.890,27.443,Dry,Out lap
 2,1:21.234,27.456,26.987,26.791,Dry,Clean lap
 3,1:20.987,27.301,26.842,26.844,Dry,New PB
 4,1:22.105,27.612,27.103,27.390,Dry,Slight lockup T3
 5,1:21.998,27.501,27.012,27.485,Damp,Light rain starting
 `;
+
+function buildTemplateCsv(meta: Record<string, string | null | undefined>): string {
+  const lines: string[] = [
+    "# My Race Engineer — lap import template",
+    "# Lines starting with '#' are metadata and ignored by the parser.",
+    "# Keep these tags to ensure laps re-attach to the correct setup / session.",
+  ];
+  for (const [k, v] of Object.entries(meta)) {
+    if (v) lines.push(`# ${k}: ${v}`);
+  }
+  lines.push("#");
+  return lines.join("\n") + "\n" + TEMPLATE_BODY;
+}
 
 function downloadCsv(filename: string, csv: string) {
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
@@ -24,9 +40,7 @@ function downloadCsv(filename: string, csv: string) {
   URL.revokeObjectURL(url);
 }
 
-function downloadTemplate() {
-  downloadCsv("lap-log-template.csv", TEMPLATE_CSV);
-}
+// Template is now built per-call with car/setup/session metadata.
 
 function fmtMs(ms: number | null): string {
   if (ms == null) return "";
@@ -58,6 +72,7 @@ export function LapImportDialog({
 }: { setupId: string; carId: string; userId: string; defaultConditions: string }) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [sessionId, setSessionId] = useState<string>("none");
   const [preview, setPreview] = useState<{
     laps: ParsedLap[];
     errors: { row: number; reason: string }[];
@@ -66,7 +81,45 @@ export function LapImportDialog({
     rawHeaders: string[];
     missingRequired: boolean;
     confirmed: boolean;
+    meta: Record<string, string>;
   } | null>(null);
+
+  const metaQ = useQuery({
+    queryKey: ["import-meta", setupId, carId],
+    enabled: open,
+    queryFn: async () => {
+      const [setupRes, carRes, sessionsRes] = await Promise.all([
+        supabase.from("setups").select("id, name, track").eq("id", setupId).maybeSingle(),
+        supabase.from("cars").select("id, name").eq("id", carId).maybeSingle(),
+        supabase.from("sessions").select("id, name, track, started_at").eq("setup_id", setupId).order("started_at", { ascending: false }),
+      ]);
+      return {
+        setup: setupRes.data,
+        car: carRes.data,
+        sessions: sessionsRes.data ?? [],
+      };
+    },
+  });
+
+  const sessions = metaQ.data?.sessions ?? [];
+  const selectedSession = sessions.find((s) => s.id === sessionId);
+
+  const handleDownloadTemplate = () => {
+    const m = metaQ.data;
+    downloadCsv(
+      `lap-template-${m?.car?.name?.replace(/\s+/g, "-").toLowerCase() ?? "car"}.csv`,
+      buildTemplateCsv({
+        car_id: carId,
+        car_name: m?.car?.name ?? null,
+        setup_id: setupId,
+        setup_name: m?.setup?.name ?? null,
+        track: m?.setup?.track ?? selectedSession?.track ?? null,
+        session_id: sessionId !== "none" ? sessionId : null,
+        session_name: selectedSession?.name ?? null,
+        default_conditions: defaultConditions || null,
+      }),
+    );
+  };
 
   const onFile = async (file: File) => {
     const text = await file.text();
@@ -79,7 +132,12 @@ export function LapImportDialog({
       rawHeaders: res.rawHeaders,
       missingRequired: !res.headersUsed.lap_time_ms,
       confirmed: false,
+      meta: res.meta,
     });
+    // Auto-select the session from the file metadata if it matches one we know.
+    if (res.meta.session_id && sessions.some((s) => s.id === res.meta.session_id)) {
+      setSessionId(res.meta.session_id);
+    }
   };
 
   const importMut = useMutation({
@@ -87,6 +145,7 @@ export function LapImportDialog({
       if (!preview || preview.laps.length === 0) return;
       const rows = preview.laps.map((l) => ({
         user_id: userId, setup_id: setupId, car_id: carId,
+        session_id: sessionId !== "none" ? sessionId : null,
         lap_number: l.lap_number,
         lap_time_ms: l.lap_time_ms,
         sector_1_ms: l.sector_1_ms,
@@ -101,13 +160,17 @@ export function LapImportDialog({
     onSuccess: () => {
       toast.success(`Imported ${preview?.laps.length ?? 0} laps`);
       qc.invalidateQueries({ queryKey: ["laps", setupId] });
+      qc.invalidateQueries({ queryKey: ["session-laps"] });
       setOpen(false);
       setPreview(null);
+      setSessionId("none");
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Import failed"),
   });
 
   const hasUnrecognized = (preview?.unrecognizedHeaders.length ?? 0) > 0;
+  const metaSetupMismatch = !!preview?.meta.setup_id && preview.meta.setup_id !== setupId;
+  const metaCarMismatch = !!preview?.meta.car_id && preview.meta.car_id !== carId;
   const blockImport =
     !preview ||
     preview.laps.length === 0 ||
