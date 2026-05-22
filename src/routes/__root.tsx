@@ -81,7 +81,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "My Race Engineer" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "theme-color", content: "#0a0a0a" },
+      { name: "theme-color", content: "#f7f7f5" },
     ],
     links: [
       {
@@ -138,7 +138,7 @@ function RootComponent() {
       <AuthProvider>
         <UnitsProvider>
           <Outlet />
-          <Toaster theme="dark" position="top-center" />
+          <Toaster theme="light" position="top-center" />
         </UnitsProvider>
       </AuthProvider>
     </QueryClientProvider>
