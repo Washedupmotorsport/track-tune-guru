@@ -3,7 +3,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
   LogOut, Calculator, Wand2, NotebookPen, Timer, Disc, Wrench,
-  Package, CalendarDays, Receipt, BarChart3, Menu, Search,
+  Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
@@ -12,12 +12,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CommandPalette } from "@/components/command-palette";
 import { useUnits, CURRENCIES, type CurrencyCode } from "@/lib/units";
+import { useTheme } from "@/lib/theme";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { system, toggle, currency, setCurrency } = useUnits();
+  const { theme, toggle: toggleTheme } = useTheme();
   return (
     <div className="min-h-screen text-foreground">
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
@@ -44,6 +46,14 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className={system === "metric" ? "text-primary" : ""}>SI</span>
               <span className="mx-1 opacity-40">/</span>
               <span className={system === "imperial" ? "text-primary" : ""}>US</span>
+            </button>
+            <button
+              onClick={toggleTheme}
+              title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+              aria-label="Toggle theme"
+              className="inline-flex items-center justify-center rounded-md border border-border bg-muted/30 h-[34px] w-[34px] text-muted-foreground hover:text-primary hover:border-primary/40"
+            >
+              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             <Select value={currency} onValueChange={(v) => setCurrency(v as CurrencyCode)}>
               <SelectTrigger
