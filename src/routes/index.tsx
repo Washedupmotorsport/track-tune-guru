@@ -7,6 +7,27 @@ import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/")({
   component: Landing,
+  head: () => ({
+    meta: [
+      { title: "My Race Engineer — Race Car Setup Manager" },
+      { name: "description", content: "Your digital pit garage for circuit, drift, drag, autocross, rally and oval. Save baselines, log changes, win every session." },
+      { property: "og:title", content: "My Race Engineer — Race Car Setup Manager" },
+      { property: "og:description", content: "Your digital pit garage for circuit, drift, drag, autocross, rally and oval. Save baselines, log changes, win every session." },
+      { property: "og:url", content: "/" },
+    ],
+    links: [{ rel: "canonical", href: "/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "My Race Engineer",
+          description: "Race car setup, session, and lap analysis manager for every motorsport discipline.",
+        }),
+      },
+    ],
+  }),
 });
 
 function Landing() {
@@ -74,6 +95,7 @@ function Landing() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20 grid md:grid-cols-3 gap-6">
+        <h2 className="sr-only">Features</h2>
         {[
           { icon: Wrench, title: "Setup sheets", body: "Tires, alignment, suspension, aero, drivetrain — built per discipline." },
           { icon: LineChart, title: "Track conditions", body: "Tag every setup with track, weather and notes for total recall." },

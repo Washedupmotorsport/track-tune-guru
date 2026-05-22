@@ -95,10 +95,13 @@ export function PhotoAttachments({ carId, scope, scopeId }: { carId: string; sco
           {items.map((a) => (
             <div key={a.id} className="relative group aspect-square rounded-md overflow-hidden border border-border bg-muted">
               {urls[a.id] ? (
-                <img src={urls[a.id]} alt={a.file_name ?? ""} className="w-full h-full object-cover" loading="lazy" />
+                <img src={urls[a.id]} alt={a.caption ?? "Attached photo"} className="w-full h-full object-cover" loading="lazy" />
               ) : <div className="w-full h-full flex items-center justify-center"><Loader2 className="w-4 h-4 animate-spin text-muted-foreground" /></div>}
-              <button onClick={() => { if (confirm("Delete?")) del.mutate(a); }}
-                className="absolute top-1 right-1 p-1 rounded bg-background/80 opacity-0 group-hover:opacity-100 text-destructive">
+              <button
+                onClick={() => { if (confirm("Delete?")) del.mutate(a); }}
+                aria-label="Delete photo"
+                className="absolute top-1 right-1 p-1 rounded bg-background/80 opacity-0 group-hover:opacity-100 text-destructive"
+              >
                 <Trash2 className="w-3 h-3" />
               </button>
             </div>
