@@ -148,14 +148,15 @@ function TyreComparePage() {
     doc.setFont("helvetica", "bold"); doc.setFontSize(12);
     doc.text("Compound summary", M, y); y += 14;
     doc.setFontSize(9);
-    const headers = ["Compound", "Eff. grip", "Raw grip", "Longev.", "Tread °C", "In win.", "Wear/stint", "Stint life"];
-    const colX = [M, M+90, M+150, M+205, M+260, M+315, M+365, M+435];
+    const headers = ["Compound", "Score", "Eff. grip", "Raw grip", "Longev.", "Tread °C", "In win.", "Wear/stint", "Stint life"];
+    const colX = [M, M+60, M+110, M+170, M+225, M+280, M+335, M+385, M+455];
     headers.forEach((h, i) => doc.text(h, colX[i], y));
     y += 4; doc.line(M, y, W - M, y); y += 12;
     doc.setFont("helvetica", "normal");
     rows.forEach((r) => {
       const vals = [
         r.c.label,
+        r.score.toFixed(1),
         r.effectiveGrip.toFixed(0),
         r.c.grip.toFixed(0),
         r.c.longevity.toFixed(0),
