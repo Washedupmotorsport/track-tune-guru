@@ -72,6 +72,10 @@ function TyreComparePage() {
   const rows = useMemo(() => {
     const track = parseFloat(trackC);
     const laps = Math.max(0, parseFloat(stintLaps) || 0);
+    const gw = Math.max(0, parseFloat(gripW) || 0);
+    const ww = Math.max(0, parseFloat(warmupW) || 0);
+    const lw = Math.max(0, parseFloat(longevityW) || 0);
+    const totalW = gw + ww + lw || 1;
     return COMPOUNDS.map((c) => {
       // Estimate tread temp ~ track + 30°C on dry running. For wet, much cooler.
       const treadC = (isNaN(track) ? 25 : track) + (condition === "wet" ? 5 : 30);
@@ -85,9 +89,11 @@ function TyreComparePage() {
       // Wear scales with grip pressure (hot tread) and laps.
       const wearMm = c.wearMmPerLap * laps * (1 + Math.max(0, treadC - c.peakTempC) * 0.01);
       const stintLifeLaps = Math.round((4 / c.wearMmPerLap) * (condition === "wet" && !c.wetOk ? 0.6 : 1));
-      return { c, treadC, effectiveGrip, inWindow, wearMm, stintLifeLaps };
+      // Weighted score: normalize each attribute to 0-100 then apply weights.
+      const score = (effectiveGrip * gw + c.warmup * ww + c.longevity * lw) / totalW;
+      return { c, treadC, effectiveGrip, inWindow, wearMm, stintLifeLaps, score };
     });
-  }, [trackC, stintLaps, condition]);
+  }, [trackC, stintLaps, condition, gripW, warmupW, longevityW]);
 
   // Per-corner wear bias. Multipliers sum roughly to 4 so total wear ≈ wearMm * 4.
   // Layout: right-handed circuits load fronts & left-side tyres more, etc.
