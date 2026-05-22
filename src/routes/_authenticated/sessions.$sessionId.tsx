@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, AlertTriangle, Cloud, FileDown } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, AlertTriangle, Cloud, FileDown, Monitor } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { parseLapTime, formatLapTime } from "@/lib/lap-time";
@@ -16,6 +16,8 @@ import { VoiceRecorder } from "@/components/voice-recorder";
 import { PhotoAttachments } from "@/components/photo-attachments";
 import { getCurrentWeather } from "@/lib/weather";
 import { exportSessionPDF } from "@/lib/pdf-export";
+import { LapTimer } from "@/components/lap-timer";
+import { IncidentLog } from "@/components/incident-log";
 
 export const Route = createFileRoute("/_authenticated/sessions/$sessionId")({ component: SessionDetail });
 
@@ -151,6 +153,9 @@ function SessionDetail() {
             className="mt-1 font-display !text-3xl font-bold !h-auto !py-2 !px-3 bg-transparent border-transparent hover:border-border focus-visible:border-primary" />
         </div>
         <div className="flex items-center gap-2">
+          <Link to="/sessions/$sessionId/pitboard" params={{ sessionId }}>
+            <Button variant="outline" size="sm"><Monitor className="w-4 h-4 mr-1" /> Pit board</Button>
+          </Link>
           <Button variant="outline" size="sm" onClick={fetchWeather} disabled={weatherLoading}>
             {weatherLoading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Cloud className="w-4 h-4 mr-1" />} Weather
           </Button>
@@ -180,6 +185,23 @@ function SessionDetail() {
         <Stat label="Best" value={formatLapTime(best)} icon={<Trophy className="w-4 h-4 text-primary" />} />
         <Stat label="Avg" value={formatLapTime(avg)} />
         <Stat label="Fuel / lap" value={fuelPerLap != null ? `${fuelPerLap.toFixed(2)} L` : "—"} icon={<Fuel className="w-4 h-4 text-primary" />} />
+      </div>
+
+      <div className="mt-6">
+        <LapTimer onSaveLap={async (ms, n) => {
+          if (!sessionQ.data?.setup_id) { toast.error("Attach a setup to log laps"); return; }
+          const { error } = await supabase.from("laps").insert({
+            user_id: user!.id,
+            setup_id: sessionQ.data.setup_id,
+            car_id: sessionQ.data.car_id,
+            session_id: sessionId,
+            lap_number: n,
+            lap_time_ms: ms,
+            conditions: sessionQ.data.weather,
+          });
+          if (error) { toast.error(error.message); return; }
+          qc.invalidateQueries({ queryKey: ["session-laps", sessionId] });
+        }} />
       </div>
 
       <div className="mt-6 rounded-lg border border-border bg-card p-5">
@@ -235,6 +257,10 @@ function SessionDetail() {
 
       <div className="mt-6 rounded-lg border border-border bg-card p-5">
         <PhotoAttachments carId={sessionQ.data.car_id} scope="session_id" scopeId={sessionId} />
+      </div>
+
+      <div className="mt-6 rounded-lg border border-border bg-card p-5">
+        <IncidentLog sessionId={sessionId} carId={sessionQ.data.car_id} />
       </div>
 
       <div className="mt-6 rounded-lg border border-primary/40 bg-card p-5 shadow-card">
