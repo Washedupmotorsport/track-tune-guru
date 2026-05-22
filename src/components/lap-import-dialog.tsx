@@ -1,9 +1,27 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Upload, Loader2 } from "lucide-react";
+import { Upload, Loader2, Download } from "lucide-react";
 import { parseLapCsv, type ParsedLap } from "@/lib/lap-csv";
 import { supabase } from "@/integrations/supabase/client";
+
+const TEMPLATE_CSV = `Lap,Lap Time,S1,S2,S3,Conditions,Notes
+1,1:23.456,28.123,27.890,27.443,Dry,Out lap
+2,1:21.234,27.456,26.987,26.791,Dry,Clean lap
+3,1:20.987,27.301,26.842,26.844,Dry,New PB
+4,1:22.105,27.612,27.103,27.390,Dry,Slight lockup T3
+5,1:21.998,27.501,27.012,27.485,Damp,Light rain starting
+`;
+
+function downloadTemplate() {
+  const blob = new Blob([TEMPLATE_CSV], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "lap-log-template.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
