@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTyreWearRouteImport } from './routes/_authenticated/tyre-wear'
 import { Route as AuthenticatedTyreSetupRouteImport } from './routes/_authenticated/tyre-setup'
+import { Route as AuthenticatedTyreCompareRouteImport } from './routes/_authenticated/tyre-compare'
 import { Route as AuthenticatedTiresRouteImport } from './routes/_authenticated/tires'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
@@ -62,6 +63,12 @@ const AuthenticatedTyreSetupRoute = AuthenticatedTyreSetupRouteImport.update({
   path: '/tyre-setup',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedTyreCompareRoute =
+  AuthenticatedTyreCompareRouteImport.update({
+    id: '/tyre-compare',
+    path: '/tyre-compare',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedTiresRoute = AuthenticatedTiresRouteImport.update({
   id: '/tires',
   path: '/tires',
@@ -169,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/notes': typeof AuthenticatedNotesRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/tires': typeof AuthenticatedTiresRoute
+  '/tyre-compare': typeof AuthenticatedTyreCompareRoute
   '/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/tyre-wear': typeof AuthenticatedTyreWearRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
@@ -193,6 +201,7 @@ export interface FileRoutesByTo {
   '/notes': typeof AuthenticatedNotesRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/tires': typeof AuthenticatedTiresRoute
+  '/tyre-compare': typeof AuthenticatedTyreCompareRoute
   '/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/tyre-wear': typeof AuthenticatedTyreWearRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
@@ -219,6 +228,7 @@ export interface FileRoutesById {
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/_authenticated/tires': typeof AuthenticatedTiresRoute
+  '/_authenticated/tyre-compare': typeof AuthenticatedTyreCompareRoute
   '/_authenticated/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/_authenticated/tyre-wear': typeof AuthenticatedTyreWearRoute
   '/_authenticated/cars/$carId': typeof AuthenticatedCarsCarIdRoute
@@ -245,6 +255,7 @@ export interface FileRouteTypes {
     | '/notes'
     | '/sessions'
     | '/tires'
+    | '/tyre-compare'
     | '/tyre-setup'
     | '/tyre-wear'
     | '/cars/$carId'
@@ -269,6 +280,7 @@ export interface FileRouteTypes {
     | '/notes'
     | '/sessions'
     | '/tires'
+    | '/tyre-compare'
     | '/tyre-setup'
     | '/tyre-wear'
     | '/cars/$carId'
@@ -294,6 +306,7 @@ export interface FileRouteTypes {
     | '/_authenticated/notes'
     | '/_authenticated/sessions'
     | '/_authenticated/tires'
+    | '/_authenticated/tyre-compare'
     | '/_authenticated/tyre-setup'
     | '/_authenticated/tyre-wear'
     | '/_authenticated/cars/$carId'
@@ -353,6 +366,13 @@ declare module '@tanstack/react-router' {
       path: '/tyre-setup'
       fullPath: '/tyre-setup'
       preLoaderRoute: typeof AuthenticatedTyreSetupRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/tyre-compare': {
+      id: '/_authenticated/tyre-compare'
+      path: '/tyre-compare'
+      fullPath: '/tyre-compare'
+      preLoaderRoute: typeof AuthenticatedTyreCompareRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/tires': {
@@ -519,6 +539,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRouteWithChildren
   AuthenticatedTiresRoute: typeof AuthenticatedTiresRoute
+  AuthenticatedTyreCompareRoute: typeof AuthenticatedTyreCompareRoute
   AuthenticatedTyreSetupRoute: typeof AuthenticatedTyreSetupRoute
   AuthenticatedTyreWearRoute: typeof AuthenticatedTyreWearRoute
   AuthenticatedCarsCarIdRoute: typeof AuthenticatedCarsCarIdRoute
@@ -538,6 +559,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRouteWithChildren,
   AuthenticatedTiresRoute: AuthenticatedTiresRoute,
+  AuthenticatedTyreCompareRoute: AuthenticatedTyreCompareRoute,
   AuthenticatedTyreSetupRoute: AuthenticatedTyreSetupRoute,
   AuthenticatedTyreWearRoute: AuthenticatedTyreWearRoute,
   AuthenticatedCarsCarIdRoute: AuthenticatedCarsCarIdRoute,
@@ -558,3 +580,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
