@@ -284,6 +284,23 @@ function TyreComparePage() {
         </div>
       </div>
 
+      {best && (
+        <div className="mt-6 rounded-lg border border-primary/30 bg-primary/5 p-5 flex items-center gap-4">
+          <div className="flex-1">
+            <div className="font-mono text-[10px] uppercase tracking-widest text-primary">Recommended compound</div>
+            <div className="font-display text-2xl font-bold mt-1">{best.c.label} — {best.score.toFixed(1)} pts</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Best balanced choice for grip {gripW}% · warm-up {warmupW}% · longevity {longevityW}%
+            </p>
+          </div>
+          <div className="hidden sm:grid grid-cols-3 gap-3 text-xs font-mono">
+            <Stat k="Eff. grip" v={`${best.effectiveGrip.toFixed(0)}`} />
+            <Stat k="Warm-up" v={`${best.c.warmup}`} />
+            <Stat k="Longevity" v={`${best.c.longevity}`} />
+          </div>
+        </div>
+      )}
+
       <div className="mt-6 grid md:grid-cols-2 xl:grid-cols-4 gap-4">
         {rows.map((r) => {
           const isBest = r === best && r.score > 0;
