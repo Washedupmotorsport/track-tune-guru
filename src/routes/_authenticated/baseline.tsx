@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { generateBaseline, type BaselineInput, type Drivetrain, type TireType, type Surface, type Grip } from "@/lib/baseline";
 import type { DisciplineId } from "@/lib/disciplines";
 import { DISCIPLINES } from "@/lib/disciplines";
+import { useUnits } from "@/lib/units";
 
 export const Route = createFileRoute("/_authenticated/baseline")({
   component: BaselinePage,
@@ -23,6 +24,7 @@ type Car = { id: string; name: string; discipline: string };
 function BaselinePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const units = useUnits();
 
   const carsQ = useQuery({
     queryKey: ["cars", user?.id],
@@ -44,6 +46,23 @@ function BaselinePage() {
   const [grip, setGrip] = useState<Grip>("medium");
   const [ambientC, setAmbientC] = useState("20");
   const [aero, setAero] = useState(false);
+
+  // Display-converted I/O wrappers — internal state stays metric.
+  const weightDisplay = String(units.toDisplayMass(Number(weightKg) || 0));
+  const setWeightDisplay = (v: string) => {
+    const n = parseFloat(v);
+    setWeightKg(isNaN(n) ? "" : String(Math.round(units.fromDisplayMass(n))));
+  };
+  const ambientDisplay = (() => {
+    const t = units.toDisplayTemp(Number(ambientC));
+    return t == null ? "" : String(t);
+  })();
+  const setAmbientDisplay = (v: string) => {
+    const n = parseFloat(v);
+    if (isNaN(n)) { setAmbientC(""); return; }
+    const c = units.fromDisplayTemp(n);
+    setAmbientC(c == null ? "" : String(Math.round(c * 10) / 10));
+  };
 
   // sync discipline when car changes
   useEffect(() => {
@@ -130,7 +149,7 @@ function BaselinePage() {
             <SelField label="Drivetrain" value={drivetrain} onChange={(v) => setDrivetrain(v as Drivetrain)}
               options={[{value:"FWD",label:"FWD"},{value:"RWD",label:"RWD"},{value:"AWD",label:"AWD"}]} />
 
-            <NumField label="Weight" unit="kg" value={weightKg} onChange={setWeightKg} />
+            <NumField label="Weight" unit={units.massUnit} value={weightDisplay} onChange={setWeightDisplay} />
             <NumField label="Front bias" unit="%" value={frontBiasPct} onChange={setFrontBiasPct} />
 
             <SelField label="Tire type" value={tire} onChange={(v) => setTire(v as TireType)}
@@ -154,7 +173,7 @@ function BaselinePage() {
 
             <SelField label="Grip level" value={grip} onChange={(v) => setGrip(v as Grip)}
               options={[{value:"low",label:"Low"},{value:"medium",label:"Medium"},{value:"high",label:"High"}]} />
-            <NumField label="Ambient" unit="°C" value={ambientC} onChange={setAmbientC} />
+            <NumField label="Ambient" unit={units.tempUnit} value={ambientDisplay} onChange={setAmbientDisplay} />
 
             <div className="col-span-2 flex items-center justify-between rounded-md border border-border px-3 py-2">
               <div>
@@ -175,8 +194,7 @@ function BaselinePage() {
                   {r.rationale && <div className="text-[11px] text-muted-foreground/80 truncate">{r.rationale}</div>}
                 </div>
                 <div className="font-display text-lg font-bold whitespace-nowrap">
-                  {r.value}
-                  {r.unit && <span className="text-primary text-xs font-mono ml-1">{r.unit}</span>}
+                  {displayRow(r.value, r.unit, units)}
                 </div>
               </div>
             ))}
