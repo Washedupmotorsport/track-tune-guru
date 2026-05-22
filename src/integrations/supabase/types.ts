@@ -741,6 +741,63 @@ export type Database = {
         }
         Relationships: []
       }
+      tire_stints: {
+        Row: {
+          car_id: string
+          compound: string | null
+          created_at: string
+          distance_km: number | null
+          id: string
+          laps: number
+          notes: string | null
+          recorded_at: string
+          session_id: string | null
+          tire_set: string
+          tread_fl: number | null
+          tread_fr: number | null
+          tread_rl: number | null
+          tread_rr: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          compound?: string | null
+          created_at?: string
+          distance_km?: number | null
+          id?: string
+          laps?: number
+          notes?: string | null
+          recorded_at?: string
+          session_id?: string | null
+          tire_set: string
+          tread_fl?: number | null
+          tread_fr?: number | null
+          tread_rl?: number | null
+          tread_rr?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          compound?: string | null
+          created_at?: string
+          distance_km?: number | null
+          id?: string
+          laps?: number
+          notes?: string | null
+          recorded_at?: string
+          session_id?: string | null
+          tire_set?: string
+          tread_fl?: number | null
+          tread_fr?: number | null
+          tread_rl?: number | null
+          tread_rr?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
