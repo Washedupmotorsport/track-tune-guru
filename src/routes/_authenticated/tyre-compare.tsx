@@ -65,6 +65,9 @@ function TyreComparePage() {
   const [sweepMinC, setSweepMinC] = useState("5");
   const [sweepMaxC, setSweepMaxC] = useState("50");
   const [sweepCondition, setSweepCondition] = useState<"both" | "dry" | "wet">("both");
+  const [gripW, setGripW] = useState("50");
+  const [warmupW, setWarmupW] = useState("25");
+  const [longevityW, setLongevityW] = useState("25");
 
   const rows = useMemo(() => {
     const track = parseFloat(trackC);
