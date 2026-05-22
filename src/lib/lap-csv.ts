@@ -82,7 +82,10 @@ export function parseLapCsv(text: string): ParseResult {
   rawHeaders.forEach((h, i) => {
     if (colMap[i]) return;
     const n = normalize(h);
-    if (["laptime", "time", "totaltime", "duration"].includes(n) && !headersUsed.lap_time_ms) {
+    if (
+      ["laptime", "time", "totaltime", "duration", "elapsed", "elapsedtime", "racetime", "finishtime", "besttime", "t", "tlap"].includes(n) &&
+      !headersUsed.lap_time_ms
+    ) {
       colMap[i] = "lap_time_ms";
       headersUsed.lap_time_ms = h;
     }
