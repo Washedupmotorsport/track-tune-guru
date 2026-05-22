@@ -284,16 +284,22 @@ function TyreComparePage() {
 
       <div className="mt-6 grid md:grid-cols-2 xl:grid-cols-4 gap-4">
         {rows.map((r) => {
-          const isBest = r === best && r.effectiveGrip > 0;
+          const isBest = r === best && r.score > 0;
           return (
             <div
               key={r.c.key}
-              className={`rounded-lg border p-5 shadow-card bg-card ${isBest ? "border-primary/60" : "border-border"}`}
+              className={`rounded-lg border p-5 shadow-card bg-card relative overflow-hidden ${isBest ? "border-primary/60 ring-1 ring-primary/20" : "border-border"}`}
             >
+              {isBest && (
+                <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[9px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-bl-md">
+                  Best pick
+                </div>
+              )}
               <div className="flex items-baseline justify-between">
                 <h2 className="font-display text-xl font-bold uppercase tracking-wider">{r.c.label}</h2>
-                {isBest && <span className="font-mono text-[10px] uppercase tracking-widest text-primary">Best pick</span>}
+                <span className="font-mono text-sm font-bold text-primary">{r.score.toFixed(1)}</span>
               </div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Weighted score</div>
               <Bar label="Effective grip" value={r.effectiveGrip} max={100} accent />
               <Bar label="Raw grip" value={r.c.grip} max={100} />
               <Bar label="Warm-up" value={r.c.warmup} max={100} />
