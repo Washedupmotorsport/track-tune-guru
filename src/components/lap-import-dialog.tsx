@@ -14,14 +14,41 @@ const TEMPLATE_CSV = `Lap,Lap Time,S1,S2,S3,Conditions,Notes
 5,1:21.998,27.501,27.012,27.485,Damp,Light rain starting
 `;
 
-function downloadTemplate() {
-  const blob = new Blob([TEMPLATE_CSV], { type: "text/csv;charset=utf-8" });
+function downloadCsv(filename: string, csv: string) {
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "lap-log-template.csv";
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+function downloadTemplate() {
+  downloadCsv("lap-log-template.csv", TEMPLATE_CSV);
+}
+
+function fmtMs(ms: number | null): string {
+  if (ms == null) return "";
+  const totalSec = ms / 1000;
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec - m * 60;
+  return m > 0 ? `${m}:${s.toFixed(3).padStart(6, "0")}` : s.toFixed(3);
+}
+
+function previewToCsv(laps: ParsedLap[], defaultConditions: string): string {
+  const header = "Lap,Lap Time,S1,S2,S3,Conditions,Notes";
+  const esc = (v: string) => /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+  const rows = laps.map((l, i) => [
+    String(l.lap_number ?? i + 1),
+    fmtMs(l.lap_time_ms),
+    fmtMs(l.sector_1_ms),
+    fmtMs(l.sector_2_ms),
+    fmtMs(l.sector_3_ms),
+    esc(l.conditions ?? defaultConditions ?? ""),
+    esc(l.notes ?? ""),
+  ].join(","));
+  return [header, ...rows].join("\n") + "\n";
 }
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
