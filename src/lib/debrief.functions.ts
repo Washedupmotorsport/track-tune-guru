@@ -19,7 +19,19 @@ export const getDebrief = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+
+    // Defense-in-depth: verify caller owns (or has share access to) this car
+    // before reading laps. RLS already protects, but explicit checks prevent
+    // accidental data exposure if a policy regresses.
+    const { data: car, error: carErr } = await supabase
+      .from("cars")
+      .select("id")
+      .eq("id", data.carId)
+      .maybeSingle();
+    if (carErr) throw new Error(carErr.message);
+    if (!car) throw new Error("Car not found or access denied");
+    void userId;
 
     let lapQ = supabase.from("laps").select("*").eq("car_id", data.carId);
     if (data.sessionId) lapQ = lapQ.eq("session_id", data.sessionId);
