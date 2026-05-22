@@ -317,6 +317,22 @@ export function LapImportDialog({
                   </AlertDescription>
                 </Alert>
               )}
+              {(metaSetupMismatch || metaCarMismatch) && (
+                <Alert variant="destructive" className="mb-3">
+                  <AlertTriangle className="w-4 h-4" />
+                  <AlertTitle>This file was generated for a different {metaSetupMismatch ? "setup" : "car"}</AlertTitle>
+                  <AlertDescription className="text-xs space-y-1">
+                    {metaCarMismatch && <div>File car_id: <span className="font-mono">{preview!.meta.car_id}</span> — current: <span className="font-mono">{carId}</span></div>}
+                    {metaSetupMismatch && <div>File setup_id: <span className="font-mono">{preview!.meta.setup_id}</span> — current: <span className="font-mono">{setupId}</span></div>}
+                    <div>Laps will still be imported against the current setup if you continue.</div>
+                  </AlertDescription>
+                </Alert>
+              )}
+              {Object.keys(preview.meta).length > 0 && !metaSetupMismatch && !metaCarMismatch && (
+                <div className="mb-2 text-[11px] text-muted-foreground font-mono">
+                  File metadata: {Object.entries(preview.meta).map(([k, v]) => `${k}=${v}`).join(" · ")}
+                </div>
+              )}
               <div className="flex flex-wrap gap-4 mb-2">
                 <div><span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Detected:</span> <span className="font-display font-bold">{preview.laps.length} laps</span></div>
                 {preview.errors.length > 0 && (
