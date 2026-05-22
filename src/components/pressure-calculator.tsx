@@ -38,7 +38,7 @@ export function PressureCalculator() {
     const hn = parseFloat(hot[c]);
     if (isNaN(cn) || isNaN(hn) || isNaN(targetN)) return "—";
     const heatGain = hn - cn;
-    const newCold = targetN - heatGain - ambDelta * psiPerDeg;
+    const newCold = targetN - heatGain - ambDelta * pressurePerDeg;
     return newCold.toFixed(1);
   };
 
