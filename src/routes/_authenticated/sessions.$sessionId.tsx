@@ -73,6 +73,7 @@ function SessionDetail() {
   const addLap = useMutation({
     mutationFn: async () => {
       if (!sessionQ.data) throw new Error("No session");
+      if (!sessionQ.data.setup_id) throw new Error("Attach a setup to this session before logging laps");
       const ms = parseLapTime(lapForm.lap_time);
       if (ms == null) throw new Error("Bad lap time");
       const { error } = await supabase.from("laps").insert({
