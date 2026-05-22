@@ -207,6 +207,15 @@ export function LapImportDialog({
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+          {preview && preview.laps.length > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => downloadCsv("lap-import-preview.csv", previewToCsv(preview.laps, defaultConditions))}
+            >
+              <Download className="w-4 h-4 mr-1" /> Export preview
+            </Button>
+          )}
           <Button onClick={() => importMut.mutate()} disabled={blockImport}>
             {importMut.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Upload className="w-4 h-4 mr-1" />}
             Import {preview ? `${preview.laps.length} laps` : ""}
