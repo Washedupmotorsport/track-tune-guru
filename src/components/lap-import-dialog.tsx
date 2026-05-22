@@ -78,12 +78,17 @@ export function LapImportDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          <input
-            type="file"
-            accept=".csv,text/csv"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }}
-            className="block w-full text-sm file:mr-3 file:py-2 file:px-3 file:rounded-md file:border file:border-border file:bg-muted file:text-foreground file:font-mono file:text-xs file:uppercase file:tracking-widest hover:file:bg-muted/70"
-          />
+          <div className="flex items-center justify-between gap-2">
+            <input
+              type="file"
+              accept=".csv,text/csv"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }}
+              className="block w-full text-sm file:mr-3 file:py-2 file:px-3 file:rounded-md file:border file:border-border file:bg-muted file:text-foreground file:font-mono file:text-xs file:uppercase file:tracking-widest hover:file:bg-muted/70"
+            />
+            <Button type="button" variant="ghost" size="sm" onClick={downloadTemplate} className="shrink-0">
+              <Download className="w-4 h-4 mr-1" /> Template
+            </Button>
+          </div>
 
           {preview && (
             <div className="rounded-md border border-border bg-card p-3 text-sm">
