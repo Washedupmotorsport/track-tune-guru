@@ -13,10 +13,18 @@ type Corners = "fl" | "fr" | "rl" | "rr";
 const CORNERS: Corners[] = ["fl", "fr", "rl", "rr"];
 
 export function PressureCalculator() {
-  const { tempUnit, system } = useUnits();
-  // Convert PSI per °C into per-display-degree (°F delta = 5/9 °C).
-  const psiPerDeg = system === "imperial" ? PSI_PER_C * (5 / 9) : PSI_PER_C;
-  const [targetHot, setTargetHot] = useState("28");
+  const units = useUnits();
+  const { tempUnit, system, pressureUnit } = units;
+  // Convert PSI per °C into display units (pressure/temp).
+  // 1 bar ≈ 14.5038 psi · 1 °F delta = 5/9 °C delta.
+  const pressurePerDeg = (() => {
+    let p = PSI_PER_C;                 // psi per °C
+    if (system === "imperial") p *= 5 / 9; // psi per °F
+    else p = p / 14.5038;              // bar per °C
+    return p;
+  })();
+  const defaultTarget = system === "imperial" ? "28" : units.toDisplayPressure(28).toString();
+  const [targetHot, setTargetHot] = useState(defaultTarget);
   const [lastAmbient, setLastAmbient] = useState("");
   const [newAmbient, setNewAmbient] = useState("");
   const [cold, setCold] = useState<Record<Corners, string>>({ fl: "", fr: "", rl: "", rr: "" });
@@ -30,7 +38,7 @@ export function PressureCalculator() {
     const hn = parseFloat(hot[c]);
     if (isNaN(cn) || isNaN(hn) || isNaN(targetN)) return "—";
     const heatGain = hn - cn;
-    const newCold = targetN - heatGain - ambDelta * psiPerDeg;
+    const newCold = targetN - heatGain - ambDelta * pressurePerDeg;
     return newCold.toFixed(1);
   };
 
@@ -42,11 +50,11 @@ export function PressureCalculator() {
       </div>
       <p className="text-xs text-muted-foreground mb-3">
         Enter your last run's cold + hot pressures and ambient temps, plus a target hot pressure.
-        Get cold-set pressures for the next run, adjusted for ambient delta (~{psiPerDeg.toFixed(2)} psi/{tempUnit}).
+        Get cold-set pressures for the next run, adjusted for ambient delta (~{pressurePerDeg.toFixed(2)} {pressureUnit}/{tempUnit}).
       </p>
 
       <div className="grid sm:grid-cols-3 gap-3 mb-3">
-        <div><Label>Target hot (psi)</Label><Input value={targetHot} onChange={(e) => setTargetHot(e.target.value)} className="font-mono" /></div>
+        <div><Label>Target hot ({pressureUnit})</Label><Input value={targetHot} onChange={(e) => setTargetHot(e.target.value)} className="font-mono" /></div>
         <div><Label>Last ambient {tempUnit}</Label><Input value={lastAmbient} onChange={(e) => setLastAmbient(e.target.value)} className="font-mono" /></div>
         <div><Label>New ambient {tempUnit}</Label><Input value={newAmbient} onChange={(e) => setNewAmbient(e.target.value)} className="font-mono" /></div>
       </div>

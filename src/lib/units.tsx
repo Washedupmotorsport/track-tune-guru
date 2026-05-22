@@ -46,6 +46,10 @@ type Ctx = {
   // Length (short, suspension scale)
   lengthShortUnit: string;     // "mm" | "in"
   toDisplayLengthShort: (mm: number) => number;
+  // Pressure
+  pressureUnit: string;        // "psi" | "bar"
+  toDisplayPressure: (psi: number) => number;
+  fromDisplayPressure: (v: number) => number;
 };
 
 const UnitsContext = createContext<Ctx | null>(null);
@@ -104,6 +108,9 @@ export function UnitsProvider({ children }: { children: ReactNode }) {
     fromDisplayMass: (v) => imperial ? v / 2.20462 : v,
     lengthShortUnit: imperial ? "in" : "mm",
     toDisplayLengthShort: (mm) => round(imperial ? mm / 25.4 : mm, imperial ? 2 : 0),
+    pressureUnit: imperial ? "psi" : "bar",
+    toDisplayPressure: (psi) => round(imperial ? psi : psi / 14.5038, imperial ? 1 : 2),
+    fromDisplayPressure: (v) => imperial ? v : v * 14.5038,
   };
 
   return <UnitsContext.Provider value={value}>{children}</UnitsContext.Provider>;
