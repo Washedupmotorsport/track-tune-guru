@@ -3,8 +3,10 @@ import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Disc, Gauge, Thermometer } from "lucide-react";
+import { ArrowLeft, Disc, Download, Gauge, Thermometer } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useUnits } from "@/lib/units";
+import jsPDF from "jspdf";
 
 export const Route = createFileRoute("/_authenticated/tyre-setup")({
   component: TyreSetupPage,
@@ -54,20 +56,101 @@ function TyreSetupPage() {
     return { cold: fmt(coldPsi), hotMin: fmt(hotMinPsi), hotMax: fmt(hotMaxPsi) };
   }, [base, load, trackTemp, system, toDisplayPressure]);
 
+  const downloadReport = () => {
+    if (!recommendation || !base) return;
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const W = doc.internal.pageSize.getWidth();
+    let y = 56;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("Tyre Setup Report", 48, y);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(120);
+    y += 18;
+    doc.text(new Date().toLocaleString(), 48, y);
+    doc.setTextColor(0);
+    y += 28;
+
+    const section = (title: string) => {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.text(title.toUpperCase(), 48, y);
+      doc.setDrawColor(200);
+      doc.line(48, y + 4, W - 48, y + 4);
+      y += 22;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+    };
+    const row = (label: string, value: string) => {
+      doc.setTextColor(110);
+      doc.text(label, 56, y);
+      doc.setTextColor(0);
+      doc.text(value, 260, y);
+      y += 18;
+    };
+
+    section("Inputs");
+    row("Compound", base.label);
+    row("Car + driver load", `${load} kg`);
+    row("Track temperature", `${trackTemp} ${tempUnit}`);
+    const anyCold = Object.values(currentCold).some((v) => v);
+    if (anyCold) {
+      row("Current cold FL / FR", `${currentCold.fl || "—"} / ${currentCold.fr || "—"} ${pressureUnit}`);
+      row("Current cold RL / RR", `${currentCold.rl || "—"} / ${currentCold.rr || "—"} ${pressureUnit}`);
+    }
+    y += 8;
+
+    section("Recommended baseline");
+    row("Cold target (all corners)", `${recommendation.cold} ${pressureUnit}`);
+    row("Hot working window", `${recommendation.hotMin} – ${recommendation.hotMax} ${pressureUnit}`);
+    y += 8;
+
+    if (anyCold) {
+      section("Recommended changes (cold)");
+      const target = parseFloat(recommendation.cold);
+      (["fl", "fr", "rl", "rr"] as const).forEach((k) => {
+        const cur = parseFloat(currentCold[k]);
+        if (isNaN(cur)) {
+          row(k.toUpperCase(), `set to ${target.toFixed(1)} ${pressureUnit}`);
+        } else {
+          const diff = target - cur;
+          const sign = diff > 0 ? "+" : "";
+          const action = Math.abs(diff) < 0.05 ? "hold" : diff > 0 ? "add air" : "bleed";
+          row(k.toUpperCase(), `${cur.toFixed(1)} → ${target.toFixed(1)} (${sign}${diff.toFixed(1)}) · ${action}`);
+        }
+      });
+      y += 8;
+    }
+
+    section("Reference");
+    doc.setFontSize(9);
+    doc.setTextColor(110);
+    const note = `Baseline at ${TRACK_REF_C} C track, ${LOAD_REF_KG} kg load. Cold target shifts -${PSI_PER_C.toFixed(2)} psi per C above reference and +${(PSI_PER_KG * 100).toFixed(2)} psi per 100 kg over reference.`;
+    doc.text(doc.splitTextToSize(note, W - 96), 56, y);
+
+    doc.save(`tyre-setup-${base.label.toLowerCase()}-${Date.now()}.pdf`);
+  };
+
   return (
     <div>
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
-      <div className="mt-4">
-        <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
-          <Disc className="w-3 h-3" /> Baseline
+      <div className="mt-4 flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
+            <Disc className="w-3 h-3" /> Baseline
+          </div>
+          <h1 className="font-display text-4xl font-bold mt-1">Tyre Setup</h1>
+          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+            Pick compound, enter car load and track temp, optionally log your current cold pressures.
+            You get a recommended cold-set baseline plus the hot window to aim for.
+          </p>
         </div>
-        <h1 className="font-display text-4xl font-bold mt-1">Tyre Setup</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Pick compound, enter car load and track temp, optionally log your current cold pressures.
-          You get a recommended cold-set baseline plus the hot window to aim for.
-        </p>
+        <Button onClick={downloadReport} disabled={!recommendation} className="shrink-0">
+          <Download className="w-4 h-4 mr-2" /> Download PDF report
+        </Button>
       </div>
 
       <div className="mt-6 grid lg:grid-cols-2 gap-6">
