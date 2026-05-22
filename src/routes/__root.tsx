@@ -11,6 +11,7 @@ import {
 import appCss from "../styles.css?url";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/lib/auth-context";
+import { useEffect } from "react";
 
 function NotFoundComponent() {
   return (
@@ -118,11 +119,10 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
-  if (typeof window !== "undefined" && "serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
-    }, { once: true });
-  }
+  useEffect(() => {
+    if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
