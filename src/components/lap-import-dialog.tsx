@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Upload, Loader2, Download } from "lucide-react";
+import { Upload, Loader2, Download, AlertTriangle } from "lucide-react";
 import { parseLapCsv, type ParsedLap } from "@/lib/lap-csv";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 
 const TEMPLATE_CSV = `Lap,Lap Time,S1,S2,S3,Conditions,Notes
@@ -30,12 +31,28 @@ export function LapImportDialog({
 }: { setupId: string; carId: string; userId: string; defaultConditions: string }) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [preview, setPreview] = useState<{ laps: ParsedLap[]; errors: { row: number; reason: string }[]; headers: Partial<Record<string, string>> } | null>(null);
+  const [preview, setPreview] = useState<{
+    laps: ParsedLap[];
+    errors: { row: number; reason: string }[];
+    headers: Partial<Record<string, string>>;
+    unrecognizedHeaders: string[];
+    rawHeaders: string[];
+    missingRequired: boolean;
+    confirmed: boolean;
+  } | null>(null);
 
   const onFile = async (file: File) => {
     const text = await file.text();
     const res = parseLapCsv(text);
-    setPreview({ laps: res.laps, errors: res.errors, headers: res.headersUsed });
+    setPreview({
+      laps: res.laps,
+      errors: res.errors,
+      headers: res.headersUsed,
+      unrecognizedHeaders: res.unrecognizedHeaders,
+      rawHeaders: res.rawHeaders,
+      missingRequired: !res.headersUsed.lap_time_ms,
+      confirmed: false,
+    });
   };
 
   const importMut = useMutation({
@@ -62,6 +79,14 @@ export function LapImportDialog({
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Import failed"),
   });
+
+  const hasUnrecognized = (preview?.unrecognizedHeaders.length ?? 0) > 0;
+  const blockImport =
+    !preview ||
+    preview.laps.length === 0 ||
+    preview.missingRequired ||
+    (hasUnrecognized && !preview.confirmed) ||
+    importMut.isPending;
 
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setPreview(null); }}>
@@ -92,6 +117,38 @@ export function LapImportDialog({
 
           {preview && (
             <div className="rounded-md border border-border bg-card p-3 text-sm">
+              {preview.missingRequired && (
+                <Alert variant="destructive" className="mb-3">
+                  <AlertTriangle className="w-4 h-4" />
+                  <AlertTitle>Headers don't match the template</AlertTitle>
+                  <AlertDescription>
+                    No lap time column was found. Expected a header like <span className="font-mono">Lap Time</span>, <span className="font-mono">Time</span>, or <span className="font-mono">Duration</span>.
+                    {preview.rawHeaders.length > 0 && (
+                      <div className="mt-1 text-xs">Found: <span className="font-mono">{preview.rawHeaders.join(", ")}</span></div>
+                    )}
+                    <div className="mt-1 text-xs">Download the template to see the accepted format.</div>
+                  </AlertDescription>
+                </Alert>
+              )}
+              {!preview.missingRequired && hasUnrecognized && (
+                <Alert className="mb-3 border-warning/40">
+                  <AlertTriangle className="w-4 h-4" />
+                  <AlertTitle>Some headers weren't recognized</AlertTitle>
+                  <AlertDescription>
+                    <div className="text-xs">
+                      Ignored: <span className="font-mono">{preview.unrecognizedHeaders.join(", ")}</span>
+                    </div>
+                    <label className="flex items-center gap-2 mt-2 text-xs cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={preview.confirmed}
+                        onChange={(e) => setPreview((p) => p ? { ...p, confirmed: e.target.checked } : p)}
+                      />
+                      Import anyway — I've reviewed the mapped columns below.
+                    </label>
+                  </AlertDescription>
+                </Alert>
+              )}
               <div className="flex flex-wrap gap-4 mb-2">
                 <div><span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Detected:</span> <span className="font-display font-bold">{preview.laps.length} laps</span></div>
                 {preview.errors.length > 0 && (
@@ -123,7 +180,7 @@ export function LapImportDialog({
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={() => importMut.mutate()} disabled={!preview || preview.laps.length === 0 || importMut.isPending}>
+          <Button onClick={() => importMut.mutate()} disabled={blockImport}>
             {importMut.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Upload className="w-4 h-4 mr-1" />}
             Import {preview ? `${preview.laps.length} laps` : ""}
           </Button>
