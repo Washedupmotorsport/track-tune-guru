@@ -115,7 +115,7 @@ export function parseLapCsv(text: string): ParseResult {
 
   if (!headersUsed.lap_time_ms) {
     const unrecognized = rawHeaders.filter((_, i) => !colMap[i]);
-    return { laps: [], errors: [{ row: 0, reason: "No lap time column found. Expected a header like 'Lap Time', 'Time', or 'Duration'." }], headersUsed, unrecognizedHeaders: unrecognized, rawHeaders };
+    return { laps: [], errors: [{ row: 0, reason: "No lap time column found. Expected a header like 'Lap Time', 'Time', or 'Duration'." }], headersUsed, unrecognizedHeaders: unrecognized, rawHeaders, meta };
   }
 
   const laps: ParsedLap[] = [];
@@ -156,5 +156,5 @@ export function parseLapCsv(text: string): ParseResult {
     });
   }
   const unrecognizedHeaders = rawHeaders.filter((_, i) => !colMap[i]);
-  return { laps, errors, headersUsed, unrecognizedHeaders, rawHeaders };
+  return { laps, errors, headersUsed, unrecognizedHeaders, rawHeaders, meta };
 }
