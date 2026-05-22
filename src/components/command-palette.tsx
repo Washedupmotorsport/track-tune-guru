@@ -72,7 +72,7 @@ export function CommandPalette() {
     return () => { cancelled = true; };
   }, [query, open]);
 
-  const go = (to: string) => { setOpen(false); setQuery(""); navigate({ to }); };
+  const go = (to: string) => { setOpen(false); setQuery(""); navigate({ to: to as never }); };
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
