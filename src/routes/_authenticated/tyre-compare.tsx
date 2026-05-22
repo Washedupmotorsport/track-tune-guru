@@ -141,6 +141,7 @@ function TyreComparePage() {
       `Circuit layout: ${layout}`,
       `Car balance: ${balance}`,
       `New tread: ${newMm.toFixed(2)} mm`,
+      `Priority: grip ${gripW}% / warm-up ${warmupW}% / longevity ${longevityW}%`,
     ];
     inputs.forEach((t) => { doc.text(t, M, y); y += 13; });
     y += 8;
