@@ -193,16 +193,43 @@ export function LapImportDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between gap-2">
+          <div className="grid sm:grid-cols-[1fr_auto] gap-3 items-end">
+            <div>
+              <Label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                Attach to session (optional)
+              </Label>
+              <Select value={sessionId} onValueChange={setSessionId}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="No session — laps attach to setup only" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No session — setup only</SelectItem>
+                  {sessions.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name}{s.track ? ` · ${s.track}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button type="button" variant="outline" size="sm" onClick={handleDownloadTemplate} className="shrink-0" disabled={metaQ.isLoading}>
+              <Download className="w-4 h-4 mr-1" /> Download template
+            </Button>
+          </div>
+          <p className="text-[11px] text-muted-foreground -mt-2">
+            The template embeds <span className="font-mono">car_id</span>, <span className="font-mono">setup_id</span>
+            {sessionId !== "none" ? <> and <span className="font-mono">session_id</span></> : null} as comment lines, so re-importing
+            the file always attaches to the right place.
+          </p>
+
+          <div>
+            <Label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">CSV file</Label>
             <input
               type="file"
               accept=".csv,text/csv"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }}
-              className="block w-full text-sm file:mr-3 file:py-2 file:px-3 file:rounded-md file:border file:border-border file:bg-muted file:text-foreground file:font-mono file:text-xs file:uppercase file:tracking-widest hover:file:bg-muted/70"
+              className="mt-1 block w-full text-sm file:mr-3 file:py-2 file:px-3 file:rounded-md file:border file:border-border file:bg-muted file:text-foreground file:font-mono file:text-xs file:uppercase file:tracking-widest hover:file:bg-muted/70"
             />
-            <Button type="button" variant="ghost" size="sm" onClick={downloadTemplate} className="shrink-0">
-              <Download className="w-4 h-4 mr-1" /> Template
-            </Button>
           </div>
 
           <div className="rounded-md border border-border/60 bg-muted/20 p-3 text-xs">
