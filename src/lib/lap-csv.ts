@@ -59,11 +59,24 @@ export type ParseResult = {
   headersUsed: Partial<Record<keyof ParsedLap, string>>;
   unrecognizedHeaders: string[];
   rawHeaders: string[];
+  meta: Record<string, string>;
 };
 
 export function parseLapCsv(text: string): ParseResult {
-  const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
-  if (lines.length < 2) return { laps: [], errors: [{ row: 0, reason: "Empty file" }], headersUsed: {}, unrecognizedHeaders: [], rawHeaders: [] };
+  const allLines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+  // Extract leading `# key: value` metadata rows, then strip all comment lines.
+  const meta: Record<string, string> = {};
+  const lines: string[] = [];
+  for (const l of allLines) {
+    if (l.trimStart().startsWith("#")) {
+      const body = l.trimStart().replace(/^#\s*/, "");
+      const m = body.match(/^([a-zA-Z0-9 _-]+?)\s*[:=]\s*(.+)$/);
+      if (m) meta[m[1].trim().toLowerCase().replace(/[\s-]+/g, "_")] = m[2].trim();
+      continue;
+    }
+    lines.push(l);
+  }
+  if (lines.length < 2) return { laps: [], errors: [{ row: 0, reason: "Empty file" }], headersUsed: {}, unrecognizedHeaders: [], rawHeaders: [], meta };
 
   const rawHeaders = splitCsvLine(lines[0]);
   const colMap: Array<keyof ParsedLap | null> = rawHeaders.map(() => null);
@@ -102,7 +115,7 @@ export function parseLapCsv(text: string): ParseResult {
 
   if (!headersUsed.lap_time_ms) {
     const unrecognized = rawHeaders.filter((_, i) => !colMap[i]);
-    return { laps: [], errors: [{ row: 0, reason: "No lap time column found. Expected a header like 'Lap Time', 'Time', or 'Duration'." }], headersUsed, unrecognizedHeaders: unrecognized, rawHeaders };
+    return { laps: [], errors: [{ row: 0, reason: "No lap time column found. Expected a header like 'Lap Time', 'Time', or 'Duration'." }], headersUsed, unrecognizedHeaders: unrecognized, rawHeaders, meta };
   }
 
   const laps: ParsedLap[] = [];
@@ -143,5 +156,5 @@ export function parseLapCsv(text: string): ParseResult {
     });
   }
   const unrecognizedHeaders = rawHeaders.filter((_, i) => !colMap[i]);
-  return { laps, errors, headersUsed, unrecognizedHeaders, rawHeaders };
+  return { laps, errors, headersUsed, unrecognizedHeaders, rawHeaders, meta };
 }
