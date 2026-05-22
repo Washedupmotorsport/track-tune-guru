@@ -142,6 +142,57 @@ export function LapImportDialog({
             </Button>
           </div>
 
+          <div className="rounded-md border border-border/60 bg-muted/20 p-3 text-xs">
+            <div className="font-mono uppercase tracking-widest text-[10px] text-primary mb-2">Expected format</div>
+            <table className="w-full">
+              <thead className="text-muted-foreground">
+                <tr className="text-left font-mono text-[10px] uppercase tracking-widest">
+                  <th className="pb-1 pr-3 font-normal">Column</th>
+                  <th className="pb-1 pr-3 font-normal">Required</th>
+                  <th className="pb-1 pr-3 font-normal">Format</th>
+                  <th className="pb-1 font-normal">Example</th>
+                </tr>
+              </thead>
+              <tbody className="font-mono">
+                <tr className="border-t border-border/40">
+                  <td className="py-1 pr-3">Lap</td>
+                  <td className="py-1 pr-3 text-muted-foreground">optional</td>
+                  <td className="py-1 pr-3 text-muted-foreground">integer</td>
+                  <td className="py-1">1, 2, 3…</td>
+                </tr>
+                <tr className="border-t border-border/40">
+                  <td className="py-1 pr-3 text-primary">Lap Time</td>
+                  <td className="py-1 pr-3 text-primary">required</td>
+                  <td className="py-1 pr-3 text-muted-foreground">M:SS.mmm or seconds</td>
+                  <td className="py-1">1:23.456 · 83.456</td>
+                </tr>
+                <tr className="border-t border-border/40">
+                  <td className="py-1 pr-3">S1 / S2 / S3</td>
+                  <td className="py-1 pr-3 text-muted-foreground">optional</td>
+                  <td className="py-1 pr-3 text-muted-foreground">SS.mmm or M:SS.mmm</td>
+                  <td className="py-1">27.890</td>
+                </tr>
+                <tr className="border-t border-border/40">
+                  <td className="py-1 pr-3">Conditions</td>
+                  <td className="py-1 pr-3 text-muted-foreground">optional</td>
+                  <td className="py-1 pr-3 text-muted-foreground">free text</td>
+                  <td className="py-1">Dry, Damp, Wet</td>
+                </tr>
+                <tr className="border-t border-border/40">
+                  <td className="py-1 pr-3">Notes</td>
+                  <td className="py-1 pr-3 text-muted-foreground">optional</td>
+                  <td className="py-1 pr-3 text-muted-foreground">free text</td>
+                  <td className="py-1">Lockup T3</td>
+                </tr>
+              </tbody>
+            </table>
+            <div className="mt-2 text-[11px] text-muted-foreground">
+              Time also accepts <span className="font-mono">MM:SS:mmm</span>, raw milliseconds, or seconds. Header aliases like <span className="font-mono">Time</span>, <span className="font-mono">Sector 1</span>, <span className="font-mono">Split 1</span>, <span className="font-mono">T1</span> are auto-detected.
+            </div>
+          </div>
+
+
+
           {preview && (
             <div className="rounded-md border border-border bg-card p-3 text-sm">
               {preview.missingRequired && (
