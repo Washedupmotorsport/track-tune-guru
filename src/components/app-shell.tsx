@@ -3,13 +3,14 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
   LogOut, Calculator, Wand2, NotebookPen, Timer, Disc, Wrench,
-  Package, CalendarDays, Receipt, BarChart3, Menu,
+  Package, CalendarDays, Receipt, BarChart3, Menu, Search,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
   DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { CommandPalette } from "@/components/command-palette";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
@@ -23,6 +24,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             SUMMIT<span className="text-primary">RACING</span>
           </Link>
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
+              className="hidden md:inline-flex items-center gap-2 rounded-md border border-border bg-muted/30 px-3 py-1.5 text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40"
+              aria-label="Search"
+            >
+              <Search className="w-3.5 h-3.5" /> Search
+              <span className="ml-2 text-[10px] opacity-70">⌘K</span>
+            </button>
             <Link to="/sessions" className="hidden lg:inline-flex items-center text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
               <Timer className="w-4 h-4 mr-1" /> Sessions
             </Link>
@@ -65,6 +74,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
+      <CommandPalette />
     </div>
   );
 }

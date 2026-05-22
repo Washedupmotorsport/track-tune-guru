@@ -24,6 +24,7 @@ import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedCalculatorsRouteImport } from './routes/_authenticated/calculators'
 import { Route as AuthenticatedBaselineRouteImport } from './routes/_authenticated/baseline'
 import { Route as AuthenticatedAnalysisRouteImport } from './routes/_authenticated/analysis'
+import { Route as ShareSessionTokenRouteImport } from './routes/share.session.$token'
 import { Route as AuthenticatedSetupsSetupIdRouteImport } from './routes/_authenticated/setups.$setupId'
 import { Route as AuthenticatedSessionsSessionIdRouteImport } from './routes/_authenticated/sessions.$sessionId'
 import { Route as AuthenticatedCarsCarIdRouteImport } from './routes/_authenticated/cars.$carId'
@@ -105,6 +106,11 @@ const AuthenticatedAnalysisRoute = AuthenticatedAnalysisRouteImport.update({
   path: '/analysis',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ShareSessionTokenRoute = ShareSessionTokenRouteImport.update({
+  id: '/share/session/$token',
+  path: '/share/session/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedSetupsSetupIdRoute =
   AuthenticatedSetupsSetupIdRouteImport.update({
     id: '/setups/$setupId',
@@ -147,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRouteWithChildren
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
+  '/share/session/$token': typeof ShareSessionTokenRoute
   '/sessions/$sessionId/pitboard': typeof AuthenticatedSessionsSessionIdPitboardRoute
 }
 export interface FileRoutesByTo {
@@ -167,6 +174,7 @@ export interface FileRoutesByTo {
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRouteWithChildren
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
+  '/share/session/$token': typeof ShareSessionTokenRoute
   '/sessions/$sessionId/pitboard': typeof AuthenticatedSessionsSessionIdPitboardRoute
 }
 export interface FileRoutesById {
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/_authenticated/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/_authenticated/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRouteWithChildren
   '/_authenticated/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
+  '/share/session/$token': typeof ShareSessionTokenRoute
   '/_authenticated/sessions/$sessionId/pitboard': typeof AuthenticatedSessionsSessionIdPitboardRoute
 }
 export interface FileRouteTypes {
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/cars/$carId'
     | '/sessions/$sessionId'
     | '/setups/$setupId'
+    | '/share/session/$token'
     | '/sessions/$sessionId/pitboard'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/cars/$carId'
     | '/sessions/$sessionId'
     | '/setups/$setupId'
+    | '/share/session/$token'
     | '/sessions/$sessionId/pitboard'
   id:
     | '__root__'
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cars/$carId'
     | '/_authenticated/sessions/$sessionId'
     | '/_authenticated/setups/$setupId'
+    | '/share/session/$token'
     | '/_authenticated/sessions/$sessionId/pitboard'
   fileRoutesById: FileRoutesById
 }
@@ -259,6 +271,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ShareSessionTokenRoute: typeof ShareSessionTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -368,6 +381,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalysisRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/share/session/$token': {
+      id: '/share/session/$token'
+      path: '/share/session/$token'
+      fullPath: '/share/session/$token'
+      preLoaderRoute: typeof ShareSessionTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/setups/$setupId': {
       id: '/_authenticated/setups/$setupId'
       path: '/setups/$setupId'
@@ -470,6 +490,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
+  ShareSessionTokenRoute: ShareSessionTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
