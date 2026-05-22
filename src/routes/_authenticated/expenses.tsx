@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { useUnits, CURRENCIES, type CurrencyCode } from "@/lib/units";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,8 +21,10 @@ const CATEGORIES = ["tires", "fuel", "entry", "travel", "parts", "consumables", 
 function ExpensesPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const units = useUnits();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ car_id: "none", category: "tires", description: "", amount: "", currency: "USD", spent_on: new Date().toISOString().slice(0, 10) });
+  const [form, setForm] = useState({ car_id: "none", category: "tires", description: "", amount: "", currency: units.currency as string, spent_on: new Date().toISOString().slice(0, 10) });
+  useEffect(() => { setForm((f) => ({ ...f, currency: units.currency })); }, [units.currency]);
 
   const carsQ = useQuery({
     queryKey: ["cars-min", user?.id],
@@ -104,7 +107,15 @@ function ExpensesPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Amount *</Label><Input type="number" step="any" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
-                <div><Label>Currency</Label><Input value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} maxLength={3} /></div>
+                <div>
+                  <Label>Currency</Label>
+                  <Select value={form.currency} onValueChange={(v) => setForm({ ...form, currency: v as CurrencyCode })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {CURRENCIES.map((c) => <SelectItem key={c.code} value={c.code}>{c.code} {c.symbol}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div>
                 <Label>Car (optional)</Label>
@@ -126,12 +137,12 @@ function ExpensesPage() {
       <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="rounded-lg border border-primary/40 bg-card p-4">
           <div className="font-mono text-[10px] uppercase tracking-widest text-primary">Total</div>
-          <div className="font-display text-3xl font-bold mt-1">{total.toFixed(2)}</div>
+          <div className="font-display text-3xl font-bold mt-1">{units.formatCurrency(total)}</div>
         </div>
         {byCategory.map((c) => (
           <div key={c.category} className="rounded-lg border border-border bg-card p-4">
             <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{c.category}</div>
-            <div className="font-display text-2xl font-bold mt-1">{c.total.toFixed(2)}</div>
+            <div className="font-display text-2xl font-bold mt-1">{units.formatCurrency(c.total)}</div>
           </div>
         ))}
       </div>
@@ -148,7 +159,7 @@ function ExpensesPage() {
                 <td className="py-3 px-4"><span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded bg-muted">{e.category}</span></td>
                 <td className="py-3 px-4 text-muted-foreground">{e.description ?? "—"}</td>
                 <td className="py-3 px-4 text-muted-foreground text-xs">{carName(e.car_id)}</td>
-                <td className="py-3 px-4 text-right font-mono font-bold">{Number(e.amount).toFixed(2)} {e.currency}</td>
+                <td className="py-3 px-4 text-right font-mono font-bold">{units.formatCurrency(Number(e.amount), e.currency)}</td>
                 <td className="py-3 px-4 text-right">
                   <button onClick={() => { if (confirm("Delete?")) del.mutate(e.id); }} className="text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></button>
                 </td>
