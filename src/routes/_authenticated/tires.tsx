@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Disc, Plus, ArrowLeft, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { PressureCalculator } from "@/components/pressure-calculator";
 
 export const Route = createFileRoute("/_authenticated/tires")({ component: TiresPage });
 
