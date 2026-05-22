@@ -1,4 +1,4 @@
-// Lightweight offline shell cache for Summit Racing.
+// Lightweight offline shell cache for My Race Engineer.
 const CACHE = "summit-v1";
 const SHELL = ["/", "/manifest.webmanifest"];
 

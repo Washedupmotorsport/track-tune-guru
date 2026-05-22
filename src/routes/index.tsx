@@ -17,7 +17,7 @@ function Landing() {
         <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 font-display font-bold text-lg">
             <span className="inline-block w-2 h-6 bg-primary shadow-glow" />
-            SUMMIT<span className="text-primary">RACING</span>
+            MY RACE<span className="text-primary">ENGINEER</span>
           </Link>
           <nav className="flex items-center gap-2">
             {user ? (
@@ -106,7 +106,7 @@ function Landing() {
 
       <footer className="border-t border-border mt-16">
         <div className="mx-auto max-w-6xl px-6 py-8 text-sm text-muted-foreground flex items-center justify-between">
-          <div>© {new Date().getFullYear()} Summit Racing</div>
+          <div>© {new Date().getFullYear()} My Race Engineer</div>
           <div className="font-mono text-xs uppercase tracking-widest">Built for the paddock</div>
         </div>
       </footer>

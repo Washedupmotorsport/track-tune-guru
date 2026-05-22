@@ -24,7 +24,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
           <Link to="/garage" className="flex items-center gap-2 font-display font-bold">
             <span className="inline-block w-2 h-6 bg-primary shadow-glow" />
-            SUMMIT<span className="text-primary">RACING</span>
+            MY RACE<span className="text-primary">ENGINEER</span>
           </Link>
           <div className="flex items-center gap-3">
             <button
