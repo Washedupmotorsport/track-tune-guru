@@ -1,6 +1,6 @@
 {
   "name": "My Race Engineer",
-  "short_name": "Summit",
+  "short_name": "Race Engineer",
   "description": "Race car setup, sessions, telemetry and trackside companion.",
   "start_url": "/",
   "display": "standalone",

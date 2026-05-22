@@ -81,7 +81,7 @@ function PublicSessionView() {
         )}
 
         <div className="mt-10 text-center text-xs font-mono uppercase tracking-widest text-muted-foreground">
-          SUMMIT<span className="text-primary">RACING</span>
+          MY RACE<span className="text-primary">ENGINEER</span>
         </div>
       </div>
     </div>
