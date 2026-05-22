@@ -3,7 +3,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
   LogOut, Calculator, Wand2, NotebookPen, Timer, Disc, Wrench,
-  Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon,
+  Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon, Gauge,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
@@ -86,6 +86,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-widest text-primary">Trackside</DropdownMenuLabel>
                 <DropdownMenuItem asChild><Link to="/sessions"><Timer className="w-4 h-4 mr-2" /> Sessions</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/tires"><Disc className="w-4 h-4 mr-2" /> Tires</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/tyre-setup"><Gauge className="w-4 h-4 mr-2" /> Tyre setup</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/analysis"><BarChart3 className="w-4 h-4 mr-2" /> Analysis</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-widest text-primary">Workshop</DropdownMenuLabel>

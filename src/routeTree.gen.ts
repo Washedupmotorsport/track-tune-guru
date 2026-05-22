@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedTyreSetupRouteImport } from './routes/_authenticated/tyre-setup'
 import { Route as AuthenticatedTiresRouteImport } from './routes/_authenticated/tires'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
@@ -49,6 +50,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedTyreSetupRoute = AuthenticatedTyreSetupRouteImport.update({
+  id: '/tyre-setup',
+  path: '/tyre-setup',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedTiresRoute = AuthenticatedTiresRouteImport.update({
   id: '/tires',
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/notes': typeof AuthenticatedNotesRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/tires': typeof AuthenticatedTiresRoute
+  '/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRouteWithChildren
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/notes': typeof AuthenticatedNotesRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/tires': typeof AuthenticatedTiresRoute
+  '/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRouteWithChildren
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/_authenticated/tires': typeof AuthenticatedTiresRoute
+  '/_authenticated/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/_authenticated/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/_authenticated/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRouteWithChildren
   '/_authenticated/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/notes'
     | '/sessions'
     | '/tires'
+    | '/tyre-setup'
     | '/cars/$carId'
     | '/sessions/$sessionId'
     | '/setups/$setupId'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/notes'
     | '/sessions'
     | '/tires'
+    | '/tyre-setup'
     | '/cars/$carId'
     | '/sessions/$sessionId'
     | '/setups/$setupId'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/_authenticated/notes'
     | '/_authenticated/sessions'
     | '/_authenticated/tires'
+    | '/_authenticated/tyre-setup'
     | '/_authenticated/cars/$carId'
     | '/_authenticated/sessions/$sessionId'
     | '/_authenticated/setups/$setupId'
@@ -316,6 +328,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/tyre-setup': {
+      id: '/_authenticated/tyre-setup'
+      path: '/tyre-setup'
+      fullPath: '/tyre-setup'
+      preLoaderRoute: typeof AuthenticatedTyreSetupRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/tires': {
       id: '/_authenticated/tires'
@@ -481,6 +500,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRouteWithChildren
   AuthenticatedTiresRoute: typeof AuthenticatedTiresRoute
+  AuthenticatedTyreSetupRoute: typeof AuthenticatedTyreSetupRoute
   AuthenticatedCarsCarIdRoute: typeof AuthenticatedCarsCarIdRoute
   AuthenticatedSetupsSetupIdRoute: typeof AuthenticatedSetupsSetupIdRoute
 }
@@ -498,6 +518,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRouteWithChildren,
   AuthenticatedTiresRoute: AuthenticatedTiresRoute,
+  AuthenticatedTyreSetupRoute: AuthenticatedTyreSetupRoute,
   AuthenticatedCarsCarIdRoute: AuthenticatedCarsCarIdRoute,
   AuthenticatedSetupsSetupIdRoute: AuthenticatedSetupsSetupIdRoute,
 }
