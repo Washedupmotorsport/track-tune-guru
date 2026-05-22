@@ -198,7 +198,7 @@ function TyreComparePage() {
     doc.save(`tyre-compare-${condition}-${ts}.pdf`);
   };
 
-  const best = rows.reduce((b, r) => (r.effectiveGrip > b.effectiveGrip ? r : b), rows[0]);
+  const best = rows.reduce((b, r) => (r.score > b.score ? r : b), rows[0]);
 
   return (
     <div>
@@ -240,6 +240,45 @@ function TyreComparePage() {
               <SelectItem value="wet">Wet</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+      </div>
+
+      <div className="mt-4 rounded-lg border border-border bg-card p-5 shadow-card">
+        <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">Balance priority</div>
+        <div className="grid sm:grid-cols-3 gap-4">
+          <div>
+            <div className="flex justify-between text-xs font-mono mb-1">
+              <span>Grip</span>
+              <span className="text-primary">{gripW}%</span>
+            </div>
+            <input
+              type="range" min={0} max={100} value={gripW}
+              onChange={(e) => setGripW(e.target.value)}
+              className="w-full accent-[hsl(var(--primary))]"
+            />
+          </div>
+          <div>
+            <div className="flex justify-between text-xs font-mono mb-1">
+              <span>Warm-up</span>
+              <span className="text-primary">{warmupW}%</span>
+            </div>
+            <input
+              type="range" min={0} max={100} value={warmupW}
+              onChange={(e) => setWarmupW(e.target.value)}
+              className="w-full accent-[hsl(var(--primary))]"
+            />
+          </div>
+          <div>
+            <div className="flex justify-between text-xs font-mono mb-1">
+              <span>Longevity</span>
+              <span className="text-primary">{longevityW}%</span>
+            </div>
+            <input
+              type="range" min={0} max={100} value={longevityW}
+              onChange={(e) => setLongevityW(e.target.value)}
+              className="w-full accent-[hsl(var(--primary))]"
+            />
+          </div>
         </div>
       </div>
 
