@@ -509,7 +509,7 @@ function RideHeightCalc() {
 
       <Section title="Spring sag">
         <div className="grid grid-cols-2 gap-4">
-          <NumField label="Spring rate" unit="N/mm" value={springRate} onChange={setSpringRate} />
+          <NumField label="Spring rate" unit="kg/mm" value={springRate} onChange={setSpringRate} />
           <NumField label="Motion ratio" value={motionRatio} onChange={setMotionRatio} />
           <NumField label="Corner weight" unit="kg" value={cornerWeight} onChange={setCornerWeight} />
         </div>
