@@ -477,8 +477,9 @@ function RideHeightCalc() {
   const groundClearF = cf + off;
   const groundClearR = cr + off;
 
-  const mr = num(motionRatio), sr = num(springRate), cw = num(cornerWeight);
-  // wheel rate = spring rate * MR^2  (N/mm)
+  const mr = num(motionRatio), sr_kg = num(springRate), cw = num(cornerWeight);
+  // wheel rate (N/mm) = spring rate (kg/mm → N/mm) * MR^2
+  const sr = sr_kg * 9.80665;
   const wheelRate = sr * mr * mr;
   // sag (mm) = corner weight (kg) * g / wheel rate (N/mm) -> use 9.81
   const sag = (cw * 9.81) / wheelRate;
