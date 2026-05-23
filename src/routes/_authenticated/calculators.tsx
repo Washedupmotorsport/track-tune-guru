@@ -201,9 +201,9 @@ function BalanceCalc() {
   const [cgHeight, setCgHeight] = useState("500");
   const [trackWidth, setTrackWidth] = useState("1580");
 
-  // Suspension
-  const [springF, setSpringF] = useState("80");
-  const [springR, setSpringR] = useState("70");
+  // Suspension (spring rates in kg/mm; converted to N/mm for calculations)
+  const [springF, setSpringF] = useState("8");
+  const [springR, setSpringR] = useState("7");
   const [arbF, setArbF] = useState("25");
   const [arbR, setArbR] = useState("18");
   const [mrF, setMrF] = useState("1.0");
@@ -221,8 +221,10 @@ function BalanceCalc() {
   const hCG = num(cgHeight);
   const tr = num(trackWidth);
 
-  // Wheel rates (N/mm) — spring × MR² + ARB (already as wheel-rate equivalent)
-  const sF = num(springF), sR = num(springR);
+  // Wheel rates (N/mm) — spring (kg/mm → N/mm) × MR² + ARB (already as wheel-rate equivalent)
+  const sF_kg = num(springF), sR_kg = num(springR);
+  const sF = sF_kg * 9.80665;
+  const sR = sR_kg * 9.80665;
   const aF = num(arbF), aR = num(arbR);
   const rF = num(mrF), rR = num(mrR);
   const wheelRateF = sF * rF * rF + aF;
@@ -314,8 +316,8 @@ function BalanceCalc() {
           <NumField label="Track width" unit="mm" value={trackWidth} onChange={setTrackWidth} />
         </div>
         <div className="mt-5 grid grid-cols-2 gap-4">
-          <NumField label="Spring F" unit="N/mm" value={springF} onChange={setSpringF} />
-          <NumField label="Spring R" unit="N/mm" value={springR} onChange={setSpringR} />
+          <NumField label="Spring F" unit="kg/mm" value={springF} onChange={setSpringF} />
+          <NumField label="Spring R" unit="kg/mm" value={springR} onChange={setSpringR} />
           <NumField label="ARB F (wheel)" unit="N/mm" value={arbF} onChange={setArbF} />
           <NumField label="ARB R (wheel)" unit="N/mm" value={arbR} onChange={setArbR} />
           <NumField label="Motion ratio F" value={mrF} onChange={setMrF} />
