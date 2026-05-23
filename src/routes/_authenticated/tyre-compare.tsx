@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, GitCompare, Grid2x2, Download, Thermometer } from "lucide-react";
+import { ArrowLeft, GitCompare, Grid2x2, Download, Thermometer, Activity } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -55,6 +55,19 @@ function effectiveGripAt(c: Compound, trackTempC: number, condition: "dry" | "we
   return g;
 }
 
+// Determine the winning compound at a given track temp + weight mix.
+function bestCompoundAt(trackTempC: number, condition: "dry" | "wet", gw: number, ww: number, lw: number) {
+  const totalW = gw + ww + lw || 1;
+  let winner = COMPOUNDS[0];
+  let bestScore = -Infinity;
+  for (const c of COMPOUNDS) {
+    const eg = effectiveGripAt(c, trackTempC, condition);
+    const score = (eg * gw + c.warmup * ww + c.longevity * lw) / totalW;
+    if (score > bestScore) { bestScore = score; winner = c; }
+  }
+  return { winner, score: bestScore };
+}
+
 function TyreComparePage() {
   const [trackC, setTrackC] = useState("28");
   const [stintLaps, setStintLaps] = useState("20");
@@ -68,6 +81,8 @@ function TyreComparePage() {
   const [gripW, setGripW] = useState("50");
   const [warmupW, setWarmupW] = useState("25");
   const [longevityW, setLongevityW] = useState("25");
+  const [sensAxis, setSensAxis] = useState<"grip" | "warmup" | "longevity">("grip");
+  const [sensCondition, setSensCondition] = useState<"dry" | "wet">("dry");
 
   const rows = useMemo(() => {
     const track = parseFloat(trackC);
@@ -475,6 +490,19 @@ function TyreComparePage() {
           </div>
         </div>
       </div>
+
+      <SensitivityView
+        sweepLo={sweep.lo}
+        sweepHi={sweep.hi}
+        currentC={parseFloat(trackC) || 0}
+        gripW={parseFloat(gripW) || 0}
+        warmupW={parseFloat(warmupW) || 0}
+        longevityW={parseFloat(longevityW) || 0}
+        axis={sensAxis}
+        setAxis={setSensAxis}
+        condition={sensCondition}
+        setCondition={setSensCondition}
+      />
     </div>
   );
 }
@@ -562,5 +590,196 @@ function Stat({ k, v, good }: { k: string; v: string; good?: boolean }) {
       <div className="text-[9px] uppercase tracking-widest text-muted-foreground">{k}</div>
       <div className={good === undefined ? "" : good ? "text-chart-3" : "text-chart-1"}>{v}</div>
     </div>
+  );
+}
+
+function SensitivityView({
+  sweepLo, sweepHi, currentC, gripW, warmupW, longevityW, axis, setAxis, condition, setCondition,
+}: {
+  sweepLo: number; sweepHi: number; currentC: number;
+  gripW: number; warmupW: number; longevityW: number;
+  axis: "grip" | "warmup" | "longevity";
+  setAxis: (v: "grip" | "warmup" | "longevity") => void;
+  condition: "dry" | "wet";
+  setCondition: (v: "dry" | "wet") => void;
+}) {
+  const COLS = 32; // temp steps
+  const ROWS = 24; // weight steps (0-100)
+
+  // Build the 2D matrix: for each cell, override `axis` weight from 0-100,
+  // keep the other two weights at their current values.
+  const cells = useMemo(() => {
+    const out: { key: string; label: string; score: number }[][] = [];
+    for (let r = 0; r < ROWS; r++) {
+      const wVal = (r / (ROWS - 1)) * 100;
+      const gw = axis === "grip" ? wVal : gripW;
+      const ww = axis === "warmup" ? wVal : warmupW;
+      const lw = axis === "longevity" ? wVal : longevityW;
+      const row: { key: string; label: string; score: number }[] = [];
+      for (let c = 0; c < COLS; c++) {
+        const t = sweepLo + ((sweepHi - sweepLo) * c) / (COLS - 1);
+        const { winner, score } = bestCompoundAt(t, condition, gw, ww, lw);
+        row.push({ key: winner.key, label: winner.label, score });
+      }
+      out.push(row);
+    }
+    return out;
+  }, [sweepLo, sweepHi, gripW, warmupW, longevityW, axis, condition]);
+
+  // Where the current settings sit on the matrix (for the crosshair).
+  const curCol = Math.round(((currentC - sweepLo) / (sweepHi - sweepLo || 1)) * (COLS - 1));
+  const curWeight = axis === "grip" ? gripW : axis === "warmup" ? warmupW : longevityW;
+  const curRow = Math.round((curWeight / 100) * (ROWS - 1));
+
+  // Compute which compounds actually win anywhere in the grid (for the legend).
+  const winnersInGrid = useMemo(() => {
+    const seen = new Set<string>();
+    cells.forEach((row) => row.forEach((cell) => seen.add(cell.key)));
+    return COMPOUNDS.filter((c) => seen.has(c.key));
+  }, [cells]);
+
+  const axisLabel = axis === "grip" ? "Grip weight" : axis === "warmup" ? "Warm-up weight" : "Longevity weight";
+
+  return (
+    <div className="mt-8">
+      <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
+        <Activity className="w-3 h-3" /> Sensitivity
+      </div>
+      <h2 className="font-display text-2xl font-bold mt-1">Recommended compound sensitivity</h2>
+      <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+        How the winning compound shifts as you sweep one priority weight (vertical) against track temperature (horizontal). The crosshair marks your current setup — if you sit near a colour boundary, the call is fragile.
+      </p>
+
+      <div className="mt-4 grid sm:grid-cols-2 gap-3 rounded-lg border border-border bg-card p-5 shadow-card">
+        <div>
+          <Label>Sensitivity axis</Label>
+          <Select value={axis} onValueChange={(v) => setAxis(v as typeof axis)}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="grip">Vary grip weight</SelectItem>
+              <SelectItem value="warmup">Vary warm-up weight</SelectItem>
+              <SelectItem value="longevity">Vary longevity weight</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label>Condition</Label>
+          <Select value={condition} onValueChange={(v) => setCondition(v as typeof condition)}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="dry">Dry</SelectItem>
+              <SelectItem value="wet">Wet</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="mt-4 rounded-lg border border-border bg-card p-5 shadow-card">
+        <SensitivityHeatmap
+          cells={cells}
+          rows={ROWS}
+          cols={COLS}
+          curRow={curRow}
+          curCol={curCol}
+          sweepLo={sweepLo}
+          sweepHi={sweepHi}
+          axisLabel={axisLabel}
+        />
+        <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs font-mono">
+          {winnersInGrid.map((c) => (
+            <div key={c.key} className="flex items-center gap-2">
+              <span className="inline-block w-3 h-3 rounded-sm" style={{ background: COMPOUND_COLORS[c.key] }} />
+              <span className="uppercase tracking-widest text-muted-foreground">{c.label}</span>
+            </div>
+          ))}
+          <div className="ml-auto text-muted-foreground">
+            {winnersInGrid.length === 1
+              ? "Robust — same pick across the whole range."
+              : `${winnersInGrid.length} compounds win somewhere — pick is sensitive.`}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SensitivityHeatmap({
+  cells, rows, cols, curRow, curCol, sweepLo, sweepHi, axisLabel,
+}: {
+  cells: { key: string; label: string; score: number }[][];
+  rows: number; cols: number; curRow: number; curCol: number;
+  sweepLo: number; sweepHi: number; axisLabel: string;
+}) {
+  const W = 720, H = 280, PL = 90, PR = 12, PT = 12, PB = 40;
+  const innerW = W - PL - PR, innerH = H - PT - PB;
+  const cw = innerW / cols;
+  const ch = innerH / rows;
+
+  const tempTicks = 6;
+  const tickTemps = Array.from({ length: tempTicks + 1 }, (_, i) => sweepLo + ((sweepHi - sweepLo) * i) / tempTicks);
+  const weightTicks = [0, 25, 50, 75, 100];
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" role="img" aria-label="Compound sensitivity heatmap">
+      {cells.map((row, r) =>
+        row.map((cell, c) => (
+          <rect
+            key={`${r}-${c}`}
+            x={PL + c * cw}
+            // r=0 means weight=0 → draw at bottom; flip vertically.
+            y={PT + (rows - 1 - r) * ch}
+            width={cw + 0.5}
+            height={ch + 0.5}
+            fill={COMPOUND_COLORS[cell.key]}
+            opacity={0.85}
+          />
+        )),
+      )}
+      {/* current crosshair */}
+      {curCol >= 0 && curCol < cols && curRow >= 0 && curRow < rows && (
+        <rect
+          x={PL + curCol * cw - 1}
+          y={PT + (rows - 1 - curRow) * ch - 1}
+          width={cw + 2}
+          height={ch + 2}
+          fill="none"
+          stroke="hsl(var(--foreground))"
+          strokeWidth={1.5}
+        />
+      )}
+      {/* x-axis ticks (temperature) */}
+      {tickTemps.map((t) => {
+        const xPos = PL + ((t - sweepLo) / (sweepHi - sweepLo || 1)) * innerW;
+        return (
+          <g key={t}>
+            <line x1={xPos} x2={xPos} y1={H - PB} y2={H - PB + 4} stroke="hsl(var(--border))" />
+            <text x={xPos} y={H - PB + 14} fontSize="9" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontFamily="monospace">{t.toFixed(0)}°</text>
+          </g>
+        );
+      })}
+      {/* y-axis ticks (weight 0-100) */}
+      {weightTicks.map((w) => {
+        const yPos = PT + (1 - w / 100) * innerH;
+        return (
+          <g key={w}>
+            <line x1={PL - 4} x2={PL} y1={yPos} y2={yPos} stroke="hsl(var(--border))" />
+            <text x={PL - 8} y={yPos + 3} fontSize="9" textAnchor="end" fill="hsl(var(--muted-foreground))" fontFamily="monospace">{w}%</text>
+          </g>
+        );
+      })}
+      {/* axis labels */}
+      <text x={PL} y={H - 6} fontSize="9" fill="hsl(var(--muted-foreground))" fontFamily="monospace">Track temp (°C)</text>
+      <text
+        x={-(PT + innerH / 2)}
+        y={14}
+        fontSize="9"
+        textAnchor="middle"
+        transform="rotate(-90)"
+        fill="hsl(var(--muted-foreground))"
+        fontFamily="monospace"
+      >
+        {axisLabel} (0–100%)
+      </text>
+    </svg>
   );
 }
