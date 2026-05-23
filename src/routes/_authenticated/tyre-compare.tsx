@@ -55,6 +55,19 @@ function effectiveGripAt(c: Compound, trackTempC: number, condition: "dry" | "we
   return g;
 }
 
+// Determine the winning compound at a given track temp + weight mix.
+function bestCompoundAt(trackTempC: number, condition: "dry" | "wet", gw: number, ww: number, lw: number) {
+  const totalW = gw + ww + lw || 1;
+  let winner = COMPOUNDS[0];
+  let bestScore = -Infinity;
+  for (const c of COMPOUNDS) {
+    const eg = effectiveGripAt(c, trackTempC, condition);
+    const score = (eg * gw + c.warmup * ww + c.longevity * lw) / totalW;
+    if (score > bestScore) { bestScore = score; winner = c; }
+  }
+  return { winner, score: bestScore };
+}
+
 function TyreComparePage() {
   const [trackC, setTrackC] = useState("28");
   const [stintLaps, setStintLaps] = useState("20");
