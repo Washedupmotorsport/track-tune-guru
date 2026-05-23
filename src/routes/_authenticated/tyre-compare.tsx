@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, GitCompare, Grid2x2, Download, Thermometer } from "lucide-react";
+import { ArrowLeft, GitCompare, Grid2x2, Download, Thermometer, Activity } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -68,6 +68,8 @@ function TyreComparePage() {
   const [gripW, setGripW] = useState("50");
   const [warmupW, setWarmupW] = useState("25");
   const [longevityW, setLongevityW] = useState("25");
+  const [sensAxis, setSensAxis] = useState<"grip" | "warmup" | "longevity">("grip");
+  const [sensCondition, setSensCondition] = useState<"dry" | "wet">("dry");
 
   const rows = useMemo(() => {
     const track = parseFloat(trackC);
