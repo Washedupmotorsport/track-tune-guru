@@ -464,7 +464,7 @@ function RideHeightCalc() {
   const [chassisRear, setChassisRear] = useState("95");
   const [wheelbase, setWheelbase] = useState("2650");
   const [motionRatio, setMotionRatio] = useState("1.0");
-  const [springRate, setSpringRate] = useState("80");
+  const [springRate, setSpringRate] = useState("8");
   const [cornerWeight, setCornerWeight] = useState("320");
 
   const cf = num(chassisFront), cr = num(chassisRear), wb = num(wheelbase);
