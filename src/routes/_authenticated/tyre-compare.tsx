@@ -490,6 +490,19 @@ function TyreComparePage() {
           </div>
         </div>
       </div>
+
+      <SensitivityView
+        sweepLo={sweep.lo}
+        sweepHi={sweep.hi}
+        currentC={parseFloat(trackC) || 0}
+        gripW={parseFloat(gripW) || 0}
+        warmupW={parseFloat(warmupW) || 0}
+        longevityW={parseFloat(longevityW) || 0}
+        axis={sensAxis}
+        setAxis={setSensAxis}
+        condition={sensCondition}
+        setCondition={setSensCondition}
+      />
     </div>
   );
 }
