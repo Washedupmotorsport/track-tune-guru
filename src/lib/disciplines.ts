@@ -47,8 +47,8 @@ const alignment: SetupSection = {
 const suspension: SetupSection = {
   title: "Suspension",
   fields: [
-    { key: "spring_front", label: "Spring Front", unit: "N/mm", type: "number" },
-    { key: "spring_rear", label: "Spring Rear", unit: "N/mm", type: "number" },
+    { key: "spring_front", label: "Spring Front", unit: "kg/mm", type: "number" },
+    { key: "spring_rear", label: "Spring Rear", unit: "kg/mm", type: "number" },
     { key: "ride_front", label: "Ride Height F", unit: "mm", type: "number" },
     { key: "ride_rear", label: "Ride Height R", unit: "mm", type: "number" },
     { key: "arb_front", label: "ARB Front" },

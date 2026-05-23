@@ -76,7 +76,7 @@ export function generateBaseline(input: BaselineInput): { rows: BaselineRow[]; s
   // ---- Caster ----
   const caster = discipline === "drift" ? 7.5 : discipline === "drag" ? 3.0 : 5.5;
 
-  // ---- Springs (N/mm) — based on corner weight & discipline ----
+  // ---- Springs (kg/mm) — based on corner weight & discipline ----
   const stiffnessFactor =
     discipline === "circuit" ? 0.30 :
     discipline === "autocross" ? 0.26 :
@@ -123,8 +123,8 @@ export function generateBaseline(input: BaselineInput): { rows: BaselineRow[]; s
     { key: "toe_front", label: "Toe Front", value: fmt(toeF, 2), unit: "°", rationale: toeF < 0 ? "toe-out for turn-in" : "toe-in for stability" },
     { key: "toe_rear", label: "Toe Rear", value: fmt(toeR, 2), unit: "°", rationale: "rear toe-in for stability" },
     { key: "caster", label: "Caster", value: fmt(caster, 1), unit: "°" },
-    { key: "spring_front", label: "Spring Front", value: fmt(springF, 0), unit: "N/mm", rationale: `~${(stiffnessFactor*100).toFixed(0)}% of corner weight` },
-    { key: "spring_rear", label: "Spring Rear", value: fmt(springR, 0), unit: "N/mm" },
+    { key: "spring_front", label: "Spring Front", value: fmt(springF / 9.80665, 1), unit: "kg/mm", rationale: `~${(stiffnessFactor*100).toFixed(0)}% of corner weight` },
+    { key: "spring_rear", label: "Spring Rear", value: fmt(springR / 9.80665, 1), unit: "kg/mm" },
     { key: "ride_front", label: "Ride Height F", value: fmt(rhF, 0), unit: "mm" },
     { key: "ride_rear", label: "Ride Height R", value: fmt(rhR, 0), unit: "mm", rationale: `${rhR - rhF}mm rake` },
     { key: "arb_front", label: "ARB", value: arbBalance, rationale: `tuned for ${drivetrain}` },
