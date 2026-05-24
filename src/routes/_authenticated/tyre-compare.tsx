@@ -610,6 +610,21 @@ function Stat({ k, v, good }: { k: string; v: string; good?: boolean }) {
   );
 }
 
+function WhyRow({ label, value, total, color }: { label: string; value: number; total: number; color: string }) {
+  const pct = total > 0 ? Math.max(0, Math.min(100, (value / total) * 100)) : 0;
+  return (
+    <div>
+      <div className="flex justify-between text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+        <span>{label}</span>
+        <span className="text-foreground">{value.toFixed(1)}</span>
+      </div>
+      <div className="mt-1 h-1.5 rounded-full bg-muted overflow-hidden">
+        <div className={`h-full ${color}`} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
 function SensitivityView({
   sweepLo, sweepHi, currentC, gripW, warmupW, longevityW, axis, setAxis, condition, setCondition,
 }: {
