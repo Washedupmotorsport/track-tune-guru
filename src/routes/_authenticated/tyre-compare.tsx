@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, GitCompare, Grid2x2, Download, Thermometer, Activity } from "lucide-react";
+import { ArrowLeft, GitCompare, Grid2x2, Download, Thermometer, Activity, Info } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import jsPDF from "jspdf";
 
 export const Route = createFileRoute("/_authenticated/tyre-compare")({
@@ -83,6 +84,7 @@ function TyreComparePage() {
   const [longevityW, setLongevityW] = useState("25");
   const [sensAxis, setSensAxis] = useState<"grip" | "warmup" | "longevity">("grip");
   const [sensCondition, setSensCondition] = useState<"dry" | "wet">("dry");
+  const [showCalcDetails, setShowCalcDetails] = useState(false);
 
   const rows = useMemo(() => {
     const track = parseFloat(trackC);
@@ -305,7 +307,7 @@ function TyreComparePage() {
             <div className="font-mono text-[10px] uppercase tracking-widest text-primary">Recommended compound</div>
             <div className="font-display text-2xl font-bold mt-1">{best.c.label} — {best.score.toFixed(1)} pts</div>
             <p className="text-sm text-muted-foreground mt-1">
-              Best balanced choice for grip {gripW}% · warm-up {warmupW}% · longevity {longevityW}%
+              Best balanced choice for grip {gripW}% / warm-up {warmupW}% / longevity {longevityW}%
             </p>
           </div>
           <div className="hidden sm:grid grid-cols-3 gap-3 text-xs font-mono">
@@ -347,7 +349,81 @@ function TyreComparePage() {
               <Bar label="Longevity" value={r.c.longevity} max={100} />
               {isBest && (
                 <div className="mt-4 rounded-md border border-primary/20 bg-primary/5 p-3">
-                  <div className="text-[9px] font-mono uppercase tracking-widest text-primary mb-2">Why this wins</div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-[9px] font-mono uppercase tracking-widest text-primary">Why this wins</div>
+                    <Dialog open={showCalcDetails} onOpenChange={setShowCalcDetails}>
+                      <DialogTrigger asChild>
+                        <button className="text-[10px] font-mono text-primary underline underline-offset-2 hover:text-primary/80 flex items-center gap-0.5">
+                          <Info className="w-3 h-3" /> Calculation details
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-lg">
+                        <DialogHeader>
+                          <DialogTitle className="font-display text-lg">{best.c.label} — Calculation details</DialogTitle>
+                          <DialogDescription className="text-xs">Step-by-step breakdown of effective grip and weighted score.</DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 mt-2 text-xs font-mono">
+                          <div>
+                            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">1. Estimated tread temperature</div>
+                            <div className="rounded-md border border-border bg-background/50 px-3 py-2">
+                              trackTemp + {condition === "wet" ? 5 : 30} = {best.treadC.toFixed(0)}°C
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">2. Distance from peak temp</div>
+                            <div className="rounded-md border border-border bg-background/50 px-3 py-2">
+                              |{best.treadC.toFixed(0)} - {best.c.peakTempC}| = {Math.abs(best.treadC - best.c.peakTempC).toFixed(1)}°C
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">3. Temperature window check</div>
+                            <div className="rounded-md border border-border bg-background/50 px-3 py-2">
+                              Window = ±{best.c.tempWindowC}°C → {best.inWindow ? "Inside window (no penalty)" : "Outside window"}
+                            </div>
+                          </div>
+                          {!best.inWindow && (
+                            <div>
+                              <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">4. Temperature penalty</div>
+                              <div className="rounded-md border border-border bg-background/50 px-3 py-2">
+                                min(40, (dist - window) * 1.8) = {Math.min(40, (Math.abs(best.treadC - best.c.peakTempC) - best.c.tempWindowC) * 1.8).toFixed(1)} pts
+                              </div>
+                            </div>
+                          )}
+                          <div>
+                            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">{best.inWindow ? "4" : "5"}. Effective grip</div>
+                            <div className="rounded-md border border-border bg-background/50 px-3 py-2 space-y-1">
+                              <div>Raw grip = {best.c.grip}</div>
+                              {!best.inWindow && (
+                                <div>Penalty = {Math.min(40, (Math.abs(best.treadC - best.c.peakTempC) - best.c.tempWindowC) * 1.8).toFixed(1)}</div>
+                              )}
+                              {condition === "wet" && !best.c.wetOk && (
+                                <div>Wet modifier: *0.25 (not wet-rated)</div>
+                              )}
+                              {condition === "dry" && best.c.wetOk && (
+                                <div>Dry modifier: *0.5 (wet tyre on dry)</div>
+                              )}
+                              <div className="text-primary font-semibold">Effective grip = {best.effectiveGrip.toFixed(1)}</div>
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">{best.inWindow ? "5" : "6"}. Weighted score</div>
+                            <div className="rounded-md border border-border bg-background/50 px-3 py-2 space-y-1">
+                              <div>Weights: grip {gripW}% / warm-up {warmupW}% / longevity {longevityW}%</div>
+                              <div>Total weight = {(parseFloat(gripW)||0) + (parseFloat(warmupW)||0) + (parseFloat(longevityW)||0)}</div>
+                              <div className="break-all space-y-1">
+                                <div>effGrip = {best.effectiveGrip.toFixed(1)}, gripWeight = {gripW}</div>
+                                <div>warmup = {best.c.warmup}, warmupWeight = {warmupW}</div>
+                                <div>longevity = {best.c.longevity}, longWeight = {longevityW}</div>
+                                <div>totalWeight = {(parseFloat(gripW)||0) + (parseFloat(warmupW)||0) + (parseFloat(longevityW)||0)}</div>
+                                <div>(effGrip * gripWeight + warmup * warmupWeight + longevity * longWeight) / totalWeight</div>
+                              </div>
+                              <div className="text-primary font-semibold">Weighted score = {best.score.toFixed(1)}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                   <div className="space-y-2">
                     <WhyRow label="Grip" value={gripContrib} total={r.score} color="bg-chart-1" />
                     <WhyRow label="Warm-up" value={warmupContrib} total={r.score} color="bg-chart-2" />
@@ -372,7 +448,7 @@ function TyreComparePage() {
         <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
           <Grid2x2 className="w-3 h-3" /> Per-corner wear forecast
         </div>
-        <h2 className="font-display text-2xl font-bold mt-1">Wear per corner × compound</h2>
+        <h2 className="font-display text-2xl font-bold mt-1">Wear per corner * compound</h2>
         <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
           Predicted tread loss at each corner over the planned stint, biased by circuit layout and car balance. Remaining tread assumes a fresh tyre at the depth below.
         </p>
@@ -497,7 +573,7 @@ function TyreComparePage() {
               <div key={c.key} className="flex items-center gap-2">
                 <span className="inline-block w-3 h-0.5" style={{ background: COMPOUND_COLORS[c.key] }} />
                 <span className="uppercase tracking-widest text-muted-foreground">{c.label}</span>
-                <span className="text-muted-foreground">· peak {c.peakTempC + (c.wetOk ? -5 : -30)}°C track</span>
+                <span className="text-muted-foreground">/ peak {c.peakTempC + (c.wetOk ? -5 : -30)}°C track</span>
               </div>
             ))}
             <div className="flex items-center gap-3 ml-auto text-muted-foreground">
