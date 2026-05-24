@@ -319,6 +319,13 @@ function TyreComparePage() {
       <div className="mt-6 grid md:grid-cols-2 xl:grid-cols-4 gap-4">
         {rows.map((r) => {
           const isBest = r === best && r.score > 0;
+          const gw = Math.max(0, parseFloat(gripW) || 0);
+          const ww = Math.max(0, parseFloat(warmupW) || 0);
+          const lw = Math.max(0, parseFloat(longevityW) || 0);
+          const totalW = gw + ww + lw || 1;
+          const gripContrib = (r.effectiveGrip * gw) / totalW;
+          const warmupContrib = (r.c.warmup * ww) / totalW;
+          const longContrib = (r.c.longevity * lw) / totalW;
           return (
             <div
               key={r.c.key}
@@ -338,6 +345,16 @@ function TyreComparePage() {
               <Bar label="Raw grip" value={r.c.grip} max={100} />
               <Bar label="Warm-up" value={r.c.warmup} max={100} />
               <Bar label="Longevity" value={r.c.longevity} max={100} />
+              {isBest && (
+                <div className="mt-4 rounded-md border border-primary/20 bg-primary/5 p-3">
+                  <div className="text-[9px] font-mono uppercase tracking-widest text-primary mb-2">Why this wins</div>
+                  <div className="space-y-2">
+                    <WhyRow label="Grip" value={gripContrib} total={r.score} color="bg-chart-1" />
+                    <WhyRow label="Warm-up" value={warmupContrib} total={r.score} color="bg-chart-2" />
+                    <WhyRow label="Longevity" value={longContrib} total={r.score} color="bg-chart-3" />
+                  </div>
+                </div>
+              )}
               <div className="mt-3 grid grid-cols-2 gap-2 text-xs font-mono">
                 <Stat k="Peak temp" v={`${r.c.peakTempC}°C`} />
                 <Stat k="Window" v={`±${r.c.tempWindowC}°C`} />
@@ -589,6 +606,21 @@ function Stat({ k, v, good }: { k: string; v: string; good?: boolean }) {
     <div className="rounded-md border border-border bg-background/50 px-2 py-1.5">
       <div className="text-[9px] uppercase tracking-widest text-muted-foreground">{k}</div>
       <div className={good === undefined ? "" : good ? "text-chart-3" : "text-chart-1"}>{v}</div>
+    </div>
+  );
+}
+
+function WhyRow({ label, value, total, color }: { label: string; value: number; total: number; color: string }) {
+  const pct = total > 0 ? Math.max(0, Math.min(100, (value / total) * 100)) : 0;
+  return (
+    <div>
+      <div className="flex justify-between text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+        <span>{label}</span>
+        <span className="text-foreground">{value.toFixed(1)}</span>
+      </div>
+      <div className="mt-1 h-1.5 rounded-full bg-muted overflow-hidden">
+        <div className={`h-full ${color}`} style={{ width: `${pct}%` }} />
+      </div>
     </div>
   );
 }
