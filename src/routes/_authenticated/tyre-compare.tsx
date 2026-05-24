@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, GitCompare, Grid2x2, Download, Thermometer, Activity } from "lucide-react";
+import { ArrowLeft, GitCompare, Grid2x2, Download, Thermometer, Activity, Info } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import jsPDF from "jspdf";
 
 export const Route = createFileRoute("/_authenticated/tyre-compare")({
