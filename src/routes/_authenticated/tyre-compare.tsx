@@ -411,7 +411,7 @@ function TyreComparePage() {
                               <div>Weights: grip {gripW}% / warm-up {warmupW}% / longevity {longevityW}%</div>
                               <div>Total weight = {(parseFloat(gripW)||0) + (parseFloat(warmupW)||0) + (parseFloat(longevityW)||0)}</div>
                               <div className="break-all">
-                                {"("}{best.effectiveGrip.toFixed(1)} * {parseFloat(gripW)||0} + {best.c.warmup} * {parseFloat(warmupW)||0} + {best.c.longevity} * {parseFloat(longevityW)||0}) / {((parseFloat(gripW)||0) + (parseFloat(warmupW)||0) + (parseFloat(longevityW)||0) || 1}
+                                (effGrip * gripWeight + warmup * warmupWeight + longevity * longWeight) / totalWeight
                               </div>
                               <div className="text-primary font-semibold">Weighted score = {best.score.toFixed(1)}</div>
                             </div>
