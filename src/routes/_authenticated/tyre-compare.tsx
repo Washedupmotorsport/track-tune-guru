@@ -393,11 +393,9 @@ function TyreComparePage() {
                             <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">{best.inWindow ? "4" : "5"}. Effective grip</div>
                             <div className="rounded-md border border-border bg-background/50 px-3 py-2 space-y-1">
                               <div>Raw grip = {best.c.grip}</div>
-                              {(() => {
-                                const dist = Math.abs(best.treadC - best.c.peakTempC);
-                                const penalty = dist <= best.c.tempWindowC ? 0 : Math.min(40, (dist - best.c.tempWindowC) * 1.8);
-                                return penalty > 0 ? <div>Penalty = {penalty.toFixed(1)}</div> : null;
-                              })()}
+                              {!best.inWindow && (
+                                <div>Penalty = {Math.min(40, (Math.abs(best.treadC - best.c.peakTempC) - best.c.tempWindowC) * 1.8).toFixed(1)}</div>
+                              )}
                               {condition === "wet" && !best.c.wetOk && (
                                 <div>Wet modifier: *0.25 (not wet-rated)</div>
                               )}
