@@ -307,7 +307,7 @@ function TyreComparePage() {
             <div className="font-mono text-[10px] uppercase tracking-widest text-primary">Recommended compound</div>
             <div className="font-display text-2xl font-bold mt-1">{best.c.label} — {best.score.toFixed(1)} pts</div>
             <p className="text-sm text-muted-foreground mt-1">
-              Best balanced choice for grip {gripW}% · warm-up {warmupW}% · longevity {longevityW}%
+              Best balanced choice for grip {gripW}% / warm-up {warmupW}% / longevity {longevityW}%
             </p>
           </div>
           <div className="hidden sm:grid grid-cols-3 gap-3 text-xs font-mono">
@@ -385,7 +385,7 @@ function TyreComparePage() {
                             <div>
                               <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">4. Temperature penalty</div>
                               <div className="rounded-md border border-border bg-background/50 px-3 py-2">
-                                min(40, (dist - window) × 1.8) = {Math.min(40, (Math.abs(best.treadC - best.c.peakTempC) - best.c.tempWindowC) * 1.8).toFixed(1)} pts
+                                min(40, (dist - window) * 1.8) = {Math.min(40, (Math.abs(best.treadC - best.c.peakTempC) - best.c.tempWindowC) * 1.8).toFixed(1)} pts
                               </div>
                             </div>
                           )}
@@ -399,10 +399,10 @@ function TyreComparePage() {
                                 return penalty > 0 ? <div>Penalty = {penalty.toFixed(1)}</div> : null;
                               })()}
                               {condition === "wet" && !best.c.wetOk && (
-                                <div>Wet modifier: ×0.25 (not wet-rated)</div>
+                                <div>Wet modifier: *0.25 (not wet-rated)</div>
                               )}
                               {condition === "dry" && best.c.wetOk && (
-                                <div>Dry modifier: ×0.5 (wet tyre on dry)</div>
+                                <div>Dry modifier: *0.5 (wet tyre on dry)</div>
                               )}
                               <div className="text-primary font-semibold">Effective grip = {best.effectiveGrip.toFixed(1)}</div>
                             </div>
@@ -410,10 +410,10 @@ function TyreComparePage() {
                           <div>
                             <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">{best.inWindow ? "5" : "6"}. Weighted score</div>
                             <div className="rounded-md border border-border bg-background/50 px-3 py-2 space-y-1">
-                              <div>Weights: grip {gripW}% · warm-up {warmupW}% · longevity {longevityW}%</div>
+                              <div>Weights: grip {gripW}% / warm-up {warmupW}% / longevity {longevityW}%</div>
                               <div>Total weight = {(parseFloat(gripW)||0) + (parseFloat(warmupW)||0) + (parseFloat(longevityW)||0)}</div>
                               <div className="break-all">
-                                ({best.effectiveGrip.toFixed(1)} × {parseFloat(gripW)||0} + {best.c.warmup} × {parseFloat(warmupW)||0} + {best.c.longevity} × {parseFloat(longevityW)||0}) ÷ {((parseFloat(gripW)||0) + (parseFloat(warmupW)||0) + (parseFloat(longevityW)||0) || 1}
+                                ({best.effectiveGrip.toFixed(1)} * {parseFloat(gripW)||0} + {best.c.warmup} * {parseFloat(warmupW)||0} + {best.c.longevity} * {parseFloat(longevityW)||0}) / {((parseFloat(gripW)||0) + (parseFloat(warmupW)||0) + (parseFloat(longevityW)||0) || 1}
                               </div>
                               <div className="text-primary font-semibold">Weighted score = {best.score.toFixed(1)}</div>
                             </div>
@@ -446,7 +446,7 @@ function TyreComparePage() {
         <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
           <Grid2x2 className="w-3 h-3" /> Per-corner wear forecast
         </div>
-        <h2 className="font-display text-2xl font-bold mt-1">Wear per corner × compound</h2>
+        <h2 className="font-display text-2xl font-bold mt-1">Wear per corner * compound</h2>
         <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
           Predicted tread loss at each corner over the planned stint, biased by circuit layout and car balance. Remaining tread assumes a fresh tyre at the depth below.
         </p>
@@ -571,7 +571,7 @@ function TyreComparePage() {
               <div key={c.key} className="flex items-center gap-2">
                 <span className="inline-block w-3 h-0.5" style={{ background: COMPOUND_COLORS[c.key] }} />
                 <span className="uppercase tracking-widest text-muted-foreground">{c.label}</span>
-                <span className="text-muted-foreground">· peak {c.peakTempC + (c.wetOk ? -5 : -30)}°C track</span>
+                <span className="text-muted-foreground">/ peak {c.peakTempC + (c.wetOk ? -5 : -30)}°C track</span>
               </div>
             ))}
             <div className="flex items-center gap-3 ml-auto text-muted-foreground">
