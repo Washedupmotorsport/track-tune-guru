@@ -86,6 +86,7 @@ function TyreComparePage() {
   const [sensAxis, setSensAxis] = useState<"grip" | "warmup" | "longevity">("grip");
   const [sensCondition, setSensCondition] = useState<"dry" | "wet">("dry");
   const [showCalcDetails, setShowCalcDetails] = useState(false);
+  const [calcViewMode, setCalcViewMode] = useState<"simplified" | "expanded">("simplified");
 
   const rows = useMemo(() => {
     const track = parseFloat(trackC);
