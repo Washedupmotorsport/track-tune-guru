@@ -364,6 +364,20 @@ function TyreComparePage() {
                           <DialogTitle className="font-display text-lg">{best.c.label} — Calculation details</DialogTitle>
                           <DialogDescription className="text-xs">Step-by-step breakdown of effective grip and weighted score.</DialogDescription>
                         </DialogHeader>
+                        <div className="rounded-md border border-border bg-background/50 px-3 py-2 mt-2 grid grid-cols-3 gap-2 text-xs font-mono">
+                          <div>
+                            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Track temp</div>
+                            <div>{trackC}°C</div>
+                          </div>
+                          <div>
+                            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Condition</div>
+                            <div className="capitalize">{condition}</div>
+                          </div>
+                          <div>
+                            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Est. tread</div>
+                            <div>{best.treadC.toFixed(0)}°C</div>
+                          </div>
+                        </div>
                         <div className="flex items-center justify-end gap-2 mt-2">
                           <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">{calcViewMode === "simplified" ? "Simplified" : "Expanded"}</span>
                           <Switch
