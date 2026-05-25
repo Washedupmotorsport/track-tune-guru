@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import jsPDF from "jspdf";
 
@@ -85,6 +86,7 @@ function TyreComparePage() {
   const [sensAxis, setSensAxis] = useState<"grip" | "warmup" | "longevity">("grip");
   const [sensCondition, setSensCondition] = useState<"dry" | "wet">("dry");
   const [showCalcDetails, setShowCalcDetails] = useState(false);
+  const [calcViewMode, setCalcViewMode] = useState<"simplified" | "expanded">("simplified");
 
   const rows = useMemo(() => {
     const track = parseFloat(trackC);
@@ -362,65 +364,100 @@ function TyreComparePage() {
                           <DialogTitle className="font-display text-lg">{best.c.label} — Calculation details</DialogTitle>
                           <DialogDescription className="text-xs">Step-by-step breakdown of effective grip and weighted score.</DialogDescription>
                         </DialogHeader>
-                        <div className="space-y-4 mt-2 text-xs font-mono">
-                          <div>
-                            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">1. Estimated tread temperature</div>
-                            <div className="rounded-md border border-border bg-background/50 px-3 py-2">
-                              trackTemp + {condition === "wet" ? 5 : 30} = {best.treadC.toFixed(0)}°C
-                            </div>
-                          </div>
-                          <div>
-                            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">2. Distance from peak temp</div>
-                            <div className="rounded-md border border-border bg-background/50 px-3 py-2">
-                              |{best.treadC.toFixed(0)} - {best.c.peakTempC}| = {Math.abs(best.treadC - best.c.peakTempC).toFixed(1)}°C
-                            </div>
-                          </div>
-                          <div>
-                            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">3. Temperature window check</div>
-                            <div className="rounded-md border border-border bg-background/50 px-3 py-2">
-                              Window = ±{best.c.tempWindowC}°C → {best.inWindow ? "Inside window (no penalty)" : "Outside window"}
-                            </div>
-                          </div>
-                          {!best.inWindow && (
-                            <div>
-                              <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">4. Temperature penalty</div>
-                              <div className="rounded-md border border-border bg-background/50 px-3 py-2">
-                                min(40, (dist - window) * 1.8) = {Math.min(40, (Math.abs(best.treadC - best.c.peakTempC) - best.c.tempWindowC) * 1.8).toFixed(1)} pts
-                              </div>
-                            </div>
-                          )}
-                          <div>
-                            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">{best.inWindow ? "4" : "5"}. Effective grip</div>
+                        <div className="flex items-center justify-end gap-2 mt-2">
+                          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">{calcViewMode === "simplified" ? "Simplified" : "Expanded"}</span>
+                          <Switch
+                            checked={calcViewMode === "expanded"}
+                            onCheckedChange={(checked) => setCalcViewMode(checked ? "expanded" : "simplified")}
+                            aria-label="Toggle expanded math view"
+                          />
+                        </div>
+                        {calcViewMode === "simplified" ? (
+                          <div className="space-y-3 mt-2 text-xs font-mono">
                             <div className="rounded-md border border-border bg-background/50 px-3 py-2 space-y-1">
+                              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Tread temperature</div>
+                              <div>trackTemp + {condition === "wet" ? 5 : 30} = {best.treadC.toFixed(0)}°C</div>
+                            </div>
+                            <div className="rounded-md border border-border bg-background/50 px-3 py-2 space-y-1">
+                              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Distance from peak</div>
+                              <div>|{best.treadC.toFixed(0)} - {best.c.peakTempC}| = {Math.abs(best.treadC - best.c.peakTempC).toFixed(1)}°C {best.inWindow ? "(inside window)" : "(outside window)"}</div>
+                            </div>
+                            <div className="rounded-md border border-border bg-background/50 px-3 py-2 space-y-1">
+                              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Effective grip</div>
                               <div>Raw grip = {best.c.grip}</div>
-                              {!best.inWindow && (
-                                <div>Penalty = {Math.min(40, (Math.abs(best.treadC - best.c.peakTempC) - best.c.tempWindowC) * 1.8).toFixed(1)}</div>
-                              )}
-                              {condition === "wet" && !best.c.wetOk && (
-                                <div>Wet modifier: *0.25 (not wet-rated)</div>
-                              )}
-                              {condition === "dry" && best.c.wetOk && (
-                                <div>Dry modifier: *0.5 (wet tyre on dry)</div>
-                              )}
+                              {!best.inWindow && <div>Penalty = {Math.min(40, (Math.abs(best.treadC - best.c.peakTempC) - best.c.tempWindowC) * 1.8).toFixed(1)}</div>}
+                              {condition === "wet" && !best.c.wetOk && <div>Wet modifier: *0.25</div>}
+                              {condition === "dry" && best.c.wetOk && <div>Dry modifier: *0.5</div>}
                               <div className="text-primary font-semibold">Effective grip = {best.effectiveGrip.toFixed(1)}</div>
                             </div>
-                          </div>
-                          <div>
-                            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">{best.inWindow ? "5" : "6"}. Weighted score</div>
                             <div className="rounded-md border border-border bg-background/50 px-3 py-2 space-y-1">
-                              <div>Weights: grip {gripW}% / warm-up {warmupW}% / longevity {longevityW}%</div>
-                              <div>Total weight = {(parseFloat(gripW)||0) + (parseFloat(warmupW)||0) + (parseFloat(longevityW)||0)}</div>
-                              <div className="break-all space-y-1">
-                                <div>effGrip = {best.effectiveGrip.toFixed(1)}, gripWeight = {gripW}</div>
-                                <div>warmup = {best.c.warmup}, warmupWeight = {warmupW}</div>
-                                <div>longevity = {best.c.longevity}, longWeight = {longevityW}</div>
-                                <div>totalWeight = {(parseFloat(gripW)||0) + (parseFloat(warmupW)||0) + (parseFloat(longevityW)||0)}</div>
-                                <div>(effGrip * gripWeight + warmup * warmupWeight + longevity * longWeight) / totalWeight</div>
+                              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Weighted score</div>
+                              <div className="text-primary font-semibold">
+                                ({best.effectiveGrip.toFixed(1)} * {gripW} + {best.c.warmup} * {warmupW} + {best.c.longevity} * {longevityW}) / {((parseFloat(gripW)||0) + (parseFloat(warmupW)||0) + (parseFloat(longevityW)||0))} = {best.score.toFixed(1)}
                               </div>
-                              <div className="text-primary font-semibold">Weighted score = {best.score.toFixed(1)}</div>
                             </div>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="space-y-4 mt-2 text-xs font-mono">
+                            <div>
+                              <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">1. Estimated tread temperature</div>
+                              <div className="rounded-md border border-border bg-background/50 px-3 py-2">
+                                trackTemp + {condition === "wet" ? 5 : 30} = {best.treadC.toFixed(0)}°C
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">2. Distance from peak temp</div>
+                              <div className="rounded-md border border-border bg-background/50 px-3 py-2">
+                                |{best.treadC.toFixed(0)} - {best.c.peakTempC}| = {Math.abs(best.treadC - best.c.peakTempC).toFixed(1)}°C
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">3. Temperature window check</div>
+                              <div className="rounded-md border border-border bg-background/50 px-3 py-2">
+                                Window = ±{best.c.tempWindowC}°C → {best.inWindow ? "Inside window (no penalty)" : "Outside window"}
+                              </div>
+                            </div>
+                            {!best.inWindow && (
+                              <div>
+                                <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">4. Temperature penalty</div>
+                                <div className="rounded-md border border-border bg-background/50 px-3 py-2">
+                                  min(40, (dist - window) * 1.8) = {Math.min(40, (Math.abs(best.treadC - best.c.peakTempC) - best.c.tempWindowC) * 1.8).toFixed(1)} pts
+                                </div>
+                              </div>
+                            )}
+                            <div>
+                              <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">{best.inWindow ? "4" : "5"}. Effective grip</div>
+                              <div className="rounded-md border border-border bg-background/50 px-3 py-2 space-y-1">
+                                <div>Raw grip = {best.c.grip}</div>
+                                {!best.inWindow && (
+                                  <div>Penalty = {Math.min(40, (Math.abs(best.treadC - best.c.peakTempC) - best.c.tempWindowC) * 1.8).toFixed(1)}</div>
+                                )}
+                                {condition === "wet" && !best.c.wetOk && (
+                                  <div>Wet modifier: *0.25 (not wet-rated)</div>
+                                )}
+                                {condition === "dry" && best.c.wetOk && (
+                                  <div>Dry modifier: *0.5 (wet tyre on dry)</div>
+                                )}
+                                <div className="text-primary font-semibold">Effective grip = {best.effectiveGrip.toFixed(1)}</div>
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">{best.inWindow ? "5" : "6"}. Weighted score</div>
+                              <div className="rounded-md border border-border bg-background/50 px-3 py-2 space-y-1">
+                                <div>Weights: grip {gripW}% / warm-up {warmupW}% / longevity {longevityW}%</div>
+                                <div>Total weight = {(parseFloat(gripW)||0) + (parseFloat(warmupW)||0) + (parseFloat(longevityW)||0)}</div>
+                                <div className="break-all space-y-1">
+                                  <div>effGrip = {best.effectiveGrip.toFixed(1)}, gripWeight = {gripW}</div>
+                                  <div>warmup = {best.c.warmup}, warmupWeight = {warmupW}</div>
+                                  <div>longevity = {best.c.longevity}, longWeight = {longevityW}</div>
+                                  <div>totalWeight = {(parseFloat(gripW)||0) + (parseFloat(warmupW)||0) + (parseFloat(longevityW)||0)}</div>
+                                  <div>(effGrip * gripWeight + warmup * warmupWeight + longevity * longWeight) / totalWeight</div>
+                                </div>
+                                <div className="text-primary font-semibold">Weighted score = {best.score.toFixed(1)}</div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </DialogContent>
                     </Dialog>
                   </div>
