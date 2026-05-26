@@ -55,7 +55,7 @@ export function exportSetupPdf({ setup, car, laps }: { setup: Setup; car: Car | 
   doc.setTextColor(200, 200, 200);
   doc.text(disc.label.toUpperCase() + " · " + disc.tagline.toUpperCase(), margin, 52);
 
-  doc.setTextColor(...ORANGE);
+  doc.setTextColor(...RED);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10);
   const dateStr = new Date(setup.updated_at).toLocaleString();
@@ -92,7 +92,7 @@ export function exportSetupPdf({ setup, car, laps }: { setup: Setup; car: Car | 
     theme: "plain",
     styles: { fontSize: 10, cellPadding: 4 },
     columnStyles: {
-      0: { fontStyle: "bold", textColor: ORANGE, cellWidth: 90 },
+      0: { fontStyle: "bold", textColor: RED, cellWidth: 90 },
       1: { textColor: DARK },
     },
   });
