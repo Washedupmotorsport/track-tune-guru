@@ -265,7 +265,11 @@ function displayRow(value: string, unit: string | undefined, units: ReturnType<t
     return <>{value}<span className="text-primary text-xs font-mono ml-1">{unit}</span></>;
   }
   if (unit === "mm") {
-    return <>{units.toDisplayLengthShort(n)}<span className="text-primary text-xs font-mono ml-1">{units.lengthShortUnit}</span></>;
+    const decimals = Math.abs(n) < 10 ? 2 : 0;
+    const converted = units.system === "imperial" ? n / 25.4 : n;
+    const imperialDecimals = Math.abs(n) < 10 ? 3 : 2;
+    const shown = units.system === "imperial" ? converted.toFixed(imperialDecimals) : converted.toFixed(decimals);
+    return <>{shown}<span className="text-primary text-xs font-mono ml-1">{units.lengthShortUnit}</span></>;
   }
   if (unit === "psi") {
     return <>{units.toDisplayPressure(n)}<span className="text-primary text-xs font-mono ml-1">{units.pressureUnit}</span></>;
