@@ -65,7 +65,7 @@
 }
 
 :root {
-  /* Paper + racing-orange motorsport theme. Light variant. */
+  /* Paper + racing-red motorsport theme. Light variant. */
   --radius: 0.375rem;
   --background: oklch(0.965 0.004 80);
   --foreground: oklch(0.18 0.014 255);
@@ -73,7 +73,7 @@
   --card-foreground: oklch(0.18 0.014 255);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.014 255);
-  --primary: oklch(0.582 0.184 38);          /* brick orange #D94100 */
+  --primary: oklch(0.58 0.20 28);          /* racing red #D90429 */
   --primary-foreground: oklch(0.99 0.005 250);
   --secondary: oklch(0.95 0.008 250);
   --secondary-foreground: oklch(0.20 0.014 255);
@@ -85,24 +85,24 @@
   --destructive-foreground: oklch(0.99 0.005 250);
   --border: oklch(0.86 0.008 250);
   --input: oklch(0.92 0.008 250);
-  --ring: oklch(0.582 0.184 38);
+  --ring: oklch(0.58 0.20 28);
   --grid: oklch(0.74 0.012 250 / 0.7);
   /* Light-mode chart palette — desaturated enough to layer on paper, distinct in hue */
-  --chart-1: oklch(0.582 0.184 38);   /* brick orange (primary) */
+  --chart-1: oklch(0.58 0.20 28);   /* racing red (primary) */
   --chart-2: oklch(0.512 0.135 244);  /* ocean blue (accent) */
   --chart-3: oklch(0.55 0.13 155);    /* pit-lane green */
   --chart-4: oklch(0.60 0.16 85);     /* amber */
   --chart-5: oklch(0.50 0.15 305);    /* violet */
   --sidebar: oklch(0.97 0.006 250);
   --sidebar-foreground: oklch(0.18 0.014 255);
-  --sidebar-primary: oklch(0.582 0.184 38);
+  --sidebar-primary: oklch(0.58 0.20 28);
   --sidebar-primary-foreground: oklch(0.99 0.005 250);
   --sidebar-accent: oklch(0.94 0.008 250);
   --sidebar-accent-foreground: oklch(0.20 0.014 255);
   --sidebar-border: oklch(0.90 0.008 250);
-  --sidebar-ring: oklch(0.582 0.184 38);
-  --gradient-hero: linear-gradient(135deg, oklch(0.582 0.184 38) 0%, oklch(0.62 0.17 28) 100%);
-  --shadow-glow: 0 0 40px -8px oklch(0.582 0.184 38 / 0.35);
+  --sidebar-ring: oklch(0.58 0.20 28);
+  --gradient-hero: linear-gradient(135deg, oklch(0.58 0.20 28) 0%, oklch(0.62 0.18 20) 100%);
+  --shadow-glow: 0 0 40px -8px oklch(0.58 0.20 28 / 0.35);
   --shadow-card: 0 1px 0 oklch(1 0 0 / 0.6) inset, 0 8px 24px -12px oklch(0.20 0.02 255 / 0.18);
 }
 
