@@ -76,6 +76,13 @@ export function generateBaseline(input: BaselineInput): { rows: BaselineRow[]; s
   // ---- Caster ----
   const caster = discipline === "drift" ? 7.5 : discipline === "drag" ? 3.0 : 5.5;
 
+  // ---- Toe converted to mm (measured across a reference wheel diameter) ----
+  // Using 380mm (~15" rim) as a common reference. toe_mm = D * tan(angle)
+  const TOE_REF_DIAMETER_MM = 380;
+  const toeDegToMm = (deg: number) => TOE_REF_DIAMETER_MM * Math.tan((deg * Math.PI) / 180);
+  const toeFmm = toeDegToMm(toeF);
+  const toeRmm = toeDegToMm(toeR);
+
   // ---- Springs (kg/mm) — based on corner weight & discipline ----
   const stiffnessFactor =
     discipline === "circuit" ? 0.30 :
@@ -120,8 +127,8 @@ export function generateBaseline(input: BaselineInput): { rows: BaselineRow[]; s
     { key: "camber_rf", label: "Camber Front", value: fmt(camF, 1), unit: "°" },
     { key: "camber_lr", label: "Camber Rear", value: fmt(camR, 1), unit: "°", rationale: `${drivetrain} balance` },
     { key: "camber_rr", label: "Camber Rear", value: fmt(camR, 1), unit: "°" },
-    { key: "toe_front", label: "Toe Front", value: fmt(toeF, 2), unit: "°", rationale: toeF < 0 ? "toe-out for turn-in" : "toe-in for stability" },
-    { key: "toe_rear", label: "Toe Rear", value: fmt(toeR, 2), unit: "°", rationale: "rear toe-in for stability" },
+    { key: "toe_front", label: "Toe Front", value: fmt(toeFmm, 2), unit: "mm", rationale: `${toeF < 0 ? "toe-out for turn-in" : "toe-in for stability"} (@ ${TOE_REF_DIAMETER_MM}mm ref)` },
+    { key: "toe_rear", label: "Toe Rear", value: fmt(toeRmm, 2), unit: "mm", rationale: `rear toe-in for stability (@ ${TOE_REF_DIAMETER_MM}mm ref)` },
     { key: "caster", label: "Caster", value: fmt(caster, 1), unit: "°" },
     { key: "spring_front", label: "Spring Front", value: fmt(springF / 9.80665, 1), unit: "kg/mm", rationale: `~${(stiffnessFactor*100).toFixed(0)}% of corner weight` },
     { key: "spring_rear", label: "Spring Rear", value: fmt(springR / 9.80665, 1), unit: "kg/mm" },
