@@ -78,7 +78,7 @@ function AuthPage() {
         </Link>
         <div>
           <p className="font-display text-4xl font-bold leading-tight">Your pit garage,<br /><span className="text-primary">always with you</span>.</p>
-          <p className="mt-4 text-muted-foreground max-w-sm">Save setups for every car you race. Recall the winning sheet on a wet Sunday at midnight.</p>
+          <p className="mt-4 text-muted-foreground max-w-sm">Save setups for every car you race. Recall the winning setup on a wet Sunday at midnight.</p>
         </div>
         <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Sector 1 // Login</div>
       </div>

@@ -79,7 +79,7 @@ function Landing() {
           </h1>
           <p className="mt-6 max-w-xl text-lg text-muted-foreground">
             Your digital pit garage for circuit, drift, drag, autocross, rally and oval.
-            Save baselines, log changes, never lose a winning sheet again.
+            Save baselines, log changes, never lose a winning setup again.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to={user ? "/garage" : "/auth"}>
@@ -97,7 +97,7 @@ function Landing() {
       <section className="mx-auto max-w-6xl px-6 py-20 grid md:grid-cols-3 gap-6">
         <h2 className="sr-only">Features</h2>
         {[
-          { icon: Wrench, title: "Setup sheets", body: "Tires, alignment, suspension, aero, drivetrain — built per discipline." },
+          { icon: Wrench, title: "Setups", body: "Tires, alignment, suspension, aero, drivetrain — built per discipline." },
           { icon: LineChart, title: "Track conditions", body: "Tag every setup with track, weather and notes for total recall." },
           { icon: Gauge, title: "Compare baselines", body: "Clone a setup, tweak one knob, save the new baseline. Iterate fast." },
         ].map((f) => (

@@ -115,7 +115,7 @@ function CarDetail() {
             <Button className="shadow-glow"><Plus className="w-4 h-4 mr-1" /> New setup</Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>New setup sheet</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>New setup</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <div><Label>Name *</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Quali baseline" /></div>
               <div><Label>Track</Label><Input value={form.track} onChange={(e) => setForm({ ...form, track: e.target.value })} placeholder="Spa-Francorchamps" /></div>
@@ -150,7 +150,7 @@ function CarDetail() {
                 <div className="text-sm text-muted-foreground">{[s.track, s.conditions].filter(Boolean).join(" · ") || "—"}</div>
                 <div className="text-xs font-mono text-muted-foreground mt-2">Updated {new Date(s.updated_at).toLocaleDateString()}</div>
                 <Link to="/setups/$setupId" params={{ setupId: s.id }} className="mt-3 inline-flex items-center text-sm text-accent hover:text-primary">
-                  Open sheet <ChevronRight className="w-4 h-4 ml-1" />
+                  Open setup <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>
               </div>
             ))}
@@ -159,7 +159,7 @@ function CarDetail() {
           <div className="rounded-lg border border-dashed border-border p-12 text-center">
             <FileText className="w-10 h-10 mx-auto text-muted-foreground" />
             <h3 className="mt-4 font-display text-xl font-semibold">No setups yet</h3>
-            <p className="text-sm text-muted-foreground">Create your first {disc.label.toLowerCase()} setup sheet.</p>
+            <p className="text-sm text-muted-foreground">Create your first {disc.label.toLowerCase()} setup.</p>
           </div>
         )}
       </div>
