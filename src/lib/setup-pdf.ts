@@ -43,7 +43,7 @@ export function exportSetupPdf({ setup, car, laps }: { setup: Setup; car: Car | 
   // Header bar
   doc.setFillColor(...DARK);
   doc.rect(0, 0, pageW, 70, "F");
-  doc.setFillColor(...ORANGE);
+  doc.setFillColor(...RED);
   doc.rect(0, 70, pageW, 3, "F");
 
   doc.setTextColor(255, 255, 255);
