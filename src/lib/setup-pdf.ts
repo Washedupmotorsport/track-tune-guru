@@ -30,7 +30,7 @@ type Lap = {
   notes: string | null;
 };
 
-const ORANGE: [number, number, number] = [234, 88, 12];
+const RED: [number, number, number] = [217, 4, 41];
 const DARK: [number, number, number] = [20, 20, 20];
 const MUTED: [number, number, number] = [120, 120, 120];
 
@@ -43,7 +43,7 @@ export function exportSetupPdf({ setup, car, laps }: { setup: Setup; car: Car | 
   // Header bar
   doc.setFillColor(...DARK);
   doc.rect(0, 0, pageW, 70, "F");
-  doc.setFillColor(...ORANGE);
+  doc.setFillColor(...RED);
   doc.rect(0, 70, pageW, 3, "F");
 
   doc.setTextColor(255, 255, 255);
@@ -55,7 +55,7 @@ export function exportSetupPdf({ setup, car, laps }: { setup: Setup; car: Car | 
   doc.setTextColor(200, 200, 200);
   doc.text(disc.label.toUpperCase() + " · " + disc.tagline.toUpperCase(), margin, 52);
 
-  doc.setTextColor(...ORANGE);
+  doc.setTextColor(...RED);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10);
   const dateStr = new Date(setup.updated_at).toLocaleString();
@@ -92,7 +92,7 @@ export function exportSetupPdf({ setup, car, laps }: { setup: Setup; car: Car | 
     theme: "plain",
     styles: { fontSize: 10, cellPadding: 4 },
     columnStyles: {
-      0: { fontStyle: "bold", textColor: ORANGE, cellWidth: 90 },
+      0: { fontStyle: "bold", textColor: RED, cellWidth: 90 },
       1: { textColor: DARK },
     },
   });
