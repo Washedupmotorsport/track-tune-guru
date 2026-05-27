@@ -18,9 +18,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const saved = (typeof localStorage !== "undefined" && localStorage.getItem(STORAGE_KEY)) as Theme | null;
-    const prefersDark =
-      typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-    const initial: Theme = saved ?? (prefersDark ? "dark" : "light");
+    // Default to dark to match the brand identity (deep black + racing red).
+    const initial: Theme = saved ?? "dark";
     setThemeState(initial);
     applyTheme(initial);
   }, []);

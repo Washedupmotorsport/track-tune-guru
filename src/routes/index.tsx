@@ -4,6 +4,7 @@ import { Gauge, Wrench, LineChart, Flag } from "lucide-react";
 import heroCar from "@/assets/hero-car.jpg";
 import { DISCIPLINES } from "@/lib/disciplines";
 import { useAuth } from "@/lib/auth-context";
+import logoMre from "@/assets/logo-mre.png";
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -36,9 +37,8 @@ function Landing() {
     <div className="min-h-screen text-foreground">
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/70 border-b border-border">
         <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 font-display font-bold text-lg">
-            <span className="inline-block w-2 h-6 bg-primary shadow-glow" />
-            MY RACE<span className="text-primary">ENGINEER</span>
+          <Link to="/" aria-label="My Race Engineer — home" className="flex items-center">
+            <img src={logoMre} alt="My Race Engineer" className="h-10 w-auto" />
           </Link>
           <nav className="flex items-center gap-2">
             {user ? (
