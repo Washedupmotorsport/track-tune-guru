@@ -30,7 +30,7 @@ type Lap = {
   notes: string | null;
 };
 
-const RED: [number, number, number] = [217, 4, 41];
+const RED: [number, number, number] = [227, 6, 19]; // #E30613
 const DARK: [number, number, number] = [20, 20, 20];
 const MUTED: [number, number, number] = [120, 120, 120];
 
