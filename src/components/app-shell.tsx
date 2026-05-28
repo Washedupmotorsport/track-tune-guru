@@ -217,6 +217,13 @@ const WORKSPACES = [
 
 const ALL_NAV_GROUPS = [
   {
+    label: "Roles",
+    items: [
+      { to: "/driver",   label: "Driver workspace",   icon: Mic },
+      { to: "/engineer", label: "Engineer workspace", icon: HardHat },
+    ],
+  },
+  {
     label: "Garage",
     items: [
       { to: "/garage",   label: "Garage",         icon: Home },
