@@ -167,6 +167,9 @@ function MaintenancePage() {
                   <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{carName(it.car_id)}</div>
                   <div className="flex items-center gap-2 mt-1">
                     <h2 className="font-display text-xl font-bold">{it.component}</h2>
+                    {it.priority && it.priority !== "normal" && (
+                      <span className={"text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded border " + (it.priority === "critical" ? "bg-destructive/20 text-destructive border-destructive/60" : it.priority === "high" ? "bg-primary/15 text-primary border-primary/50" : "bg-muted text-muted-foreground border-border")}>{it.priority}</span>
+                    )}
                     {overdue && <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded bg-destructive/20 text-destructive flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Overdue</span>}
                     {!overdue && warn && <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded bg-primary/20 text-primary flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Due soon</span>}
                     {!overdue && !warn && interval > 0 && <CheckCircle2 className="w-4 h-4 text-muted-foreground" />}
