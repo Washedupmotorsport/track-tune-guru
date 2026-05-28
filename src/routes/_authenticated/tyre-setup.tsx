@@ -153,7 +153,7 @@ function TyreSetupPage() {
         </Button>
       </div>
 
-      <div className="mt-6 grid lg:grid-cols-2 gap-6">
+      <div className="mt-6 grid lg:grid-cols-2 gap-3">
         <div className="rounded-lg border border-border bg-card p-5 shadow-card space-y-4">
           <h2 className="font-display text-lg font-bold uppercase tracking-wider">Inputs</h2>
           <div>

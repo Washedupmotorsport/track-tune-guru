@@ -49,7 +49,7 @@ function PublicSessionView() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto max-w-4xl px-6 py-10">
+      <div className="mx-auto max-w-4xl px-4 py-10">
         <div className="font-mono text-xs uppercase tracking-widest text-primary">
           Shared session · {session.session_type}
         </div>
@@ -91,7 +91,7 @@ function PublicSessionView() {
           <div className="mt-6 rounded-lg border border-border bg-card p-5 whitespace-pre-wrap text-sm">{session.notes}</div>
         )}
 
-        <div className="mt-10 text-center text-xs font-mono uppercase tracking-widest text-muted-foreground">
+        <div className="mt-6 text-center text-xs font-mono uppercase tracking-widest text-muted-foreground">
           MY RACE<span className="text-primary">ENGINEER</span>
         </div>
       </div>

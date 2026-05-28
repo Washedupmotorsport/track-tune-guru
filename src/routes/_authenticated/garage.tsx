@@ -139,7 +139,7 @@ function Garage() {
                 )}
 
                 {shared.length > 0 && (
-                  <div className="mt-10">
+                  <div className="mt-6">
                     <div className="flex items-center gap-2 mb-4">
                       <Users className="w-4 h-4 text-accent" />
                       <h2 className="font-display text-xl font-bold uppercase tracking-wider">Shared with you</h2>

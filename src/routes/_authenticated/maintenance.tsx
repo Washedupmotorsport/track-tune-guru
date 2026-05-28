@@ -137,7 +137,7 @@ function MaintenancePage() {
       <div className="mt-6 space-y-3">
         {itemsQ.isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
         {!itemsQ.isLoading && (itemsQ.data ?? []).length === 0 && (
-          <div className="rounded-lg border border-dashed border-border p-10 text-center">
+          <div className="rounded-lg border border-dashed border-border p-6 text-center">
             <Wrench className="w-8 h-8 mx-auto text-muted-foreground" />
             <p className="mt-3 text-sm text-muted-foreground">No maintenance items yet.</p>
           </div>

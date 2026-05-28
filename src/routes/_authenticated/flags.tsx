@@ -60,9 +60,9 @@ function FlagsSettingsPage() {
         </Button>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6 mt-8">
+      <div className="grid lg:grid-cols-2 gap-3 mt-8">
         {/* Preview */}
-        <div className="rounded-lg border border-border bg-card p-6 shadow-card">
+        <div className="rounded-lg border border-border bg-card p-4 shadow-card">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px flex-1 bg-border" />
             <h2 className="font-display text-lg font-bold uppercase tracking-wider">Live preview</h2>
@@ -93,7 +93,7 @@ function FlagsSettingsPage() {
         </div>
 
         {/* Controls */}
-        <div className="rounded-lg border border-border bg-card p-6 shadow-card space-y-6">
+        <div className="rounded-lg border border-border bg-card p-4 shadow-card space-y-3">
           <div className="flex items-center gap-3">
             <div className="h-px flex-1 bg-border" />
             <h2 className="font-display text-lg font-bold uppercase tracking-wider">Animation</h2>

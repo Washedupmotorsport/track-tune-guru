@@ -24,7 +24,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen text-foreground">
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
-        <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
+        <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
           <Link to="/garage" aria-label="My Race Engineer — garage" className="flex items-center">
             <img src={logoMre} alt="My Race Engineer" className="h-10 w-auto" />
           </Link>
@@ -114,7 +114,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
+      <main className="mx-auto max-w-6xl px-4 py-5">{children}</main>
       <CommandPalette />
     </div>
   );

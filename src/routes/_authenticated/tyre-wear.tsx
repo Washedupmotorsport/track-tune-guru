@@ -186,7 +186,7 @@ function TyreWearPage() {
       <div className="mt-6 space-y-4">
         {stintsQ.isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
         {!stintsQ.isLoading && grouped.length === 0 && (
-          <div className="rounded-lg border border-dashed border-border p-10 text-center">
+          <div className="rounded-lg border border-dashed border-border p-6 text-center">
             <Disc className="w-8 h-8 mx-auto text-muted-foreground" />
             <p className="mt-3 text-sm text-muted-foreground">No stints yet. Log one to start tracking wear.</p>
           </div>

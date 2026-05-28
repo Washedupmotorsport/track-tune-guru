@@ -36,7 +36,7 @@ function Landing() {
   return (
     <div className="min-h-screen text-foreground">
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/70 border-b border-border">
-        <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
+        <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
           <Link to="/" aria-label="My Race Engineer — home" className="flex items-center">
             <img src={logoMre} alt="My Race Engineer" className="h-10 w-auto" />
           </Link>
@@ -69,7 +69,7 @@ function Landing() {
         <img src={heroCar} alt="Race car at night" width={1920} height={1080}
           className="absolute inset-0 w-full h-full object-cover opacity-90 mix-blend-screen" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background" />
-        <div className="relative mx-auto max-w-6xl px-6 pt-24 pb-32">
+        <div className="relative mx-auto max-w-6xl px-4 pt-24 pb-32">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs font-mono uppercase tracking-widest text-muted-foreground">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" /> Pit-lane ready
           </div>
@@ -94,14 +94,14 @@ function Landing() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20 grid md:grid-cols-3 gap-6">
+      <section className="mx-auto max-w-6xl px-4 py-10 grid md:grid-cols-3 gap-3">
         <h2 className="sr-only">Features</h2>
         {[
           { icon: Wrench, title: "Setups", body: "Tires, alignment, suspension, aero, drivetrain — built per discipline." },
           { icon: LineChart, title: "Track conditions", body: "Tag every setup with track, weather and notes for total recall." },
           { icon: Gauge, title: "Compare baselines", body: "Clone a setup, tweak one knob, save the new baseline. Iterate fast." },
         ].map((f) => (
-          <div key={f.title} className="rounded-lg border border-border bg-card p-6 shadow-card hover:border-primary/50 transition-colors">
+          <div key={f.title} className="rounded-lg border border-border bg-card p-4 shadow-card hover:border-primary/50 transition-colors">
             <f.icon className="w-6 h-6 text-primary" />
             <h3 className="mt-4 text-xl font-display font-semibold">{f.title}</h3>
             <p className="mt-2 text-sm text-muted-foreground">{f.body}</p>
@@ -109,7 +109,7 @@ function Landing() {
         ))}
       </section>
 
-      <section id="disciplines" className="mx-auto max-w-6xl px-6 py-12">
+      <section id="disciplines" className="mx-auto max-w-6xl px-4 py-6">
         <div className="flex items-end justify-between mb-8">
           <h2 className="font-display text-3xl font-bold flex items-center gap-3">
             <Flag className="w-6 h-6 text-primary" />Every discipline, covered
@@ -127,7 +127,7 @@ function Landing() {
       </section>
 
       <footer className="border-t border-border mt-16">
-        <div className="mx-auto max-w-6xl px-6 py-8 text-sm text-muted-foreground flex items-center justify-between">
+        <div className="mx-auto max-w-6xl px-4 py-5 text-sm text-muted-foreground flex items-center justify-between">
           <div>© {new Date().getFullYear()} My Race Engineer</div>
           <div className="font-mono text-xs uppercase tracking-widest">Built for the paddock</div>
         </div>
