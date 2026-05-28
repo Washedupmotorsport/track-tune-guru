@@ -72,8 +72,8 @@ function useWakeLock(active: boolean) {
     let lock: { release: () => Promise<void> } | null = null;
     const acquire = async () => {
       try {
-        // @ts-expect-error - experimental API
-        if (navigator.wakeLock?.request) lock = await navigator.wakeLock.request("screen");
+        const nav = navigator as unknown as { wakeLock?: { request: (t: string) => Promise<{ release: () => Promise<void> }> } };
+        if (nav.wakeLock?.request) lock = await nav.wakeLock.request("screen");
       } catch { /* ignore */ }
     };
     acquire();
@@ -194,7 +194,7 @@ function RaceModePage() {
   }, [session, laps.length, targets.fuelPerLap, targets.fuelReserve]);
 
   // Tyre check
-  const tyreState = useMemo(() => {
+  const tyreState = useMemo<Array<{ k: string; v: number | null; status: "ok" | "warn" | "bad" | "na"; delta: number | null }> | null>(() => {
     if (!tire) return null;
     const corners = [
       { k: "FL", v: tire.hot_fl }, { k: "FR", v: tire.hot_fr },
@@ -203,7 +203,8 @@ function RaceModePage() {
     return corners.map((c) => {
       if (c.v == null) return { ...c, status: "na" as const, delta: null };
       const d = c.v - targets.tyreTarget;
-      const status = Math.abs(d) <= targets.tyreTol ? "ok" : Math.abs(d) <= targets.tyreTol * 2 ? "warn" : "bad";
+      const status: "ok" | "warn" | "bad" =
+        Math.abs(d) <= targets.tyreTol ? "ok" : Math.abs(d) <= targets.tyreTol * 2 ? "warn" : "bad";
       return { ...c, status, delta: d };
     });
   }, [tire, targets.tyreTarget, targets.tyreTol]);

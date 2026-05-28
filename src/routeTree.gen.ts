@@ -24,6 +24,7 @@ import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSympathyRouteImport } from './routes/_authenticated/sympathy'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedRacemodeRouteImport } from './routes/_authenticated/racemode'
 import { Route as AuthenticatedPitwallRouteImport } from './routes/_authenticated/pitwall'
 import { Route as AuthenticatedPhilosophiesRouteImport } from './routes/_authenticated/philosophies'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
@@ -121,6 +122,11 @@ const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedRacemodeRoute = AuthenticatedRacemodeRouteImport.update({
+  id: '/racemode',
+  path: '/racemode',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedPitwallRoute = AuthenticatedPitwallRouteImport.update({
@@ -261,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/notes': typeof AuthenticatedNotesRoute
   '/philosophies': typeof AuthenticatedPhilosophiesRoute
   '/pitwall': typeof AuthenticatedPitwallRoute
+  '/racemode': typeof AuthenticatedRacemodeRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/sympathy': typeof AuthenticatedSympathyRoute
@@ -299,6 +306,7 @@ export interface FileRoutesByTo {
   '/notes': typeof AuthenticatedNotesRoute
   '/philosophies': typeof AuthenticatedPhilosophiesRoute
   '/pitwall': typeof AuthenticatedPitwallRoute
+  '/racemode': typeof AuthenticatedRacemodeRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/sympathy': typeof AuthenticatedSympathyRoute
@@ -339,6 +347,7 @@ export interface FileRoutesById {
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
   '/_authenticated/philosophies': typeof AuthenticatedPhilosophiesRoute
   '/_authenticated/pitwall': typeof AuthenticatedPitwallRoute
+  '/_authenticated/racemode': typeof AuthenticatedRacemodeRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/_authenticated/sympathy': typeof AuthenticatedSympathyRoute
@@ -379,6 +388,7 @@ export interface FileRouteTypes {
     | '/notes'
     | '/philosophies'
     | '/pitwall'
+    | '/racemode'
     | '/reports'
     | '/sessions'
     | '/sympathy'
@@ -417,6 +427,7 @@ export interface FileRouteTypes {
     | '/notes'
     | '/philosophies'
     | '/pitwall'
+    | '/racemode'
     | '/reports'
     | '/sessions'
     | '/sympathy'
@@ -456,6 +467,7 @@ export interface FileRouteTypes {
     | '/_authenticated/notes'
     | '/_authenticated/philosophies'
     | '/_authenticated/pitwall'
+    | '/_authenticated/racemode'
     | '/_authenticated/reports'
     | '/_authenticated/sessions'
     | '/_authenticated/sympathy'
@@ -588,6 +600,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/racemode': {
+      id: '/_authenticated/racemode'
+      path: '/racemode'
+      fullPath: '/racemode'
+      preLoaderRoute: typeof AuthenticatedRacemodeRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/pitwall': {
@@ -806,6 +825,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
   AuthenticatedPhilosophiesRoute: typeof AuthenticatedPhilosophiesRoute
   AuthenticatedPitwallRoute: typeof AuthenticatedPitwallRoute
+  AuthenticatedRacemodeRoute: typeof AuthenticatedRacemodeRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRouteWithChildren
   AuthenticatedSympathyRoute: typeof AuthenticatedSympathyRoute
@@ -838,6 +858,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
   AuthenticatedPhilosophiesRoute: AuthenticatedPhilosophiesRoute,
   AuthenticatedPitwallRoute: AuthenticatedPitwallRoute,
+  AuthenticatedRacemodeRoute: AuthenticatedRacemodeRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRouteWithChildren,
   AuthenticatedSympathyRoute: AuthenticatedSympathyRoute,
