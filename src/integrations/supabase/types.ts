@@ -190,6 +190,63 @@ export type Database = {
         }
         Relationships: []
       }
+      damage_reports: {
+        Row: {
+          car_id: string
+          component: string
+          created_at: string
+          description: string | null
+          event_id: string | null
+          id: string
+          notes: string | null
+          occurred_at: string
+          parts_used: string | null
+          repair_cost: number | null
+          resolved_at: string | null
+          session_id: string | null
+          severity: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          component: string
+          created_at?: string
+          description?: string | null
+          event_id?: string | null
+          id?: string
+          notes?: string | null
+          occurred_at?: string
+          parts_used?: string | null
+          repair_cost?: number | null
+          resolved_at?: string | null
+          session_id?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          component?: string
+          created_at?: string
+          description?: string | null
+          event_id?: string | null
+          id?: string
+          notes?: string | null
+          occurred_at?: string
+          parts_used?: string | null
+          repair_cost?: number | null
+          resolved_at?: string | null
+          session_id?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       driver_notes: {
         Row: {
           body: string | null
@@ -408,6 +465,7 @@ export type Database = {
           last_service_date: string | null
           last_service_value: number | null
           notes: string | null
+          priority: string
           service_interval: number | null
           unit: string
           updated_at: string
@@ -424,6 +482,7 @@ export type Database = {
           last_service_date?: string | null
           last_service_value?: number | null
           notes?: string | null
+          priority?: string
           service_interval?: number | null
           unit?: string
           updated_at?: string
@@ -440,6 +499,7 @@ export type Database = {
           last_service_date?: string | null
           last_service_value?: number | null
           notes?: string | null
+          priority?: string
           service_interval?: number | null
           unit?: string
           updated_at?: string

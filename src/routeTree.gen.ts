@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedWorkshopRouteImport } from './routes/_authenticated/workshop'
 import { Route as AuthenticatedWeekendsRouteImport } from './routes/_authenticated/weekends'
 import { Route as AuthenticatedTyreWearRouteImport } from './routes/_authenticated/tyre-wear'
 import { Route as AuthenticatedTyreSetupRouteImport } from './routes/_authenticated/tyre-setup'
@@ -25,6 +26,7 @@ import { Route as AuthenticatedInventoryRouteImport } from './routes/_authentica
 import { Route as AuthenticatedGarageRouteImport } from './routes/_authenticated/garage'
 import { Route as AuthenticatedFlagsRouteImport } from './routes/_authenticated/flags'
 import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated/expenses'
+import { Route as AuthenticatedDamageRouteImport } from './routes/_authenticated/damage'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
 import { Route as AuthenticatedCalculatorsRouteImport } from './routes/_authenticated/calculators'
 import { Route as AuthenticatedBaselineRouteImport } from './routes/_authenticated/baseline'
@@ -54,6 +56,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedWorkshopRoute = AuthenticatedWorkshopRouteImport.update({
+  id: '/workshop',
+  path: '/workshop',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedWeekendsRoute = AuthenticatedWeekendsRouteImport.update({
   id: '/weekends',
@@ -115,6 +122,11 @@ const AuthenticatedFlagsRoute = AuthenticatedFlagsRouteImport.update({
 const AuthenticatedExpensesRoute = AuthenticatedExpensesRouteImport.update({
   id: '/expenses',
   path: '/expenses',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDamageRoute = AuthenticatedDamageRouteImport.update({
+  id: '/damage',
+  path: '/damage',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
@@ -181,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/baseline': typeof AuthenticatedBaselineRoute
   '/calculators': typeof AuthenticatedCalculatorsRoute
   '/calendar': typeof AuthenticatedCalendarRoute
+  '/damage': typeof AuthenticatedDamageRoute
   '/expenses': typeof AuthenticatedExpensesRoute
   '/flags': typeof AuthenticatedFlagsRoute
   '/garage': typeof AuthenticatedGarageRoute
@@ -193,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/tyre-wear': typeof AuthenticatedTyreWearRoute
   '/weekends': typeof AuthenticatedWeekendsRouteWithChildren
+  '/workshop': typeof AuthenticatedWorkshopRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRouteWithChildren
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
@@ -208,6 +222,7 @@ export interface FileRoutesByTo {
   '/baseline': typeof AuthenticatedBaselineRoute
   '/calculators': typeof AuthenticatedCalculatorsRoute
   '/calendar': typeof AuthenticatedCalendarRoute
+  '/damage': typeof AuthenticatedDamageRoute
   '/expenses': typeof AuthenticatedExpensesRoute
   '/flags': typeof AuthenticatedFlagsRoute
   '/garage': typeof AuthenticatedGarageRoute
@@ -220,6 +235,7 @@ export interface FileRoutesByTo {
   '/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/tyre-wear': typeof AuthenticatedTyreWearRoute
   '/weekends': typeof AuthenticatedWeekendsRouteWithChildren
+  '/workshop': typeof AuthenticatedWorkshopRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRouteWithChildren
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
@@ -237,6 +253,7 @@ export interface FileRoutesById {
   '/_authenticated/baseline': typeof AuthenticatedBaselineRoute
   '/_authenticated/calculators': typeof AuthenticatedCalculatorsRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
+  '/_authenticated/damage': typeof AuthenticatedDamageRoute
   '/_authenticated/expenses': typeof AuthenticatedExpensesRoute
   '/_authenticated/flags': typeof AuthenticatedFlagsRoute
   '/_authenticated/garage': typeof AuthenticatedGarageRoute
@@ -249,6 +266,7 @@ export interface FileRoutesById {
   '/_authenticated/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/_authenticated/tyre-wear': typeof AuthenticatedTyreWearRoute
   '/_authenticated/weekends': typeof AuthenticatedWeekendsRouteWithChildren
+  '/_authenticated/workshop': typeof AuthenticatedWorkshopRoute
   '/_authenticated/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/_authenticated/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRouteWithChildren
   '/_authenticated/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
@@ -266,6 +284,7 @@ export interface FileRouteTypes {
     | '/baseline'
     | '/calculators'
     | '/calendar'
+    | '/damage'
     | '/expenses'
     | '/flags'
     | '/garage'
@@ -278,6 +297,7 @@ export interface FileRouteTypes {
     | '/tyre-setup'
     | '/tyre-wear'
     | '/weekends'
+    | '/workshop'
     | '/cars/$carId'
     | '/sessions/$sessionId'
     | '/setups/$setupId'
@@ -293,6 +313,7 @@ export interface FileRouteTypes {
     | '/baseline'
     | '/calculators'
     | '/calendar'
+    | '/damage'
     | '/expenses'
     | '/flags'
     | '/garage'
@@ -305,6 +326,7 @@ export interface FileRouteTypes {
     | '/tyre-setup'
     | '/tyre-wear'
     | '/weekends'
+    | '/workshop'
     | '/cars/$carId'
     | '/sessions/$sessionId'
     | '/setups/$setupId'
@@ -321,6 +343,7 @@ export interface FileRouteTypes {
     | '/_authenticated/baseline'
     | '/_authenticated/calculators'
     | '/_authenticated/calendar'
+    | '/_authenticated/damage'
     | '/_authenticated/expenses'
     | '/_authenticated/flags'
     | '/_authenticated/garage'
@@ -333,6 +356,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tyre-setup'
     | '/_authenticated/tyre-wear'
     | '/_authenticated/weekends'
+    | '/_authenticated/workshop'
     | '/_authenticated/cars/$carId'
     | '/_authenticated/sessions/$sessionId'
     | '/_authenticated/setups/$setupId'
@@ -378,6 +402,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/workshop': {
+      id: '/_authenticated/workshop'
+      path: '/workshop'
+      fullPath: '/workshop'
+      preLoaderRoute: typeof AuthenticatedWorkshopRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/weekends': {
       id: '/_authenticated/weekends'
@@ -461,6 +492,13 @@ declare module '@tanstack/react-router' {
       path: '/expenses'
       fullPath: '/expenses'
       preLoaderRoute: typeof AuthenticatedExpensesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/damage': {
+      id: '/_authenticated/damage'
+      path: '/damage'
+      fullPath: '/damage'
+      preLoaderRoute: typeof AuthenticatedDamageRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/calendar': {
@@ -583,6 +621,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedBaselineRoute: typeof AuthenticatedBaselineRoute
   AuthenticatedCalculatorsRoute: typeof AuthenticatedCalculatorsRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
+  AuthenticatedDamageRoute: typeof AuthenticatedDamageRoute
   AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRoute
   AuthenticatedFlagsRoute: typeof AuthenticatedFlagsRoute
   AuthenticatedGarageRoute: typeof AuthenticatedGarageRoute
@@ -595,6 +634,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTyreSetupRoute: typeof AuthenticatedTyreSetupRoute
   AuthenticatedTyreWearRoute: typeof AuthenticatedTyreWearRoute
   AuthenticatedWeekendsRoute: typeof AuthenticatedWeekendsRouteWithChildren
+  AuthenticatedWorkshopRoute: typeof AuthenticatedWorkshopRoute
   AuthenticatedCarsCarIdRoute: typeof AuthenticatedCarsCarIdRoute
   AuthenticatedSetupsSetupIdRoute: typeof AuthenticatedSetupsSetupIdRoute
 }
@@ -604,6 +644,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedBaselineRoute: AuthenticatedBaselineRoute,
   AuthenticatedCalculatorsRoute: AuthenticatedCalculatorsRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
+  AuthenticatedDamageRoute: AuthenticatedDamageRoute,
   AuthenticatedExpensesRoute: AuthenticatedExpensesRoute,
   AuthenticatedFlagsRoute: AuthenticatedFlagsRoute,
   AuthenticatedGarageRoute: AuthenticatedGarageRoute,
@@ -616,6 +657,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedTyreSetupRoute: AuthenticatedTyreSetupRoute,
   AuthenticatedTyreWearRoute: AuthenticatedTyreWearRoute,
   AuthenticatedWeekendsRoute: AuthenticatedWeekendsRouteWithChildren,
+  AuthenticatedWorkshopRoute: AuthenticatedWorkshopRoute,
   AuthenticatedCarsCarIdRoute: AuthenticatedCarsCarIdRoute,
   AuthenticatedSetupsSetupIdRoute: AuthenticatedSetupsSetupIdRoute,
 }

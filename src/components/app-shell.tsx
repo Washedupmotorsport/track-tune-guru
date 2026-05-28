@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Calculator, Wand2, NotebookPen, Timer, Disc, Wrench,
   Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon, Gauge, TrendingDown, GitCompare,
-  Home, Flag,
+  Home, Flag, AlertTriangle, HardHat,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
@@ -98,7 +98,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <DropdownMenuItem asChild><Link to="/analysis"><BarChart3 className="w-4 h-4 mr-2" /> Analysis</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-widest text-primary">Workshop</DropdownMenuLabel>
+                <DropdownMenuItem asChild><Link to="/workshop"><HardHat className="w-4 h-4 mr-2" /> Workshop hub</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/maintenance"><Wrench className="w-4 h-4 mr-2" /> Maintenance</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/damage"><AlertTriangle className="w-4 h-4 mr-2" /> Damage log</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/inventory"><Package className="w-4 h-4 mr-2" /> Inventory</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-widest text-primary">Plan</DropdownMenuLabel>
