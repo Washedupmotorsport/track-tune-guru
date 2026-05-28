@@ -117,7 +117,7 @@ function IterationPage() {
         .eq("car_id", carId)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as ChangeRow[];
+      return (data ?? []) as unknown as ChangeRow[];
     },
   });
 
