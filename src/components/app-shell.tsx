@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Calculator, Wand2, NotebookPen, Timer, Disc, Wrench,
   Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon, Gauge, TrendingDown, GitCompare,
-  Home,
+  Home, Flag,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
@@ -72,6 +72,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                 ))}
               </SelectContent>
             </Select>
+            <Link to="/weekends" className="hidden lg:inline-flex items-center text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
+              <Flag className="w-4 h-4 mr-1" /> Weekends
+            </Link>
             <Link to="/sessions" className="hidden lg:inline-flex items-center text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
               <Timer className="w-4 h-4 mr-1" /> Sessions
             </Link>
@@ -86,6 +89,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-widest text-primary">Trackside</DropdownMenuLabel>
+                <DropdownMenuItem asChild><Link to="/weekends"><Flag className="w-4 h-4 mr-2" /> Race weekends</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/sessions"><Timer className="w-4 h-4 mr-2" /> Sessions</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/tires"><Disc className="w-4 h-4 mr-2" /> Tires</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/tyre-setup"><Gauge className="w-4 h-4 mr-2" /> Tyre setup</Link></DropdownMenuItem>

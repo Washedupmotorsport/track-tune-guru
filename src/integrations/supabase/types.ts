@@ -68,6 +68,7 @@ export type Database = {
       calendar_events: {
         Row: {
           car_id: string | null
+          checklist: Json
           created_at: string
           ends_at: string | null
           event_type: string
@@ -75,6 +76,7 @@ export type Database = {
           location: string | null
           notes: string | null
           starts_at: string
+          status: string
           title: string
           track: string | null
           updated_at: string
@@ -82,6 +84,7 @@ export type Database = {
         }
         Insert: {
           car_id?: string | null
+          checklist?: Json
           created_at?: string
           ends_at?: string | null
           event_type?: string
@@ -89,6 +92,7 @@ export type Database = {
           location?: string | null
           notes?: string | null
           starts_at: string
+          status?: string
           title: string
           track?: string | null
           updated_at?: string
@@ -96,6 +100,7 @@ export type Database = {
         }
         Update: {
           car_id?: string | null
+          checklist?: Json
           created_at?: string
           ends_at?: string | null
           event_type?: string
@@ -103,6 +108,7 @@ export type Database = {
           location?: string | null
           notes?: string | null
           starts_at?: string
+          status?: string
           title?: string
           track?: string | null
           updated_at?: string
@@ -550,6 +556,7 @@ export type Database = {
           car_id: string
           created_at: string
           driver: string | null
+          event_id: string | null
           fuel_end_l: number | null
           fuel_start_l: number | null
           id: string
@@ -569,6 +576,7 @@ export type Database = {
           car_id: string
           created_at?: string
           driver?: string | null
+          event_id?: string | null
           fuel_end_l?: number | null
           fuel_start_l?: number | null
           id?: string
@@ -588,6 +596,7 @@ export type Database = {
           car_id?: string
           created_at?: string
           driver?: string | null
+          event_id?: string | null
           fuel_end_l?: number | null
           fuel_start_l?: number | null
           id?: string
