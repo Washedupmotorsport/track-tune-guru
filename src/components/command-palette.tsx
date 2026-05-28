@@ -31,6 +31,7 @@ const PAGES: { label: string; to: string; icon: React.ReactNode }[] = [
   { label: "Setup library", to: "/setup-library", icon: <BookMarked className="w-4 h-4" /> },
   { label: "Post-session debrief", to: "/post-debrief", icon: <NotebookPen className="w-4 h-4" /> },
   { label: "Flags", to: "/flags", icon: <Flag className="w-4 h-4" /> },
+  { label: "Pit lane mode", to: "/pitlane", icon: <Flag className="w-4 h-4" /> },
 ];
 
 export function CommandPalette() {
