@@ -42,10 +42,10 @@ function Garage() {
         supabase.from("sessions").select("car_id, started_at"),
         supabase.from("laps").select("car_id, lap_time_ms"),
       ]);
-      const m = new Map<string, { setups: number; sessions: number; lastOut: string | null; best: number | null }>();
+      const m: Record<string, { setups: number; sessions: number; lastOut: string | null; best: number | null }> = {};
       const ensure = (id: string) => {
-        if (!m.has(id)) m.set(id, { setups: 0, sessions: 0, lastOut: null, best: null });
-        return m.get(id)!;
+        if (!m[id]) m[id] = { setups: 0, sessions: 0, lastOut: null, best: null };
+        return m[id];
       };
       (setups.data ?? []).forEach((r) => { ensure(r.car_id).setups++; });
       (sessions.data ?? []).forEach((r) => {
@@ -90,7 +90,7 @@ function Garage() {
     onSuccess: () => { toast.success("Car removed"); qc.invalidateQueries({ queryKey: ["cars"] }); },
   });
 
-  const statFor = (id: string) => statsQ.data?.get(id) ?? { setups: 0, sessions: 0, lastOut: null as string | null, best: null as number | null };
+  const statFor = (id: string) => statsQ.data?.[id] ?? { setups: 0, sessions: 0, lastOut: null as string | null, best: null as number | null };
   const fmtAgo = (iso: string | null) => {
     if (!iso) return "—";
     const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
