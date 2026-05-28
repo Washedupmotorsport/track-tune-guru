@@ -6,7 +6,7 @@ import {
   Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon, Gauge, TrendingDown, GitCompare,
   Home, Flag, AlertTriangle, HardHat, Radio,
   ClipboardList, FileText,
-  MapPin,
+  MapPin, CloudRain,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
@@ -97,6 +97,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-widest text-primary">Trackside</DropdownMenuLabel>
                 <DropdownMenuItem asChild><Link to="/pitwall"><Radio className="w-4 h-4 mr-2" /> Pit wall</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/track-evolution"><CloudRain className="w-4 h-4 mr-2" /> Track evolution</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/weekends"><Flag className="w-4 h-4 mr-2" /> Race weekends</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/sessions"><Timer className="w-4 h-4 mr-2" /> Sessions</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/debrief"><ClipboardList className="w-4 h-4 mr-2" /> Driver debrief</Link></DropdownMenuItem>
