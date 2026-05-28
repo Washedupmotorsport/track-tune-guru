@@ -18,6 +18,7 @@ import { Route as AuthenticatedWeekendsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedTyreWearRouteImport } from './routes/_authenticated/tyre-wear'
 import { Route as AuthenticatedTyreSetupRouteImport } from './routes/_authenticated/tyre-setup'
 import { Route as AuthenticatedTyreCompareRouteImport } from './routes/_authenticated/tyre-compare'
+import { Route as AuthenticatedTrackEvolutionRouteImport } from './routes/_authenticated/track-evolution'
 import { Route as AuthenticatedTiresRouteImport } from './routes/_authenticated/tires'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
@@ -86,6 +87,12 @@ const AuthenticatedTyreCompareRoute =
   AuthenticatedTyreCompareRouteImport.update({
     id: '/tyre-compare',
     path: '/tyre-compare',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTrackEvolutionRoute =
+  AuthenticatedTrackEvolutionRouteImport.update({
+    id: '/track-evolution',
+    path: '/track-evolution',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedTiresRoute = AuthenticatedTiresRouteImport.update({
@@ -237,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/tires': typeof AuthenticatedTiresRoute
+  '/track-evolution': typeof AuthenticatedTrackEvolutionRoute
   '/tyre-compare': typeof AuthenticatedTyreCompareRoute
   '/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/tyre-wear': typeof AuthenticatedTyreWearRoute
@@ -271,6 +279,7 @@ export interface FileRoutesByTo {
   '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/tires': typeof AuthenticatedTiresRoute
+  '/track-evolution': typeof AuthenticatedTrackEvolutionRoute
   '/tyre-compare': typeof AuthenticatedTyreCompareRoute
   '/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/tyre-wear': typeof AuthenticatedTyreWearRoute
@@ -307,6 +316,7 @@ export interface FileRoutesById {
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/_authenticated/tires': typeof AuthenticatedTiresRoute
+  '/_authenticated/track-evolution': typeof AuthenticatedTrackEvolutionRoute
   '/_authenticated/tyre-compare': typeof AuthenticatedTyreCompareRoute
   '/_authenticated/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/_authenticated/tyre-wear': typeof AuthenticatedTyreWearRoute
@@ -343,6 +353,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/sessions'
     | '/tires'
+    | '/track-evolution'
     | '/tyre-compare'
     | '/tyre-setup'
     | '/tyre-wear'
@@ -377,6 +388,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/sessions'
     | '/tires'
+    | '/track-evolution'
     | '/tyre-compare'
     | '/tyre-setup'
     | '/tyre-wear'
@@ -412,6 +424,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reports'
     | '/_authenticated/sessions'
     | '/_authenticated/tires'
+    | '/_authenticated/track-evolution'
     | '/_authenticated/tyre-compare'
     | '/_authenticated/tyre-setup'
     | '/_authenticated/tyre-wear'
@@ -496,6 +509,13 @@ declare module '@tanstack/react-router' {
       path: '/tyre-compare'
       fullPath: '/tyre-compare'
       preLoaderRoute: typeof AuthenticatedTyreCompareRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/track-evolution': {
+      id: '/_authenticated/track-evolution'
+      path: '/track-evolution'
+      fullPath: '/track-evolution'
+      preLoaderRoute: typeof AuthenticatedTrackEvolutionRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/tires': {
@@ -730,6 +750,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRouteWithChildren
   AuthenticatedTiresRoute: typeof AuthenticatedTiresRoute
+  AuthenticatedTrackEvolutionRoute: typeof AuthenticatedTrackEvolutionRoute
   AuthenticatedTyreCompareRoute: typeof AuthenticatedTyreCompareRoute
   AuthenticatedTyreSetupRoute: typeof AuthenticatedTyreSetupRoute
   AuthenticatedTyreWearRoute: typeof AuthenticatedTyreWearRoute
@@ -758,6 +779,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRouteWithChildren,
   AuthenticatedTiresRoute: AuthenticatedTiresRoute,
+  AuthenticatedTrackEvolutionRoute: AuthenticatedTrackEvolutionRoute,
   AuthenticatedTyreCompareRoute: AuthenticatedTyreCompareRoute,
   AuthenticatedTyreSetupRoute: AuthenticatedTyreSetupRoute,
   AuthenticatedTyreWearRoute: AuthenticatedTyreWearRoute,
