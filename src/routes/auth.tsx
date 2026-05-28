@@ -72,7 +72,7 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen grid md:grid-cols-2">
-      <div className="hidden md:flex flex-col justify-between p-10 bg-card border-r border-border">
+      <div className="hidden md:flex flex-col justify-between p-6 bg-card border-r border-border">
         <Link to="/" className="font-display font-bold text-lg flex items-center gap-2">
           <span className="inline-block w-2 h-6 bg-primary shadow-glow" />MY RACE<span className="text-primary">ENGINEER</span>
         </Link>
@@ -83,7 +83,7 @@ function AuthPage() {
         <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Sector 1 // Login</div>
       </div>
 
-      <div className="flex items-center justify-center p-6">
+      <div className="flex items-center justify-center p-4">
         <div className="w-full max-w-sm">
           <h1 className="font-display text-3xl font-bold">{mode === "signin" ? "Sign in" : "Create account"}</h1>
           <p className="text-sm text-muted-foreground mt-1">

@@ -155,7 +155,7 @@ function SetupDetail() {
         <div className="md:col-span-1"><Label>Notes</Label><Input readOnly={!writable} value={meta.notes} onChange={(e) => setMeta({ ...meta, notes: e.target.value })} placeholder="Lap times, feel…" /></div>
       </div>
 
-      <div className="mt-6 space-y-6">
+      <div className="mt-6 space-y-3">
         {disc.sections.map((section) => (
           <div key={section.title} className="rounded-lg border border-border bg-card p-5 shadow-card">
             <div className="flex items-center gap-3 mb-4">
@@ -420,7 +420,7 @@ function LapLog({ setupId, carId, userId, defaultConditions, canEdit }: {
 
       {laps.length > 0 && (
         <>
-          <div className="mt-6 flex flex-wrap gap-6 text-sm">
+          <div className="mt-6 flex flex-wrap gap-3 text-sm">
             <div><span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Laps:</span> <span className="font-display font-bold">{laps.length}</span></div>
             <div className="flex items-center gap-1"><Trophy className="w-4 h-4 text-primary" /><span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Best:</span> <span className="font-display font-bold">{formatLapTime(best)}</span></div>
             <div><span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Avg:</span> <span className="font-display font-bold">{formatLapTime(avg)}</span></div>

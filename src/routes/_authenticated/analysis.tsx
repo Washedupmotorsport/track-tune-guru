@@ -196,7 +196,7 @@ function AnalysisPage() {
                     <th className="py-2 pr-3">Field</th><th className="py-2 pr-3">{setupAData.name}</th><th className="py-2 pr-3">{setupBData.name}</th>
                   </tr></thead>
                   <tbody>
-                    {deltaKeys.length === 0 && <tr><td colSpan={3} className="py-6 text-center text-muted-foreground">No differences.</td></tr>}
+                    {deltaKeys.length === 0 && <tr><td colSpan={3} className="py-4 text-center text-muted-foreground">No differences.</td></tr>}
                     {deltaKeys.map((k) => (
                       <tr key={k} className="border-b border-border/50">
                         <td className="py-2 pr-3 font-mono text-xs">{k}</td>

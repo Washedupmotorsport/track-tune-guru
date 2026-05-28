@@ -162,7 +162,7 @@ function CalendarPage() {
 
       {past.length > 0 && (
         <>
-          <h2 className="mt-10 font-display text-xl font-bold uppercase tracking-wider text-muted-foreground">Past</h2>
+          <h2 className="mt-6 font-display text-xl font-bold uppercase tracking-wider text-muted-foreground">Past</h2>
           <div className="mt-3 space-y-2 opacity-60">
             {past.slice(-10).reverse().map((e) => (
               <div key={e.id} className="rounded-lg border border-border bg-card p-3 text-sm flex justify-between">
