@@ -137,6 +137,21 @@ function TiresPage() {
 
       <div className="mt-6 space-y-3">
         <PressureCalculator />
+        {(logsQ.data ?? []).length > 0 && (() => {
+          const logs = logsQ.data!;
+          const sets = new Set(logs.map((l) => `${l.car_id}|${l.tire_set}`)).size;
+          const cycles = logs.reduce((s, l) => s + (l.heat_cycles ?? 0), 0);
+          const allCold = logs.flatMap((l) => [l.cold_fl, l.cold_fr, l.cold_rl, l.cold_rr]).filter((v): v is number => v != null);
+          const avgCold = allCold.length ? (allCold.reduce((a, b) => a + b, 0) / allCold.length) : null;
+          return (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <SummaryTile label="Total logs" value={String(logs.length)} />
+              <SummaryTile label="Unique sets" value={String(sets)} />
+              <SummaryTile label="Heat cycles" value={String(cycles)} accent />
+              <SummaryTile label="Avg cold psi" value={avgCold != null ? avgCold.toFixed(1) : "—"} accent />
+            </div>
+          );
+        })()}
         {logsQ.isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
         {!logsQ.isLoading && (logsQ.data ?? []).length === 0 && (
           <div className="rounded-lg border border-dashed border-border p-6 text-center">
@@ -189,6 +204,15 @@ function ReadGrid({ label, v }: { label: string; v: (number | null)[] }) {
         <div>FL: {v[0] ?? "—"}</div><div>FR: {v[1] ?? "—"}</div>
         <div>RL: {v[2] ?? "—"}</div><div>RR: {v[3] ?? "—"}</div>
       </div>
+    </div>
+  );
+}
+
+function SummaryTile({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  return (
+    <div className="rounded-sm border border-border bg-card px-3 py-2">
+      <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-muted-foreground">{label}</div>
+      <div className={`mt-0.5 text-lg font-bold font-mono tabular-nums ${accent ? "text-primary" : ""}`}>{value}</div>
     </div>
   );
 }
