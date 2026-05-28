@@ -436,6 +436,66 @@ export type Database = {
           },
         ]
       }
+      engineering_memory: {
+        Row: {
+          car_id: string
+          category: string
+          conditions: string | null
+          confidence: number
+          created_at: string
+          detail: string | null
+          id: string
+          last_observed_at: string
+          occurrences: number
+          pinned: boolean
+          session_id: string | null
+          setup_id: string | null
+          status: string
+          tags: string[]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          category?: string
+          conditions?: string | null
+          confidence?: number
+          created_at?: string
+          detail?: string | null
+          id?: string
+          last_observed_at?: string
+          occurrences?: number
+          pinned?: boolean
+          session_id?: string | null
+          setup_id?: string | null
+          status?: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          category?: string
+          conditions?: string | null
+          confidence?: number
+          created_at?: string
+          detail?: string | null
+          id?: string
+          last_observed_at?: string
+          occurrences?: number
+          pinned?: boolean
+          session_id?: string | null
+          setup_id?: string | null
+          status?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           amount: number
