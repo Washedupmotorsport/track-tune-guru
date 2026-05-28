@@ -19,6 +19,7 @@ import { useTheme } from "@/lib/theme";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import logoMre from "@/assets/logo-mre.png";
 import { ConnectionStatus } from "@/lib/offline";
+import { QuickLogFab } from "@/components/quick-log-fab";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
@@ -130,6 +131,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
       <main className="mx-auto max-w-[1400px] px-4 py-4">{children}</main>
       <CommandPalette />
+      <QuickLogFab />
       <MobileTabBar />
       <div className="md:hidden h-[68px]" aria-hidden />
     </div>
