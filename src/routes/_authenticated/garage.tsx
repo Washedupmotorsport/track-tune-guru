@@ -253,3 +253,184 @@ function Stat({ icon, label, value, mono }: { icon?: React.ReactNode; label: str
     </div>
   );
 }
+
+// ---------------- Trackside rail (engineer's clipboard) ----------------
+// Surfaces the most-recent session, its setup, latest tyre log and driver
+// confidence so the homepage answers "what were we doing last time, and
+// what's the next thing to do?" without taps.
+
+type LastSession = {
+  id: string; name: string; car_id: string; started_at: string;
+  session_type: string; track: string | null; driver: string | null;
+  setup_id: string | null;
+};
+type LastSetup = { id: string; name: string };
+type LastTire = {
+  recorded_at: string; tire_set: string; compound: string | null;
+  hot_fl: number | null; hot_fr: number | null; hot_rl: number | null; hot_rr: number | null;
+};
+type LastConf = { overall: number; recorded_at: string };
+type LastLap = { lap_time_ms: number };
+
+function TracksideRail({ userId }: { userId: string }) {
+  const sessQ = useQuery({
+    queryKey: ["rail-last-session", userId],
+    queryFn: async () => {
+      const { data } = await supabase.from("sessions")
+        .select("id, name, car_id, started_at, session_type, track, driver, setup_id")
+        .order("started_at", { ascending: false }).limit(1).maybeSingle();
+      return (data ?? null) as LastSession | null;
+    },
+  });
+  const session = sessQ.data;
+
+  const setupQ = useQuery({
+    queryKey: ["rail-setup", session?.setup_id],
+    enabled: !!session?.setup_id,
+    queryFn: async () => {
+      const { data } = await supabase.from("setups").select("id, name").eq("id", session!.setup_id!).maybeSingle();
+      return (data ?? null) as LastSetup | null;
+    },
+  });
+  const tireQ = useQuery({
+    queryKey: ["rail-tire", session?.id],
+    enabled: !!session?.id,
+    queryFn: async () => {
+      const { data } = await supabase.from("tire_logs")
+        .select("recorded_at, tire_set, compound, hot_fl, hot_fr, hot_rl, hot_rr")
+        .eq("session_id", session!.id)
+        .order("recorded_at", { ascending: false }).limit(1).maybeSingle();
+      return (data ?? null) as LastTire | null;
+    },
+  });
+  const confQ = useQuery({
+    queryKey: ["rail-conf", session?.id],
+    enabled: !!session?.id,
+    queryFn: async () => {
+      const { data } = await supabase.from("driver_confidence")
+        .select("overall, recorded_at").eq("session_id", session!.id)
+        .order("recorded_at", { ascending: false }).limit(1).maybeSingle();
+      return (data ?? null) as LastConf | null;
+    },
+  });
+  const lapQ = useQuery({
+    queryKey: ["rail-best", session?.id],
+    enabled: !!session?.id,
+    queryFn: async () => {
+      const { data } = await supabase.from("laps")
+        .select("lap_time_ms").eq("session_id", session!.id)
+        .order("lap_time_ms", { ascending: true }).limit(1).maybeSingle();
+      return (data ?? null) as LastLap | null;
+    },
+  });
+
+  if (!session) return null;
+
+  const hot = tireQ.data
+    ? [tireQ.data.hot_fl, tireQ.data.hot_fr, tireQ.data.hot_rl, tireQ.data.hot_rr].filter((v): v is number => v != null)
+    : [];
+  const hotAvg = hot.length ? +(hot.reduce((s, v) => s + v, 0) / hot.length).toFixed(1) : null;
+
+  const ago = sessionAgo(session.started_at);
+
+  return (
+    <section
+      aria-label="Last run — engineer's clipboard"
+      className="mb-6 rounded-lg border border-primary/30 bg-gradient-to-br from-primary/[0.06] to-transparent"
+    >
+      <header className="flex items-center gap-2 px-4 pt-3 text-[10px] font-mono uppercase tracking-[0.2em] text-primary">
+        <Radio className="w-3.5 h-3.5" /> Last run · {ago}
+        <span className="ml-auto text-muted-foreground">{session.driver ?? "Driver"} · {session.track ?? "Track"}</span>
+      </header>
+      <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-3 p-4">
+        {/* Context */}
+        <div className="rounded-md border border-border bg-card/60 p-3">
+          <div className="flex items-baseline gap-3 flex-wrap">
+            <div className="font-display text-2xl font-bold uppercase tracking-tight leading-none">{session.name}</div>
+            <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">{session.session_type}</div>
+          </div>
+          <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 mt-3 text-xs">
+            <RailMetric label="Best lap"  value={lapQ.data ? formatLapTime(lapQ.data.lap_time_ms) : "—"} mono />
+            <RailMetric label="Confidence" value={confQ.data ? `${confQ.data.overall}/10` : "—"} mono />
+            <RailMetric label="Hot avg"   value={hotAvg != null ? `${hotAvg} psi` : "—"} mono />
+            <RailMetric label="Tyre set"  value={tireQ.data?.tire_set ?? "—"} />
+          </dl>
+          <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-mono uppercase tracking-[0.18em]">
+            {setupQ.data && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-accent/40 bg-accent/5 text-accent">
+                <Wand2 className="w-3 h-3" /> {setupQ.data.name}
+              </span>
+            )}
+            {tireQ.data?.compound && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-primary/40 bg-primary/5 text-primary">
+                <Disc className="w-3 h-3" /> {tireQ.data.compound}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Next actions — glove-friendly tap targets */}
+        <div className="grid grid-cols-2 gap-2">
+          <RailAction to="/racemode" tone="primary" icon={Flag} label="Race mode" sub="Big board" />
+          <RailAction to="/pitwall"  tone="default" icon={Radio} label="Pit wall" sub="Engineer view" />
+          <RailAction
+            to="/sessions/$sessionId" params={{ sessionId: session.id }}
+            tone="default" icon={Timer} label="Open run" sub="Last session"
+          />
+          <RailAction to="/debrief" tone="default" icon={ClipboardList} label="Debrief" sub="Log feedback" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RailMetric({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div className="min-w-0">
+      <dt className="text-[9px] font-mono uppercase tracking-[0.18em] text-muted-foreground">{label}</dt>
+      <dd className={`mt-0.5 truncate ${mono ? "font-mono tabular-nums text-base font-semibold" : "text-sm font-medium"}`}>{value}</dd>
+    </div>
+  );
+}
+
+function RailAction({
+  to, params, tone, icon: Icon, label, sub,
+}: {
+  to: string;
+  params?: Record<string, string>;
+  tone: "primary" | "default";
+  icon: typeof Flag;
+  label: string;
+  sub: string;
+}) {
+  const cls = tone === "primary"
+    ? "border-primary/50 bg-primary/15 text-primary hover:bg-primary/20"
+    : "border-border bg-card/60 hover:border-primary/40 hover:text-primary";
+  return (
+    <Link
+      // @ts-expect-error — runtime-safe dynamic to/params (rail covers static + param routes)
+      to={to} params={params}
+      className={`group min-h-[64px] rounded-md border ${cls} px-3 py-2 flex items-center gap-3 transition-colors`}
+    >
+      <Icon className="w-5 h-5 shrink-0" />
+      <div className="min-w-0">
+        <div className="text-xs font-mono uppercase tracking-[0.18em] truncate">{label}</div>
+        <div className="text-[10px] text-muted-foreground truncate">{sub}</div>
+      </div>
+      <ChevronRight className="w-4 h-4 ml-auto opacity-50 group-hover:opacity-100" />
+    </Link>
+  );
+}
+
+function sessionAgo(iso: string) {
+  const ms = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(ms / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m} min ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  if (d === 1) return "yesterday";
+  if (d < 30) return `${d}d ago`;
+  return new Date(iso).toLocaleDateString();
+}
