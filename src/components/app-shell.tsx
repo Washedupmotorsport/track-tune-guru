@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LogOut, Calculator, Wand2, NotebookPen, Timer, Disc, Wrench,
   Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon, Gauge, TrendingDown, GitCompare,
+  Home,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
@@ -117,6 +118,43 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
       <main className="mx-auto max-w-[1400px] px-4 py-4">{children}</main>
       <CommandPalette />
+      <MobileTabBar />
+      <div className="md:hidden h-[68px]" aria-hidden />
     </div>
+  );
+}
+
+function MobileTabBar() {
+  const items = [
+    { to: "/garage", label: "Garage", icon: Home },
+    { to: "/sessions", label: "Sessions", icon: Timer },
+    { to: "/tyre-setup", label: "Tyres", icon: Gauge },
+    { to: "/analysis", label: "Analysis", icon: BarChart3 },
+  ] as const;
+  return (
+    <nav
+      aria-label="Primary"
+      className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur-md"
+      style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+    >
+      <div className="h-[2px] w-full bg-primary/70" aria-hidden />
+      <ul className="grid grid-cols-4">
+        {items.map((it) => {
+          const Icon = it.icon;
+          return (
+            <li key={it.to}>
+              <Link
+                to={it.to}
+                className="flex flex-col items-center justify-center gap-1 h-16 text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary active:bg-primary/10 transition-colors"
+                activeProps={{ className: "text-primary" }}
+              >
+                <Icon className="w-5 h-5" />
+                <span>{it.label}</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
   );
 }
