@@ -13,7 +13,6 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "@/lib/auth-context";
 import { UnitsProvider } from "@/lib/units";
 import { ThemeProvider } from "@/lib/theme";
-import { OfflinePersistGate } from "@/lib/offline";
 import { useEffect } from "react";
 
 function NotFoundComponent() {
@@ -83,7 +82,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "My Race Engineer" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "theme-color", content: "#0d0d0f" },
+      { name: "theme-color", content: "#f7f7f5" },
+      { title: "Lovable App" },
+      { property: "og:title", content: "Lovable App" },
+      { name: "twitter:title", content: "Lovable App" },
+      { name: "description", content: "Race Ready Setup is a digital race engineering console for optimizing car performance." },
+      { property: "og:description", content: "Race Ready Setup is a digital race engineering console for optimizing car performance." },
+      { name: "twitter:description", content: "Race Ready Setup is a digital race engineering console for optimizing car performance." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ece682a0-5f54-4dc1-a3be-7f5903f67450/id-preview-b6114ac2--05a0664b-b381-4980-9a39-8d51edb3106a.lovable.app-1779954092144.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ece682a0-5f54-4dc1-a3be-7f5903f67450/id-preview-b6114ac2--05a0664b-b381-4980-9a39-8d51edb3106a.lovable.app-1779954092144.png" },
     ],
     links: [
       {
@@ -95,7 +102,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", href: "/app-icon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" },
     ],
     scripts: [
       {
@@ -117,7 +124,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <head>
         <HeadContent />
       </head>
@@ -139,16 +146,14 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <OfflinePersistGate client={queryClient}>
-        <ThemeProvider>
-          <AuthProvider>
-            <UnitsProvider>
-              <Outlet />
-              <Toaster position="top-center" />
-            </UnitsProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </OfflinePersistGate>
+      <ThemeProvider>
+        <AuthProvider>
+          <UnitsProvider>
+            <Outlet />
+            <Toaster position="top-center" />
+          </UnitsProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
