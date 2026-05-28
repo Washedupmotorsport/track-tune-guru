@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Timer, Plus, ArrowLeft, ChevronRight } from "lucide-react";
+import { Timer, Plus, ArrowLeft, ChevronRight, Trophy, Cloud, Thermometer, Droplet } from "lucide-react";
 import { toast } from "sonner";
+import { formatLapTime } from "@/lib/lap-time";
 
 export const Route = createFileRoute("/_authenticated/sessions")({ component: SessionsPage });
 
@@ -62,6 +63,23 @@ function SessionsPage() {
       const { data, error } = await supabase.from("sessions").select("*").order("started_at", { ascending: false });
       if (error) throw error;
       return data as Session[];
+    },
+    enabled: !!user,
+  });
+
+  const lapsQ = useQuery({
+    queryKey: ["sessions-laps-agg", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("laps").select("session_id, lap_time_ms");
+      if (error) throw error;
+      const m = new Map<string, { count: number; best: number }>();
+      (data ?? []).forEach((l) => {
+        if (!l.session_id) return;
+        const cur = m.get(l.session_id);
+        if (!cur) m.set(l.session_id, { count: 1, best: l.lap_time_ms });
+        else { cur.count++; if (l.lap_time_ms < cur.best) cur.best = l.lap_time_ms; }
+      });
+      return m;
     },
     enabled: !!user,
   });
@@ -174,28 +192,53 @@ function SessionsPage() {
           </div>
         )}
         {(sessionsQ.data ?? []).map((s) => (
-          <Link key={s.id} to="/sessions/$sessionId" params={{ sessionId: s.id }}
-            className="block rounded-lg border border-border bg-card p-5 shadow-card hover:border-primary transition-colors">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded bg-primary/20 text-primary">{s.session_type}</span>
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{carName(s.car_id)}</span>
+          (() => {
+            const agg = lapsQ.data?.get(s.id);
+            const fuel = s.fuel_start_l != null && s.fuel_end_l != null ? (s.fuel_start_l - s.fuel_end_l) : null;
+            return (
+            <Link key={s.id} to="/sessions/$sessionId" params={{ sessionId: s.id }}
+              className="block rounded-sm border border-border bg-card hover:border-primary transition-colors">
+              <div className="flex items-center gap-3 px-3 py-2.5 border-b border-border/60 bg-muted/20">
+                <span className="font-mono text-[10px] uppercase tracking-[0.15em] px-1.5 py-0.5 rounded-sm bg-primary/20 text-primary">{s.session_type}</span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground truncate">{carName(s.car_id)}</span>
+                <div className="ml-auto text-[10px] font-mono tabular-nums text-muted-foreground">
+                  {new Date(s.started_at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}
                 </div>
-                <h2 className="font-display text-xl font-bold mt-1">{s.name}</h2>
-                <div className="text-xs font-mono text-muted-foreground mt-1">
-                  {new Date(s.started_at).toLocaleString()}
-                  {s.track && ` · ${s.track}`}
-                  {s.driver && ` · ${s.driver}`}
-                  {s.weather && ` · ${s.weather}`}
-                  {s.air_temp_c != null && ` · ${s.air_temp_c}°C`}
+                <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+              </div>
+              <div className="px-3 py-2.5 flex items-center gap-4 flex-wrap">
+                <div className="min-w-0 flex-1">
+                  <div className="font-display text-base font-bold uppercase tracking-tight truncate">{s.name}</div>
+                  <div className="mt-0.5 flex items-center gap-3 text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground flex-wrap">
+                    {s.track && <span>{s.track}</span>}
+                    {s.driver && <span>· {s.driver}</span>}
+                    {s.weather && <span className="flex items-center gap-1"><Cloud className="w-3 h-3" />{s.weather}</span>}
+                    {s.air_temp_c != null && <span className="flex items-center gap-1"><Thermometer className="w-3 h-3" />{s.air_temp_c}°C</span>}
+                    {s.track_temp_c != null && <span>Track {s.track_temp_c}°C</span>}
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 font-mono tabular-nums text-xs shrink-0">
+                  <Cell label="Laps" value={String(agg?.count ?? 0)} />
+                  <Cell label="Best" value={formatLapTime(agg?.best ?? null)} accent />
+                  {fuel != null && <Cell label="Fuel" value={`${fuel.toFixed(1)}L`} icon={<Droplet className="w-3 h-3" />} />}
                 </div>
               </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
-            </div>
-          </Link>
+            </Link>
+            );
+          })()
         ))}
       </div>
     </div>
   );
 }
+
+function Cell({ label, value, accent, icon }: { label: string; value: string; accent?: boolean; icon?: React.ReactNode }) {
+  return (
+    <div className="text-right">
+      <div className="flex items-center justify-end gap-1 text-[9px] uppercase tracking-[0.15em] text-muted-foreground">{icon}{label}</div>
+      <div className={`text-sm font-bold ${accent ? "text-primary" : ""}`}>{value}</div>
+    </div>
+  );
+}
+
+const _Trophy = Trophy; // keep import
