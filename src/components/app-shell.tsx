@@ -205,7 +205,7 @@ const ALL_NAV_GROUPS = [
       { to: "/sessions",        label: "Sessions",         icon: Timer },
       { to: "/timeline",        label: "Weekend timeline", icon: ClipboardList },
       { to: "/track-evolution", label: "Track evolution",  icon: CloudRain },
-      { to: "/debrief",         label: "Driver debrief",   label2: "Driver debrief", icon: ClipboardList },
+      { to: "/debrief",         label: "Driver debrief",   icon: ClipboardList },
       { to: "/flags",           label: "Flags & incidents", icon: AlertTriangle },
     ],
   },
