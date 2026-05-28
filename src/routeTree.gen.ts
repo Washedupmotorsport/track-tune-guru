@@ -20,6 +20,7 @@ import { Route as AuthenticatedTyreSetupRouteImport } from './routes/_authentica
 import { Route as AuthenticatedTyreCompareRouteImport } from './routes/_authenticated/tyre-compare'
 import { Route as AuthenticatedTiresRouteImport } from './routes/_authenticated/tires'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedPitwallRouteImport } from './routes/_authenticated/pitwall'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
 import { Route as AuthenticatedMaintenanceRouteImport } from './routes/_authenticated/maintenance'
@@ -93,6 +94,11 @@ const AuthenticatedTiresRoute = AuthenticatedTiresRouteImport.update({
 const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
   id: '/sessions',
   path: '/sessions',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedPitwallRoute = AuthenticatedPitwallRouteImport.update({
@@ -214,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/maintenance': typeof AuthenticatedMaintenanceRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/pitwall': typeof AuthenticatedPitwallRoute
+  '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/tires': typeof AuthenticatedTiresRoute
   '/tyre-compare': typeof AuthenticatedTyreCompareRoute
@@ -245,6 +252,7 @@ export interface FileRoutesByTo {
   '/maintenance': typeof AuthenticatedMaintenanceRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/pitwall': typeof AuthenticatedPitwallRoute
+  '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/tires': typeof AuthenticatedTiresRoute
   '/tyre-compare': typeof AuthenticatedTyreCompareRoute
@@ -278,6 +286,7 @@ export interface FileRoutesById {
   '/_authenticated/maintenance': typeof AuthenticatedMaintenanceRoute
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
   '/_authenticated/pitwall': typeof AuthenticatedPitwallRoute
+  '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/_authenticated/tires': typeof AuthenticatedTiresRoute
   '/_authenticated/tyre-compare': typeof AuthenticatedTyreCompareRoute
@@ -311,6 +320,7 @@ export interface FileRouteTypes {
     | '/maintenance'
     | '/notes'
     | '/pitwall'
+    | '/reports'
     | '/sessions'
     | '/tires'
     | '/tyre-compare'
@@ -342,6 +352,7 @@ export interface FileRouteTypes {
     | '/maintenance'
     | '/notes'
     | '/pitwall'
+    | '/reports'
     | '/sessions'
     | '/tires'
     | '/tyre-compare'
@@ -374,6 +385,7 @@ export interface FileRouteTypes {
     | '/_authenticated/maintenance'
     | '/_authenticated/notes'
     | '/_authenticated/pitwall'
+    | '/_authenticated/reports'
     | '/_authenticated/sessions'
     | '/_authenticated/tires'
     | '/_authenticated/tyre-compare'
@@ -474,6 +486,13 @@ declare module '@tanstack/react-router' {
       path: '/sessions'
       fullPath: '/sessions'
       preLoaderRoute: typeof AuthenticatedSessionsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/pitwall': {
@@ -668,6 +687,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedMaintenanceRoute: typeof AuthenticatedMaintenanceRoute
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
   AuthenticatedPitwallRoute: typeof AuthenticatedPitwallRoute
+  AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRouteWithChildren
   AuthenticatedTiresRoute: typeof AuthenticatedTiresRoute
   AuthenticatedTyreCompareRoute: typeof AuthenticatedTyreCompareRoute
@@ -693,6 +713,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMaintenanceRoute: AuthenticatedMaintenanceRoute,
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
   AuthenticatedPitwallRoute: AuthenticatedPitwallRoute,
+  AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRouteWithChildren,
   AuthenticatedTiresRoute: AuthenticatedTiresRoute,
   AuthenticatedTyreCompareRoute: AuthenticatedTyreCompareRoute,

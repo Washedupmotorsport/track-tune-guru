@@ -5,7 +5,7 @@ import {
   LogOut, Calculator, Wand2, NotebookPen, Timer, Disc, Wrench,
   Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon, Gauge, TrendingDown, GitCompare,
   Home, Flag, AlertTriangle, HardHat, Radio,
-  ClipboardList,
+  ClipboardList, FileText,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
