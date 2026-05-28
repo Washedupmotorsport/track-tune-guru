@@ -20,6 +20,7 @@ import { Route as AuthenticatedTyreSetupRouteImport } from './routes/_authentica
 import { Route as AuthenticatedTyreCompareRouteImport } from './routes/_authenticated/tyre-compare'
 import { Route as AuthenticatedTrackEvolutionRouteImport } from './routes/_authenticated/track-evolution'
 import { Route as AuthenticatedTiresRouteImport } from './routes/_authenticated/tires'
+import { Route as AuthenticatedSympathyRouteImport } from './routes/_authenticated/sympathy'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedPitwallRouteImport } from './routes/_authenticated/pitwall'
@@ -98,6 +99,11 @@ const AuthenticatedTrackEvolutionRoute =
 const AuthenticatedTiresRoute = AuthenticatedTiresRouteImport.update({
   id: '/tires',
   path: '/tires',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSympathyRoute = AuthenticatedSympathyRouteImport.update({
+  id: '/sympathy',
+  path: '/sympathy',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
@@ -243,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/pitwall': typeof AuthenticatedPitwallRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
+  '/sympathy': typeof AuthenticatedSympathyRoute
   '/tires': typeof AuthenticatedTiresRoute
   '/track-evolution': typeof AuthenticatedTrackEvolutionRoute
   '/tyre-compare': typeof AuthenticatedTyreCompareRoute
@@ -278,6 +285,7 @@ export interface FileRoutesByTo {
   '/pitwall': typeof AuthenticatedPitwallRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
+  '/sympathy': typeof AuthenticatedSympathyRoute
   '/tires': typeof AuthenticatedTiresRoute
   '/track-evolution': typeof AuthenticatedTrackEvolutionRoute
   '/tyre-compare': typeof AuthenticatedTyreCompareRoute
@@ -315,6 +323,7 @@ export interface FileRoutesById {
   '/_authenticated/pitwall': typeof AuthenticatedPitwallRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRouteWithChildren
+  '/_authenticated/sympathy': typeof AuthenticatedSympathyRoute
   '/_authenticated/tires': typeof AuthenticatedTiresRoute
   '/_authenticated/track-evolution': typeof AuthenticatedTrackEvolutionRoute
   '/_authenticated/tyre-compare': typeof AuthenticatedTyreCompareRoute
@@ -352,6 +361,7 @@ export interface FileRouteTypes {
     | '/pitwall'
     | '/reports'
     | '/sessions'
+    | '/sympathy'
     | '/tires'
     | '/track-evolution'
     | '/tyre-compare'
@@ -387,6 +397,7 @@ export interface FileRouteTypes {
     | '/pitwall'
     | '/reports'
     | '/sessions'
+    | '/sympathy'
     | '/tires'
     | '/track-evolution'
     | '/tyre-compare'
@@ -423,6 +434,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pitwall'
     | '/_authenticated/reports'
     | '/_authenticated/sessions'
+    | '/_authenticated/sympathy'
     | '/_authenticated/tires'
     | '/_authenticated/track-evolution'
     | '/_authenticated/tyre-compare'
@@ -523,6 +535,13 @@ declare module '@tanstack/react-router' {
       path: '/tires'
       fullPath: '/tires'
       preLoaderRoute: typeof AuthenticatedTiresRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/sympathy': {
+      id: '/_authenticated/sympathy'
+      path: '/sympathy'
+      fullPath: '/sympathy'
+      preLoaderRoute: typeof AuthenticatedSympathyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/sessions': {
@@ -749,6 +768,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedPitwallRoute: typeof AuthenticatedPitwallRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRouteWithChildren
+  AuthenticatedSympathyRoute: typeof AuthenticatedSympathyRoute
   AuthenticatedTiresRoute: typeof AuthenticatedTiresRoute
   AuthenticatedTrackEvolutionRoute: typeof AuthenticatedTrackEvolutionRoute
   AuthenticatedTyreCompareRoute: typeof AuthenticatedTyreCompareRoute
@@ -778,6 +798,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedPitwallRoute: AuthenticatedPitwallRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRouteWithChildren,
+  AuthenticatedSympathyRoute: AuthenticatedSympathyRoute,
   AuthenticatedTiresRoute: AuthenticatedTiresRoute,
   AuthenticatedTrackEvolutionRoute: AuthenticatedTrackEvolutionRoute,
   AuthenticatedTyreCompareRoute: AuthenticatedTyreCompareRoute,
