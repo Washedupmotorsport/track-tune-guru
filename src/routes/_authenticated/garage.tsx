@@ -202,13 +202,12 @@ function CarCard({ c, stat, fmtAgo, shared, onDelete }: {
   c: CarRow; stat: { setups: number; sessions: number; lastOut: string | null; best: number | null };
   fmtAgo: (s: string | null) => string; shared?: boolean; onDelete?: () => void;
 }) {
-  const accent = shared ? "accent" : "primary";
   return (
-    <div className={`group relative rounded-sm border border-border bg-card hover:border-${accent} transition-colors`}>
+    <div className={`group relative rounded-sm border border-border bg-card transition-colors ${shared ? "hover:border-accent" : "hover:border-primary"}`}>
       <div className="flex items-center justify-between px-3 py-2 border-b border-border/60 bg-muted/20">
         <div className="flex items-center gap-2 min-w-0">
-          <Car className={`w-4 h-4 text-${accent} shrink-0`} />
-          <span className={`font-mono text-[10px] uppercase tracking-[0.15em] text-${accent} truncate`}>{c.discipline}</span>
+          <Car className={`w-4 h-4 shrink-0 ${shared ? "text-accent" : "text-primary"}`} />
+          <span className={`font-mono text-[10px] uppercase tracking-[0.15em] truncate ${shared ? "text-accent" : "text-primary"}`}>{c.discipline}</span>
         </div>
         <div className="flex items-center gap-1">
           {shared && <span className="text-[10px] font-mono uppercase tracking-[0.15em] px-1.5 py-0.5 rounded-sm bg-accent/20 text-accent">Shared</span>}
