@@ -16,6 +16,7 @@ import { parseLapTime, formatLapTime } from "@/lib/lap-time";
 import { exportSetupPdf } from "@/lib/setup-pdf";
 import { useCarAccess, canEdit } from "@/lib/use-car-access";
 import { LapImportDialog } from "@/components/lap-import-dialog";
+import { SetupConsole } from "@/components/setup-console";
 
 export const Route = createFileRoute("/_authenticated/setups/$setupId")({
   component: SetupDetail,
@@ -57,6 +58,15 @@ function SetupDetail() {
       const { data, error } = await supabase.from("cars").select("user_id").eq("id", setupQ.data!.car_id).single();
       if (error) throw error;
       return data;
+    },
+  });
+  const carNameQ = useQuery({
+    queryKey: ["car-name", setupQ.data?.car_id],
+    enabled: !!setupQ.data,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("cars").select("name").eq("id", setupQ.data!.car_id).single();
+      if (error) throw error;
+      return data?.name as string;
     },
   });
   const accessQ = useCarAccess(setupQ.data?.car_id, carQ.data?.user_id);
@@ -147,6 +157,16 @@ function SetupDetail() {
         }}>
           <Download className="w-4 h-4 mr-1" /> Export PDF
         </Button>
+      </div>
+
+      <div className="mt-4">
+        <SetupConsole
+          data={data}
+          setData={setData}
+          meta={meta}
+          writable={writable}
+          carName={carNameQ.data ?? ""}
+        />
       </div>
 
       <div className="mt-6 grid md:grid-cols-3 gap-4 rounded-lg border border-border bg-card p-5">
