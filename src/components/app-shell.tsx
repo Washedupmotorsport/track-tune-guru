@@ -6,7 +6,7 @@ import {
   Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon, Gauge, TrendingDown, GitCompare,
   Home, Flag, AlertTriangle, HardHat, Radio,
   ClipboardList, FileText,
-  MapPin, CloudRain, ShieldAlert, BookOpen,
+  MapPin, CloudRain, ShieldAlert, BookOpen, GitBranch,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
