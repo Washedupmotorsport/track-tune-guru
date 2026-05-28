@@ -7,7 +7,7 @@ import {
   Home, Flag, AlertTriangle, HardHat, Radio,
   ClipboardList, FileText,
   MapPin, CloudRain, ShieldAlert, BookOpen, GitBranch, Brain,
-  Mic,
+  Mic, BookMarked,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
