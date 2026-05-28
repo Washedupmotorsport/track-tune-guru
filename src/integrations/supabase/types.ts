@@ -944,8 +944,11 @@ export type Database = {
           created_at: string
           discipline: string
           id: string
+          ideal_conditions: string | null
+          is_baseline: boolean
           name: string
           notes: string | null
+          preset_type: string
           setup_data: Json
           track: string | null
           updated_at: string
@@ -957,8 +960,11 @@ export type Database = {
           created_at?: string
           discipline?: string
           id?: string
+          ideal_conditions?: string | null
+          is_baseline?: boolean
           name: string
           notes?: string | null
+          preset_type?: string
           setup_data?: Json
           track?: string | null
           updated_at?: string
@@ -970,8 +976,11 @@ export type Database = {
           created_at?: string
           discipline?: string
           id?: string
+          ideal_conditions?: string | null
+          is_baseline?: boolean
           name?: string
           notes?: string | null
+          preset_type?: string
           setup_data?: Json
           track?: string | null
           updated_at?: string
