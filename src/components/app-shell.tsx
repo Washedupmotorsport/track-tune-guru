@@ -235,6 +235,7 @@ const ALL_NAV_GROUPS = [
     label: "Trackside",
     items: [
       { to: "/pitwall",         label: "Pit wall",         icon: Radio },
+      { to: "/pitlane",         label: "Pit lane mode",    icon: Flag },
       { to: "/racemode",        label: "Race mode",        icon: Flag },
       { to: "/sessions",        label: "Sessions",         icon: Timer },
       { to: "/timeline",        label: "Weekend timeline", icon: ClipboardList },
