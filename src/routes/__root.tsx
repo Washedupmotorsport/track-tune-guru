@@ -13,6 +13,7 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "@/lib/auth-context";
 import { UnitsProvider } from "@/lib/units";
 import { ThemeProvider } from "@/lib/theme";
+import { OfflinePersistGate } from "@/lib/offline";
 import { useEffect } from "react";
 
 function NotFoundComponent() {
@@ -138,14 +139,16 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          <UnitsProvider>
-            <Outlet />
-            <Toaster position="top-center" />
-          </UnitsProvider>
-        </AuthProvider>
-      </ThemeProvider>
+      <OfflinePersistGate client={queryClient}>
+        <ThemeProvider>
+          <AuthProvider>
+            <UnitsProvider>
+              <Outlet />
+              <Toaster position="top-center" />
+            </UnitsProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </OfflinePersistGate>
     </QueryClientProvider>
   );
 }
