@@ -9,7 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { DISCIPLINES } from "@/lib/disciplines";
-import { Plus, Car, ChevronRight, Trash2, Users, Share2, Timer, FileText, Trophy } from "lucide-react";
+import {
+  Plus, Car, Trash2, Users, Share2, Timer, FileText, Trophy,
+  Radio, Flag, ClipboardList, ChevronRight, Disc, Wand2,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ShareDialog } from "@/components/share-dialog";
@@ -138,6 +141,8 @@ function Garage() {
           </DialogContent>
         </Dialog>
       </div>
+
+      <TracksideRail userId={user!.id} />
 
       {carsQ.isLoading ? (
         <div className="text-muted-foreground">Loading…</div>
