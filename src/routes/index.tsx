@@ -60,7 +60,7 @@ function Landing() {
           className="absolute inset-0 opacity-30"
           style={{
             backgroundImage:
-              "linear-gradient(45deg, hsl(var(--foreground)) 25%, transparent 25%), linear-gradient(-45deg, hsl(var(--foreground)) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, hsl(var(--foreground)) 75%), linear-gradient(-45deg, transparent 75%, hsl(var(--foreground)) 75%)",
+              "linear-gradient(45deg, var(--foreground) 25%, transparent 25%), linear-gradient(-45deg, var(--foreground) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, var(--foreground) 75%), linear-gradient(-45deg, transparent 75%, var(--foreground) 75%)",
             backgroundSize: "48px 48px",
             backgroundPosition: "0 0, 0 24px, 24px -24px, -24px 0px",
           }}
