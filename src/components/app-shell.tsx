@@ -23,10 +23,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { theme, toggle: toggleTheme } = useTheme();
   return (
     <div className="min-h-screen text-foreground">
+      <div className="h-[2px] w-full bg-primary" aria-hidden />
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
-        <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
+        <div className="mx-auto max-w-[1400px] px-4 h-12 flex items-center justify-between">
           <Link to="/garage" aria-label="My Race Engineer — garage" className="flex items-center">
-            <img src={logoMre} alt="My Race Engineer" className="h-10 w-auto" />
+            <img src={logoMre} alt="My Race Engineer" className="h-7 w-auto" />
           </Link>
           <div className="flex items-center gap-3">
             <button
@@ -114,7 +115,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-5">{children}</main>
+      <main className="mx-auto max-w-[1400px] px-4 py-4">{children}</main>
       <CommandPalette />
     </div>
   );
