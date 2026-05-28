@@ -160,6 +160,7 @@ export type Database = {
           model: string | null
           name: string
           notes: string | null
+          photo_path: string | null
           updated_at: string
           user_id: string
           year: number | null
@@ -172,6 +173,7 @@ export type Database = {
           model?: string | null
           name: string
           notes?: string | null
+          photo_path?: string | null
           updated_at?: string
           user_id: string
           year?: number | null
@@ -184,6 +186,7 @@ export type Database = {
           model?: string | null
           name?: string
           notes?: string | null
+          photo_path?: string | null
           updated_at?: string
           user_id?: string
           year?: number | null

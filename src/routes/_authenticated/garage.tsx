@@ -11,9 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { DISCIPLINES } from "@/lib/disciplines";
 import {
   Plus, Car, Trash2, Users, Share2, Timer, FileText, Trophy,
-  Radio, Flag, ClipboardList, ChevronRight, Disc, Wand2,
+  Radio, Flag, ClipboardList, ChevronRight, Disc, Wand2, Camera, Loader2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { ShareDialog } from "@/components/share-dialog";
 import { formatLapTime } from "@/lib/lap-time";
@@ -204,11 +204,12 @@ function EmptyState() {
 
 type CarRow = { id: string; name: string; discipline: string; make: string | null; model: string | null; year: number | null };
 function CarCard({ c, stat, fmtAgo, shared, onDelete }: {
-  c: CarRow; stat: { setups: number; sessions: number; lastOut: string | null; best: number | null };
+  c: CarRow & { photo_path?: string | null }; stat: { setups: number; sessions: number; lastOut: string | null; best: number | null };
   fmtAgo: (s: string | null) => string; shared?: boolean; onDelete?: () => void;
 }) {
   return (
     <div className={`group relative rounded-sm border border-border bg-card transition-colors ${shared ? "hover:border-accent" : "hover:border-primary"}`}>
+      <CarPhoto carId={c.id} photoPath={c.photo_path ?? null} editable={!shared} />
       <div className="flex items-center justify-between px-3 py-2 border-b border-border/60 bg-muted/20">
         <div className="flex items-center gap-2 min-w-0">
           <Car className={`w-4 h-4 shrink-0 ${shared ? "text-accent" : "text-primary"}`} />
@@ -250,6 +251,74 @@ function Stat({ icon, label, value, mono }: { icon?: React.ReactNode; label: str
         {icon}{label}
       </div>
       <div className={`mt-0.5 text-sm font-bold truncate ${mono ? "font-mono tabular-nums" : "font-display"}`}>{value}</div>
+    </div>
+  );
+}
+
+function CarPhoto({ carId, photoPath, editable }: { carId: string; photoPath: string | null; editable: boolean }) {
+  const qc = useQueryClient();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [url, setUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!photoPath) { setUrl(null); return; }
+    (async () => {
+      const { data } = await supabase.storage.from("photos").createSignedUrl(photoPath, 3600);
+      if (!cancelled) setUrl(data?.signedUrl ?? null);
+    })();
+    return () => { cancelled = true; };
+  }, [photoPath]);
+
+  const onPick = async (file: File) => {
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const path = `${carId}/cover/${crypto.randomUUID()}.${ext}`;
+      const up = await supabase.storage.from("photos").upload(path, file, { contentType: file.type });
+      if (up.error) throw up.error;
+      if (photoPath) await supabase.storage.from("photos").remove([photoPath]);
+      const { error } = await supabase.from("cars").update({ photo_path: path }).eq("id", carId);
+      if (error) throw error;
+      toast.success("Photo updated");
+      qc.invalidateQueries({ queryKey: ["cars"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted/30 border-b border-border/60">
+      {url ? (
+        <img src={url} alt="Car" className="w-full h-full object-cover" loading="lazy" />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+          <Car className="w-10 h-10 opacity-30" />
+        </div>
+      )}
+      {editable && (
+        <>
+          <button
+            type="button"
+            onClick={(e) => { e.preventDefault(); fileRef.current?.click(); }}
+            disabled={uploading}
+            className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-sm bg-background/85 backdrop-blur px-2 py-1 text-[10px] font-mono uppercase tracking-[0.15em] border border-border hover:border-primary hover:text-primary transition-colors"
+          >
+            {uploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Camera className="w-3 h-3" />}
+            {url ? "Change" : "Add photo"}
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) onPick(f); e.target.value = ""; }}
+          />
+        </>
+      )}
     </div>
   );
 }
