@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { Stepper } from "@/components/stepper";
 import { Gauge, Thermometer, Fuel, Wind, Activity, AlertTriangle } from "lucide-react";
 
 type Data = Record<string, string>;
@@ -16,6 +17,12 @@ const psiColor = (psi: number) => {
   if (psi < 25) return "oklch(0.62 0.18 244)"; // cold - blue
   if (psi > 32) return "oklch(0.62 0.22 27)"; // hot - red
   return "oklch(0.70 0.16 145)"; // optimal - green
+};
+const psiAccent = (psi: number): "cold" | "ok" | "hot" | "none" => {
+  if (!psi) return "none";
+  if (psi < 25) return "cold";
+  if (psi > 32) return "hot";
+  return "ok";
 };
 
 const tempColor = (t: number) => {
@@ -150,40 +157,58 @@ export function SetupConsole({
         </div>
       </div>
 
+      {/* TYRE PRESSURE QUICK-EDIT — pit lane priority #1 */}
+      <div className="telemetry-panel telemetry-accent-bar p-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="telemetry-label flex items-center gap-1"><Gauge className="w-3 h-3 text-primary" /> Tyre Pressures — psi</div>
+          <div className="telemetry-label hidden sm:block">tap ± to adjust · auto-saves</div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {tyres.map((t) => (
+            <Stepper
+              key={t.id}
+              label={t.label}
+              unit="PSI"
+              value={data[`psi_${t.id}`]}
+              onChange={(v) => set(`psi_${t.id}`, v)}
+              step={0.1}
+              min={15}
+              max={45}
+              precision={1}
+              disabled={!writable}
+              accent={psiAccent(t.psi)}
+            />
+          ))}
+        </div>
+      </div>
+
       {/* CENTERPIECE: Car schematic + side panels */}
       <div className="grid lg:grid-cols-12 gap-3">
         {/* Left rail — front numbers */}
         <div className="lg:col-span-3 space-y-3">
-          <TelemetryStat label="Brake Bias %F" value={bias.toFixed(1)} accent />
-          <div className="telemetry-panel p-3">
-            <div className="telemetry-label mb-2">Spring Rates kg/mm</div>
-            <div className="flex items-baseline justify-between gap-2">
-              <div>
-                <div className="telemetry-label text-[9px]">FRONT</div>
-                <div className="telemetry-value text-2xl">{sprF || "—"}</div>
-              </div>
-              <div className="text-right">
-                <div className="telemetry-label text-[9px]">REAR</div>
-                <div className="telemetry-value text-2xl">{sprR || "—"}</div>
-              </div>
-            </div>
+          <div className="telemetry-panel p-3 space-y-2">
+            <div className="telemetry-label">Brake Bias %F</div>
+            <Stepper value={data.brake_bias} onChange={(v) => set("brake_bias", v)}
+              step={0.5} min={45} max={70} precision={1} disabled={!writable} />
           </div>
-          <div className="telemetry-panel p-3">
-            <div className="telemetry-label mb-2">Ride Height mm</div>
-            <div className="flex items-baseline justify-between gap-2">
-              <div>
-                <div className="telemetry-label text-[9px]">FRONT</div>
-                <div className="telemetry-value text-2xl">{rhF || "—"}</div>
-              </div>
-              <div className="text-right">
-                <div className="telemetry-label text-[9px]">REAR</div>
-                <div className="telemetry-value text-2xl">{rhR || "—"}</div>
-              </div>
+          <div className="telemetry-panel p-3 space-y-2">
+            <div className="telemetry-label">Spring Rates kg/mm</div>
+            <Stepper label="FRONT" value={data.spring_front} onChange={(v) => set("spring_front", v)}
+              step={0.5} min={20} max={250} precision={1} disabled={!writable} />
+            <Stepper label="REAR" value={data.spring_rear} onChange={(v) => set("spring_rear", v)}
+              step={0.5} min={20} max={250} precision={1} disabled={!writable} />
+          </div>
+          <div className="telemetry-panel p-3 space-y-2">
+            <div className="telemetry-label flex items-center justify-between">
+              <span>Ride Height mm</span>
+              <span className={"font-mono " + (rake > 0 ? "text-primary" : "text-muted-foreground")}>
+                RAKE {rake > 0 ? "+" : ""}{rake.toFixed(1)}
+              </span>
             </div>
-            <div className="mt-2 telemetry-label text-[9px] flex justify-between">
-              <span>RAKE</span>
-              <span className={"font-mono " + (rake > 0 ? "text-primary" : "text-muted-foreground")}>{rake > 0 ? "+" : ""}{rake.toFixed(1)} mm</span>
-            </div>
+            <Stepper label="FRONT" value={data.ride_front} onChange={(v) => set("ride_front", v)}
+              step={1} min={20} max={120} precision={0} disabled={!writable} />
+            <Stepper label="REAR" value={data.ride_rear} onChange={(v) => set("ride_rear", v)}
+              step={1} min={20} max={120} precision={0} disabled={!writable} />
           </div>
         </div>
 
@@ -252,7 +277,7 @@ export function SetupConsole({
           <AlertTriangle className="w-4 h-4 text-primary" />
           <div className="telemetry-label">Driver Feedback — quick select</div>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {COMPLAINTS.map((c) => {
             const active = selectedComplaints.includes(c.id);
             return (
@@ -261,8 +286,7 @@ export function SetupConsole({
                 disabled={!writable}
                 onClick={() => toggleComplaint(c.id)}
                 variant={active ? "default" : "outline"}
-                size="sm"
-                className={"font-mono uppercase text-[11px] tracking-wider " + (active ? "shadow-glow" : "")}
+                className={"h-14 font-mono uppercase text-[11px] tracking-wider whitespace-normal text-center leading-tight " + (active ? "shadow-glow" : "")}
               >
                 {c.label}
               </Button>
