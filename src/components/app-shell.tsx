@@ -119,6 +119,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <DropdownMenuItem asChild><Link to="/baseline"><Wand2 className="w-4 h-4 mr-2" /> Baseline</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/calculators"><Calculator className="w-4 h-4 mr-2" /> Calculators</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/notes"><NotebookPen className="w-4 h-4 mr-2" /> Notes</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/reports"><FileText className="w-4 h-4 mr-2" /> Reports</Link></DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <span className="hidden xl:block text-xs font-mono uppercase tracking-widest text-muted-foreground">
