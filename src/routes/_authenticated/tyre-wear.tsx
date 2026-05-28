@@ -222,7 +222,7 @@ function TyreWearPage() {
                   {c.currentMm != null && (
                     <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
                       <div
-                        className={`h-full ${c.currentMm <= MIN_TREAD_MM ? "bg-destructive" : c.currentMm <= MIN_TREAD_MM + 1 ? "bg-chart-4" : "bg-chart-3"}`}
+                        className={`h-full ${c.currentMm <= MIN_TREAD_MM ? "bg-destructive" : c.currentMm <= MIN_TREAD_MM + 1 ? "bg-destructive/70" : "bg-chart-3"}`}
                         style={{ width: `${Math.max(4, Math.min(100, (c.currentMm / NEW_TREAD_MM) * 100))}%` }}
                       />
                     </div>
@@ -261,7 +261,7 @@ function StatusBadge({ status, minRemaining }: { status: "ok" | "warn" | "change
     </div>
   );
   if (status === "warn") return (
-    <div className="flex items-center gap-2 rounded-md border border-chart-4/40 bg-chart-4/10 px-3 py-1.5 text-chart-4">
+    <div className="flex items-center gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-1.5 text-destructive">
       <AlertTriangle className="w-4 h-4" />
       <span className="font-mono text-xs uppercase tracking-widest">~{minRemaining} laps left</span>
     </div>
