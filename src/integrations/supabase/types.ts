@@ -247,6 +247,81 @@ export type Database = {
         }
         Relationships: []
       }
+      driver_confidence: {
+        Row: {
+          air_temp_c: number | null
+          best_lap_ms: number | null
+          brakes: number | null
+          car_id: string
+          created_at: string
+          front: number | null
+          hot_fl: number | null
+          hot_fr: number | null
+          hot_rl: number | null
+          hot_rr: number | null
+          id: string
+          notes: string | null
+          overall: number
+          rear: number | null
+          recorded_at: string
+          session_id: string | null
+          setup_id: string | null
+          track_temp_c: number | null
+          traction: number | null
+          updated_at: string
+          user_id: string
+          weather: string | null
+        }
+        Insert: {
+          air_temp_c?: number | null
+          best_lap_ms?: number | null
+          brakes?: number | null
+          car_id: string
+          created_at?: string
+          front?: number | null
+          hot_fl?: number | null
+          hot_fr?: number | null
+          hot_rl?: number | null
+          hot_rr?: number | null
+          id?: string
+          notes?: string | null
+          overall: number
+          rear?: number | null
+          recorded_at?: string
+          session_id?: string | null
+          setup_id?: string | null
+          track_temp_c?: number | null
+          traction?: number | null
+          updated_at?: string
+          user_id: string
+          weather?: string | null
+        }
+        Update: {
+          air_temp_c?: number | null
+          best_lap_ms?: number | null
+          brakes?: number | null
+          car_id?: string
+          created_at?: string
+          front?: number | null
+          hot_fl?: number | null
+          hot_fr?: number | null
+          hot_rl?: number | null
+          hot_rr?: number | null
+          id?: string
+          notes?: string | null
+          overall?: number
+          rear?: number | null
+          recorded_at?: string
+          session_id?: string | null
+          setup_id?: string | null
+          track_temp_c?: number | null
+          traction?: number | null
+          updated_at?: string
+          user_id?: string
+          weather?: string | null
+        }
+        Relationships: []
+      }
       driver_feedback: {
         Row: {
           balance: string | null
