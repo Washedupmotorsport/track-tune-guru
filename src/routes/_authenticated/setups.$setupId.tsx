@@ -213,6 +213,60 @@ function SetupDetail() {
         <div className="md:col-span-1"><Label>Notes</Label><Input readOnly={!writable} value={meta.notes} onChange={(e) => setMeta({ ...meta, notes: e.target.value })} placeholder="Lap times, feel…" /></div>
       </div>
 
+      <div className="mt-4 rounded-lg border border-border bg-card p-5 shadow-card">
+        <div className="flex items-center gap-2 mb-3">
+          <BookMarked className="w-4 h-4 text-primary" />
+          <h3 className="font-display text-sm font-bold uppercase tracking-wider">Library</h3>
+          {presetMeta(library.preset_type) && (
+            <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${presetMeta(library.preset_type)!.tone}`}>
+              {presetMeta(library.preset_type)!.label}
+            </span>
+          )}
+        </div>
+        <div className="grid md:grid-cols-3 gap-4">
+          <div>
+            <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Preset type</Label>
+            <Select
+              value={library.preset_type}
+              onValueChange={(v) => setLibrary((s) => ({ ...s, preset_type: v }))}
+              disabled={!writable}
+            >
+              <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">— Untagged —</SelectItem>
+                {PRESET_TYPES.map((p) => (
+                  <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="md:col-span-1">
+            <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Ideal conditions</Label>
+            <Input
+              readOnly={!writable}
+              value={library.ideal_conditions}
+              onChange={(e) => setLibrary((s) => ({ ...s, ideal_conditions: e.target.value }))}
+              placeholder="Cool/dry, high grip, 18–24°C"
+              className="mt-1"
+            />
+          </div>
+          <div className="flex items-end justify-between md:justify-start gap-3 rounded-md border border-border px-3 py-2">
+            <div>
+              <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Pin as baseline</div>
+              <div className="text-[11px] text-muted-foreground">Surface first in the library</div>
+            </div>
+            <Switch
+              checked={library.is_baseline}
+              onCheckedChange={(v) => setLibrary((s) => ({ ...s, is_baseline: v }))}
+              disabled={!writable}
+            />
+          </div>
+        </div>
+        <div className="mt-3 text-[11px] text-muted-foreground">
+          Tagged setups appear in the <Link to="/setup-library" className="text-primary hover:underline">Setup library</Link> with their best lap, tyre behaviour, and driver confidence.
+        </div>
+      </div>
+
       <div className="mt-6 space-y-3">
         {disc.sections.map((section) => (
           <div key={section.title} className="rounded-lg border border-border bg-card p-5 shadow-card">
