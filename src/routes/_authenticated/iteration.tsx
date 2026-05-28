@@ -507,6 +507,15 @@ function ChangeCard({
         </div>
       )}
 
+      {row.driver_response && (
+        <div className="px-4 pb-3">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1">Driver response</div>
+          <blockquote className="border-l-2 border-primary/50 pl-3 text-sm italic text-foreground/90 whitespace-pre-wrap">
+            “{row.driver_response}”
+          </blockquote>
+        </div>
+      )}
+
       <div className="px-4 py-2 border-t border-border/60 bg-muted/20 flex items-center justify-between gap-2">
         <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => setOpen((v) => !v)}>
           {open ? "Close" : row.outcome_status === "pending" ? "Record outcome" : "Update outcome"}
