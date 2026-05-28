@@ -420,6 +420,7 @@ function ChangeCard({
   const [lapDelta, setLapDelta] = useState<string>(row.lap_delta_ms != null ? String(row.lap_delta_ms / 1000) : "");
   const [confDelta, setConfDelta] = useState<string>(row.confidence_delta != null ? String(row.confidence_delta) : "");
   const [notes, setNotes] = useState<string>(row.outcome_notes ?? "");
+  const [driverResponse, setDriverResponse] = useState<string>(row.driver_response ?? "");
   const [status, setStatus] = useState<ChangeRow["outcome_status"]>(row.outcome_status);
 
   const recordOutcome = useMutation({
@@ -427,6 +428,7 @@ function ChangeCard({
       const { error } = await supabase.from("setup_changes").update({
         outcome_status: status,
         outcome_notes: notes.trim() || null,
+        driver_response: driverResponse.trim() || null,
         lap_delta_ms: lapDelta === "" ? null : Math.round(parseFloat(lapDelta) * 1000),
         confidence_delta: confDelta === "" ? null : parseInt(confDelta, 10),
         measured_at: new Date().toISOString(),
