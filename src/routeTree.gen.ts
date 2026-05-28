@@ -28,6 +28,7 @@ import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedRacemodeRouteImport } from './routes/_authenticated/racemode'
 import { Route as AuthenticatedPostDebriefRouteImport } from './routes/_authenticated/post-debrief'
 import { Route as AuthenticatedPitwallRouteImport } from './routes/_authenticated/pitwall'
+import { Route as AuthenticatedPitlaneRouteImport } from './routes/_authenticated/pitlane'
 import { Route as AuthenticatedPhilosophiesRouteImport } from './routes/_authenticated/philosophies'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
 import { Route as AuthenticatedMaintenanceRouteImport } from './routes/_authenticated/maintenance'
@@ -150,6 +151,11 @@ const AuthenticatedPostDebriefRoute =
 const AuthenticatedPitwallRoute = AuthenticatedPitwallRouteImport.update({
   id: '/pitwall',
   path: '/pitwall',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPitlaneRoute = AuthenticatedPitlaneRouteImport.update({
+  id: '/pitlane',
+  path: '/pitlane',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedPhilosophiesRoute =
@@ -309,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/maintenance': typeof AuthenticatedMaintenanceRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/philosophies': typeof AuthenticatedPhilosophiesRoute
+  '/pitlane': typeof AuthenticatedPitlaneRoute
   '/pitwall': typeof AuthenticatedPitwallRoute
   '/post-debrief': typeof AuthenticatedPostDebriefRoute
   '/racemode': typeof AuthenticatedRacemodeRoute
@@ -354,6 +361,7 @@ export interface FileRoutesByTo {
   '/maintenance': typeof AuthenticatedMaintenanceRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/philosophies': typeof AuthenticatedPhilosophiesRoute
+  '/pitlane': typeof AuthenticatedPitlaneRoute
   '/pitwall': typeof AuthenticatedPitwallRoute
   '/post-debrief': typeof AuthenticatedPostDebriefRoute
   '/racemode': typeof AuthenticatedRacemodeRoute
@@ -401,6 +409,7 @@ export interface FileRoutesById {
   '/_authenticated/maintenance': typeof AuthenticatedMaintenanceRoute
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
   '/_authenticated/philosophies': typeof AuthenticatedPhilosophiesRoute
+  '/_authenticated/pitlane': typeof AuthenticatedPitlaneRoute
   '/_authenticated/pitwall': typeof AuthenticatedPitwallRoute
   '/_authenticated/post-debrief': typeof AuthenticatedPostDebriefRoute
   '/_authenticated/racemode': typeof AuthenticatedRacemodeRoute
@@ -448,6 +457,7 @@ export interface FileRouteTypes {
     | '/maintenance'
     | '/notes'
     | '/philosophies'
+    | '/pitlane'
     | '/pitwall'
     | '/post-debrief'
     | '/racemode'
@@ -493,6 +503,7 @@ export interface FileRouteTypes {
     | '/maintenance'
     | '/notes'
     | '/philosophies'
+    | '/pitlane'
     | '/pitwall'
     | '/post-debrief'
     | '/racemode'
@@ -539,6 +550,7 @@ export interface FileRouteTypes {
     | '/_authenticated/maintenance'
     | '/_authenticated/notes'
     | '/_authenticated/philosophies'
+    | '/_authenticated/pitlane'
     | '/_authenticated/pitwall'
     | '/_authenticated/post-debrief'
     | '/_authenticated/racemode'
@@ -703,6 +715,13 @@ declare module '@tanstack/react-router' {
       path: '/pitwall'
       fullPath: '/pitwall'
       preLoaderRoute: typeof AuthenticatedPitwallRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/pitlane': {
+      id: '/_authenticated/pitlane'
+      path: '/pitlane'
+      fullPath: '/pitlane'
+      preLoaderRoute: typeof AuthenticatedPitlaneRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/philosophies': {
@@ -945,6 +964,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedMaintenanceRoute: typeof AuthenticatedMaintenanceRoute
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
   AuthenticatedPhilosophiesRoute: typeof AuthenticatedPhilosophiesRoute
+  AuthenticatedPitlaneRoute: typeof AuthenticatedPitlaneRoute
   AuthenticatedPitwallRoute: typeof AuthenticatedPitwallRoute
   AuthenticatedPostDebriefRoute: typeof AuthenticatedPostDebriefRoute
   AuthenticatedRacemodeRoute: typeof AuthenticatedRacemodeRoute
@@ -984,6 +1004,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMaintenanceRoute: AuthenticatedMaintenanceRoute,
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
   AuthenticatedPhilosophiesRoute: AuthenticatedPhilosophiesRoute,
+  AuthenticatedPitlaneRoute: AuthenticatedPitlaneRoute,
   AuthenticatedPitwallRoute: AuthenticatedPitwallRoute,
   AuthenticatedPostDebriefRoute: AuthenticatedPostDebriefRoute,
   AuthenticatedRacemodeRoute: AuthenticatedRacemodeRoute,
@@ -1017,3 +1038,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
