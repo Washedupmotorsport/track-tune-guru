@@ -11,9 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { DISCIPLINES } from "@/lib/disciplines";
 import {
   Plus, Car, Trash2, Users, Share2, Timer, FileText, Trophy,
-  Radio, Flag, ClipboardList, ChevronRight, Disc, Wand2,
+  Radio, Flag, ClipboardList, ChevronRight, Disc, Wand2, Camera, Loader2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { ShareDialog } from "@/components/share-dialog";
 import { formatLapTime } from "@/lib/lap-time";
@@ -204,11 +204,12 @@ function EmptyState() {
 
 type CarRow = { id: string; name: string; discipline: string; make: string | null; model: string | null; year: number | null };
 function CarCard({ c, stat, fmtAgo, shared, onDelete }: {
-  c: CarRow; stat: { setups: number; sessions: number; lastOut: string | null; best: number | null };
+  c: CarRow & { photo_path?: string | null }; stat: { setups: number; sessions: number; lastOut: string | null; best: number | null };
   fmtAgo: (s: string | null) => string; shared?: boolean; onDelete?: () => void;
 }) {
   return (
     <div className={`group relative rounded-sm border border-border bg-card transition-colors ${shared ? "hover:border-accent" : "hover:border-primary"}`}>
+      <CarPhoto carId={c.id} photoPath={c.photo_path ?? null} editable={!shared} />
       <div className="flex items-center justify-between px-3 py-2 border-b border-border/60 bg-muted/20">
         <div className="flex items-center gap-2 min-w-0">
           <Car className={`w-4 h-4 shrink-0 ${shared ? "text-accent" : "text-primary"}`} />
