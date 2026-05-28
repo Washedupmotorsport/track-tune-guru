@@ -108,9 +108,9 @@
 
 .dark {
   /* MRE brand — pure black with racing red, matches key art. */
-  --background: oklch(0.13 0.004 250);   /* graphite black */
-  --foreground: oklch(0.97 0.004 250);
-  --card: oklch(0.16 0.005 250);         /* panel */
+  --background: oklch(0.10 0.004 250);   /* deeper graphite for sunlight contrast */
+  --foreground: oklch(0.99 0.004 250);
+  --card: oklch(0.17 0.005 250);         /* panel */
   --card-foreground: oklch(0.97 0.004 250);
   --popover: oklch(0.17 0.005 250);
   --popover-foreground: oklch(0.96 0.005 250);
@@ -119,13 +119,13 @@
   --secondary: oklch(0.19 0.006 250);
   --secondary-foreground: oklch(0.96 0.005 250);
   --muted: oklch(0.18 0.006 250);
-  --muted-foreground: oklch(0.72 0.012 250);
+  --muted-foreground: oklch(0.82 0.012 250);
   --accent: oklch(0.62 0.14 244);
   --accent-foreground: oklch(0.99 0.005 250);
   --destructive: oklch(0.62 0.22 27);
   --destructive-foreground: oklch(0.99 0.005 250);
-  --border: oklch(0.26 0.01 250);         /* sharper rule */
-  --input: oklch(0.20 0.008 250);
+  --border: oklch(0.34 0.01 250);         /* sharper rule for outdoor readability */
+  --input: oklch(0.30 0.008 250);
   --ring: oklch(0.62 0.248 26);
   --grid: oklch(0.30 0.008 250 / 0.18);  /* faint telemetry grid */
   --sidebar: oklch(0.11 0.004 250);
@@ -214,4 +214,10 @@
     border-left: 2px solid var(--primary);
   }
   .tabular-nums { font-variant-numeric: tabular-nums; }
+}
+
+@layer utilities {
+  /* Bottom-nav safe area for mobile pit-lane use */
+  .pb-safe-nav { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4.25rem); }
+  @media (min-width: 768px) { .pb-safe-nav { padding-bottom: 0; } }
 }
