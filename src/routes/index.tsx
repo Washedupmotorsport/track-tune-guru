@@ -67,9 +67,9 @@ function Landing() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/30 to-background" />
         <img src={heroCar} alt="Race car at night" width={1920} height={1080}
-          className="relative z-10 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background" />
-        <div className="relative mx-auto max-w-6xl px-4 pt-24 pb-32">
+          className="absolute inset-0 w-full h-full object-cover z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background z-20" />
+        <div className="relative z-30 mx-auto max-w-6xl px-4 pt-24 pb-32">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs font-mono uppercase tracking-widest text-muted-foreground">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" /> Pit-lane ready
           </div>
