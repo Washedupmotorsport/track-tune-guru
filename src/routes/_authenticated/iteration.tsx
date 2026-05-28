@@ -423,14 +423,13 @@ function ChangeCard({
 
   const recordOutcome = useMutation({
     mutationFn: async () => {
-      const payload: Record<string, unknown> = {
+      const { error } = await supabase.from("setup_changes").update({
         outcome_status: status,
         outcome_notes: notes.trim() || null,
         lap_delta_ms: lapDelta === "" ? null : Math.round(parseFloat(lapDelta) * 1000),
         confidence_delta: confDelta === "" ? null : parseInt(confDelta, 10),
         measured_at: new Date().toISOString(),
-      };
-      const { error } = await supabase.from("setup_changes").update(payload).eq("id", row.id);
+      }).eq("id", row.id);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Outcome recorded"); setOpen(false); onUpdated(); },
