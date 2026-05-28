@@ -16,6 +16,7 @@ import { useUnits, CURRENCIES, type CurrencyCode } from "@/lib/units";
 import { useTheme } from "@/lib/theme";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import logoMre from "@/assets/logo-mre.png";
+import { ConnectionStatus } from "@/lib/offline";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
@@ -31,6 +32,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <img src={logoMre} alt="My Race Engineer" className="h-7 w-auto" />
           </Link>
           <div className="flex items-center gap-3">
+            <ConnectionStatus />
             <button
               onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
               className="hidden md:inline-flex items-center gap-2 rounded-md border border-border bg-muted/30 px-3 py-1.5 text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40"
