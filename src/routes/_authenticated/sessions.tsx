@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Timer, Plus, ArrowLeft, ChevronRight, Trophy, Cloud, Thermometer, Droplet } from "lucide-react";
+import { Timer, Plus, ArrowLeft, ChevronRight, Cloud, Thermometer, Droplet } from "lucide-react";
 import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
 
@@ -240,5 +240,3 @@ function Cell({ label, value, accent, icon }: { label: string; value: string; ac
     </div>
   );
 }
-
-const _Trophy = Trophy; // keep import
