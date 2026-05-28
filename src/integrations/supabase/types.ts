@@ -778,6 +778,63 @@ export type Database = {
         }
         Relationships: []
       }
+      session_debriefs: {
+        Row: {
+          ai_summary: Json | null
+          balance_issue: string | null
+          car_id: string
+          confidence_issue: string | null
+          created_at: string
+          id: string
+          improved: string | null
+          needs_work: string | null
+          notes: string | null
+          session_id: string | null
+          setup_id: string | null
+          suggested_changes: string | null
+          tyre_issue: string | null
+          updated_at: string
+          user_id: string
+          worsened: string | null
+        }
+        Insert: {
+          ai_summary?: Json | null
+          balance_issue?: string | null
+          car_id: string
+          confidence_issue?: string | null
+          created_at?: string
+          id?: string
+          improved?: string | null
+          needs_work?: string | null
+          notes?: string | null
+          session_id?: string | null
+          setup_id?: string | null
+          suggested_changes?: string | null
+          tyre_issue?: string | null
+          updated_at?: string
+          user_id: string
+          worsened?: string | null
+        }
+        Update: {
+          ai_summary?: Json | null
+          balance_issue?: string | null
+          car_id?: string
+          confidence_issue?: string | null
+          created_at?: string
+          id?: string
+          improved?: string | null
+          needs_work?: string | null
+          notes?: string | null
+          session_id?: string | null
+          setup_id?: string | null
+          suggested_changes?: string | null
+          tyre_issue?: string | null
+          updated_at?: string
+          user_id?: string
+          worsened?: string | null
+        }
+        Relationships: []
+      }
       session_shares: {
         Row: {
           car_id: string
