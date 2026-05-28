@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Disc, Download, Gauge, Thermometer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUnits } from "@/lib/units";
+import { Stepper } from "@/components/stepper";
 import jsPDF from "jspdf";
 
 export const Route = createFileRoute("/_authenticated/tyre-setup")({
@@ -181,13 +182,13 @@ function TyreSetupPage() {
           </div>
           <div>
             <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-              Current cold pressures ({pressureUnit}) — optional
+              Current cold pressures ({pressureUnit}) — tap ± to adjust
             </Label>
-            <div className="grid grid-cols-4 gap-2 mt-1">
+            <div className="grid grid-cols-2 gap-2 mt-2">
               {(["fl","fr","rl","rr"] as const).map((k) => (
-                <Input key={k} className="font-mono text-center" placeholder={k.toUpperCase()}
-                  type="number" step="any" value={currentCold[k]}
-                  onChange={(e) => setCurrentCold({ ...currentCold, [k]: e.target.value })} />
+                <Stepper key={k} label={k.toUpperCase()} unit={pressureUnit}
+                  value={currentCold[k]} step={0.1} min={10} max={45} precision={1}
+                  onChange={(v) => setCurrentCold({ ...currentCold, [k]: v })} />
               ))}
             </div>
           </div>
@@ -319,13 +320,13 @@ function StintProjector({ base }: { base: { hotMin: number; hotMax: number; labe
 
       <div className="mt-4">
         <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-          Cold-set pressures ({pressureUnit})
+          Cold-set pressures ({pressureUnit}) — tap ± to adjust
         </Label>
-        <div className="grid grid-cols-4 gap-2 mt-1">
+        <div className="grid grid-cols-2 gap-2 mt-2">
           {(["fl","fr","rl","rr"] as const).map((k) => (
-            <Input key={k} placeholder={k.toUpperCase()} type="number" step="any"
-              value={cold[k]} onChange={(e) => setCold({ ...cold, [k]: e.target.value })}
-              className="font-mono text-center" />
+            <Stepper key={k} label={k.toUpperCase()} unit={pressureUnit}
+              value={cold[k]} step={0.1} min={10} max={45} precision={1}
+              onChange={(v) => setCold({ ...cold, [k]: v })} />
           ))}
         </div>
       </div>

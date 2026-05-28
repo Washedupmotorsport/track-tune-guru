@@ -1,54 +1,73 @@
-## Pit-Lane Optimization Plan
+## Race-weekend mode: pit-lane optimization pass
 
-Focused, high-impact pass — no new features, just making the existing screens usable while standing next to the car in direct sun with gloves on.
+A focused refactor across the high-traffic screens so they survive sun, gloves, and 5 minutes between sessions. No new features — just radically faster paths to the actions an engineer actually performs in the pit lane.
 
-### 1. Global controls — sunlight + glove friendly
-- Buttons: bump default `h-9` → `h-11`, `sm` → `h-9`, `lg` → `h-12`; min width `min-w-11`; bolder font weight; stronger active/pressed state.
-- Inputs / Select / Textarea: `h-9` → `h-11`, `text-sm` → `text-base`, thicker `border` (1.5px), focus ring `ring-2` red.
-- Slider: thumb 3.5 → 5; track 1 → 2; add visible tick marks.
-- Switch / Checkbox: enlarge ~30%.
-- Contrast: lift `--foreground` and `--muted-foreground` luminance; darken `--background` slightly; raise border contrast for outdoor readability.
-- Numerics everywhere: `tabular-nums` + telemetry-value class on key values (pressures, temps, lap times).
+### Principles applied everywhere
+- **Thumb-zone first**: primary actions sit in a sticky bottom bar on mobile, never behind a menu.
+- **Steppers over keyboards**: numeric edits use big −/+ buttons (h-12) with auto-save. No "Save" button to hunt for.
+- **Big type, tabular numerics**: pressures/temps/lap times in mono tabular figures at ≥18px.
+- **Sunlight contrast**: lift foreground luminance, thicker borders (1.5px), ring-2 focus.
+- **1 tap = 1 decision**: collapse multi-step flows (compare, log lap, log complaint) into single sticky actions.
 
-### 2. Tyre pressure quick-edit (highest priority pit task)
-- On `tyre-setup` and `setup-console`, replace number inputs with **stepper controls**: big `−` / `+` buttons (h-12, w-12) flanking a large value display, configurable step (0.1 / 0.5 psi). One tap = one adjustment.
-- Auto-save on change (debounced 400ms), no Save button needed.
-- Per-corner color status (cold/optimal/hot) visible at a glance.
+### 1. Global controls
+- Buttons default `h-11`, lg `h-12`, sm `h-9`; bolder font, stronger pressed state. *(already done — keep)*
+- Inputs/Select/Textarea → `h-11`, `text-base`, border 1.5px, `ring-2` red focus.
+- Slider thumb 5, track 2, visible ticks.
+- Switch/Checkbox +30% size.
+- Token tweak in `src/styles.css`: lift `--foreground` / `--muted-foreground`, raise `--border` contrast, add `.telemetry-value` utility (`font-mono tabular-nums tracking-tight`).
 
-### 3. Suspension / setup adjust
-- Same stepper pattern for camber, toe, ride height, spring rate, ARB, brake bias.
-- Add a sticky bottom action bar on mobile setup screen: `[Save] [Duplicate] [Compare]` — h-12, full-width split, always reachable with thumb.
+### 2. Mobile shell → bottom tab bar
+`src/components/app-shell.tsx`: on <768px replace the hamburger/sheet with a 5-slot bottom tab bar — **Sessions · Setups · Tyres · Garage · More**. Always visible, thumb-reachable, 56px tall, safe-area padding. Desktop layout unchanged.
 
-### 4. Driver feedback — 1-tap logging
-- In `setup-console` feedback section: make complaint buttons full-width on mobile, h-14, large icon + label, toggle state with haptic-style press feedback.
-- Add a floating "Quick Log" FAB on sessions/setup screens (mobile only) → opens a bottom-sheet with the 6 complaint chips + a voice-note button.
+### 3. Tyre logging — the #1 pit task
+`src/routes/_authenticated/tyre-setup.tsx` + `tyre-wear.tsx` + `tires.tsx` "New log" dialog:
+- Replace 4 number inputs per row with a **2×2 corner grid of steppers** (FL/FR/RL/RR), each cell h-20: large value, −/+ on either side, step 0.5 psi (long-press for 0.1).
+- Per-corner color status (cold/optimal/hot) baked into the cell.
+- Auto-save on change (400ms debounce). No Save button on mobile.
+- Compound + heat cycles promoted to chip selectors at the top.
 
-### 5. Sessions — fast logging
-- Sessions list: bigger row height (h-16), large lap-time as primary, secondary meta muted.
-- "New lap" / "End session" actions promoted to sticky bottom bar.
+### 4. Setup console — fast tweaks
+`src/components/setup-console.tsx`:
+- Camber, toe, ride height, spring rate, ARB, brake bias all switch to the stepper pattern.
+- Sticky bottom action bar on mobile: `[Save] [Duplicate] [Compare]` — h-12, full-width split.
+- Driver-feedback complaint chips: full-width, h-14, large icon + label, toggle with visible pressed state.
 
-### 6. Setup compare — fewer taps
-- On `/setups` list: add a checkbox per row + sticky "Compare (N)" bar → jumps straight to compare view. Removes the current nested flow.
+### 5. Quick-Log FAB (mobile only)
+Floating action button on Sessions / Setup / Tyres screens → bottom sheet with: 6 complaint chips, voice note button, quick lap-time entry. One tap to open, one tap to log.
 
-### 7. Navigation — flatten
-- App shell: convert mobile nav from hamburger/sheet to a **bottom tab bar** (5 primary: Sessions, Setups, Tyres, Garage, More) — thumb-reachable, always visible.
-- Desktop layout unchanged.
+### 6. Sessions
+`src/routes/_authenticated/sessions.tsx` + `sessions.$sessionId.tsx`:
+- Row height h-16, lap-time as primary mono numeral, secondary meta muted.
+- Sticky bottom bar with `[+ Lap] [End session]`.
 
-### 8. Density tuning for mobile
-- On screens <768px: reduce horizontal padding to `px-3`, but **increase vertical rhythm** on interactive rows to keep tap targets ≥44px.
-- Hide non-essential secondary metadata behind a "Details" toggle on small viewports.
+### 7. Setups compare — fewer taps
+`src/routes/_authenticated/setups.$setupId.tsx` list view:
+- Checkbox per row → sticky "Compare (N)" bar at bottom → jump straight to compare. Removes the current nested flow.
+
+### 8. Mobile density
+- `px-3` horizontal, but row vertical ≥44px tap target.
+- Hide secondary metadata behind "Details" toggle on <768px.
 
 ### Files to touch
-- `src/components/ui/{button,input,select,textarea,slider,switch,checkbox}.tsx` — sizing
-- `src/styles.css` — contrast tokens, stepper utility class
-- `src/components/app-shell.tsx` — bottom tab bar on mobile
-- `src/components/setup-console.tsx` — steppers + sticky action bar + feedback FAB
-- `src/components/stepper.tsx` — NEW reusable big-touch stepper
-- `src/routes/_authenticated/{setups,tyre-setup,tyre-wear,sessions,sessions.$sessionId}.tsx` — apply steppers, sticky bars, compare checkboxes
+```
+src/components/ui/{input,select,textarea,slider,switch,checkbox}.tsx   — sizing
+src/styles.css                                                          — contrast + .telemetry-value
+src/components/app-shell.tsx                                            — bottom tab bar (mobile)
+src/components/stepper.tsx                                              — extend: long-press, cell variant
+src/components/setup-console.tsx                                        — steppers + sticky bar + chip feedback
+src/components/quick-log-fab.tsx                                        — NEW
+src/components/tyre-corner-grid.tsx                                     — NEW (2×2 stepper grid)
+src/routes/_authenticated/tyre-setup.tsx                                — corner grid + auto-save
+src/routes/_authenticated/tyre-wear.tsx                                 — corner grid
+src/routes/_authenticated/tires.tsx                                     — corner grid in dialog
+src/routes/_authenticated/sessions.tsx                                  — row sizing + sticky bar
+src/routes/_authenticated/sessions.$sessionId.tsx                       — sticky [+ Lap] [End]
+src/routes/_authenticated/setups.$setupId.tsx                           — compare checkboxes
+```
 
 ### Out of scope
-- No new data models or backend changes
-- No new pages
-- Keep desktop layouts unchanged except where they naturally benefit (larger numbers, contrast)
+- No schema changes, no new tables.
+- No new pages or routes.
+- Desktop layouts unchanged except where they naturally inherit (bigger numbers, better contrast).
 
 Approve and I'll ship it in one pass.

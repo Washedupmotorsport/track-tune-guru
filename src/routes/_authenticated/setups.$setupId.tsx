@@ -169,6 +169,28 @@ function SetupDetail() {
         />
       </div>
 
+      {writable && (
+        <>
+          {/* Mobile sticky save bar — sits above the bottom tab bar */}
+          <div
+            className="md:hidden fixed inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-md px-3 py-2"
+            style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 64px)" }}
+          >
+            <Button
+              size="lg"
+              onClick={() => save.mutate()}
+              disabled={save.isPending}
+              className="w-full h-12 shadow-glow font-display uppercase tracking-widest"
+            >
+              {save.isPending
+                ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Saving…</>
+                : <><Save className="w-5 h-5 mr-2" /> Save setup</>}
+            </Button>
+          </div>
+          <div className="md:hidden h-16" aria-hidden />
+        </>
+      )}
+
       <div className="mt-6 grid md:grid-cols-3 gap-4 rounded-lg border border-border bg-card p-5">
         <div><Label>Track</Label><Input readOnly={!writable} value={meta.track} onChange={(e) => setMeta({ ...meta, track: e.target.value })} /></div>
         <div><Label>Conditions</Label><Input readOnly={!writable} value={meta.conditions} onChange={(e) => setMeta({ ...meta, conditions: e.target.value })} /></div>
