@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { CalendarDays, Plus, ArrowLeft, Trash2, Clock } from "lucide-react";
+import { CalendarDays, Plus, ArrowLeft, Trash2, Clock, Flag } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/calendar")({ component: CalendarPage });
@@ -155,6 +155,12 @@ function CalendarPage() {
                 </div>
               </div>
               <button onClick={() => { if (confirm("Delete?")) del.mutate(e.id); }} className="text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></button>
+              {(e.event_type === "race" || e.event_type === "test") && (
+                <Link to="/weekends/$eventId" params={{ eventId: e.id }}
+                  className="ml-2 inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-[0.15em] text-primary hover:underline">
+                  <Flag className="w-3 h-3" /> Weekend
+                </Link>
+              )}
             </div>
           );
         })}
