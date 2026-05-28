@@ -36,6 +36,7 @@ type ChangeRow = {
   changes: Record<string, { from: string | number | null; to: string | number | null }>;
   outcome_status: "pending" | "confirmed" | "partial" | "rejected";
   outcome_notes: string | null;
+  driver_response: string | null;
   lap_delta_ms: number | null;
   confidence_delta: number | null;
   measured_at: string | null;
@@ -419,6 +420,7 @@ function ChangeCard({
   const [lapDelta, setLapDelta] = useState<string>(row.lap_delta_ms != null ? String(row.lap_delta_ms / 1000) : "");
   const [confDelta, setConfDelta] = useState<string>(row.confidence_delta != null ? String(row.confidence_delta) : "");
   const [notes, setNotes] = useState<string>(row.outcome_notes ?? "");
+  const [driverResponse, setDriverResponse] = useState<string>(row.driver_response ?? "");
   const [status, setStatus] = useState<ChangeRow["outcome_status"]>(row.outcome_status);
 
   const recordOutcome = useMutation({
@@ -426,6 +428,7 @@ function ChangeCard({
       const { error } = await supabase.from("setup_changes").update({
         outcome_status: status,
         outcome_notes: notes.trim() || null,
+        driver_response: driverResponse.trim() || null,
         lap_delta_ms: lapDelta === "" ? null : Math.round(parseFloat(lapDelta) * 1000),
         confidence_delta: confDelta === "" ? null : parseInt(confDelta, 10),
         measured_at: new Date().toISOString(),
@@ -504,6 +507,15 @@ function ChangeCard({
         </div>
       )}
 
+      {row.driver_response && (
+        <div className="px-4 pb-3">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1">Driver response</div>
+          <blockquote className="border-l-2 border-primary/50 pl-3 text-sm italic text-foreground/90 whitespace-pre-wrap">
+            “{row.driver_response}”
+          </blockquote>
+        </div>
+      )}
+
       <div className="px-4 py-2 border-t border-border/60 bg-muted/20 flex items-center justify-between gap-2">
         <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => setOpen((v) => !v)}>
           {open ? "Close" : row.outcome_status === "pending" ? "Record outcome" : "Update outcome"}
@@ -552,6 +564,15 @@ function ChangeCard({
               rows={2}
               placeholder="Rear platform calmer over kerbs, no loss mid-corner. Kept the change."
               className="mt-1"
+            />
+          </div>
+          <div>
+            <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Driver response</Label>
+            <Textarea
+              value={driverResponse} onChange={(e) => setDriverResponse(e.target.value)}
+              rows={2}
+              placeholder="“Much better drive out of T7, but a touch nervous under braking into T9.”"
+              className="mt-1 italic"
             />
           </div>
           <Button size="sm" onClick={() => recordOutcome.mutate()} disabled={recordOutcome.isPending}>

@@ -878,6 +878,7 @@ export type Database = {
           changes: Json
           confidence_delta: number | null
           created_at: string
+          driver_response: string | null
           expected_effect: string | null
           id: string
           lap_delta_ms: number | null
@@ -898,6 +899,7 @@ export type Database = {
           changes?: Json
           confidence_delta?: number | null
           created_at?: string
+          driver_response?: string | null
           expected_effect?: string | null
           id?: string
           lap_delta_ms?: number | null
@@ -918,6 +920,7 @@ export type Database = {
           changes?: Json
           confidence_delta?: number | null
           created_at?: string
+          driver_response?: string | null
           expected_effect?: string | null
           id?: string
           lap_delta_ms?: number | null
