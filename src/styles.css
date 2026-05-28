@@ -221,3 +221,37 @@
   .pb-safe-nav { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4.25rem); }
   @media (min-width: 768px) { .pb-safe-nav { padding-bottom: 0; } }
 }
+
+/* ===== Print / engineering document export ===== */
+@media print {
+  @page { size: A4; margin: 12mm 12mm 14mm 12mm; }
+  html, body {
+    background: #ffffff !important;
+    color: #0a0a0a !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .no-print, .no-print * { display: none !important; }
+  .print-only { display: block !important; }
+  .print-sheet {
+    background: #ffffff !important;
+    color: #0a0a0a !important;
+    box-shadow: none !important;
+    border: none !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .print-sheet * {
+    color: #0a0a0a !important;
+    border-color: #c8c8c8 !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+  .print-sheet .print-accent { background-color: #0a0a0a !important; color: #ffffff !important; }
+  .print-sheet .print-zebra > tr:nth-child(even) td,
+  .print-sheet .print-zebra > tbody > tr:nth-child(even) td { background-color: #f3f3f3 !important; }
+  .print-page-break { break-after: page; page-break-after: always; }
+  .avoid-break { break-inside: avoid; page-break-inside: avoid; }
+}
+.print-only { display: none; }
