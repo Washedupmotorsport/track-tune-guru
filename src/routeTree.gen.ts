@@ -27,6 +27,7 @@ import { Route as AuthenticatedInventoryRouteImport } from './routes/_authentica
 import { Route as AuthenticatedGarageRouteImport } from './routes/_authenticated/garage'
 import { Route as AuthenticatedFlagsRouteImport } from './routes/_authenticated/flags'
 import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated/expenses'
+import { Route as AuthenticatedDebriefRouteImport } from './routes/_authenticated/debrief'
 import { Route as AuthenticatedDamageRouteImport } from './routes/_authenticated/damage'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
 import { Route as AuthenticatedCalculatorsRouteImport } from './routes/_authenticated/calculators'
@@ -130,6 +131,11 @@ const AuthenticatedExpensesRoute = AuthenticatedExpensesRouteImport.update({
   path: '/expenses',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedDebriefRoute = AuthenticatedDebriefRouteImport.update({
+  id: '/debrief',
+  path: '/debrief',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDamageRoute = AuthenticatedDamageRouteImport.update({
   id: '/damage',
   path: '/damage',
@@ -200,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/calculators': typeof AuthenticatedCalculatorsRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/damage': typeof AuthenticatedDamageRoute
+  '/debrief': typeof AuthenticatedDebriefRoute
   '/expenses': typeof AuthenticatedExpensesRoute
   '/flags': typeof AuthenticatedFlagsRoute
   '/garage': typeof AuthenticatedGarageRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/calculators': typeof AuthenticatedCalculatorsRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/damage': typeof AuthenticatedDamageRoute
+  '/debrief': typeof AuthenticatedDebriefRoute
   '/expenses': typeof AuthenticatedExpensesRoute
   '/flags': typeof AuthenticatedFlagsRoute
   '/garage': typeof AuthenticatedGarageRoute
@@ -262,6 +270,7 @@ export interface FileRoutesById {
   '/_authenticated/calculators': typeof AuthenticatedCalculatorsRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/damage': typeof AuthenticatedDamageRoute
+  '/_authenticated/debrief': typeof AuthenticatedDebriefRoute
   '/_authenticated/expenses': typeof AuthenticatedExpensesRoute
   '/_authenticated/flags': typeof AuthenticatedFlagsRoute
   '/_authenticated/garage': typeof AuthenticatedGarageRoute
@@ -294,6 +303,7 @@ export interface FileRouteTypes {
     | '/calculators'
     | '/calendar'
     | '/damage'
+    | '/debrief'
     | '/expenses'
     | '/flags'
     | '/garage'
@@ -324,6 +334,7 @@ export interface FileRouteTypes {
     | '/calculators'
     | '/calendar'
     | '/damage'
+    | '/debrief'
     | '/expenses'
     | '/flags'
     | '/garage'
@@ -355,6 +366,7 @@ export interface FileRouteTypes {
     | '/_authenticated/calculators'
     | '/_authenticated/calendar'
     | '/_authenticated/damage'
+    | '/_authenticated/debrief'
     | '/_authenticated/expenses'
     | '/_authenticated/flags'
     | '/_authenticated/garage'
@@ -513,6 +525,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedExpensesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/debrief': {
+      id: '/_authenticated/debrief'
+      path: '/debrief'
+      fullPath: '/debrief'
+      preLoaderRoute: typeof AuthenticatedDebriefRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/damage': {
       id: '/_authenticated/damage'
       path: '/damage'
@@ -641,6 +660,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCalculatorsRoute: typeof AuthenticatedCalculatorsRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedDamageRoute: typeof AuthenticatedDamageRoute
+  AuthenticatedDebriefRoute: typeof AuthenticatedDebriefRoute
   AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRoute
   AuthenticatedFlagsRoute: typeof AuthenticatedFlagsRoute
   AuthenticatedGarageRoute: typeof AuthenticatedGarageRoute
@@ -665,6 +685,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCalculatorsRoute: AuthenticatedCalculatorsRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedDamageRoute: AuthenticatedDamageRoute,
+  AuthenticatedDebriefRoute: AuthenticatedDebriefRoute,
   AuthenticatedExpensesRoute: AuthenticatedExpensesRoute,
   AuthenticatedFlagsRoute: AuthenticatedFlagsRoute,
   AuthenticatedGarageRoute: AuthenticatedGarageRoute,

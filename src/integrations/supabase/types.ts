@@ -247,6 +247,66 @@ export type Database = {
         }
         Relationships: []
       }
+      driver_feedback: {
+        Row: {
+          balance: string | null
+          car_id: string
+          category: string
+          confidence: number | null
+          corner: string | null
+          created_at: string
+          description: string
+          id: string
+          phase: string | null
+          recommendation: string | null
+          recorded_at: string
+          session_id: string | null
+          setup_id: string | null
+          severity: string
+          tags: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: string | null
+          car_id: string
+          category?: string
+          confidence?: number | null
+          corner?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          phase?: string | null
+          recommendation?: string | null
+          recorded_at?: string
+          session_id?: string | null
+          setup_id?: string | null
+          severity?: string
+          tags?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: string | null
+          car_id?: string
+          category?: string
+          confidence?: number | null
+          corner?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          phase?: string | null
+          recommendation?: string | null
+          recorded_at?: string
+          session_id?: string | null
+          setup_id?: string | null
+          severity?: string
+          tags?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       driver_notes: {
         Row: {
           body: string | null
