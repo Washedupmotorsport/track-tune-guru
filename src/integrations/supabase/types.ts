@@ -808,6 +808,69 @@ export type Database = {
         }
         Relationships: []
       }
+      setup_changes: {
+        Row: {
+          area: string
+          car_id: string
+          changes: Json
+          confidence_delta: number | null
+          created_at: string
+          expected_effect: string | null
+          id: string
+          lap_delta_ms: number | null
+          measured_at: string | null
+          outcome_notes: string | null
+          outcome_status: string
+          parent_setup_id: string | null
+          reason: string | null
+          session_id: string | null
+          setup_id: string
+          summary: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          area?: string
+          car_id: string
+          changes?: Json
+          confidence_delta?: number | null
+          created_at?: string
+          expected_effect?: string | null
+          id?: string
+          lap_delta_ms?: number | null
+          measured_at?: string | null
+          outcome_notes?: string | null
+          outcome_status?: string
+          parent_setup_id?: string | null
+          reason?: string | null
+          session_id?: string | null
+          setup_id: string
+          summary: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          area?: string
+          car_id?: string
+          changes?: Json
+          confidence_delta?: number | null
+          created_at?: string
+          expected_effect?: string | null
+          id?: string
+          lap_delta_ms?: number | null
+          measured_at?: string | null
+          outcome_notes?: string | null
+          outcome_status?: string
+          parent_setup_id?: string | null
+          reason?: string | null
+          session_id?: string | null
+          setup_id?: string
+          summary?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       setups: {
         Row: {
           car_id: string

@@ -6,7 +6,7 @@ import {
   Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon, Gauge, TrendingDown, GitCompare,
   Home, Flag, AlertTriangle, HardHat, Radio,
   ClipboardList, FileText,
-  MapPin, CloudRain, ShieldAlert, BookOpen,
+  MapPin, CloudRain, ShieldAlert, BookOpen, GitBranch,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
@@ -141,7 +141,7 @@ function MobileTabBar() {
   const items = [
     { to: "/garage",     label: "Garage",    icon: Home,    matches: ["/garage", "/cars", "/calendar", "/weekends"] },
     { to: "/pitwall",    label: "Trackside", icon: Radio,   matches: ["/pitwall", "/racemode", "/sessions", "/track-evolution", "/debrief", "/flags", "/timeline"] },
-    { to: "/setups",     label: "Setup",     icon: Wand2,   matches: ["/setups", "/baseline", "/philosophies", "/corners", "/confidence", "/sympathy", "/notes"] },
+   { to: "/setups",     label: "Setup",     icon: Wand2,   matches: ["/setups", "/baseline", "/iteration", "/philosophies", "/corners", "/confidence", "/sympathy", "/notes"] },
     { to: "/tyre-setup", label: "Tyres",     icon: Disc,    matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
     { to: "/workshop",   label: "Workshop",  icon: HardHat, matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
   ] as const;
@@ -183,7 +183,7 @@ function MobileTabBar() {
 const WORKSPACES = [
   { key: "garage",    label: "Garage",    icon: Home,    to: "/garage",     matches: ["/garage", "/cars", "/calendar", "/weekends"] },
   { key: "trackside", label: "Trackside", icon: Radio,   to: "/pitwall",    matches: ["/pitwall", "/racemode", "/sessions", "/track-evolution", "/debrief", "/flags", "/timeline"] },
-  { key: "setup",     label: "Setup",     icon: Wand2,   to: "/setups",     matches: ["/setups", "/baseline", "/philosophies", "/corners", "/confidence", "/sympathy", "/notes"] },
+  { key: "setup",     label: "Setup",     icon: Wand2,   to: "/setups",     matches: ["/setups", "/baseline", "/iteration", "/philosophies", "/corners", "/confidence", "/sympathy", "/notes"] },
   { key: "tyres",     label: "Tyres",     icon: Disc,    to: "/tyre-setup", matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
   { key: "workshop",  label: "Workshop",  icon: HardHat, to: "/workshop",   matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
 ] as const;
@@ -213,6 +213,7 @@ const ALL_NAV_GROUPS = [
     label: "Setup",
     items: [
       { to: "/baseline",     label: "Baseline",            icon: Wand2 },
+      { to: "/iteration",    label: "Setup iteration",     icon: GitBranch },
       { to: "/philosophies", label: "Setup philosophies",  icon: BookOpen },
       { to: "/corners",      label: "Corner analysis",     icon: MapPin },
       { to: "/confidence",   label: "Driver confidence",   icon: Gauge },
