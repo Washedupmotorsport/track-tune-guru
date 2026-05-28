@@ -22,6 +22,7 @@ import { Route as AuthenticatedTrackEvolutionRouteImport } from './routes/_authe
 import { Route as AuthenticatedTiresRouteImport } from './routes/_authenticated/tires'
 import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticated/timeline'
 import { Route as AuthenticatedSympathyRouteImport } from './routes/_authenticated/sympathy'
+import { Route as AuthenticatedSetupLibraryRouteImport } from './routes/_authenticated/setup-library'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedRacemodeRouteImport } from './routes/_authenticated/racemode'
@@ -118,6 +119,12 @@ const AuthenticatedSympathyRoute = AuthenticatedSympathyRouteImport.update({
   path: '/sympathy',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSetupLibraryRoute =
+  AuthenticatedSetupLibraryRouteImport.update({
+    id: '/setup-library',
+    path: '/setup-library',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
   id: '/sessions',
   path: '/sessions',
@@ -299,6 +306,7 @@ export interface FileRoutesByFullPath {
   '/racemode': typeof AuthenticatedRacemodeRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
+  '/setup-library': typeof AuthenticatedSetupLibraryRoute
   '/sympathy': typeof AuthenticatedSympathyRoute
   '/timeline': typeof AuthenticatedTimelineRoute
   '/tires': typeof AuthenticatedTiresRoute
@@ -342,6 +350,7 @@ export interface FileRoutesByTo {
   '/racemode': typeof AuthenticatedRacemodeRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
+  '/setup-library': typeof AuthenticatedSetupLibraryRoute
   '/sympathy': typeof AuthenticatedSympathyRoute
   '/timeline': typeof AuthenticatedTimelineRoute
   '/tires': typeof AuthenticatedTiresRoute
@@ -387,6 +396,7 @@ export interface FileRoutesById {
   '/_authenticated/racemode': typeof AuthenticatedRacemodeRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRouteWithChildren
+  '/_authenticated/setup-library': typeof AuthenticatedSetupLibraryRoute
   '/_authenticated/sympathy': typeof AuthenticatedSympathyRoute
   '/_authenticated/timeline': typeof AuthenticatedTimelineRoute
   '/_authenticated/tires': typeof AuthenticatedTiresRoute
@@ -432,6 +442,7 @@ export interface FileRouteTypes {
     | '/racemode'
     | '/reports'
     | '/sessions'
+    | '/setup-library'
     | '/sympathy'
     | '/timeline'
     | '/tires'
@@ -475,6 +486,7 @@ export interface FileRouteTypes {
     | '/racemode'
     | '/reports'
     | '/sessions'
+    | '/setup-library'
     | '/sympathy'
     | '/timeline'
     | '/tires'
@@ -519,6 +531,7 @@ export interface FileRouteTypes {
     | '/_authenticated/racemode'
     | '/_authenticated/reports'
     | '/_authenticated/sessions'
+    | '/_authenticated/setup-library'
     | '/_authenticated/sympathy'
     | '/_authenticated/timeline'
     | '/_authenticated/tires'
@@ -635,6 +648,13 @@ declare module '@tanstack/react-router' {
       path: '/sympathy'
       fullPath: '/sympathy'
       preLoaderRoute: typeof AuthenticatedSympathyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/setup-library': {
+      id: '/_authenticated/setup-library'
+      path: '/setup-library'
+      fullPath: '/setup-library'
+      preLoaderRoute: typeof AuthenticatedSetupLibraryRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/sessions': {
@@ -909,6 +929,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedRacemodeRoute: typeof AuthenticatedRacemodeRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRouteWithChildren
+  AuthenticatedSetupLibraryRoute: typeof AuthenticatedSetupLibraryRoute
   AuthenticatedSympathyRoute: typeof AuthenticatedSympathyRoute
   AuthenticatedTimelineRoute: typeof AuthenticatedTimelineRoute
   AuthenticatedTiresRoute: typeof AuthenticatedTiresRoute
@@ -946,6 +967,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedRacemodeRoute: AuthenticatedRacemodeRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRouteWithChildren,
+  AuthenticatedSetupLibraryRoute: AuthenticatedSetupLibraryRoute,
   AuthenticatedSympathyRoute: AuthenticatedSympathyRoute,
   AuthenticatedTimelineRoute: AuthenticatedTimelineRoute,
   AuthenticatedTiresRoute: AuthenticatedTiresRoute,

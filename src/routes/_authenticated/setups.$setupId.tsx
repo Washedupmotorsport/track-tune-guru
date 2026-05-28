@@ -17,6 +17,10 @@ import { exportSetupPdf } from "@/lib/setup-pdf";
 import { useCarAccess, canEdit } from "@/lib/use-car-access";
 import { LapImportDialog } from "@/components/lap-import-dialog";
 import { SetupConsole } from "@/components/setup-console";
+import { PRESET_TYPES, presetMeta } from "./setup-library";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { BookMarked } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/setups/$setupId")({
   component: SetupDetail,
@@ -26,6 +30,7 @@ type SetupRow = {
   id: string; name: string; track: string | null; conditions: string | null;
   notes: string | null; discipline: string; car_id: string; updated_at: string;
   setup_data: Record<string, string | number | null>;
+  preset_type?: string; ideal_conditions?: string | null; is_baseline?: boolean;
 };
 
 function SetupDetail() {
@@ -75,6 +80,9 @@ function SetupDetail() {
 
   const [meta, setMeta] = useState({ name: "", track: "", conditions: "", notes: "" });
   const [data, setData] = useState<Record<string, string>>({});
+  const [library, setLibrary] = useState<{ preset_type: string; ideal_conditions: string; is_baseline: boolean }>({
+    preset_type: "none", ideal_conditions: "", is_baseline: false,
+  });
 
   useEffect(() => {
     if (setupQ.data) {
@@ -89,6 +97,11 @@ function SetupDetail() {
         initial[k] = v == null ? "" : String(v);
       });
       setData(initial);
+      setLibrary({
+        preset_type: setupQ.data.preset_type ?? "none",
+        ideal_conditions: setupQ.data.ideal_conditions ?? "",
+        is_baseline: !!setupQ.data.is_baseline,
+      });
     }
   }, [setupQ.data]);
 
@@ -100,6 +113,9 @@ function SetupDetail() {
         conditions: meta.conditions || null,
         notes: meta.notes || null,
         setup_data: data,
+        preset_type: library.preset_type,
+        ideal_conditions: library.ideal_conditions || null,
+        is_baseline: library.is_baseline,
       }).eq("id", setupId);
       if (error) throw error;
     },
