@@ -97,6 +97,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-widest text-primary">Trackside</DropdownMenuLabel>
                 <DropdownMenuItem asChild><Link to="/pitwall"><Radio className="w-4 h-4 mr-2" /> Pit wall</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/racemode"><Flag className="w-4 h-4 mr-2" /> Race mode</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/track-evolution"><CloudRain className="w-4 h-4 mr-2" /> Track evolution</Link></DropdownMenuItem>
                  <DropdownMenuItem asChild><Link to="/weekends"><Flag className="w-4 h-4 mr-2" /> Race weekends</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/timeline"><ClipboardList className="w-4 h-4 mr-2" /> Weekend timeline</Link></DropdownMenuItem>
