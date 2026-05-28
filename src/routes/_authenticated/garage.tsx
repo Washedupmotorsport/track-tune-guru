@@ -408,8 +408,8 @@ function RailAction({
     : "border-border bg-card/60 hover:border-primary/40 hover:text-primary";
   return (
     <Link
-      // @ts-expect-error — runtime-safe dynamic to/params (rail covers static + param routes)
-      to={to} params={params}
+      to={to as never}
+      params={params as never}
       className={`group min-h-[64px] rounded-md border ${cls} px-3 py-2 flex items-center gap-3 transition-colors`}
     >
       <Icon className="w-5 h-5 shrink-0" />
