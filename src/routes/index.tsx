@@ -67,7 +67,7 @@ function Landing() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/30 to-background" />
         <img src={heroCar} alt="Race car at night" width={1920} height={1080}
-          className="absolute inset-0 w-full h-full object-cover opacity-90 mix-blend-screen" />
+          className="relative z-10 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background" />
         <div className="relative mx-auto max-w-6xl px-4 pt-24 pb-32">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs font-mono uppercase tracking-widest text-muted-foreground">
