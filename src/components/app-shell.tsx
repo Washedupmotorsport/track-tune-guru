@@ -6,7 +6,7 @@ import {
   Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon, Gauge, TrendingDown, GitCompare,
   Home, Flag, AlertTriangle, HardHat, Radio,
   ClipboardList, FileText,
-  MapPin, CloudRain, ShieldAlert,
+  MapPin, CloudRain, ShieldAlert, BookOpen,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
@@ -104,6 +104,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <DropdownMenuItem asChild><Link to="/corners"><MapPin className="w-4 h-4 mr-2" /> Corner analysis</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/confidence"><Gauge className="w-4 h-4 mr-2" /> Confidence &amp; feel</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/sympathy"><ShieldAlert className="w-4 h-4 mr-2" /> Mechanical sympathy</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/philosophies"><BookOpen className="w-4 h-4 mr-2" /> Setup philosophies</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/tires"><Disc className="w-4 h-4 mr-2" /> Tires</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/tyre-setup"><Gauge className="w-4 h-4 mr-2" /> Tyre setup</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/tyre-wear"><TrendingDown className="w-4 h-4 mr-2" /> Tyre wear</Link></DropdownMenuItem>
