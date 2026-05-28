@@ -36,6 +36,7 @@ type ChangeRow = {
   changes: Record<string, { from: string | number | null; to: string | number | null }>;
   outcome_status: "pending" | "confirmed" | "partial" | "rejected";
   outcome_notes: string | null;
+  driver_response: string | null;
   lap_delta_ms: number | null;
   confidence_delta: number | null;
   measured_at: string | null;
