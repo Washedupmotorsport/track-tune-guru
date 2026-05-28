@@ -566,6 +566,15 @@ function ChangeCard({
               className="mt-1"
             />
           </div>
+          <div>
+            <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Driver response</Label>
+            <Textarea
+              value={driverResponse} onChange={(e) => setDriverResponse(e.target.value)}
+              rows={2}
+              placeholder="“Much better drive out of T7, but a touch nervous under braking into T9.”"
+              className="mt-1 italic"
+            />
+          </div>
           <Button size="sm" onClick={() => recordOutcome.mutate()} disabled={recordOutcome.isPending}>
             {recordOutcome.isPending ? "Saving…" : "Save outcome"}
           </Button>
