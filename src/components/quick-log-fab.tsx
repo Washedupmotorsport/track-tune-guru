@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import {
-  Zap, Gauge, Timer, Disc, Radio, ClipboardList, AlertTriangle, NotebookPen,
+  Zap, Gauge, Timer, Disc, Radio, ClipboardList, AlertTriangle, NotebookPen, Brain,
 } from "lucide-react";
 
 /**
@@ -23,6 +23,7 @@ export function QuickLogFab() {
     { to: "/debrief",     label: "Driver debrief", icon: ClipboardList, tone: "default" },
     { to: "/flags",       label: "Flag / incident",icon: AlertTriangle, tone: "warn" },
     { to: "/notes",       label: "Quick note",     icon: NotebookPen,   tone: "default" },
+    { to: "/engineering-memory", label: "Notebook entry", icon: Brain, tone: "default" },
     { to: "/pitwall",     label: "Pit wall",       icon: Radio,         tone: "default" },
   ] as const;
 

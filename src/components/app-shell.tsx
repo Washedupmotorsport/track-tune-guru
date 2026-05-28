@@ -6,7 +6,7 @@ import {
   Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon, Gauge, TrendingDown, GitCompare,
   Home, Flag, AlertTriangle, HardHat, Radio,
   ClipboardList, FileText,
-  MapPin, CloudRain, ShieldAlert, BookOpen, GitBranch,
+  MapPin, CloudRain, ShieldAlert, BookOpen, GitBranch, Brain,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
@@ -221,6 +221,7 @@ const ALL_NAV_GROUPS = [
       { to: "/confidence",   label: "Driver confidence",   icon: Gauge },
       { to: "/sympathy",     label: "Mechanical sympathy", icon: ShieldAlert },
       { to: "/notes",        label: "Engineering notes",   icon: NotebookPen },
+      { to: "/engineering-memory", label: "Engineering memory", icon: Brain },
     ],
   },
   {
