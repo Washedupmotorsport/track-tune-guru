@@ -7,7 +7,7 @@ import {
   Home, Flag, AlertTriangle, HardHat, Radio,
   ClipboardList, FileText,
   MapPin, CloudRain, ShieldAlert, BookOpen, GitBranch, Brain,
-  Mic,
+  Mic, BookMarked,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
@@ -247,6 +247,7 @@ const ALL_NAV_GROUPS = [
     label: "Setup",
     items: [
       { to: "/baseline",     label: "Baseline",            icon: Wand2 },
+      { to: "/setup-library", label: "Setup library",      icon: BookMarked },
       { to: "/iteration",    label: "Setup iteration",     icon: GitBranch },
       { to: "/philosophies", label: "Setup philosophies",  icon: BookOpen },
       { to: "/corners",      label: "Corner analysis",     icon: MapPin },
