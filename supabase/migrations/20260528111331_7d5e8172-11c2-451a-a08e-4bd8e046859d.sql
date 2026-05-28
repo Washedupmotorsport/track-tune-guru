@@ -1,0 +1,1 @@
+ALTER TABLE public.cars ADD COLUMN IF NOT EXISTS photo_path text;
