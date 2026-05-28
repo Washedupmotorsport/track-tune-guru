@@ -35,6 +35,8 @@ import { Route as AuthenticatedGarageRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedFlagsRouteImport } from './routes/_authenticated/flags'
 import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated/expenses'
 import { Route as AuthenticatedEngineeringMemoryRouteImport } from './routes/_authenticated/engineering-memory'
+import { Route as AuthenticatedEngineerRouteImport } from './routes/_authenticated/engineer'
+import { Route as AuthenticatedDriverRouteImport } from './routes/_authenticated/driver'
 import { Route as AuthenticatedDebriefRouteImport } from './routes/_authenticated/debrief'
 import { Route as AuthenticatedDamageRouteImport } from './routes/_authenticated/damage'
 import { Route as AuthenticatedCornersRouteImport } from './routes/_authenticated/corners'
@@ -184,6 +186,16 @@ const AuthenticatedEngineeringMemoryRoute =
     path: '/engineering-memory',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedEngineerRoute = AuthenticatedEngineerRouteImport.update({
+  id: '/engineer',
+  path: '/engineer',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDriverRoute = AuthenticatedDriverRouteImport.update({
+  id: '/driver',
+  path: '/driver',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDebriefRoute = AuthenticatedDebriefRouteImport.update({
   id: '/debrief',
   path: '/debrief',
@@ -272,6 +284,8 @@ export interface FileRoutesByFullPath {
   '/corners': typeof AuthenticatedCornersRoute
   '/damage': typeof AuthenticatedDamageRoute
   '/debrief': typeof AuthenticatedDebriefRoute
+  '/driver': typeof AuthenticatedDriverRoute
+  '/engineer': typeof AuthenticatedEngineerRoute
   '/engineering-memory': typeof AuthenticatedEngineeringMemoryRoute
   '/expenses': typeof AuthenticatedExpensesRoute
   '/flags': typeof AuthenticatedFlagsRoute
@@ -313,6 +327,8 @@ export interface FileRoutesByTo {
   '/corners': typeof AuthenticatedCornersRoute
   '/damage': typeof AuthenticatedDamageRoute
   '/debrief': typeof AuthenticatedDebriefRoute
+  '/driver': typeof AuthenticatedDriverRoute
+  '/engineer': typeof AuthenticatedEngineerRoute
   '/engineering-memory': typeof AuthenticatedEngineeringMemoryRoute
   '/expenses': typeof AuthenticatedExpensesRoute
   '/flags': typeof AuthenticatedFlagsRoute
@@ -356,6 +372,8 @@ export interface FileRoutesById {
   '/_authenticated/corners': typeof AuthenticatedCornersRoute
   '/_authenticated/damage': typeof AuthenticatedDamageRoute
   '/_authenticated/debrief': typeof AuthenticatedDebriefRoute
+  '/_authenticated/driver': typeof AuthenticatedDriverRoute
+  '/_authenticated/engineer': typeof AuthenticatedEngineerRoute
   '/_authenticated/engineering-memory': typeof AuthenticatedEngineeringMemoryRoute
   '/_authenticated/expenses': typeof AuthenticatedExpensesRoute
   '/_authenticated/flags': typeof AuthenticatedFlagsRoute
@@ -399,6 +417,8 @@ export interface FileRouteTypes {
     | '/corners'
     | '/damage'
     | '/debrief'
+    | '/driver'
+    | '/engineer'
     | '/engineering-memory'
     | '/expenses'
     | '/flags'
@@ -440,6 +460,8 @@ export interface FileRouteTypes {
     | '/corners'
     | '/damage'
     | '/debrief'
+    | '/driver'
+    | '/engineer'
     | '/engineering-memory'
     | '/expenses'
     | '/flags'
@@ -482,6 +504,8 @@ export interface FileRouteTypes {
     | '/_authenticated/corners'
     | '/_authenticated/damage'
     | '/_authenticated/debrief'
+    | '/_authenticated/driver'
+    | '/_authenticated/engineer'
     | '/_authenticated/engineering-memory'
     | '/_authenticated/expenses'
     | '/_authenticated/flags'
@@ -704,6 +728,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEngineeringMemoryRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/engineer': {
+      id: '/_authenticated/engineer'
+      path: '/engineer'
+      fullPath: '/engineer'
+      preLoaderRoute: typeof AuthenticatedEngineerRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/driver': {
+      id: '/_authenticated/driver'
+      path: '/driver'
+      fullPath: '/driver'
+      preLoaderRoute: typeof AuthenticatedDriverRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/debrief': {
       id: '/_authenticated/debrief'
       path: '/debrief'
@@ -856,6 +894,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCornersRoute: typeof AuthenticatedCornersRoute
   AuthenticatedDamageRoute: typeof AuthenticatedDamageRoute
   AuthenticatedDebriefRoute: typeof AuthenticatedDebriefRoute
+  AuthenticatedDriverRoute: typeof AuthenticatedDriverRoute
+  AuthenticatedEngineerRoute: typeof AuthenticatedEngineerRoute
   AuthenticatedEngineeringMemoryRoute: typeof AuthenticatedEngineeringMemoryRoute
   AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRoute
   AuthenticatedFlagsRoute: typeof AuthenticatedFlagsRoute
@@ -891,6 +931,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCornersRoute: AuthenticatedCornersRoute,
   AuthenticatedDamageRoute: AuthenticatedDamageRoute,
   AuthenticatedDebriefRoute: AuthenticatedDebriefRoute,
+  AuthenticatedDriverRoute: AuthenticatedDriverRoute,
+  AuthenticatedEngineerRoute: AuthenticatedEngineerRoute,
   AuthenticatedEngineeringMemoryRoute: AuthenticatedEngineeringMemoryRoute,
   AuthenticatedExpensesRoute: AuthenticatedExpensesRoute,
   AuthenticatedFlagsRoute: AuthenticatedFlagsRoute,

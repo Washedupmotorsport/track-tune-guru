@@ -7,6 +7,7 @@ import {
   Home, Flag, AlertTriangle, HardHat, Radio,
   ClipboardList, FileText,
   MapPin, CloudRain, ShieldAlert, BookOpen, GitBranch, Brain,
+  Mic,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
@@ -35,6 +36,30 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Link to="/garage" aria-label="My Race Engineer — garage" className="flex items-center">
             <img src={logoMre} alt="My Race Engineer" className="h-7 w-auto" />
           </Link>
+          <nav aria-label="Role" className="hidden md:flex items-center gap-1 ml-2">
+            <Link
+              to="/driver"
+              className={`inline-flex items-center gap-1 px-2 h-7 rounded-md text-[10px] font-mono uppercase tracking-widest border transition-colors ${
+                pathname.startsWith("/driver")
+                  ? "bg-primary/15 text-primary border-primary/40"
+                  : "text-muted-foreground border-border hover:text-primary hover:border-primary/40"
+              }`}
+              title="Driver workspace"
+            >
+              <Mic className="w-3 h-3" /> Driver
+            </Link>
+            <Link
+              to="/engineer"
+              className={`inline-flex items-center gap-1 px-2 h-7 rounded-md text-[10px] font-mono uppercase tracking-widest border transition-colors ${
+                pathname.startsWith("/engineer")
+                  ? "bg-primary/15 text-primary border-primary/40"
+                  : "text-muted-foreground border-border hover:text-primary hover:border-primary/40"
+              }`}
+              title="Engineer workspace"
+            >
+              <HardHat className="w-3 h-3" /> Engineer
+            </Link>
+          </nav>
           {/* Workspace tabs (desktop) — 5 race-team workspaces */}
           <nav aria-label="Workspaces" className="hidden lg:flex items-center gap-1 mx-3">
             {WORKSPACES.map((w) => {
@@ -191,6 +216,13 @@ const WORKSPACES = [
 ] as const;
 
 const ALL_NAV_GROUPS = [
+  {
+    label: "Roles",
+    items: [
+      { to: "/driver",   label: "Driver workspace",   icon: Mic },
+      { to: "/engineer", label: "Engineer workspace", icon: HardHat },
+    ],
+  },
   {
     label: "Garage",
     items: [
