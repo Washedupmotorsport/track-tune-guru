@@ -24,6 +24,7 @@ import { Route as AuthenticatedSympathyRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedPitwallRouteImport } from './routes/_authenticated/pitwall'
+import { Route as AuthenticatedPhilosophiesRouteImport } from './routes/_authenticated/philosophies'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
 import { Route as AuthenticatedMaintenanceRouteImport } from './routes/_authenticated/maintenance'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
@@ -121,6 +122,12 @@ const AuthenticatedPitwallRoute = AuthenticatedPitwallRouteImport.update({
   path: '/pitwall',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedPhilosophiesRoute =
+  AuthenticatedPhilosophiesRouteImport.update({
+    id: '/philosophies',
+    path: '/philosophies',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedNotesRoute = AuthenticatedNotesRouteImport.update({
   id: '/notes',
   path: '/notes',
@@ -246,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/inventory': typeof AuthenticatedInventoryRoute
   '/maintenance': typeof AuthenticatedMaintenanceRoute
   '/notes': typeof AuthenticatedNotesRoute
+  '/philosophies': typeof AuthenticatedPhilosophiesRoute
   '/pitwall': typeof AuthenticatedPitwallRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
@@ -282,6 +290,7 @@ export interface FileRoutesByTo {
   '/inventory': typeof AuthenticatedInventoryRoute
   '/maintenance': typeof AuthenticatedMaintenanceRoute
   '/notes': typeof AuthenticatedNotesRoute
+  '/philosophies': typeof AuthenticatedPhilosophiesRoute
   '/pitwall': typeof AuthenticatedPitwallRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
@@ -320,6 +329,7 @@ export interface FileRoutesById {
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
   '/_authenticated/maintenance': typeof AuthenticatedMaintenanceRoute
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
+  '/_authenticated/philosophies': typeof AuthenticatedPhilosophiesRoute
   '/_authenticated/pitwall': typeof AuthenticatedPitwallRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRouteWithChildren
@@ -358,6 +368,7 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/maintenance'
     | '/notes'
+    | '/philosophies'
     | '/pitwall'
     | '/reports'
     | '/sessions'
@@ -394,6 +405,7 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/maintenance'
     | '/notes'
+    | '/philosophies'
     | '/pitwall'
     | '/reports'
     | '/sessions'
@@ -431,6 +443,7 @@ export interface FileRouteTypes {
     | '/_authenticated/inventory'
     | '/_authenticated/maintenance'
     | '/_authenticated/notes'
+    | '/_authenticated/philosophies'
     | '/_authenticated/pitwall'
     | '/_authenticated/reports'
     | '/_authenticated/sessions'
@@ -563,6 +576,13 @@ declare module '@tanstack/react-router' {
       path: '/pitwall'
       fullPath: '/pitwall'
       preLoaderRoute: typeof AuthenticatedPitwallRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/philosophies': {
+      id: '/_authenticated/philosophies'
+      path: '/philosophies'
+      fullPath: '/philosophies'
+      preLoaderRoute: typeof AuthenticatedPhilosophiesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/notes': {
@@ -765,6 +785,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
   AuthenticatedMaintenanceRoute: typeof AuthenticatedMaintenanceRoute
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
+  AuthenticatedPhilosophiesRoute: typeof AuthenticatedPhilosophiesRoute
   AuthenticatedPitwallRoute: typeof AuthenticatedPitwallRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRouteWithChildren
@@ -795,6 +816,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
   AuthenticatedMaintenanceRoute: AuthenticatedMaintenanceRoute,
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
+  AuthenticatedPhilosophiesRoute: AuthenticatedPhilosophiesRoute,
   AuthenticatedPitwallRoute: AuthenticatedPitwallRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRouteWithChildren,
