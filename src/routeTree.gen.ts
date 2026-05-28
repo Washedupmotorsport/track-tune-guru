@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedWeekendsRouteImport } from './routes/_authenticated/weekends'
 import { Route as AuthenticatedTyreWearRouteImport } from './routes/_authenticated/tyre-wear'
 import { Route as AuthenticatedTyreSetupRouteImport } from './routes/_authenticated/tyre-setup'
 import { Route as AuthenticatedTyreCompareRouteImport } from './routes/_authenticated/tyre-compare'
@@ -29,6 +30,7 @@ import { Route as AuthenticatedCalculatorsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedBaselineRouteImport } from './routes/_authenticated/baseline'
 import { Route as AuthenticatedAnalysisRouteImport } from './routes/_authenticated/analysis'
 import { Route as ShareSessionTokenRouteImport } from './routes/share.session.$token'
+import { Route as AuthenticatedWeekendsEventIdRouteImport } from './routes/_authenticated/weekends.$eventId'
 import { Route as AuthenticatedSetupsSetupIdRouteImport } from './routes/_authenticated/setups.$setupId'
 import { Route as AuthenticatedSessionsSessionIdRouteImport } from './routes/_authenticated/sessions.$sessionId'
 import { Route as AuthenticatedCarsCarIdRouteImport } from './routes/_authenticated/cars.$carId'
@@ -52,6 +54,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedWeekendsRoute = AuthenticatedWeekendsRouteImport.update({
+  id: '/weekends',
+  path: '/weekends',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedTyreWearRoute = AuthenticatedTyreWearRouteImport.update({
   id: '/tyre-wear',
@@ -136,6 +143,12 @@ const ShareSessionTokenRoute = ShareSessionTokenRouteImport.update({
   path: '/share/session/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedWeekendsEventIdRoute =
+  AuthenticatedWeekendsEventIdRouteImport.update({
+    id: '/$eventId',
+    path: '/$eventId',
+    getParentRoute: () => AuthenticatedWeekendsRoute,
+  } as any)
 const AuthenticatedSetupsSetupIdRoute =
   AuthenticatedSetupsSetupIdRouteImport.update({
     id: '/setups/$setupId',
@@ -179,9 +192,11 @@ export interface FileRoutesByFullPath {
   '/tyre-compare': typeof AuthenticatedTyreCompareRoute
   '/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/tyre-wear': typeof AuthenticatedTyreWearRoute
+  '/weekends': typeof AuthenticatedWeekendsRouteWithChildren
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRouteWithChildren
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
+  '/weekends/$eventId': typeof AuthenticatedWeekendsEventIdRoute
   '/share/session/$token': typeof ShareSessionTokenRoute
   '/sessions/$sessionId/pitboard': typeof AuthenticatedSessionsSessionIdPitboardRoute
 }
@@ -204,9 +219,11 @@ export interface FileRoutesByTo {
   '/tyre-compare': typeof AuthenticatedTyreCompareRoute
   '/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/tyre-wear': typeof AuthenticatedTyreWearRoute
+  '/weekends': typeof AuthenticatedWeekendsRouteWithChildren
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRouteWithChildren
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
+  '/weekends/$eventId': typeof AuthenticatedWeekendsEventIdRoute
   '/share/session/$token': typeof ShareSessionTokenRoute
   '/sessions/$sessionId/pitboard': typeof AuthenticatedSessionsSessionIdPitboardRoute
 }
@@ -231,9 +248,11 @@ export interface FileRoutesById {
   '/_authenticated/tyre-compare': typeof AuthenticatedTyreCompareRoute
   '/_authenticated/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/_authenticated/tyre-wear': typeof AuthenticatedTyreWearRoute
+  '/_authenticated/weekends': typeof AuthenticatedWeekendsRouteWithChildren
   '/_authenticated/cars/$carId': typeof AuthenticatedCarsCarIdRoute
   '/_authenticated/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRouteWithChildren
   '/_authenticated/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
+  '/_authenticated/weekends/$eventId': typeof AuthenticatedWeekendsEventIdRoute
   '/share/session/$token': typeof ShareSessionTokenRoute
   '/_authenticated/sessions/$sessionId/pitboard': typeof AuthenticatedSessionsSessionIdPitboardRoute
 }
@@ -258,9 +277,11 @@ export interface FileRouteTypes {
     | '/tyre-compare'
     | '/tyre-setup'
     | '/tyre-wear'
+    | '/weekends'
     | '/cars/$carId'
     | '/sessions/$sessionId'
     | '/setups/$setupId'
+    | '/weekends/$eventId'
     | '/share/session/$token'
     | '/sessions/$sessionId/pitboard'
   fileRoutesByTo: FileRoutesByTo
@@ -283,9 +304,11 @@ export interface FileRouteTypes {
     | '/tyre-compare'
     | '/tyre-setup'
     | '/tyre-wear'
+    | '/weekends'
     | '/cars/$carId'
     | '/sessions/$sessionId'
     | '/setups/$setupId'
+    | '/weekends/$eventId'
     | '/share/session/$token'
     | '/sessions/$sessionId/pitboard'
   id:
@@ -309,9 +332,11 @@ export interface FileRouteTypes {
     | '/_authenticated/tyre-compare'
     | '/_authenticated/tyre-setup'
     | '/_authenticated/tyre-wear'
+    | '/_authenticated/weekends'
     | '/_authenticated/cars/$carId'
     | '/_authenticated/sessions/$sessionId'
     | '/_authenticated/setups/$setupId'
+    | '/_authenticated/weekends/$eventId'
     | '/share/session/$token'
     | '/_authenticated/sessions/$sessionId/pitboard'
   fileRoutesById: FileRoutesById
@@ -353,6 +378,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/weekends': {
+      id: '/_authenticated/weekends'
+      path: '/weekends'
+      fullPath: '/weekends'
+      preLoaderRoute: typeof AuthenticatedWeekendsRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/tyre-wear': {
       id: '/_authenticated/tyre-wear'
@@ -466,6 +498,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShareSessionTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/weekends/$eventId': {
+      id: '/_authenticated/weekends/$eventId'
+      path: '/$eventId'
+      fullPath: '/weekends/$eventId'
+      preLoaderRoute: typeof AuthenticatedWeekendsEventIdRouteImport
+      parentRoute: typeof AuthenticatedWeekendsRoute
+    }
     '/_authenticated/setups/$setupId': {
       id: '/_authenticated/setups/$setupId'
       path: '/setups/$setupId'
@@ -526,6 +565,19 @@ const AuthenticatedSessionsRouteWithChildren =
     AuthenticatedSessionsRouteChildren,
   )
 
+interface AuthenticatedWeekendsRouteChildren {
+  AuthenticatedWeekendsEventIdRoute: typeof AuthenticatedWeekendsEventIdRoute
+}
+
+const AuthenticatedWeekendsRouteChildren: AuthenticatedWeekendsRouteChildren = {
+  AuthenticatedWeekendsEventIdRoute: AuthenticatedWeekendsEventIdRoute,
+}
+
+const AuthenticatedWeekendsRouteWithChildren =
+  AuthenticatedWeekendsRoute._addFileChildren(
+    AuthenticatedWeekendsRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAnalysisRoute: typeof AuthenticatedAnalysisRoute
   AuthenticatedBaselineRoute: typeof AuthenticatedBaselineRoute
@@ -542,6 +594,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTyreCompareRoute: typeof AuthenticatedTyreCompareRoute
   AuthenticatedTyreSetupRoute: typeof AuthenticatedTyreSetupRoute
   AuthenticatedTyreWearRoute: typeof AuthenticatedTyreWearRoute
+  AuthenticatedWeekendsRoute: typeof AuthenticatedWeekendsRouteWithChildren
   AuthenticatedCarsCarIdRoute: typeof AuthenticatedCarsCarIdRoute
   AuthenticatedSetupsSetupIdRoute: typeof AuthenticatedSetupsSetupIdRoute
 }
@@ -562,6 +615,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedTyreCompareRoute: AuthenticatedTyreCompareRoute,
   AuthenticatedTyreSetupRoute: AuthenticatedTyreSetupRoute,
   AuthenticatedTyreWearRoute: AuthenticatedTyreWearRoute,
+  AuthenticatedWeekendsRoute: AuthenticatedWeekendsRouteWithChildren,
   AuthenticatedCarsCarIdRoute: AuthenticatedCarsCarIdRoute,
   AuthenticatedSetupsSetupIdRoute: AuthenticatedSetupsSetupIdRoute,
 }
