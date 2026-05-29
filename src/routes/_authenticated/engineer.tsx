@@ -181,9 +181,14 @@ function EngineerCockpit() {
   });
 
   const verdictM = useMutation({
-    mutationFn: async (vars: { id: string; status: "confirmed" | "partial" | "rejected" }) => {
+    mutationFn: async (vars: { id: string; status: "testing" | "successful" | "rejected" }) => {
+      const patch: Record<string, unknown> = {
+        outcome_status: vars.status,
+        measured_at: new Date().toISOString(),
+      };
+      if (vars.status === "testing") patch.testing_started_at = new Date().toISOString();
       const { error } = await supabase.from("setup_changes")
-        .update({ outcome_status: vars.status, measured_at: new Date().toISOString() })
+        .update(patch)
         .eq("id", vars.id);
       if (error) throw error;
     },
@@ -196,7 +201,7 @@ function EngineerCockpit() {
 
   // derived
   const pendingChanges = useMemo(
-    () => (changesQ.data ?? []).filter((r) => r.outcome_status === "pending"),
+    () => (changesQ.data ?? []).filter((r) => r.outcome_status === "proposed" || r.outcome_status === "testing"),
     [changesQ.data],
   );
   const tyreFlags = useMemo(() => {
@@ -322,9 +327,11 @@ function EngineerCockpit() {
                     </p>
                   )}
                   <div className="mt-1.5 flex items-center gap-1">
-                    <Verdict onClick={() => verdictM.mutate({ id: r.id, status: "confirmed" })} tone="ok"   icon={CheckCircle2} label="Confirm" disabled={verdictM.isPending} />
-                    <Verdict onClick={() => verdictM.mutate({ id: r.id, status: "partial"   })} tone="warn" icon={CircleDot}     label="Partial" disabled={verdictM.isPending} />
-                    <Verdict onClick={() => verdictM.mutate({ id: r.id, status: "rejected"  })} tone="bad"  icon={XCircle}       label="Reject"  disabled={verdictM.isPending} />
+                    {r.outcome_status === "proposed" && (
+                      <Verdict onClick={() => verdictM.mutate({ id: r.id, status: "testing" })} tone="warn" icon={CircleDot} label="Start test" disabled={verdictM.isPending} />
+                    )}
+                    <Verdict onClick={() => verdictM.mutate({ id: r.id, status: "successful" })} tone="ok"  icon={CheckCircle2} label="Successful" disabled={verdictM.isPending} />
+                    <Verdict onClick={() => verdictM.mutate({ id: r.id, status: "rejected"   })} tone="bad" icon={XCircle}       label="Reject"     disabled={verdictM.isPending} />
                   </div>
                 </li>
               ))}
