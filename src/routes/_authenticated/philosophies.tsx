@@ -251,6 +251,7 @@ function PhilosophiesPage() {
 
   return (
     <div>
+      <SetupWorkspaceNav />
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
