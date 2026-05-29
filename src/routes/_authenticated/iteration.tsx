@@ -138,6 +138,7 @@ function IterationPage() {
 
   return (
     <div>
+      <SetupWorkspaceNav />
       <div className="flex items-end justify-between gap-3 flex-wrap">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary inline-flex items-center gap-1">
