@@ -720,6 +720,19 @@ function severityTone(s: string) {
   return "border-border bg-muted/30 text-muted-foreground";
 }
 
+function priorityBadgeTone(p: string) {
+  if (p === "critical") return "border border-destructive/50 bg-destructive/15 text-destructive";
+  if (p === "testing") return "border border-accent/50 bg-accent/15 text-accent";
+  if (p === "resolved") return "border border-border bg-muted/40 text-muted-foreground";
+  return "border border-primary/40 bg-primary/10 text-primary";
+}
+
+function priorityHeadTone(p: string) {
+  if (p === "critical") return "bg-destructive/10";
+  if (p === "testing") return "bg-accent/10";
+  return "bg-muted/30";
+}
+
 function shortDate(iso: string) {
   return new Date(iso).toLocaleDateString([], { month: "short", day: "numeric" });
 }
