@@ -329,13 +329,78 @@ function EngineerCockpit() {
       </header>
 
       {/* KPI STRIP ====================================================== */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
+        <Kpi icon={AlertTriangle} label="Critical issues" value={criticalIssues} tone={criticalIssues > 0 ? "alert" : undefined} />
+        <Kpi icon={CircleDot} label="In testing" value={testingIssues} tone={testingIssues > 0 ? "warn" : undefined} />
         <Kpi icon={GitBranch} label="Pending verdicts" value={pendingChanges.length} tone={pendingChanges.length > 0 ? "warn" : undefined} />
         <Kpi icon={MessageSquare} label="Critical flags" value={criticalFlags} tone={criticalFlags > 0 ? "alert" : undefined} />
         <Kpi icon={Disc} label="Tyre flags" value={tyreFlags.length} tone={tyreFlags.length > 0 ? "warn" : undefined} />
         <Kpi icon={Wrench} label="Open concerns" value={openDamage.length} tone={criticalDamage > 0 ? "alert" : openDamage.length > 0 ? "warn" : undefined} />
-        <Kpi icon={Brain} label="Pinned memory" value={(memoryQ.data ?? []).filter(m => m.pinned).length} />
       </div>
+
+      {/* ENGINEERING PRIORITIES ========================================= */}
+      <Panel
+        icon={AlertTriangle}
+        title="Engineering priorities"
+        count={priorities.length}
+        action={{ to: "/engineering-memory", label: "Manage" }}
+        tone={criticalIssues > 0 ? "alert" : testingIssues > 0 ? "warn" : undefined}
+      >
+        {prioritiesQ.isLoading && <PanelEmpty>Loading…</PanelEmpty>}
+        {!prioritiesQ.isLoading && priorities.length === 0 && (
+          <PanelEmpty>No active priorities. Flag a recurring issue from the memory page.</PanelEmpty>
+        )}
+        {priorities.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border">
+            {priorityGroups.map((g) => (
+              <div key={g.key} className="min-w-0">
+                <div className={`flex items-center gap-2 px-2.5 py-1 border-b border-border ${priorityHeadTone(g.key)}`}>
+                  <span className={`inline-flex items-center px-1.5 h-4 rounded text-[9px] font-mono uppercase tracking-widest ${priorityBadgeTone(g.key)}`}>
+                    {g.key}
+                  </span>
+                  <span className="text-[10px] font-mono text-muted-foreground">· {g.items.length}</span>
+                </div>
+                {g.items.length === 0 ? (
+                  <div className="px-3 py-3 text-[11px] text-muted-foreground">—</div>
+                ) : (
+                  <ul className="divide-y divide-border">
+                    {g.items.slice(0, 6).map((m) => (
+                      <li key={m.id} className="p-2.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[12px] font-medium truncate flex-1">{m.title}</span>
+                          <Chip>{m.category}</Chip>
+                          <span className="text-[10px] font-mono text-muted-foreground shrink-0">×{m.occurrences}</span>
+                        </div>
+                        {m.detail && <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{m.detail}</p>}
+                        <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                          {g.key !== "critical" && (
+                            <Verdict tone="bad" icon={AlertTriangle} label="Critical"
+                              onClick={() => priorityM.mutate({ id: m.id, priority: "critical" })}
+                              disabled={priorityM.isPending} />
+                          )}
+                          {g.key !== "testing" && (
+                            <Verdict tone="warn" icon={CircleDot} label="Testing"
+                              onClick={() => priorityM.mutate({ id: m.id, priority: "testing" })}
+                              disabled={priorityM.isPending} />
+                          )}
+                          {g.key !== "monitor" && (
+                            <Verdict tone="ok" icon={Brain} label="Monitor"
+                              onClick={() => priorityM.mutate({ id: m.id, priority: "monitor" })}
+                              disabled={priorityM.isPending} />
+                          )}
+                          <Verdict tone="ok" icon={CheckCircle2} label="Resolved"
+                            onClick={() => priorityM.mutate({ id: m.id, priority: "resolved" })}
+                            disabled={priorityM.isPending} />
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </Panel>
 
       {/* COCKPIT GRID =================================================== */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
