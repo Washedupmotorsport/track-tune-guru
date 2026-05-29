@@ -33,7 +33,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="h-[2px] w-full bg-primary" aria-hidden />
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
         <div className="mx-auto max-w-[1400px] px-4 h-12 flex items-center justify-between">
-          <Link to="/garage" aria-label="My Race Engineer — garage" className="flex items-center">
+          <Link to="/engineer" aria-label="My Race Engineer — cockpit" className="flex items-center">
             <img src={logoMre} alt="My Race Engineer" className="h-7 w-auto" />
           </Link>
           <nav aria-label="Role" className="hidden md:flex items-center gap-1 ml-2">
