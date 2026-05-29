@@ -166,6 +166,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 function MobileTabBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = [
+    { to: "/engineer",   label: "Cockpit",   icon: HardHat, matches: ["/engineer"] },
     { to: "/garage",     label: "Garage",    icon: Home,    matches: ["/garage", "/cars", "/calendar", "/weekends"] },
     { to: "/pitwall",    label: "Trackside", icon: Radio,   matches: ["/pitwall", "/racemode", "/sessions", "/track-evolution", "/debrief", "/flags", "/timeline"] },
     { to: "/setup-library", label: "Setup",  icon: Wand2,   matches: ["/setup-library", "/setups", "/baseline", "/iteration", "/philosophies", "/notes"] },
@@ -180,7 +181,7 @@ function MobileTabBar() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="h-[2px] w-full bg-primary/70" aria-hidden />
-      <ul className="grid grid-cols-6">
+      <ul className="grid grid-cols-7">
         {items.map((it) => {
           const Icon = it.icon;
           const active = it.matches.some((m) => pathname === m || pathname.startsWith(m + "/"));
