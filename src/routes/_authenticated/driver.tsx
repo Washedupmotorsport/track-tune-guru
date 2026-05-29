@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import {
   Gauge, MessageSquare, AlertTriangle, ClipboardList, NotebookPen,
-  Radio, Flag, Disc, Mic, ArrowRight, Zap,
+  Radio, Flag, Disc, Mic, ArrowRight, Zap, CalendarDays, History, Activity,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/driver")({
   head: () => ({
@@ -22,6 +23,19 @@ type Feedback = { id: string; description: string; severity: string; category: s
 
 function DriverHub() {
   const { user } = useAuth();
+
+  // Per-user weekend-loop lens. Persisted locally so the driver lands on the
+  // moment of the weekend they actually care about: next session ahead, the
+  // last debrief to close the loop, or the live session if running.
+  const LENS_KEY = "mre.driver.weekendLens";
+  const [lens, setLens] = useState<"next" | "last" | "live">(() => {
+    if (typeof window === "undefined") return "last";
+    const v = window.localStorage.getItem(LENS_KEY);
+    return v === "next" || v === "last" || v === "live" ? v : "last";
+  });
+  useEffect(() => {
+    if (typeof window !== "undefined") window.localStorage.setItem(LENS_KEY, lens);
+  }, [lens]);
 
   const confQ = useQuery({
     queryKey: ["driver-hub-confidence", user?.id],
@@ -71,6 +85,79 @@ function DriverHub() {
         >
           Switch to engineer →
         </Link>
+      </div>
+
+      {/* Weekend-loop lens: which moment of the race weekend do you want to land on? */}
+      <div className="mt-5 rounded-lg border border-border bg-card p-3 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mr-1">Default view</span>
+        {([
+          { id: "next", label: "Next session",  icon: CalendarDays, blurb: "Setup, weather, last notes — get ready to run." },
+          { id: "last", label: "Last debrief",  icon: History,      blurb: "Close the loop before the next run." },
+          { id: "live", label: "Live session",  icon: Activity,     blurb: "Active session view if a run is happening." },
+        ] as const).map((opt) => {
+          const Icon = opt.icon;
+          const active = lens === opt.id;
+          return (
+            <button
+              key={opt.id}
+              type="button"
+              onClick={() => setLens(opt.id)}
+              title={opt.blurb}
+              className={`inline-flex items-center gap-1.5 px-2.5 h-7 rounded-md text-[10px] font-mono uppercase tracking-widest border transition-colors ${
+                active
+                  ? "bg-primary/15 text-primary border-primary/40"
+                  : "text-muted-foreground border-border hover:text-primary hover:border-primary/40"
+              }`}
+            >
+              <Icon className="w-3 h-3" /> {opt.label}
+            </button>
+          );
+        })}
+        <span className="ml-auto text-[10px] text-muted-foreground hidden sm:inline">
+          {lens === "next" && "Showing the run ahead."}
+          {lens === "last" && "Showing the last debrief — fix it before going out again."}
+          {lens === "live" && "Showing the live session if one is running, otherwise the run ahead."}
+        </span>
+      </div>
+
+      {/* Lens-specific panel — points the driver at the right page for this moment of the weekend. */}
+      <div className="mt-3 rounded-lg border border-primary/30 bg-primary/5 p-4">
+        {lens === "next" && (
+          <LensPanel
+            title="Next session"
+            blurb="Load the planned setup, check weather and tyres, review the last notes before you go out."
+            primary={{ to: "/weekends", label: "Open weekends" }}
+            secondary={[
+              { to: "/setup-library", label: "Setup library" },
+              { to: "/tyre-setup",    label: "Tyre pressures" },
+              { to: "/notes",         label: "Engineering notes" },
+            ]}
+          />
+        )}
+        {lens === "last" && (
+          <LensPanel
+            title="Last debrief"
+            blurb="What improved, what got worse, what still needs work. Close the loop before the next run."
+            primary={{ to: "/post-debrief", label: "Open post-session debrief" }}
+            secondary={[
+              { to: "/confidence", label: "Score confidence" },
+              { to: "/sympathy",   label: "Log driver feedback" },
+              { to: "/iteration",  label: "Suggest setup change" },
+            ]}
+          />
+        )}
+        {lens === "live" && (
+          <LensPanel
+            title="Live session"
+            blurb="Pit wall channel and pit-lane mode if a run is happening. Otherwise the next session ahead."
+            primary={{ to: "/pitwall", label: "Open pit wall" }}
+            secondary={[
+              { to: "/pitlane",  label: "Pit lane mode" },
+              { to: "/racemode", label: "Race mode" },
+              { to: "/flags",    label: "Flag an issue" },
+            ]}
+          />
+        )}
       </div>
 
       <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -124,6 +211,41 @@ function DriverHub() {
         <Link to="/tyre-wear" className="text-xs text-primary hover:underline inline-flex items-center">
           Send a tyre note to the engineer <ArrowRight className="w-3 h-3 ml-1" />
         </Link>
+      </div>
+    </div>
+  );
+}
+
+function LensPanel({
+  title, blurb, primary, secondary,
+}: {
+  title: string;
+  blurb: string;
+  primary: { to: string; label: string };
+  secondary: { to: string; label: string }[];
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <div className="min-w-0 flex-1">
+        <div className="font-display font-bold uppercase tracking-wider text-sm">{title}</div>
+        <div className="text-xs text-muted-foreground mt-0.5">{blurb}</div>
+      </div>
+      <Link
+        to={primary.to}
+        className="inline-flex items-center gap-1 rounded-md border border-primary/50 bg-primary text-primary-foreground px-3 h-8 text-[11px] font-mono uppercase tracking-widest hover:opacity-90"
+      >
+        {primary.label} <ArrowRight className="w-3 h-3" />
+      </Link>
+      <div className="basis-full flex flex-wrap gap-1.5">
+        {secondary.map((s) => (
+          <Link
+            key={s.to}
+            to={s.to}
+            className="inline-flex items-center px-2 h-6 rounded border border-border text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40"
+          >
+            {s.label}
+          </Link>
+        ))}
       </div>
     </div>
   );
