@@ -180,7 +180,7 @@ function MobileTabBar() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="h-[2px] w-full bg-primary/70" aria-hidden />
-      <ul className="grid grid-cols-5">
+      <ul className="grid grid-cols-6">
         {items.map((it) => {
           const Icon = it.icon;
           const active = it.matches.some((m) => pathname === m || pathname.startsWith(m + "/"));
@@ -188,11 +188,11 @@ function MobileTabBar() {
             <li key={it.to}>
               <Link
                 to={it.to}
-                className={`flex flex-col items-center justify-center gap-1 h-16 text-[10px] font-mono uppercase tracking-widest active:bg-primary/10 transition-colors ${
+                className={`flex flex-col items-center justify-center gap-1 h-16 text-[9px] font-mono uppercase tracking-widest active:bg-primary/10 transition-colors ${
                   active ? "text-primary" : "text-muted-foreground hover:text-primary"
                 }`}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="w-[18px] h-[18px]" />
                 <span>{it.label}</span>
               </Link>
             </li>
