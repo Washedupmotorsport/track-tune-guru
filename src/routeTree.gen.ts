@@ -48,6 +48,7 @@ import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedCalculatorsRouteImport } from './routes/_authenticated/calculators'
 import { Route as AuthenticatedBaselineRouteImport } from './routes/_authenticated/baseline'
 import { Route as AuthenticatedAnalysisRouteImport } from './routes/_authenticated/analysis'
+import { Route as AuthenticatedSetupsIndexRouteImport } from './routes/_authenticated/setups.index'
 import { Route as ShareSessionTokenRouteImport } from './routes/share.session.$token'
 import { Route as AuthenticatedWeekendsEventIdRouteImport } from './routes/_authenticated/weekends.$eventId'
 import { Route as AuthenticatedSetupsSetupIdRouteImport } from './routes/_authenticated/setups.$setupId'
@@ -257,6 +258,12 @@ const AuthenticatedAnalysisRoute = AuthenticatedAnalysisRouteImport.update({
   path: '/analysis',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSetupsIndexRoute =
+  AuthenticatedSetupsIndexRouteImport.update({
+    id: '/setups/',
+    path: '/setups/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const ShareSessionTokenRoute = ShareSessionTokenRouteImport.update({
   id: '/share/session/$token',
   path: '/share/session/$token',
@@ -336,6 +343,7 @@ export interface FileRoutesByFullPath {
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
   '/weekends/$eventId': typeof AuthenticatedWeekendsEventIdRoute
   '/share/session/$token': typeof ShareSessionTokenRoute
+  '/setups/': typeof AuthenticatedSetupsIndexRoute
   '/sessions/$sessionId/pitboard': typeof AuthenticatedSessionsSessionIdPitboardRoute
 }
 export interface FileRoutesByTo {
@@ -382,6 +390,7 @@ export interface FileRoutesByTo {
   '/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
   '/weekends/$eventId': typeof AuthenticatedWeekendsEventIdRoute
   '/share/session/$token': typeof ShareSessionTokenRoute
+  '/setups': typeof AuthenticatedSetupsIndexRoute
   '/sessions/$sessionId/pitboard': typeof AuthenticatedSessionsSessionIdPitboardRoute
 }
 export interface FileRoutesById {
@@ -430,6 +439,7 @@ export interface FileRoutesById {
   '/_authenticated/setups/$setupId': typeof AuthenticatedSetupsSetupIdRoute
   '/_authenticated/weekends/$eventId': typeof AuthenticatedWeekendsEventIdRoute
   '/share/session/$token': typeof ShareSessionTokenRoute
+  '/_authenticated/setups/': typeof AuthenticatedSetupsIndexRoute
   '/_authenticated/sessions/$sessionId/pitboard': typeof AuthenticatedSessionsSessionIdPitboardRoute
 }
 export interface FileRouteTypes {
@@ -478,6 +488,7 @@ export interface FileRouteTypes {
     | '/setups/$setupId'
     | '/weekends/$eventId'
     | '/share/session/$token'
+    | '/setups/'
     | '/sessions/$sessionId/pitboard'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -524,6 +535,7 @@ export interface FileRouteTypes {
     | '/setups/$setupId'
     | '/weekends/$eventId'
     | '/share/session/$token'
+    | '/setups'
     | '/sessions/$sessionId/pitboard'
   id:
     | '__root__'
@@ -571,6 +583,7 @@ export interface FileRouteTypes {
     | '/_authenticated/setups/$setupId'
     | '/_authenticated/weekends/$eventId'
     | '/share/session/$token'
+    | '/_authenticated/setups/'
     | '/_authenticated/sessions/$sessionId/pitboard'
   fileRoutesById: FileRoutesById
 }
@@ -857,6 +870,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalysisRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/setups/': {
+      id: '/_authenticated/setups/'
+      path: '/setups'
+      fullPath: '/setups/'
+      preLoaderRoute: typeof AuthenticatedSetupsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/share/session/$token': {
       id: '/share/session/$token'
       path: '/share/session/$token'
@@ -982,6 +1002,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedWorkshopRoute: typeof AuthenticatedWorkshopRoute
   AuthenticatedCarsCarIdRoute: typeof AuthenticatedCarsCarIdRoute
   AuthenticatedSetupsSetupIdRoute: typeof AuthenticatedSetupsSetupIdRoute
+  AuthenticatedSetupsIndexRoute: typeof AuthenticatedSetupsIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -1022,6 +1043,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedWorkshopRoute: AuthenticatedWorkshopRoute,
   AuthenticatedCarsCarIdRoute: AuthenticatedCarsCarIdRoute,
   AuthenticatedSetupsSetupIdRoute: AuthenticatedSetupsSetupIdRoute,
+  AuthenticatedSetupsIndexRoute: AuthenticatedSetupsIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -1038,3 +1060,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
