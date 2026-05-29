@@ -33,7 +33,7 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) navigate({ to: "/garage" });
+    if (!loading && user) navigate({ to: "/engineer" });
   }, [loading, user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
