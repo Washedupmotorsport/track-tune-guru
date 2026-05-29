@@ -262,6 +262,9 @@ function EngineeringMemoryPage() {
                     <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                       · {carName(e.car_id)}
                     </span>
+                    <span className={`inline-flex items-center px-1.5 h-4 rounded border font-mono text-[9px] uppercase tracking-widest ${PRIORITIES.find(p=>p.key===e.priority)?.cls ?? "border-border bg-muted/30 text-muted-foreground"}`}>
+                      {e.priority ?? "monitor"}
+                    </span>
                     {e.pinned && (
                       <Badge variant="outline" className="font-mono text-[9px] border-primary/50 text-primary">
                         <Pin className="w-2.5 h-2.5 mr-1" /> pinned
@@ -269,6 +272,19 @@ function EngineeringMemoryPage() {
                     )}
                   </div>
                   <h2 className="font-display text-lg font-bold mt-1 leading-tight">{e.title}</h2>
+                  <div className="mt-2 flex items-center gap-1 flex-wrap">
+                    <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mr-1">Set status</span>
+                    {PRIORITIES.map((p) => (
+                      <button
+                        key={p.key}
+                        type="button"
+                        onClick={() => patch.mutate({ id: e.id, patch: { priority: p.key, ...(p.key === "resolved" ? { status: "archived" as const } : {}) } })}
+                        className={`inline-flex items-center px-1.5 h-5 rounded border font-mono text-[9px] uppercase tracking-widest transition ${e.priority === p.key ? p.cls : "border-border bg-background/40 text-muted-foreground hover:border-primary/50"}`}
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <div className="flex gap-1 shrink-0">
                   <Button size="icon" variant="ghost" title={e.pinned ? "Unpin" : "Pin"}
