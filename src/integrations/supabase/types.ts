@@ -389,9 +389,14 @@ export type Database = {
         Row: {
           body: string | null
           car_id: string | null
+          category: string
+          corner: string | null
           created_at: string
           id: string
+          phase: string | null
+          session_id: string | null
           setup_id: string | null
+          severity: string
           tags: string[] | null
           title: string
           updated_at: string
@@ -400,9 +405,14 @@ export type Database = {
         Insert: {
           body?: string | null
           car_id?: string | null
+          category?: string
+          corner?: string | null
           created_at?: string
           id?: string
+          phase?: string | null
+          session_id?: string | null
           setup_id?: string | null
+          severity?: string
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -411,9 +421,14 @@ export type Database = {
         Update: {
           body?: string | null
           car_id?: string | null
+          category?: string
+          corner?: string | null
           created_at?: string
           id?: string
+          phase?: string | null
+          session_id?: string | null
           setup_id?: string | null
+          severity?: string
           tags?: string[] | null
           title?: string
           updated_at?: string
