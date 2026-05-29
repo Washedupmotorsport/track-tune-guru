@@ -99,6 +99,7 @@ function NotesPage() {
 
   return (
     <div>
+      <SetupWorkspaceNav />
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
