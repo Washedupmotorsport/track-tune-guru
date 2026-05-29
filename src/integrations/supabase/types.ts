@@ -945,6 +945,7 @@ export type Database = {
       }
       setup_changes: {
         Row: {
+          archived_at: string | null
           area: string
           car_id: string
           changes: Json
@@ -962,10 +963,12 @@ export type Database = {
           session_id: string | null
           setup_id: string
           summary: string
+          testing_started_at: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          archived_at?: string | null
           area?: string
           car_id: string
           changes?: Json
@@ -983,10 +986,12 @@ export type Database = {
           session_id?: string | null
           setup_id: string
           summary: string
+          testing_started_at?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          archived_at?: string | null
           area?: string
           car_id?: string
           changes?: Json
@@ -1004,6 +1009,7 @@ export type Database = {
           session_id?: string | null
           setup_id?: string
           summary?: string
+          testing_started_at?: string | null
           updated_at?: string
           user_id?: string
         }
