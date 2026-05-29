@@ -533,8 +533,11 @@ function CtxCell({ icon: Icon, label, value, sub, tone, link }: {
   );
   const wrapCls = `block px-3 py-2 ${cls} ${link ? "hover:bg-muted/30" : ""}`;
   if (!link) return <div className={wrapCls}>{body}</div>;
-  // @ts-expect-error tanstack Link union typing
-  return <Link to={link.to} params={link.params} className={wrapCls}>{body}</Link>;
+  return (
+    <Link to={link.to as string} params={link.params as never} className={wrapCls}>
+      {body}
+    </Link>
+  );
 }
 
 function Panel({ icon: Icon, title, count, action, tone, children }: {
