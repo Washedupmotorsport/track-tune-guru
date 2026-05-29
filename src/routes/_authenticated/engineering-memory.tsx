@@ -35,6 +35,7 @@ type Entry = {
   conditions: string | null;
   status: "active" | "archived";
   pinned: boolean;
+  priority: Priority;
   session_id: string | null;
   setup_id: string | null;
   created_at: string;
@@ -48,6 +49,15 @@ type Category =
   | "driver_pref"
   | "recurring_issue"
   | "weather";
+
+type Priority = "critical" | "testing" | "monitor" | "resolved";
+
+const PRIORITIES: { key: Priority; label: string; cls: string }[] = [
+  { key: "critical", label: "Critical", cls: "border-destructive/50 bg-destructive/10 text-destructive" },
+  { key: "testing",  label: "Testing",  cls: "border-accent/50 bg-accent/10 text-accent" },
+  { key: "monitor",  label: "Monitor",  cls: "border-primary/40 bg-primary/10 text-primary" },
+  { key: "resolved", label: "Resolved", cls: "border-border bg-muted/40 text-muted-foreground" },
+];
 
 const CATEGORIES: { key: Category; label: string; icon: typeof Disc; tone: string; hint: string }[] = [
   { key: "handling",          label: "Handling trait",     icon: Gauge,         tone: "text-primary",     hint: "e.g. Nervous over kerbs, lazy turn-in T7" },
