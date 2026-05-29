@@ -42,7 +42,7 @@ function Landing() {
           </Link>
           <nav className="flex items-center gap-2">
             {user ? (
-              <Link to="/garage"><Button variant="default" size="sm">Open Garage</Button></Link>
+              <Link to="/engineer"><Button variant="default" size="sm">Open Cockpit</Button></Link>
             ) : (
               <>
                 <Link to="/auth"><Button variant="ghost" size="sm">Sign in</Button></Link>
@@ -82,9 +82,9 @@ function Landing() {
             Save baselines, log changes, never lose a winning setup again.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to={user ? "/garage" : "/auth"}>
+            <Link to={user ? "/engineer" : "/auth"}>
               <Button size="lg" className="shadow-glow">
-                {user ? "Enter Garage" : "Start free"}
+                {user ? "Enter Cockpit" : "Start free"}
               </Button>
             </Link>
             <a href="#disciplines">
