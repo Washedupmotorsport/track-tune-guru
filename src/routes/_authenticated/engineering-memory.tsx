@@ -359,6 +359,7 @@ function EntryEditor({
   const [confidence, setConfidence] = useState<number>(entry?.confidence ?? 3);
   const [tagsInput, setTagsInput] = useState((entry?.tags ?? []).join(", "));
   const [pinned, setPinned] = useState<boolean>(entry?.pinned ?? false);
+  const [priority, setPriority] = useState<Priority>(entry?.priority ?? "monitor");
   const [saving, setSaving] = useState(false);
 
   const meta = CAT_META[category];
@@ -377,6 +378,7 @@ function EntryEditor({
       confidence: Math.max(1, Math.min(5, confidence)),
       tags,
       pinned,
+      priority,
     };
     try {
       if (entry) {
