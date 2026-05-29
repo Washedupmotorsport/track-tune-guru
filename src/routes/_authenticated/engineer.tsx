@@ -3,23 +3,25 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import {
-  GitBranch, Disc, Gauge, ArrowRight, Brain, MessageSquare, AlertTriangle,
-  HardHat, CheckCircle2, CircleDot, XCircle, Pin, ClipboardList, Radio, Cloud,
+  GitBranch, Disc, ArrowRight, Brain, MessageSquare, AlertTriangle,
+  HardHat, CheckCircle2, CircleDot, XCircle, Pin, Radio, Cloud,
   Fuel, Timer, Wrench, Wand2, CalendarDays, TrendingUp, TrendingDown, Minus,
+  Activity, Flag,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ComponentType } from "react";
 
 export const Route = createFileRoute("/_authenticated/engineer")({
   head: () => ({
     meta: [
-      { title: "Engineer — My Race Engineer" },
-      { name: "description", content: "Engineer workflow: setup changes, tyre analysis, balance adjustments, session comparisons." },
+      { title: "Cockpit — My Race Engineer" },
+      { name: "description", content: "Race engineer cockpit: session, setup, verdicts, tyres, confidence, memory and concerns on one screen." },
     ],
   }),
-  component: EngineerHub,
+  component: EngineerCockpit,
 });
 
+// ---------- types ----------
 type ChangeRow = {
   id: string; summary: string; reason: string | null; expected_effect: string | null;
   outcome_status: string; created_at: string; setup_id: string; area: string;
@@ -40,497 +42,596 @@ type TyreRow = {
 type SessionRow = {
   id: string; name: string; track: string | null; weather: string | null;
   air_temp_c: number | null; track_temp_c: number | null; started_at: string;
-  session_type: string;
+  session_type: string; setup_id: string | null;
+  fuel_start_l: number | null; fuel_end_l: number | null;
 };
 type ConfRow = { overall: number | null; recorded_at: string };
+type SetupRow = { id: string; name: string; track: string | null; is_baseline: boolean; updated_at: string };
+type EventRow = { id: string; title: string; track: string | null; starts_at: string; event_type: string };
+type DamageRow = { id: string; component: string; severity: string; status: string; occurred_at: string };
 
-function EngineerHub() {
+// ---------- cockpit ----------
+function EngineerCockpit() {
   const { user } = useAuth();
   const qc = useQueryClient();
 
+  // live clock for countdown
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(t);
+  }, []);
+
   const sessionQ = useQuery({
-    queryKey: ["engineer-hub-session", user?.id],
-    enabled: !!user,
+    queryKey: ["cockpit-session", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("sessions")
-        .select("id, name, track, weather, air_temp_c, track_temp_c, started_at, session_type")
-        .order("started_at", { ascending: false })
-        .limit(1);
+        .select("id, name, track, weather, air_temp_c, track_temp_c, started_at, session_type, setup_id, fuel_start_l, fuel_end_l")
+        .order("started_at", { ascending: false }).limit(1);
       if (error) throw error;
       return (data?.[0] ?? null) as SessionRow | null;
     },
   });
 
+  const nextEventQ = useQuery({
+    queryKey: ["cockpit-next-event", user?.id], enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("calendar_events")
+        .select("id, title, track, starts_at, event_type")
+        .gte("starts_at", new Date().toISOString())
+        .order("starts_at", { ascending: true }).limit(1);
+      if (error) throw error;
+      return (data?.[0] ?? null) as EventRow | null;
+    },
+  });
+
+  const activeSetupQ = useQuery({
+    queryKey: ["cockpit-active-setup", sessionQ.data?.setup_id], enabled: !!user,
+    queryFn: async () => {
+      const setupId = sessionQ.data?.setup_id;
+      if (setupId) {
+        const { data, error } = await supabase
+          .from("setups").select("id, name, track, is_baseline, updated_at").eq("id", setupId).maybeSingle();
+        if (error) throw error;
+        if (data) return data as SetupRow;
+      }
+      // fall back to most recently updated setup
+      const { data, error } = await supabase
+        .from("setups").select("id, name, track, is_baseline, updated_at")
+        .order("updated_at", { ascending: false }).limit(1);
+      if (error) throw error;
+      return (data?.[0] ?? null) as SetupRow | null;
+    },
+  });
+
   const changesQ = useQuery({
-    queryKey: ["engineer-hub-changes", user?.id],
-    enabled: !!user,
+    queryKey: ["cockpit-changes", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("setup_changes")
         .select("id, summary, reason, expected_effect, outcome_status, created_at, setup_id, area")
-        .order("created_at", { ascending: false })
-        .limit(20);
+        .order("created_at", { ascending: false }).limit(30);
       if (error) throw error;
       return (data ?? []) as ChangeRow[];
     },
   });
 
   const inboxQ = useQuery({
-    queryKey: ["engineer-hub-inbox", user?.id],
-    enabled: !!user,
+    queryKey: ["cockpit-inbox", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("driver_feedback")
         .select("id, description, severity, corner, category, recorded_at")
-        .order("recorded_at", { ascending: false })
-        .limit(8);
+        .order("recorded_at", { ascending: false }).limit(6);
       if (error) throw error;
       return (data ?? []) as FeedbackRow[];
     },
   });
 
   const memoryQ = useQuery({
-    queryKey: ["engineer-hub-memory", user?.id],
-    enabled: !!user,
+    queryKey: ["cockpit-memory", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("engineering_memory")
         .select("id, title, detail, category, occurrences, confidence, pinned, last_observed_at")
         .eq("status", "active")
-        .order("pinned", { ascending: false })
-        .order("last_observed_at", { ascending: false })
-        .limit(6);
+        .order("pinned", { ascending: false }).order("last_observed_at", { ascending: false }).limit(5);
       if (error) throw error;
       return (data ?? []) as MemoryRow[];
     },
   });
 
   const tyresQ = useQuery({
-    queryKey: ["engineer-hub-tyres", user?.id],
-    enabled: !!user,
+    queryKey: ["cockpit-tyres", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tire_logs")
         .select("id, tire_set, compound, hot_fl, hot_fr, hot_rl, hot_rr, recorded_at")
-        .order("recorded_at", { ascending: false })
-        .limit(1);
+        .order("recorded_at", { ascending: false }).limit(1);
       if (error) throw error;
       return (data?.[0] ?? null) as TyreRow | null;
     },
   });
 
   const confQ = useQuery({
-    queryKey: ["engineer-hub-conf", user?.id],
-    enabled: !!user,
+    queryKey: ["cockpit-conf", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("driver_confidence")
         .select("overall, recorded_at")
-        .order("recorded_at", { ascending: false })
-        .limit(2);
+        .order("recorded_at", { ascending: false }).limit(8);
       if (error) throw error;
-      return (data ?? []) as ConfRow[];
+      return ((data ?? []) as ConfRow[]).reverse();
+    },
+  });
+
+  const damageQ = useQuery({
+    queryKey: ["cockpit-damage", user?.id], enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("damage_reports")
+        .select("id, component, severity, status, occurred_at")
+        .neq("status", "resolved")
+        .order("occurred_at", { ascending: false }).limit(5);
+      if (error) throw error;
+      return (data ?? []) as DamageRow[];
     },
   });
 
   const verdictM = useMutation({
     mutationFn: async (vars: { id: string; status: "confirmed" | "partial" | "rejected" }) => {
-      const { error } = await supabase
-        .from("setup_changes")
+      const { error } = await supabase.from("setup_changes")
         .update({ outcome_status: vars.status, measured_at: new Date().toISOString() })
         .eq("id", vars.id);
       if (error) throw error;
     },
     onSuccess: (_d, vars) => {
       toast.success(`Marked ${vars.status}`);
-      qc.invalidateQueries({ queryKey: ["engineer-hub-changes"] });
+      qc.invalidateQueries({ queryKey: ["cockpit-changes"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
+  // derived
   const pendingChanges = useMemo(
     () => (changesQ.data ?? []).filter((r) => r.outcome_status === "pending"),
     [changesQ.data],
   );
-  const recentChanges = useMemo(
-    () => (changesQ.data ?? []).filter((r) => r.outcome_status !== "pending").slice(0, 5),
-    [changesQ.data],
-  );
-
-  // Tyre flags: hot pressure outside a 25–33 psi sanity band → call it out.
   const tyreFlags = useMemo(() => {
     const t = tyresQ.data;
-    if (!t) return [] as { corner: string; psi: number; reason: string }[];
-    const out: { corner: string; psi: number; reason: string }[] = [];
+    if (!t) return [] as { corner: string; psi: number; reason: "under" | "over" }[];
+    const out: { corner: string; psi: number; reason: "under" | "over" }[] = [];
     const check = (corner: string, v: number | null) => {
       if (v == null) return;
-      if (v < 25) out.push({ corner, psi: v, reason: "under-pressure" });
-      else if (v > 33) out.push({ corner, psi: v, reason: "over-pressure" });
+      if (v < 25) out.push({ corner, psi: v, reason: "under" });
+      else if (v > 33) out.push({ corner, psi: v, reason: "over" });
     };
     check("FL", t.hot_fl); check("FR", t.hot_fr); check("RL", t.hot_rl); check("RR", t.hot_rr);
     return out;
   }, [tyresQ.data]);
 
+  const confValues = (confQ.data ?? []).map((c) => c.overall).filter((v): v is number => v != null);
+  const lastConf = confValues.length ? confValues[confValues.length - 1] : null;
+  const prevConf = confValues.length > 1 ? confValues[confValues.length - 2] : null;
+  const confDelta = lastConf != null && prevConf != null ? lastConf - prevConf : null;
+
   const criticalFlags = (inboxQ.data ?? []).filter((f) => f.severity === "critical").length;
-  const confDelta = (() => {
-    const a = confQ.data?.[0]?.overall;
-    const b = confQ.data?.[1]?.overall;
-    if (a == null || b == null) return null;
-    return a - b;
-  })();
-  const lastConf = confQ.data?.[0]?.overall ?? null;
   const session = sessionQ.data;
+  const setup = activeSetupQ.data;
+  const nextEvent = nextEventQ.data;
+  const openDamage = damageQ.data ?? [];
+  const criticalDamage = openDamage.filter((d) => d.severity === "critical" || d.severity === "major").length;
+
+  const fuelUsed = session && session.fuel_start_l != null && session.fuel_end_l != null
+    ? Math.max(0, session.fuel_start_l - session.fuel_end_l) : null;
 
   return (
-    <div>
-      <div className="flex items-end justify-between flex-wrap gap-3">
-        <div>
-          <div className="font-mono text-xs uppercase tracking-widest text-primary inline-flex items-center gap-1">
-            <HardHat className="w-3 h-3" /> Engineer workspace
+    <div className="space-y-3">
+      {/* HEADER BAR ====================================================== */}
+      <header className="rounded-md border border-border bg-card">
+        <div className="flex items-stretch divide-x divide-border text-xs">
+          <div className="flex items-center gap-2 px-3 py-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            <span className="font-mono uppercase tracking-[0.18em] text-primary">Cockpit</span>
           </div>
-          <h1 className="font-display text-4xl font-bold mt-1">Pit wall cockpit</h1>
-          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            What needs deciding right now — pending changes, recurring trends, tyre flags, driver inbox.
-          </p>
-        </div>
-        <Link
-          to="/driver"
-          className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary border border-border rounded-md px-2.5 py-1.5"
-        >
-          ← Switch to driver
-        </Link>
-      </div>
-
-      {/* Last run strip — what context the engineer is reading inside of */}
-      <div className="mt-5 rounded-lg border border-border bg-card px-4 py-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-        <div className="flex items-center gap-2">
-          <Radio className="w-4 h-4 text-primary" />
-          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Last run</span>
-        </div>
-        {session ? (
-          <>
-            <div className="font-display font-bold uppercase tracking-wider">{session.name}</div>
-            {session.track && (
-              <div className="text-muted-foreground">· {session.track}</div>
+          <div className="flex items-center gap-2 px-3 py-2 min-w-0">
+            <Radio className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Last run</span>
+            {session ? (
+              <Link to="/sessions/$sessionId" params={{ sessionId: session.id }} className="truncate font-display font-bold uppercase tracking-wider hover:text-primary">
+                {session.name}{session.track ? ` · ${session.track}` : ""}
+              </Link>
+            ) : (
+              <span className="text-muted-foreground">no sessions</span>
             )}
-            <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              {session.session_type} · {new Date(session.started_at).toLocaleString()}
-            </div>
-            <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-              {session.weather && <span className="inline-flex items-center gap-1"><Cloud className="w-3 h-3" />{session.weather}</span>}
-              {session.air_temp_c != null && <span>air {session.air_temp_c}°C</span>}
-              {session.track_temp_c != null && <span>track {session.track_temp_c}°C</span>}
-            </div>
-            <Link
-              to="/sessions/$sessionId"
-              params={{ sessionId: session.id }}
-              className="ml-auto text-[10px] font-mono uppercase tracking-widest text-primary hover:underline inline-flex items-center gap-1"
-            >
-              Open session <ArrowRight className="w-3 h-3" />
+            {session && (
+              <span className="text-muted-foreground hidden md:inline">· {session.session_type} · {timeAgo(session.started_at, now)}</span>
+            )}
+          </div>
+          <div className="hidden md:flex items-center gap-3 px-3 py-2 text-muted-foreground">
+            {session?.weather && <span className="inline-flex items-center gap-1"><Cloud className="w-3 h-3" />{session.weather}</span>}
+            {session?.air_temp_c != null && <span>air {session.air_temp_c}°</span>}
+            {session?.track_temp_c != null && <span>track {session.track_temp_c}°</span>}
+          </div>
+          <div className="ml-auto flex items-center gap-2 px-3 py-2">
+            <Link to="/driver" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary border border-border rounded px-2 py-1">
+              Driver →
             </Link>
-          </>
-        ) : (
-          <span className="text-muted-foreground text-xs">No sessions yet — log one to start the loop.</span>
-        )}
+            <Link to="/pitwall" className="font-mono text-[10px] uppercase tracking-widest text-primary hover:underline border border-primary/40 bg-primary/10 rounded px-2 py-1">
+              Pit wall
+            </Link>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border border-t border-border text-xs">
+          <CtxCell icon={Wand2} label="Active setup"
+            value={setup ? setup.name : "—"}
+            sub={setup ? (setup.is_baseline ? "baseline" : "iteration") + (setup.track ? ` · ${setup.track}` : "") : "no setup logged"}
+            link={setup ? { to: "/setups/$setupId", params: { setupId: setup.id } } : undefined} />
+          <CtxCell icon={CalendarDays} label="Next session"
+            value={nextEvent ? countdown(nextEvent.starts_at, now) : "—"}
+            sub={nextEvent ? `${nextEvent.title}${nextEvent.track ? ` · ${nextEvent.track}` : ""}` : "no event scheduled"}
+            link={nextEvent ? { to: "/weekends/$eventId", params: { eventId: nextEvent.id } } : { to: "/calendar" }} />
+          <CtxCell icon={Fuel} label="Fuel last run"
+            value={fuelUsed != null ? `${fuelUsed.toFixed(1)} L` : "—"}
+            sub={session?.fuel_start_l != null && session?.fuel_end_l != null
+              ? `${session.fuel_start_l.toFixed(1)} → ${session.fuel_end_l.toFixed(1)} L`
+              : "not logged"} />
+          <CtxCell icon={Activity} label="Confidence"
+            value={lastConf != null ? `${lastConf}/10` : "—"}
+            sub={confDelta != null ? trendLabel(confDelta) + " vs prior" : "score after next run"}
+            tone={confDelta != null && confDelta <= -2 ? "alert" : confDelta != null && confDelta < 0 ? "warn" : undefined} />
+        </div>
+      </header>
+
+      {/* KPI STRIP ====================================================== */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+        <Kpi icon={GitBranch} label="Pending verdicts" value={pendingChanges.length} tone={pendingChanges.length > 0 ? "warn" : undefined} />
+        <Kpi icon={MessageSquare} label="Critical flags" value={criticalFlags} tone={criticalFlags > 0 ? "alert" : undefined} />
+        <Kpi icon={Disc} label="Tyre flags" value={tyreFlags.length} tone={tyreFlags.length > 0 ? "warn" : undefined} />
+        <Kpi icon={Wrench} label="Open concerns" value={openDamage.length} tone={criticalDamage > 0 ? "alert" : openDamage.length > 0 ? "warn" : undefined} />
+        <Kpi icon={Brain} label="Pinned memory" value={(memoryQ.data ?? []).filter(m => m.pinned).length} />
       </div>
 
-      {/* KPI strip — urgent things only */}
-      <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Stat
-          label="Pending verdicts"
-          value={String(pendingChanges.length)}
-          hint="Changes awaiting on-track confirmation"
-          tone={pendingChanges.length > 0 ? "warn" : undefined}
-        />
-        <Stat
-          label="Critical driver flags"
-          value={String(criticalFlags)}
-          hint="Out of last 8 entries"
-          tone={criticalFlags > 0 ? "alert" : undefined}
-        />
-        <Stat
-          label="Tyre flags"
-          value={String(tyreFlags.length)}
-          hint={tyresQ.data ? "From latest tyre log" : "No tyre log yet"}
-          tone={tyreFlags.length > 0 ? "warn" : undefined}
-        />
-        <Stat
-          label="Confidence"
-          value={lastConf != null ? `${lastConf}/10` : "—"}
-          hint={confDelta != null ? (confDelta === 0 ? "→ flat vs prior" : confDelta > 0 ? `▲ +${confDelta} vs prior` : `▼ ${confDelta} vs prior`) : "Score it after the next run"}
-          tone={confDelta != null && confDelta < 0 ? "alert" : undefined}
-        />
-      </div>
-
-      <div className="mt-6 grid lg:grid-cols-[1fr_360px] gap-6">
-        <section className="space-y-6">
-          {/* Open verdicts — inline decisions, no extra screen */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <GitBranch className="w-4 h-4 text-primary" />
-              <h2 className="font-display text-sm font-bold uppercase tracking-wider">Open verdicts</h2>
-              <span className="text-[10px] font-mono text-muted-foreground">· {pendingChanges.length} awaiting</span>
-              <Link to="/iteration" className="ml-auto text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
-                Log change →
-              </Link>
-            </div>
-            <div className="rounded-lg border border-border bg-card divide-y divide-border">
-              {changesQ.isLoading && <div className="p-4 text-xs text-muted-foreground">Loading…</div>}
-              {!changesQ.isLoading && pendingChanges.length === 0 && (
-                <div className="p-6 text-center text-sm text-muted-foreground">
-                  Nothing pending. Every logged change has a verdict.
-                </div>
-              )}
-              {pendingChanges.map((r) => (
-                <div key={r.id} className="p-3 flex flex-wrap items-start gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center px-1.5 h-5 rounded border border-border bg-muted/30 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                        {r.area}
-                      </span>
-                      <Link
-                        to="/setups/$setupId"
-                        params={{ setupId: r.setup_id }}
-                        className="text-sm font-medium truncate hover:text-primary"
-                      >
-                        {r.summary}
-                      </Link>
-                      <span className="ml-auto text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                        {new Date(r.created_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                    {(r.reason || r.expected_effect) && (
-                      <div className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                        {r.expected_effect ? <span className="text-foreground/80">Expect: </span> : null}
-                        {r.expected_effect ?? r.reason}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1 basis-full md:basis-auto">
-                    <VerdictButton onClick={() => verdictM.mutate({ id: r.id, status: "confirmed" })} tone="ok"   icon={CheckCircle2} label="Confirm" disabled={verdictM.isPending} />
-                    <VerdictButton onClick={() => verdictM.mutate({ id: r.id, status: "partial"   })} tone="warn" icon={CircleDot}     label="Partial" disabled={verdictM.isPending} />
-                    <VerdictButton onClick={() => verdictM.mutate({ id: r.id, status: "rejected"  })} tone="bad"  icon={XCircle}       label="Reject"  disabled={verdictM.isPending} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Recurring trends — pulled from engineering memory */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Brain className="w-4 h-4 text-primary" />
-              <h2 className="font-display text-sm font-bold uppercase tracking-wider">Recurring trends</h2>
-              <Link to="/engineering-memory" className="ml-auto text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
-                All memory →
-              </Link>
-            </div>
-            <div className="rounded-lg border border-border bg-card divide-y divide-border">
-              {(memoryQ.data ?? []).length === 0 && (
-                <div className="p-6 text-center text-sm text-muted-foreground">
-                  No engineering memory yet. Pin a recurring trait from <Link to="/engineering-memory" className="text-primary hover:underline">memory</Link>.
-                </div>
-              )}
-              {(memoryQ.data ?? []).map((m) => (
-                <div key={m.id} className="p-3 flex items-start gap-3">
-                  {m.pinned ? <Pin className="w-3.5 h-3.5 text-primary mt-1" /> : <span className="w-3.5 h-3.5 inline-block mt-1" aria-hidden />}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <div className="text-sm font-medium truncate">{m.title}</div>
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">{m.category}</span>
-                      <span className="text-[10px] font-mono text-muted-foreground">×{m.occurrences}</span>
-                    </div>
-                    {m.detail && <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{m.detail}</div>}
-                  </div>
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground shrink-0">
-                    {new Date(m.last_observed_at).toLocaleDateString()}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Recently resolved — proof the loop is closing */}
-          {recentChanges.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <ClipboardList className="w-4 h-4 text-muted-foreground" />
-                <h2 className="font-display text-sm font-bold uppercase tracking-wider text-muted-foreground">Recently resolved</h2>
-              </div>
-              <div className="rounded-lg border border-border bg-card/60 divide-y divide-border">
-                {recentChanges.map((r) => (
-                  <Link
-                    key={r.id}
-                    to="/setups/$setupId"
-                    params={{ setupId: r.setup_id }}
-                    className="px-3 py-2 flex items-center gap-3 hover:bg-muted/20"
-                  >
-                    <span className={`inline-flex items-center justify-center px-1.5 h-5 rounded border text-[10px] font-mono uppercase tracking-widest ${outcomeTone(r.outcome_status)}`}>
-                      {r.outcome_status}
-                    </span>
-                    <span className="text-sm flex-1 min-w-0 truncate">{r.summary}</span>
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                      {new Date(r.created_at).toLocaleDateString()}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-        </section>
-
-        <aside className="space-y-4">
-          {/* Driver inbox */}
-          <div className="rounded-lg border border-border bg-card p-4 shadow-card">
-            <div className="flex items-center gap-2 mb-2">
-              <MessageSquare className="w-4 h-4 text-primary" />
-              <h3 className="font-display font-bold uppercase tracking-wider text-sm">Driver inbox</h3>
-              <Link to="/sympathy" className="ml-auto text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
-                All →
-              </Link>
-            </div>
-            <div className="space-y-2">
-              {inboxQ.isLoading && <div className="text-xs text-muted-foreground">Loading…</div>}
-              {!inboxQ.isLoading && (inboxQ.data ?? []).length === 0 && (
-                <div className="text-xs text-muted-foreground">No driver feedback yet.</div>
-              )}
-              {(inboxQ.data ?? []).map((f) => (
-                <div key={f.id} className="rounded border border-border bg-background/50 p-2">
+      {/* COCKPIT GRID =================================================== */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+        {/* COL A — verdicts + driver inbox */}
+        <section className="space-y-3">
+          <Panel icon={GitBranch} title="Open verdicts" count={pendingChanges.length}
+                 action={{ to: "/iteration", label: "Log change" }}>
+            {changesQ.isLoading && <PanelEmpty>Loading…</PanelEmpty>}
+            {!changesQ.isLoading && pendingChanges.length === 0 && (
+              <PanelEmpty>Every change has a verdict.</PanelEmpty>
+            )}
+            <ul className="divide-y divide-border">
+              {pendingChanges.slice(0, 6).map((r) => (
+                <li key={r.id} className="p-2.5">
                   <div className="flex items-center gap-2">
-                    <span className={`inline-flex items-center justify-center px-1.5 h-4 rounded border text-[9px] font-mono uppercase tracking-widest ${severityTone(f.severity)}`}>
+                    <Chip>{r.area}</Chip>
+                    <Link to="/setups/$setupId" params={{ setupId: r.setup_id }}
+                      className="text-[13px] font-medium truncate hover:text-primary flex-1 min-w-0">
+                      {r.summary}
+                    </Link>
+                    <span className="text-[10px] font-mono text-muted-foreground shrink-0">{shortDate(r.created_at)}</span>
+                  </div>
+                  {(r.expected_effect || r.reason) && (
+                    <p className="mt-1 text-[11px] text-muted-foreground line-clamp-2">
+                      {r.expected_effect ? <span className="text-foreground/80">Expect: </span> : null}
+                      {r.expected_effect ?? r.reason}
+                    </p>
+                  )}
+                  <div className="mt-1.5 flex items-center gap-1">
+                    <Verdict onClick={() => verdictM.mutate({ id: r.id, status: "confirmed" })} tone="ok"   icon={CheckCircle2} label="Confirm" disabled={verdictM.isPending} />
+                    <Verdict onClick={() => verdictM.mutate({ id: r.id, status: "partial"   })} tone="warn" icon={CircleDot}     label="Partial" disabled={verdictM.isPending} />
+                    <Verdict onClick={() => verdictM.mutate({ id: r.id, status: "rejected"  })} tone="bad"  icon={XCircle}       label="Reject"  disabled={verdictM.isPending} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </Panel>
+
+          <Panel icon={MessageSquare} title="Driver inbox" count={(inboxQ.data ?? []).length}
+                 action={{ to: "/debrief", label: "Debrief" }}>
+            {inboxQ.isLoading && <PanelEmpty>Loading…</PanelEmpty>}
+            {!inboxQ.isLoading && (inboxQ.data ?? []).length === 0 && <PanelEmpty>No driver feedback yet.</PanelEmpty>}
+            <ul className="divide-y divide-border">
+              {(inboxQ.data ?? []).map((f) => (
+                <li key={f.id} className="p-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-flex items-center px-1.5 h-4 rounded border text-[9px] font-mono uppercase tracking-widest ${severityTone(f.severity)}`}>
                       {f.severity}
                     </span>
                     {f.corner && <span className="text-[10px] font-mono uppercase text-muted-foreground">{f.corner}</span>}
                     <span className="text-[10px] font-mono uppercase text-muted-foreground">· {f.category}</span>
-                    <span className="ml-auto text-[10px] font-mono text-muted-foreground">
-                      {new Date(f.recorded_at).toLocaleDateString()}
-                    </span>
+                    <span className="ml-auto text-[10px] font-mono text-muted-foreground">{shortDate(f.recorded_at)}</span>
                   </div>
-                  <div className="text-xs mt-1 leading-snug">{f.description}</div>
-                </div>
+                  <p className="text-[12px] mt-1 leading-snug">{f.description}</p>
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
+          </Panel>
+        </section>
 
-          {/* Tyre flags */}
-          <div className="rounded-lg border border-border bg-card p-4 shadow-card">
-            <div className="flex items-center gap-2 mb-2">
-              <Disc className="w-4 h-4 text-primary" />
-              <h3 className="font-display font-bold uppercase tracking-wider text-sm">Tyre flags</h3>
-              <Link to="/tyre-setup" className="ml-auto text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
-                Pressures →
-              </Link>
-            </div>
-            {!tyresQ.data && <div className="text-xs text-muted-foreground">No tyre log yet.</div>}
-            {tyresQ.data && tyreFlags.length === 0 && (
-              <div className="text-xs text-muted-foreground">
-                Pressures in band on last log ({tyresQ.data.tire_set}{tyresQ.data.compound ? ` · ${tyresQ.data.compound}` : ""}).
+        {/* COL B — tyres + confidence trend */}
+        <section className="space-y-3">
+          <Panel icon={Disc} title="Tyre status" count={tyreFlags.length}
+                 action={{ to: "/tyre-setup", label: "Pressures" }}
+                 tone={tyreFlags.length > 0 ? "warn" : undefined}>
+            {!tyresQ.data && <PanelEmpty>No tyre log yet.</PanelEmpty>}
+            {tyresQ.data && (
+              <div className="p-3 space-y-3">
+                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                  <span className="font-mono uppercase tracking-widest">{tyresQ.data.tire_set}</span>
+                  {tyresQ.data.compound && <span>· {tyresQ.data.compound}</span>}
+                  <span className="ml-auto font-mono">{shortDate(tyresQ.data.recorded_at)}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <TyreCell corner="FL" psi={tyresQ.data.hot_fl} />
+                  <TyreCell corner="FR" psi={tyresQ.data.hot_fr} />
+                  <TyreCell corner="RL" psi={tyresQ.data.hot_rl} />
+                  <TyreCell corner="RR" psi={tyresQ.data.hot_rr} />
+                </div>
+                {tyreFlags.length > 0 && (
+                  <ul className="text-[11px] space-y-1 pt-1 border-t border-border">
+                    {tyreFlags.map((f) => (
+                      <li key={f.corner} className="flex items-center gap-2">
+                        <AlertTriangle className="w-3 h-3 text-accent" />
+                        <span className="font-mono">{f.corner} {f.psi.toFixed(1)} psi</span>
+                        <span className="text-muted-foreground">· {f.reason === "under" ? "under-pressure (&lt;25)" : "over-pressure (&gt;33)"}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             )}
-            {tyresQ.data && tyreFlags.length > 0 && (
-              <ul className="space-y-1.5">
-                {tyreFlags.map((f) => (
-                  <li key={f.corner} className="flex items-center gap-2 text-xs">
-                    <span className="inline-flex items-center justify-center w-7 h-5 rounded border border-accent/50 bg-accent/15 text-accent text-[10px] font-mono uppercase tracking-widest">
-                      {f.corner}
-                    </span>
-                    <span className="font-mono">{f.psi.toFixed(1)} psi</span>
-                    <span className="text-muted-foreground">· {f.reason}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          </Panel>
 
-          {/* Critical alert callout — only when something is actually wrong */}
-          {(criticalFlags > 0 || (confDelta != null && confDelta < 0)) && (
-            <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4">
-              <div className="flex items-center gap-2 text-sm">
-                <AlertTriangle className="w-4 h-4 text-destructive" />
+          <Panel icon={Activity} title="Confidence trend" count={confValues.length}
+                 action={{ to: "/confidence", label: "Open" }}
+                 tone={confDelta != null && confDelta < 0 ? "warn" : undefined}>
+            {confValues.length === 0 && <PanelEmpty>Score confidence after the next run.</PanelEmpty>}
+            {confValues.length > 0 && (
+              <div className="p-3">
+                <div className="flex items-end gap-1 h-16">
+                  {confValues.map((v, i) => (
+                    <div key={i} className="flex-1 flex flex-col justify-end items-center" title={`${v}/10`}>
+                      <div className="w-full bg-primary/70 rounded-t-sm" style={{ height: `${(v / 10) * 100}%` }} />
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2 flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  <span>last {confValues.length} runs</span>
+                  <span className="inline-flex items-center gap-1">
+                    {confDelta == null ? null : confDelta > 0
+                      ? <><TrendingUp className="w-3 h-3 text-primary" /> +{confDelta}</>
+                      : confDelta < 0
+                        ? <><TrendingDown className="w-3 h-3 text-destructive" /> {confDelta}</>
+                        : <><Minus className="w-3 h-3" /> flat</>}
+                  </span>
+                </div>
+              </div>
+            )}
+          </Panel>
+        </section>
+
+        {/* COL C — recurring trends + concerns */}
+        <section className="space-y-3">
+          <Panel icon={Brain} title="Recurring trends" count={(memoryQ.data ?? []).length}
+                 action={{ to: "/engineering-memory", label: "All memory" }}>
+            {(memoryQ.data ?? []).length === 0 && <PanelEmpty>Pin recurring traits as you see them.</PanelEmpty>}
+            <ul className="divide-y divide-border">
+              {(memoryQ.data ?? []).map((m) => (
+                <li key={m.id} className="p-2.5 flex items-start gap-2">
+                  {m.pinned
+                    ? <Pin className="w-3 h-3 text-primary mt-1 shrink-0" />
+                    : <span className="w-3 h-3 inline-block mt-1 shrink-0" aria-hidden />}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[12px] font-medium truncate">{m.title}</span>
+                      <Chip>{m.category}</Chip>
+                      <span className="text-[10px] font-mono text-muted-foreground">×{m.occurrences}</span>
+                    </div>
+                    {m.detail && <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{m.detail}</p>}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </Panel>
+
+          <Panel icon={Wrench} title="Open concerns" count={openDamage.length}
+                 action={{ to: "/damage", label: "Damage log" }}
+                 tone={criticalDamage > 0 ? "alert" : undefined}>
+            {openDamage.length === 0 && <PanelEmpty>No open damage or maintenance flags.</PanelEmpty>}
+            <ul className="divide-y divide-border">
+              {openDamage.map((d) => (
+                <li key={d.id} className="p-2.5 flex items-center gap-2">
+                  <span className={`inline-flex items-center px-1.5 h-4 rounded border text-[9px] font-mono uppercase tracking-widest ${severityTone(d.severity)}`}>
+                    {d.severity}
+                  </span>
+                  <span className="text-[12px] font-medium truncate flex-1">{d.component}</span>
+                  <span className="text-[10px] font-mono text-muted-foreground">{d.status}</span>
+                  <span className="text-[10px] font-mono text-muted-foreground">{shortDate(d.occurred_at)}</span>
+                </li>
+              ))}
+            </ul>
+          </Panel>
+
+          {(criticalFlags > 0 || criticalDamage > 0 || (confDelta != null && confDelta <= -2)) && (
+            <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3">
+              <div className="flex items-center gap-2 text-xs">
+                <AlertTriangle className="w-3.5 h-3.5 text-destructive" />
                 <span className="font-display font-bold uppercase tracking-wider">Attention</span>
               </div>
-              <ul className="mt-2 text-xs text-muted-foreground space-y-1 list-disc pl-5">
-                {criticalFlags > 0 && <li>{criticalFlags} critical driver flag{criticalFlags > 1 ? "s" : ""} in inbox</li>}
-                {confDelta != null && confDelta < 0 && <li>Driver confidence down {Math.abs(confDelta)} pt vs prior session</li>}
+              <ul className="mt-1.5 text-[11px] text-muted-foreground space-y-0.5 list-disc pl-5">
+                {criticalFlags > 0 && <li>{criticalFlags} critical driver flag{criticalFlags > 1 ? "s" : ""}</li>}
+                {criticalDamage > 0 && <li>{criticalDamage} major/critical damage report{criticalDamage > 1 ? "s" : ""} open</li>}
+                {confDelta != null && confDelta <= -2 && <li>Confidence down {Math.abs(confDelta)} pt vs prior</li>}
               </ul>
               <div className="mt-2 flex flex-wrap gap-1.5">
-                <Link to="/post-debrief" className="border border-border rounded px-2 h-6 inline-flex items-center text-[10px] font-mono uppercase tracking-widest hover:border-primary hover:text-primary">
-                  Open debrief
-                </Link>
-                <Link to="/iteration" className="border border-border rounded px-2 h-6 inline-flex items-center text-[10px] font-mono uppercase tracking-widest hover:border-primary hover:text-primary">
-                  Plan a change
-                </Link>
+                <Link to="/post-debrief" className="border border-border rounded px-2 h-6 inline-flex items-center text-[10px] font-mono uppercase tracking-widest hover:border-primary hover:text-primary">Open debrief</Link>
+                <Link to="/iteration"   className="border border-border rounded px-2 h-6 inline-flex items-center text-[10px] font-mono uppercase tracking-widest hover:border-primary hover:text-primary">Plan change</Link>
               </div>
             </div>
           )}
-        </aside>
+        </section>
       </div>
 
-      {/* Thin supporting-tools footer — kept tiny so it doesn't become a link grid again */}
-      <div className="mt-8 pt-4 border-t border-border flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-        <span className="text-foreground/70">Supporting</span>
+      {/* SUPPORTING TOOLS (thin) */}
+      <div className="pt-3 border-t border-border flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+        <span className="text-foreground/70 inline-flex items-center gap-1"><HardHat className="w-3 h-3" /> Tools</span>
         <Link to="/setup-library" className="hover:text-primary">Setup library</Link>
         <Link to="/iteration"     className="hover:text-primary">Iteration log</Link>
         <Link to="/corners"       className="hover:text-primary">Corner balance</Link>
         <Link to="/analysis"      className="hover:text-primary">Session compare</Link>
         <Link to="/tyre-compare"  className="hover:text-primary">Tyre compare</Link>
         <Link to="/tyre-wear"     className="hover:text-primary">Tyre wear</Link>
-        <Link to="/confidence"    className="hover:text-primary">Confidence</Link>
-        <Link to="/philosophies"  className="hover:text-primary">Philosophies</Link>
+        <Link to="/sessions"      className="hover:text-primary">Sessions</Link>
+        <Link to="/weekends"      className="hover:text-primary">Weekends</Link>
+        <Link to="/flags"         className="hover:text-primary"><Flag className="w-3 h-3 inline -mt-0.5" /> Incidents</Link>
+        <span className="ml-auto inline-flex items-center gap-1"><Timer className="w-3 h-3" />{now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
       </div>
     </div>
   );
 }
 
-function outcomeTone(s: string) {
-  if (s === "confirmed") return "border-primary/40 bg-primary/10 text-primary";
-  if (s === "partial") return "border-accent/50 bg-accent/15 text-accent";
-  if (s === "rejected") return "border-destructive/50 bg-destructive/15 text-destructive";
-  return "border-border bg-muted/30 text-muted-foreground";
-}
-
-function severityTone(s: string) {
-  if (s === "critical") return "border-destructive/50 bg-destructive/15 text-destructive";
-  if (s === "warning") return "border-accent/50 bg-accent/15 text-accent";
-  return "border-border bg-muted/30 text-muted-foreground";
-}
-
-function Stat({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone?: "warn" | "alert" }) {
-  const toneCls =
-    tone === "alert" ? "border-destructive/40 bg-destructive/5"
-    : tone === "warn"  ? "border-accent/40 bg-accent/5"
-    : "border-border bg-card";
+// ---------- bits ----------
+function Kpi({ icon: Icon, label, value, tone }: {
+  icon: ComponentType<{ className?: string }>; label: string; value: number; tone?: "warn" | "alert";
+}) {
+  const cls = tone === "alert" ? "border-destructive/40 bg-destructive/5"
+            : tone === "warn"  ? "border-accent/40 bg-accent/5"
+            : "border-border bg-card";
   return (
-    <div className={`rounded-lg border p-3 shadow-card ${toneCls}`}>
-      <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">{label}</div>
-      <div className="font-display text-2xl font-bold mt-0.5">{value}</div>
-      {hint && <div className="text-[10px] text-muted-foreground mt-0.5">{hint}</div>}
+    <div className={`rounded-md border px-2.5 py-2 flex items-center gap-2 ${cls}`}>
+      <Icon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+      <div className="min-w-0">
+        <div className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground leading-none">{label}</div>
+        <div className="font-display text-xl font-bold leading-tight">{value}</div>
+      </div>
     </div>
   );
 }
 
-function VerdictButton({
-  onClick, icon: Icon, label, tone, disabled,
-}: {
-  onClick: () => void;
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  tone: "ok" | "warn" | "bad";
-  disabled?: boolean;
+function CtxCell({ icon: Icon, label, value, sub, tone, link }: {
+  icon: ComponentType<{ className?: string }>; label: string; value: string; sub?: string;
+  tone?: "warn" | "alert";
+  link?: { to: string; params?: Record<string, string> };
 }) {
-  const cls =
-    tone === "ok"   ? "border-primary/40 text-primary hover:bg-primary/10"
-    : tone === "warn" ? "border-accent/50 text-accent hover:bg-accent/10"
-    : "border-destructive/50 text-destructive hover:bg-destructive/10";
+  const cls = tone === "alert" ? "bg-destructive/5"
+            : tone === "warn"  ? "bg-accent/5"
+            : "";
+  const body = (
+    <>
+      <div className="flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
+        <Icon className="w-3 h-3" /> {label}
+        {link && <ArrowRight className="w-3 h-3 ml-auto opacity-50" />}
+      </div>
+      <div className="font-display text-base font-bold leading-tight mt-0.5 truncate">{value}</div>
+      {sub && <div className="text-[10px] text-muted-foreground truncate">{sub}</div>}
+    </>
+  );
+  const wrapCls = `block px-3 py-2 ${cls} ${link ? "hover:bg-muted/30" : ""}`;
+  if (!link) return <div className={wrapCls}>{body}</div>;
+  // @ts-expect-error tanstack Link union typing
+  return <Link to={link.to} params={link.params} className={wrapCls}>{body}</Link>;
+}
+
+function Panel({ icon: Icon, title, count, action, tone, children }: {
+  icon: ComponentType<{ className?: string }>; title: string; count?: number;
+  action?: { to: string; label: string }; tone?: "warn" | "alert"; children: React.ReactNode;
+}) {
+  const head = tone === "alert" ? "bg-destructive/10 border-destructive/40"
+             : tone === "warn"  ? "bg-accent/10 border-accent/40"
+             : "bg-muted/30 border-border";
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={`inline-flex items-center gap-1 px-2 h-7 rounded border text-[10px] font-mono uppercase tracking-widest disabled:opacity-50 ${cls}`}
-    >
+    <div className="rounded-md border border-border bg-card overflow-hidden">
+      <div className={`flex items-center gap-2 px-2.5 py-1.5 border-b ${head}`}>
+        <Icon className="w-3.5 h-3.5 text-primary" />
+        <h2 className="font-display text-[12px] font-bold uppercase tracking-wider">{title}</h2>
+        {count != null && <span className="text-[10px] font-mono text-muted-foreground">· {count}</span>}
+        {action && (
+          <Link to={action.to} className="ml-auto text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
+            {action.label} →
+          </Link>
+        )}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function PanelEmpty({ children }: { children: React.ReactNode }) {
+  return <div className="px-3 py-4 text-center text-[12px] text-muted-foreground">{children}</div>;
+}
+
+function Chip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center px-1.5 h-4 rounded border border-border bg-muted/30 text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
+      {children}
+    </span>
+  );
+}
+
+function TyreCell({ corner, psi }: { corner: string; psi: number | null }) {
+  const flagged = psi != null && (psi < 25 || psi > 33);
+  const cls = flagged ? "border-accent/50 bg-accent/10 text-accent"
+                      : psi == null ? "border-border bg-muted/20 text-muted-foreground"
+                                    : "border-border bg-background";
+  return (
+    <div className={`rounded border px-2 py-1.5 flex items-center justify-between ${cls}`}>
+      <span className="text-[10px] font-mono uppercase tracking-widest opacity-70">{corner}</span>
+      <span className="font-display text-sm font-bold">{psi != null ? `${psi.toFixed(1)}` : "—"}<span className="text-[9px] font-mono opacity-60 ml-0.5">psi</span></span>
+    </div>
+  );
+}
+
+function Verdict({ onClick, icon: Icon, label, tone, disabled }: {
+  onClick: () => void; icon: ComponentType<{ className?: string }>;
+  label: string; tone: "ok" | "warn" | "bad"; disabled?: boolean;
+}) {
+  const cls = tone === "ok"   ? "border-primary/40 text-primary hover:bg-primary/10"
+            : tone === "warn" ? "border-accent/50 text-accent hover:bg-accent/10"
+            : "border-destructive/50 text-destructive hover:bg-destructive/10";
+  return (
+    <button type="button" onClick={onClick} disabled={disabled}
+      className={`inline-flex items-center gap-1 px-1.5 h-6 rounded border text-[10px] font-mono uppercase tracking-widest disabled:opacity-50 ${cls}`}>
       <Icon className="w-3 h-3" /> {label}
     </button>
   );
+}
+
+function severityTone(s: string) {
+  if (s === "critical") return "border-destructive/50 bg-destructive/15 text-destructive";
+  if (s === "warning" || s === "major") return "border-accent/50 bg-accent/15 text-accent";
+  return "border-border bg-muted/30 text-muted-foreground";
+}
+
+function shortDate(iso: string) {
+  return new Date(iso).toLocaleDateString([], { month: "short", day: "numeric" });
+}
+
+function timeAgo(iso: string, now: Date) {
+  const diff = (now.getTime() - new Date(iso).getTime()) / 1000;
+  if (diff < 60) return "just now";
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return `${Math.floor(diff / 86400)}d ago`;
+}
+
+function countdown(iso: string, now: Date) {
+  const diff = (new Date(iso).getTime() - now.getTime()) / 1000;
+  if (diff <= 0) return "live";
+  const d = Math.floor(diff / 86400);
+  const h = Math.floor((diff % 86400) / 3600);
+  const m = Math.floor((diff % 3600) / 60);
+  if (d > 0) return `${d}d ${h}h`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+function trendLabel(delta: number) {
+  if (delta > 0) return `▲ +${delta}`;
+  if (delta < 0) return `▼ ${delta}`;
+  return "→ flat";
 }
