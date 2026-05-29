@@ -35,6 +35,7 @@ type Entry = {
   conditions: string | null;
   status: "active" | "archived";
   pinned: boolean;
+  priority: Priority;
   session_id: string | null;
   setup_id: string | null;
   created_at: string;
@@ -48,6 +49,15 @@ type Category =
   | "driver_pref"
   | "recurring_issue"
   | "weather";
+
+type Priority = "critical" | "testing" | "monitor" | "resolved";
+
+const PRIORITIES: { key: Priority; label: string; cls: string }[] = [
+  { key: "critical", label: "Critical", cls: "border-destructive/50 bg-destructive/10 text-destructive" },
+  { key: "testing",  label: "Testing",  cls: "border-accent/50 bg-accent/10 text-accent" },
+  { key: "monitor",  label: "Monitor",  cls: "border-primary/40 bg-primary/10 text-primary" },
+  { key: "resolved", label: "Resolved", cls: "border-border bg-muted/40 text-muted-foreground" },
+];
 
 const CATEGORIES: { key: Category; label: string; icon: typeof Disc; tone: string; hint: string }[] = [
   { key: "handling",          label: "Handling trait",     icon: Gauge,         tone: "text-primary",     hint: "e.g. Nervous over kerbs, lazy turn-in T7" },
@@ -252,6 +262,9 @@ function EngineeringMemoryPage() {
                     <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                       · {carName(e.car_id)}
                     </span>
+                    <span className={`inline-flex items-center px-1.5 h-4 rounded border font-mono text-[9px] uppercase tracking-widest ${PRIORITIES.find(p=>p.key===e.priority)?.cls ?? "border-border bg-muted/30 text-muted-foreground"}`}>
+                      {e.priority ?? "monitor"}
+                    </span>
                     {e.pinned && (
                       <Badge variant="outline" className="font-mono text-[9px] border-primary/50 text-primary">
                         <Pin className="w-2.5 h-2.5 mr-1" /> pinned
@@ -259,6 +272,19 @@ function EngineeringMemoryPage() {
                     )}
                   </div>
                   <h2 className="font-display text-lg font-bold mt-1 leading-tight">{e.title}</h2>
+                  <div className="mt-2 flex items-center gap-1 flex-wrap">
+                    <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mr-1">Set status</span>
+                    {PRIORITIES.map((p) => (
+                      <button
+                        key={p.key}
+                        type="button"
+                        onClick={() => patch.mutate({ id: e.id, patch: { priority: p.key, ...(p.key === "resolved" ? { status: "archived" as const } : {}) } })}
+                        className={`inline-flex items-center px-1.5 h-5 rounded border font-mono text-[9px] uppercase tracking-widest transition ${e.priority === p.key ? p.cls : "border-border bg-background/40 text-muted-foreground hover:border-primary/50"}`}
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <div className="flex gap-1 shrink-0">
                   <Button size="icon" variant="ghost" title={e.pinned ? "Unpin" : "Pin"}
@@ -333,6 +359,7 @@ function EntryEditor({
   const [confidence, setConfidence] = useState<number>(entry?.confidence ?? 3);
   const [tagsInput, setTagsInput] = useState((entry?.tags ?? []).join(", "));
   const [pinned, setPinned] = useState<boolean>(entry?.pinned ?? false);
+  const [priority, setPriority] = useState<Priority>(entry?.priority ?? "monitor");
   const [saving, setSaving] = useState(false);
 
   const meta = CAT_META[category];
@@ -351,6 +378,7 @@ function EntryEditor({
       confidence: Math.max(1, Math.min(5, confidence)),
       tags,
       pinned,
+      priority,
     };
     try {
       if (entry) {
@@ -464,6 +492,24 @@ function EntryEditor({
             Pin to top of notebook
           </span>
         </label>
+
+        <div>
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+            Priority
+          </Label>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {PRIORITIES.map((p) => (
+              <button
+                key={p.key}
+                type="button"
+                onClick={() => setPriority(p.key)}
+                className={`inline-flex items-center px-2 h-7 rounded border font-mono text-[10px] uppercase tracking-widest transition ${priority === p.key ? p.cls : "border-border bg-background/40 text-muted-foreground hover:border-primary/50"}`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div className="flex justify-end gap-2 pt-2">
           <Button variant="ghost" onClick={onCancel}>Cancel</Button>

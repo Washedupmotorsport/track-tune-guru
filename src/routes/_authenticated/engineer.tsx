@@ -33,6 +33,7 @@ type FeedbackRow = {
 type MemoryRow = {
   id: string; title: string; detail: string | null; category: string;
   occurrences: number; confidence: number; pinned: boolean; last_observed_at: string;
+  priority: string;
 };
 type TyreRow = {
   id: string; tire_set: string; compound: string | null;
@@ -135,12 +136,42 @@ function EngineerCockpit() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("engineering_memory")
-        .select("id, title, detail, category, occurrences, confidence, pinned, last_observed_at")
+        .select("id, title, detail, category, occurrences, confidence, pinned, last_observed_at, priority")
         .eq("status", "active")
         .order("pinned", { ascending: false }).order("last_observed_at", { ascending: false }).limit(5);
       if (error) throw error;
       return (data ?? []) as MemoryRow[];
     },
+  });
+
+  const prioritiesQ = useQuery({
+    queryKey: ["cockpit-priorities", user?.id], enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("engineering_memory")
+        .select("id, title, detail, category, occurrences, confidence, pinned, last_observed_at, priority")
+        .eq("status", "active")
+        .in("priority", ["critical", "testing", "monitor"])
+        .order("last_observed_at", { ascending: false })
+        .limit(40);
+      if (error) throw error;
+      return (data ?? []) as MemoryRow[];
+    },
+  });
+
+  const priorityM = useMutation({
+    mutationFn: async (vars: { id: string; priority: "critical" | "testing" | "monitor" | "resolved" }) => {
+      const patch: { priority: string; status?: string } = { priority: vars.priority };
+      if (vars.priority === "resolved") patch.status = "archived";
+      const { error } = await supabase.from("engineering_memory").update(patch).eq("id", vars.id);
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      toast.success(`Marked ${vars.priority}`);
+      qc.invalidateQueries({ queryKey: ["cockpit-priorities"] });
+      qc.invalidateQueries({ queryKey: ["cockpit-memory"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
   const tyresQ = useQuery({
@@ -223,6 +254,13 @@ function EngineerCockpit() {
   const confDelta = lastConf != null && prevConf != null ? lastConf - prevConf : null;
 
   const criticalFlags = (inboxQ.data ?? []).filter((f) => f.severity === "critical").length;
+  const priorities = prioritiesQ.data ?? [];
+  const priorityGroups = useMemo(() => {
+    const order: Array<"critical" | "testing" | "monitor"> = ["critical", "testing", "monitor"];
+    return order.map((p) => ({ key: p, items: priorities.filter((i) => i.priority === p) }));
+  }, [priorities]);
+  const criticalIssues = priorityGroups[0].items.length;
+  const testingIssues = priorityGroups[1].items.length;
   const session = sessionQ.data;
   const setup = activeSetupQ.data;
   const nextEvent = nextEventQ.data;
@@ -291,13 +329,78 @@ function EngineerCockpit() {
       </header>
 
       {/* KPI STRIP ====================================================== */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
+        <Kpi icon={AlertTriangle} label="Critical issues" value={criticalIssues} tone={criticalIssues > 0 ? "alert" : undefined} />
+        <Kpi icon={CircleDot} label="In testing" value={testingIssues} tone={testingIssues > 0 ? "warn" : undefined} />
         <Kpi icon={GitBranch} label="Pending verdicts" value={pendingChanges.length} tone={pendingChanges.length > 0 ? "warn" : undefined} />
         <Kpi icon={MessageSquare} label="Critical flags" value={criticalFlags} tone={criticalFlags > 0 ? "alert" : undefined} />
         <Kpi icon={Disc} label="Tyre flags" value={tyreFlags.length} tone={tyreFlags.length > 0 ? "warn" : undefined} />
         <Kpi icon={Wrench} label="Open concerns" value={openDamage.length} tone={criticalDamage > 0 ? "alert" : openDamage.length > 0 ? "warn" : undefined} />
-        <Kpi icon={Brain} label="Pinned memory" value={(memoryQ.data ?? []).filter(m => m.pinned).length} />
       </div>
+
+      {/* ENGINEERING PRIORITIES ========================================= */}
+      <Panel
+        icon={AlertTriangle}
+        title="Engineering priorities"
+        count={priorities.length}
+        action={{ to: "/engineering-memory", label: "Manage" }}
+        tone={criticalIssues > 0 ? "alert" : testingIssues > 0 ? "warn" : undefined}
+      >
+        {prioritiesQ.isLoading && <PanelEmpty>Loading…</PanelEmpty>}
+        {!prioritiesQ.isLoading && priorities.length === 0 && (
+          <PanelEmpty>No active priorities. Flag a recurring issue from the memory page.</PanelEmpty>
+        )}
+        {priorities.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border">
+            {priorityGroups.map((g) => (
+              <div key={g.key} className="min-w-0">
+                <div className={`flex items-center gap-2 px-2.5 py-1 border-b border-border ${priorityHeadTone(g.key)}`}>
+                  <span className={`inline-flex items-center px-1.5 h-4 rounded text-[9px] font-mono uppercase tracking-widest ${priorityBadgeTone(g.key)}`}>
+                    {g.key}
+                  </span>
+                  <span className="text-[10px] font-mono text-muted-foreground">· {g.items.length}</span>
+                </div>
+                {g.items.length === 0 ? (
+                  <div className="px-3 py-3 text-[11px] text-muted-foreground">—</div>
+                ) : (
+                  <ul className="divide-y divide-border">
+                    {g.items.slice(0, 6).map((m) => (
+                      <li key={m.id} className="p-2.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[12px] font-medium truncate flex-1">{m.title}</span>
+                          <Chip>{m.category}</Chip>
+                          <span className="text-[10px] font-mono text-muted-foreground shrink-0">×{m.occurrences}</span>
+                        </div>
+                        {m.detail && <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{m.detail}</p>}
+                        <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+                          {g.key !== "critical" && (
+                            <Verdict tone="bad" icon={AlertTriangle} label="Critical"
+                              onClick={() => priorityM.mutate({ id: m.id, priority: "critical" })}
+                              disabled={priorityM.isPending} />
+                          )}
+                          {g.key !== "testing" && (
+                            <Verdict tone="warn" icon={CircleDot} label="Testing"
+                              onClick={() => priorityM.mutate({ id: m.id, priority: "testing" })}
+                              disabled={priorityM.isPending} />
+                          )}
+                          {g.key !== "monitor" && (
+                            <Verdict tone="ok" icon={Brain} label="Monitor"
+                              onClick={() => priorityM.mutate({ id: m.id, priority: "monitor" })}
+                              disabled={priorityM.isPending} />
+                          )}
+                          <Verdict tone="ok" icon={CheckCircle2} label="Resolved"
+                            onClick={() => priorityM.mutate({ id: m.id, priority: "resolved" })}
+                            disabled={priorityM.isPending} />
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </Panel>
 
       {/* COCKPIT GRID =================================================== */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
@@ -615,6 +718,19 @@ function severityTone(s: string) {
   if (s === "critical") return "border-destructive/50 bg-destructive/15 text-destructive";
   if (s === "warning" || s === "major") return "border-accent/50 bg-accent/15 text-accent";
   return "border-border bg-muted/30 text-muted-foreground";
+}
+
+function priorityBadgeTone(p: string) {
+  if (p === "critical") return "border border-destructive/50 bg-destructive/15 text-destructive";
+  if (p === "testing") return "border border-accent/50 bg-accent/15 text-accent";
+  if (p === "resolved") return "border border-border bg-muted/40 text-muted-foreground";
+  return "border border-primary/40 bg-primary/10 text-primary";
+}
+
+function priorityHeadTone(p: string) {
+  if (p === "critical") return "bg-destructive/10";
+  if (p === "testing") return "bg-accent/10";
+  return "bg-muted/30";
 }
 
 function shortDate(iso: string) {
