@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   GitBranch, Plus, ArrowRight, CheckCircle2, XCircle, CircleDot,
-  ClipboardCheck, Wand2, Gauge, Disc, Wind, Mountain, Settings2,
+  Wand2, Gauge, Disc, Wind, Mountain, Settings2, FlaskConical, Archive,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
@@ -24,6 +24,8 @@ type Car = { id: string; name: string };
 type Setup = { id: string; name: string; car_id: string; track: string | null; updated_at: string };
 type Session = { id: string; name: string; started_at: string };
 
+type LifecycleStatus = "proposed" | "testing" | "successful" | "rejected" | "archived";
+
 type ChangeRow = {
   id: string;
   car_id: string;
@@ -35,12 +37,14 @@ type ChangeRow = {
   reason: string | null;
   expected_effect: string | null;
   changes: Record<string, { from: string | number | null; to: string | number | null }>;
-  outcome_status: "pending" | "confirmed" | "partial" | "rejected";
+  outcome_status: LifecycleStatus;
   outcome_notes: string | null;
   driver_response: string | null;
   lap_delta_ms: number | null;
   confidence_delta: number | null;
   measured_at: string | null;
+  testing_started_at: string | null;
+  archived_at: string | null;
   created_at: string;
 };
 
@@ -57,12 +61,15 @@ const AREAS = [
   { id: "other",    label: "Other",     icon: Wand2 },
 ] as const;
 
-const OUTCOME_META: Record<ChangeRow["outcome_status"], { label: string; tone: string; Icon: React.ComponentType<{ className?: string }> }> = {
-  pending:   { label: "Pending run",  tone: "border-border bg-muted/30 text-muted-foreground", Icon: CircleDot },
-  confirmed: { label: "Confirmed",    tone: "border-primary/40 bg-primary/10 text-primary",     Icon: CheckCircle2 },
-  partial:   { label: "Partial",      tone: "border-accent/50 bg-accent/15 text-accent",        Icon: ClipboardCheck },
-  rejected:  { label: "Rejected",     tone: "border-destructive/50 bg-destructive/15 text-destructive", Icon: XCircle },
+const STATUS_META: Record<LifecycleStatus, { label: string; tone: string; Icon: React.ComponentType<{ className?: string }> }> = {
+  proposed:   { label: "Proposed",   tone: "border-border bg-muted/30 text-muted-foreground",            Icon: CircleDot },
+  testing:    { label: "Testing",    tone: "border-accent/50 bg-accent/15 text-accent",                  Icon: FlaskConical },
+  successful: { label: "Successful", tone: "border-primary/40 bg-primary/10 text-primary",               Icon: CheckCircle2 },
+  rejected:   { label: "Rejected",   tone: "border-destructive/50 bg-destructive/15 text-destructive",   Icon: XCircle },
+  archived:   { label: "Archived",   tone: "border-border/60 bg-background/30 text-muted-foreground/80", Icon: Archive },
 };
+
+const LIFECYCLE_ORDER: LifecycleStatus[] = ["proposed", "testing", "successful", "rejected", "archived"];
 
 function IterationPage() {
   const { user } = useAuth();
@@ -123,18 +130,35 @@ function IterationPage() {
     },
   });
 
-  // Quick stats
+  const [statusFilter, setStatusFilter] = useState<LifecycleStatus | "active">("active");
+
+  const grouped = useMemo(() => {
+    const rows = changesQ.data ?? [];
+    const map: Record<LifecycleStatus, ChangeRow[]> = {
+      proposed: [], testing: [], successful: [], rejected: [], archived: [],
+    };
+    rows.forEach((r) => map[r.outcome_status]?.push(r));
+    return map;
+  }, [changesQ.data]);
+
   const stats = useMemo(() => {
     const rows = changesQ.data ?? [];
     return {
       total: rows.length,
-      pending: rows.filter((r) => r.outcome_status === "pending").length,
-      confirmed: rows.filter((r) => r.outcome_status === "confirmed").length,
+      proposed: grouped.proposed.length,
+      testing: grouped.testing.length,
+      successful: grouped.successful.length,
+      rejected: grouped.rejected.length,
       gain: rows
-        .filter((r) => r.outcome_status === "confirmed" && r.lap_delta_ms != null && r.lap_delta_ms < 0)
+        .filter((r) => r.outcome_status === "successful" && r.lap_delta_ms != null && r.lap_delta_ms < 0)
         .reduce((acc, r) => acc + (r.lap_delta_ms ?? 0), 0),
     };
-  }, [changesQ.data]);
+  }, [changesQ.data, grouped]);
+
+  const visibleRows: ChangeRow[] =
+    statusFilter === "active"
+      ? [...grouped.proposed, ...grouped.testing, ...grouped.successful, ...grouped.rejected]
+      : grouped[statusFilter];
 
   return (
     <div>
@@ -142,11 +166,11 @@ function IterationPage() {
       <div className="flex items-end justify-between gap-3 flex-wrap">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary inline-flex items-center gap-1">
-            <GitBranch className="w-3 h-3" /> Engineering memory
+            <GitBranch className="w-3 h-3" /> Decision history
           </div>
-          <h1 className="font-display text-4xl font-bold mt-1">Setup iteration</h1>
+          <h1 className="font-display text-4xl font-bold mt-1">Setup change validation</h1>
           <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            Every setup change carries a <span className="text-foreground">reason</span> → <span className="text-foreground">expected effect</span> → <span className="text-foreground">measured outcome</span> trail. Build a real engineering record across the weekend.
+            Every adjustment moves through <span className="text-foreground">Proposed → Testing → Successful / Rejected → Archived</span>. Nothing leaves the workshop without a verdict.
           </p>
         </div>
         <div className="min-w-[220px]">
@@ -162,11 +186,21 @@ function IterationPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
-        <Stat label="Iterations" value={String(stats.total)} />
-        <Stat label="Pending run" value={String(stats.pending)} />
-        <Stat label="Confirmed" value={String(stats.confirmed)} />
-        <Stat label="Cumulative gain" value={stats.gain ? formatLapTime(Math.abs(stats.gain)) : "—"} hint={stats.gain ? "vs prior baseline" : undefined} />
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mt-6">
+        <Stat label="Total" value={String(stats.total)} />
+        <Stat label="Proposed"   value={String(stats.proposed)}   onClick={() => setStatusFilter("proposed")}   active={statusFilter === "proposed"} />
+        <Stat label="Testing"    value={String(stats.testing)}    onClick={() => setStatusFilter("testing")}    active={statusFilter === "testing"}    tone="warn" />
+        <Stat label="Successful" value={String(stats.successful)} onClick={() => setStatusFilter("successful")} active={statusFilter === "successful"} tone="ok" />
+        <Stat label="Rejected"   value={String(stats.rejected)}   onClick={() => setStatusFilter("rejected")}   active={statusFilter === "rejected"}   tone="bad" />
+        <Stat label="Cumulative gain" value={stats.gain ? formatLapTime(Math.abs(stats.gain)) : "—"} hint={stats.gain ? "from successful changes" : undefined} />
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-1 text-xs font-mono uppercase tracking-widest">
+        <span className="text-muted-foreground mr-2">View:</span>
+        <FilterChip label="Active" active={statusFilter === "active"} onClick={() => setStatusFilter("active")} />
+        {LIFECYCLE_ORDER.map((s) => (
+          <FilterChip key={s} label={STATUS_META[s].label} active={statusFilter === s} onClick={() => setStatusFilter(s)} />
+        ))}
       </div>
 
       <div className="grid lg:grid-cols-[420px_1fr] gap-6 mt-8">
@@ -178,10 +212,11 @@ function IterationPage() {
           onSaved={() => qc.invalidateQueries({ queryKey: ["setup-changes", carId] })}
         />
         <HistoryColumn
-          rows={changesQ.data ?? []}
+          rows={visibleRows}
           setups={setupsQ.data ?? []}
           sessions={sessionsQ.data ?? []}
           loading={changesQ.isLoading}
+          emptyLabel={statusFilter === "active" ? "active" : STATUS_META[statusFilter as LifecycleStatus].label.toLowerCase()}
           onUpdated={() => qc.invalidateQueries({ queryKey: ["setup-changes", carId] })}
         />
       </div>
@@ -189,13 +224,35 @@ function IterationPage() {
   );
 }
 
-function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
+function Stat({ label, value, hint, onClick, active, tone }: { label: string; value: string; hint?: string; onClick?: () => void; active?: boolean; tone?: "ok" | "warn" | "bad" }) {
+  const toneCls =
+    tone === "ok"   ? "text-primary"
+    : tone === "warn" ? "text-accent"
+    : tone === "bad"  ? "text-destructive"
+    : "";
   return (
-    <div className="rounded-lg border border-border bg-card p-3 shadow-card">
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={!onClick}
+      className={`text-left rounded-lg border bg-card p-3 shadow-card transition-colors ${active ? "border-primary/60 ring-1 ring-primary/40" : "border-border"} ${onClick ? "hover:border-primary/40 cursor-pointer" : "cursor-default"}`}
+    >
       <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">{label}</div>
-      <div className="font-display text-2xl font-bold mt-0.5">{value}</div>
+      <div className={`font-display text-2xl font-bold mt-0.5 ${toneCls}`}>{value}</div>
       {hint && <div className="text-[10px] text-muted-foreground mt-0.5">{hint}</div>}
-    </div>
+    </button>
+  );
+}
+
+function FilterChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`px-2.5 py-1 rounded border transition-colors ${active ? "border-primary/60 bg-primary/10 text-primary" : "border-border bg-muted/30 text-muted-foreground hover:text-foreground hover:border-primary/30"}`}
+    >
+      {label}
+    </button>
   );
 }
 
@@ -247,12 +304,12 @@ function LogChangeForm({
         reason: reason.trim() || null,
         expected_effect: expected.trim() || null,
         changes: parseChanges(changesText),
-        outcome_status: "pending",
+        outcome_status: "proposed",
       });
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Change logged");
+      toast.success("Change proposed");
       setSummary(""); setReason(""); setExpected(""); setChangesText("");
       onSaved();
     },
@@ -263,7 +320,7 @@ function LogChangeForm({
     <div className="rounded-lg border border-border bg-card shadow-card p-5 h-fit sticky top-16">
       <div className="flex items-center gap-2 mb-4">
         <Plus className="w-4 h-4 text-primary" />
-        <h2 className="font-display text-lg font-bold uppercase tracking-wider">Log change</h2>
+        <h2 className="font-display text-lg font-bold uppercase tracking-wider">Propose change</h2>
       </div>
 
       <div className="space-y-3">
@@ -351,43 +408,47 @@ function LogChangeForm({
         </div>
 
         <Button onClick={() => save.mutate()} disabled={save.isPending} className="w-full shadow-glow">
-          {save.isPending ? "Logging…" : "Log change"}
+          {save.isPending ? "Saving…" : "Propose change"}
         </Button>
+        <p className="text-[10px] text-muted-foreground text-center -mt-1">
+          Enters as <span className="text-foreground">Proposed</span> · move to Testing when you run the change.
+        </p>
       </div>
     </div>
   );
 }
 
 function HistoryColumn({
-  rows, setups, sessions, loading, onUpdated,
+  rows, setups, sessions, loading, onUpdated, emptyLabel,
 }: {
   rows: ChangeRow[];
   setups: Setup[];
   sessions: Session[];
   loading: boolean;
   onUpdated: () => void;
+  emptyLabel: string;
 }) {
   const setupName = (id: string) => setups.find((s) => s.id === id)?.name ?? "Unknown setup";
   const sessionName = (id: string | null) => id ? sessions.find((s) => s.id === id)?.name ?? null : null;
 
   if (loading) {
-    return <div className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">Loading engineering memory…</div>;
+    return <div className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">Loading decision history…</div>;
   }
 
   if (!rows.length) {
     return (
       <div className="rounded-lg border border-dashed border-border bg-card/40 p-10 text-center">
         <GitBranch className="w-8 h-8 mx-auto text-muted-foreground/60" />
-        <div className="font-display text-lg font-bold mt-3">No iterations yet</div>
+        <div className="font-display text-lg font-bold mt-3">No {emptyLabel} changes</div>
         <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
-          Log the first change for this car. Even a single click of rear rebound deserves a reason and an expected effect — that's how the weekend builds memory.
+          Propose a change on the left. Every adjustment carries a reason, an expected effect, and ends with a verdict — that's how the weekend builds memory.
         </p>
         <div className="mt-4 inline-flex items-center gap-2 text-xs text-muted-foreground">
           <Link to="/baseline" className="text-primary hover:underline">Generate a baseline</Link>
           <ArrowRight className="w-3 h-3" />
           <Link to="/setups" className="text-primary hover:underline">Open a setup</Link>
           <ArrowRight className="w-3 h-3" />
-          <span>Log first change</span>
+          <span>Propose first change</span>
         </div>
       </div>
     );
@@ -416,28 +477,44 @@ function ChangeCard({
   sessionName: string | null;
   onUpdated: () => void;
 }) {
-  const meta = OUTCOME_META[row.outcome_status];
+  const meta = STATUS_META[row.outcome_status];
   const AreaIcon = AREAS.find((a) => a.id === row.area)?.icon ?? Wand2;
   const [open, setOpen] = useState(false);
+  const [verdictMode, setVerdictMode] = useState<"successful" | "rejected" | null>(null);
   const [lapDelta, setLapDelta] = useState<string>(row.lap_delta_ms != null ? String(row.lap_delta_ms / 1000) : "");
   const [confDelta, setConfDelta] = useState<string>(row.confidence_delta != null ? String(row.confidence_delta) : "");
   const [notes, setNotes] = useState<string>(row.outcome_notes ?? "");
   const [driverResponse, setDriverResponse] = useState<string>(row.driver_response ?? "");
-  const [status, setStatus] = useState<ChangeRow["outcome_status"]>(row.outcome_status);
 
-  const recordOutcome = useMutation({
+  const transition = useMutation({
+    mutationFn: async (next: LifecycleStatus) => {
+      const now = new Date().toISOString();
+      const patch: Record<string, unknown> = { outcome_status: next };
+      if (next === "testing")  patch.testing_started_at = now;
+      if (next === "archived") patch.archived_at = now;
+      if (next === "successful" || next === "rejected") patch.measured_at = now;
+      const { error } = await supabase.from("setup_changes").update(patch).eq("id", row.id);
+      if (error) throw error;
+    },
+    onSuccess: (_d, next) => { toast.success(`Moved to ${STATUS_META[next].label}`); onUpdated(); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const recordVerdict = useMutation({
     mutationFn: async () => {
+      if (!verdictMode) throw new Error("Pick a verdict");
+      const now = new Date().toISOString();
       const { error } = await supabase.from("setup_changes").update({
-        outcome_status: status,
+        outcome_status: verdictMode,
         outcome_notes: notes.trim() || null,
         driver_response: driverResponse.trim() || null,
         lap_delta_ms: lapDelta === "" ? null : Math.round(parseFloat(lapDelta) * 1000),
         confidence_delta: confDelta === "" ? null : parseInt(confDelta, 10),
-        measured_at: new Date().toISOString(),
+        measured_at: now,
       }).eq("id", row.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Outcome recorded"); setOpen(false); onUpdated(); },
+    onSuccess: () => { toast.success(verdictMode === "successful" ? "Marked Successful" : "Marked Rejected"); setOpen(false); setVerdictMode(null); onUpdated(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
@@ -451,9 +528,11 @@ function ChangeCard({
   });
 
   const changeEntries = Object.entries(row.changes ?? {});
+  const isTerminal = row.outcome_status === "successful" || row.outcome_status === "rejected";
+  const isArchived = row.outcome_status === "archived";
 
   return (
-    <div className="rounded-lg border border-border bg-card shadow-card overflow-hidden">
+    <div className={`rounded-lg border bg-card shadow-card overflow-hidden ${isArchived ? "border-border/40 opacity-70" : "border-border"}`}>
       <div className="px-4 py-3 flex items-start gap-3 border-b border-border/60">
         <div className="mt-0.5 w-9 h-9 rounded-md border border-border bg-muted/40 flex items-center justify-center text-primary">
           <AreaIcon className="w-4 h-4" />
@@ -472,6 +551,8 @@ function ChangeCard({
           </div>
         </div>
       </div>
+
+      <LifecycleBar status={row.outcome_status} />
 
       <div className="px-4 py-3 grid md:grid-cols-2 gap-3 text-sm">
         <Trail label="Reason"          value={row.reason} placeholder="No reason recorded" />
@@ -494,9 +575,9 @@ function ChangeCard({
         </div>
       )}
 
-      {row.outcome_status !== "pending" && (
+      {(row.lap_delta_ms != null || row.confidence_delta != null || row.outcome_notes) && (
         <div className="px-4 pb-3">
-          <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1">Measured outcome</div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1">Result</div>
           <div className="flex flex-wrap gap-3 text-sm">
             {row.lap_delta_ms != null && (
               <Metric label="Lap delta" value={`${row.lap_delta_ms <= 0 ? "−" : "+"}${formatLapTime(Math.abs(row.lap_delta_ms))}`} tone={row.lap_delta_ms < 0 ? "good" : row.lap_delta_ms > 0 ? "bad" : "neutral"} />
@@ -518,10 +599,38 @@ function ChangeCard({
         </div>
       )}
 
-      <div className="px-4 py-2 border-t border-border/60 bg-muted/20 flex items-center justify-between gap-2">
-        <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => setOpen((v) => !v)}>
-          {open ? "Close" : row.outcome_status === "pending" ? "Record outcome" : "Update outcome"}
-        </Button>
+      <div className="px-4 py-2 border-t border-border/60 bg-muted/20 flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center gap-1 flex-wrap">
+          {row.outcome_status === "proposed" && (
+            <ActionBtn icon={FlaskConical} label="Start testing" tone="warn"
+              onClick={() => transition.mutate("testing")} disabled={transition.isPending} />
+          )}
+          {row.outcome_status === "testing" && (
+            <>
+              <ActionBtn icon={CheckCircle2} label="Successful" tone="ok"
+                onClick={() => { setVerdictMode("successful"); setOpen(true); }} disabled={transition.isPending} />
+              <ActionBtn icon={XCircle} label="Rejected" tone="bad"
+                onClick={() => { setVerdictMode("rejected"); setOpen(true); }} disabled={transition.isPending} />
+              <ActionBtn icon={CircleDot} label="Back to Proposed" tone="muted"
+                onClick={() => transition.mutate("proposed")} disabled={transition.isPending} />
+            </>
+          )}
+          {isTerminal && (
+            <>
+              <ActionBtn icon={Archive} label="Archive" tone="muted"
+                onClick={() => transition.mutate("archived")} disabled={transition.isPending} />
+              <ActionBtn icon={FlaskConical} label="Re-test" tone="muted"
+                onClick={() => transition.mutate("testing")} disabled={transition.isPending} />
+            </>
+          )}
+          {isArchived && (
+            <ActionBtn icon={CircleDot} label="Restore" tone="muted"
+              onClick={() => transition.mutate(row.lap_delta_ms != null ? "successful" : "proposed")} disabled={transition.isPending} />
+          )}
+          <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => { setOpen((v) => !v); if (!open && isTerminal) setVerdictMode(row.outcome_status as "successful" | "rejected"); }}>
+            {open ? "Close" : isTerminal ? "Edit result" : "Add result"}
+          </Button>
+        </div>
         <Button variant="ghost" size="sm" className="h-7 text-xs text-muted-foreground hover:text-destructive" onClick={() => remove.mutate()} disabled={remove.isPending}>
           Delete
         </Button>
@@ -531,14 +640,12 @@ function ChangeCard({
         <div className="px-4 py-3 border-t border-border/60 bg-background/40 space-y-3">
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Status</Label>
-              <Select value={status} onValueChange={(v) => setStatus(v as ChangeRow["outcome_status"])}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+              <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Verdict</Label>
+              <Select value={verdictMode ?? ""} onValueChange={(v) => setVerdictMode(v as "successful" | "rejected")}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Pick verdict" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="confirmed">Confirmed</SelectItem>
-                  <SelectItem value="partial">Partial</SelectItem>
+                  <SelectItem value="successful">Successful</SelectItem>
                   <SelectItem value="rejected">Rejected</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -560,11 +667,11 @@ function ChangeCard({
             </div>
           </div>
           <div>
-            <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Outcome notes</Label>
+            <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Result notes</Label>
             <Textarea
               value={notes} onChange={(e) => setNotes(e.target.value)}
               rows={2}
-              placeholder="Rear platform calmer over kerbs, no loss mid-corner. Kept the change."
+              placeholder="Improved drive off slow corners. Slightly less stable under heavy braking."
               className="mt-1"
             />
           </div>
@@ -577,12 +684,69 @@ function ChangeCard({
               className="mt-1 italic"
             />
           </div>
-          <Button size="sm" onClick={() => recordOutcome.mutate()} disabled={recordOutcome.isPending}>
-            {recordOutcome.isPending ? "Saving…" : "Save outcome"}
+          <Button size="sm" onClick={() => recordVerdict.mutate()} disabled={recordVerdict.isPending || !verdictMode}>
+            {recordVerdict.isPending ? "Saving…" : verdictMode ? `Save verdict — ${STATUS_META[verdictMode].label}` : "Pick verdict to save"}
           </Button>
         </div>
       )}
     </div>
+  );
+}
+
+function LifecycleBar({ status }: { status: LifecycleStatus }) {
+  const idx = LIFECYCLE_ORDER.indexOf(status);
+  return (
+    <div className="px-4 py-2 border-b border-border/40 bg-background/30">
+      <div className="flex items-center gap-1">
+        {LIFECYCLE_ORDER.map((s, i) => {
+          const meta = STATUS_META[s];
+          const isCurrent = i === idx;
+          const isPast = i < idx && status !== "archived";
+          const isDone  = i <= idx;
+          return (
+            <div key={s} className="flex items-center gap-1 flex-1 min-w-0">
+              <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono uppercase tracking-widest border ${
+                isCurrent ? meta.tone + " font-bold"
+                : isPast  ? "border-primary/30 bg-primary/5 text-primary/70"
+                : isDone  ? meta.tone
+                : "border-border/40 bg-muted/10 text-muted-foreground/50"
+              }`}>
+                <meta.Icon className="w-2.5 h-2.5" /> {meta.label}
+              </div>
+              {i < LIFECYCLE_ORDER.length - 1 && (
+                <ArrowRight className={`w-3 h-3 shrink-0 ${i < idx ? "text-primary/60" : "text-muted-foreground/30"}`} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ActionBtn({
+  icon: Icon, label, tone, onClick, disabled,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  tone: "ok" | "warn" | "bad" | "muted";
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  const cls =
+    tone === "ok"   ? "border-primary/40 text-primary hover:bg-primary/10"
+    : tone === "warn" ? "border-accent/40 text-accent hover:bg-accent/10"
+    : tone === "bad"  ? "border-destructive/40 text-destructive hover:bg-destructive/10"
+    : "border-border text-muted-foreground hover:text-foreground hover:bg-muted/40";
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`inline-flex items-center gap-1 h-7 px-2 rounded border bg-background/40 text-[11px] font-mono uppercase tracking-widest transition-colors disabled:opacity-50 ${cls}`}
+    >
+      <Icon className="w-3 h-3" /> {label}
+    </button>
   );
 }
 
