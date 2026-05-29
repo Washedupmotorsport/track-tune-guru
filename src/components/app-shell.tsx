@@ -168,7 +168,8 @@ function MobileTabBar() {
   const items = [
     { to: "/garage",     label: "Garage",    icon: Home,    matches: ["/garage", "/cars", "/calendar", "/weekends"] },
     { to: "/pitwall",    label: "Trackside", icon: Radio,   matches: ["/pitwall", "/racemode", "/sessions", "/track-evolution", "/debrief", "/flags", "/timeline"] },
-   { to: "/setups",     label: "Setup",     icon: Wand2,   matches: ["/setups", "/baseline", "/iteration", "/philosophies", "/corners", "/confidence", "/sympathy", "/notes"] },
+    { to: "/setup-library", label: "Setup",  icon: Wand2,   matches: ["/setup-library", "/setups", "/baseline", "/iteration", "/philosophies", "/notes"] },
+    { to: "/post-debrief",  label: "Debrief", icon: ClipboardList, matches: ["/post-debrief", "/debrief", "/confidence", "/sympathy", "/corners", "/analysis", "/engineering-memory"] },
     { to: "/tyre-setup", label: "Tyres",     icon: Disc,    matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
     { to: "/workshop",   label: "Workshop",  icon: HardHat, matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
   ] as const;
@@ -179,7 +180,7 @@ function MobileTabBar() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="h-[2px] w-full bg-primary/70" aria-hidden />
-      <ul className="grid grid-cols-5">
+      <ul className="grid grid-cols-6">
         {items.map((it) => {
           const Icon = it.icon;
           const active = it.matches.some((m) => pathname === m || pathname.startsWith(m + "/"));
@@ -187,11 +188,11 @@ function MobileTabBar() {
             <li key={it.to}>
               <Link
                 to={it.to}
-                className={`flex flex-col items-center justify-center gap-1 h-16 text-[10px] font-mono uppercase tracking-widest active:bg-primary/10 transition-colors ${
+                className={`flex flex-col items-center justify-center gap-1 h-16 text-[9px] font-mono uppercase tracking-widest active:bg-primary/10 transition-colors ${
                   active ? "text-primary" : "text-muted-foreground hover:text-primary"
                 }`}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="w-[18px] h-[18px]" />
                 <span>{it.label}</span>
               </Link>
             </li>
@@ -208,11 +209,13 @@ function MobileTabBar() {
 // (where it makes sense) from the workspace front-door page.
 
 const WORKSPACES = [
-  { key: "garage",    label: "Garage",    icon: Home,    to: "/garage",     matches: ["/garage", "/cars", "/calendar", "/weekends"] },
-  { key: "trackside", label: "Trackside", icon: Radio,   to: "/pitwall",    matches: ["/pitwall", "/racemode", "/sessions", "/track-evolution", "/debrief", "/flags", "/timeline"] },
-  { key: "setup",     label: "Setup",     icon: Wand2,   to: "/setups",     matches: ["/setups", "/baseline", "/iteration", "/philosophies", "/corners", "/confidence", "/sympathy", "/notes"] },
-  { key: "tyres",     label: "Tyres",     icon: Disc,    to: "/tyre-setup", matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
-  { key: "workshop",  label: "Workshop",  icon: HardHat, to: "/workshop",   matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
+  // Race-weekend loop: Plan -> Track -> Debrief, with Setup / Tyres / Workshop as supporting workspaces.
+  { key: "plan",      label: "Plan",     icon: CalendarDays, to: "/garage",        matches: ["/garage", "/cars", "/calendar", "/weekends"] },
+  { key: "track",     label: "Track",    icon: Radio,        to: "/pitwall",       matches: ["/pitwall", "/pitlane", "/racemode", "/sessions", "/track-evolution", "/flags", "/timeline"] },
+  { key: "debrief",   label: "Debrief",  icon: ClipboardList, to: "/post-debrief", matches: ["/post-debrief", "/debrief", "/confidence", "/sympathy", "/corners", "/analysis", "/engineering-memory"] },
+  { key: "setup",     label: "Setup",    icon: Wand2,        to: "/setup-library", matches: ["/setup-library", "/setups", "/baseline", "/iteration", "/philosophies", "/notes"] },
+  { key: "tyres",     label: "Tyres",    icon: Disc,         to: "/tyre-setup",    matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
+  { key: "workshop",  label: "Workshop", icon: HardHat,      to: "/workshop",      matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
 ] as const;
 
 const ALL_NAV_GROUPS = [
@@ -224,7 +227,7 @@ const ALL_NAV_GROUPS = [
     ],
   },
   {
-    label: "Garage",
+    label: "Plan — before the weekend",
     items: [
       { to: "/garage",   label: "Garage",         icon: Home },
       { to: "/calendar", label: "Calendar",       icon: CalendarDays },
@@ -232,7 +235,7 @@ const ALL_NAV_GROUPS = [
     ],
   },
   {
-    label: "Trackside",
+    label: "Track — during the run",
     items: [
       { to: "/pitwall",         label: "Pit wall",         icon: Radio },
       { to: "/pitlane",         label: "Pit lane mode",    icon: Flag },
@@ -240,23 +243,29 @@ const ALL_NAV_GROUPS = [
       { to: "/sessions",        label: "Sessions",         icon: Timer },
       { to: "/timeline",        label: "Weekend timeline", icon: ClipboardList },
       { to: "/track-evolution", label: "Track evolution",  icon: CloudRain },
-      { to: "/debrief",         label: "Driver debrief",   icon: ClipboardList },
-      { to: "/post-debrief",    label: "Post-session debrief", icon: ClipboardList },
       { to: "/flags",           label: "Flags & incidents", icon: AlertTriangle },
     ],
   },
   {
-    label: "Setup",
+    label: "Debrief — after the run",
     items: [
-      { to: "/baseline",     label: "Baseline",            icon: Wand2 },
-      { to: "/setup-library", label: "Setup library",      icon: BookMarked },
-      { to: "/iteration",    label: "Setup iteration",     icon: GitBranch },
-      { to: "/philosophies", label: "Setup philosophies",  icon: BookOpen },
-      { to: "/corners",      label: "Corner analysis",     icon: MapPin },
-      { to: "/confidence",   label: "Driver confidence",   icon: Gauge },
-      { to: "/sympathy",     label: "Mechanical sympathy", icon: ShieldAlert },
-      { to: "/notes",        label: "Engineering notes",   icon: NotebookPen },
-      { to: "/engineering-memory", label: "Engineering memory", icon: Brain },
+      { to: "/post-debrief",       label: "Post-session debrief", icon: ClipboardList },
+      { to: "/debrief",            label: "Driver debrief",       icon: ClipboardList },
+      { to: "/confidence",         label: "Driver confidence",    icon: Gauge },
+      { to: "/sympathy",           label: "Mechanical sympathy",  icon: ShieldAlert },
+      { to: "/corners",            label: "Corner analysis",      icon: MapPin },
+      { to: "/analysis",           label: "Session analysis",     icon: BarChart3 },
+      { to: "/engineering-memory", label: "Engineering memory",   icon: Brain },
+    ],
+  },
+  {
+    label: "Setup — evolve the car",
+    items: [
+      { to: "/setup-library", label: "Setup library",       icon: BookMarked },
+      { to: "/baseline",      label: "Baseline generator",  icon: Wand2 },
+      { to: "/iteration",     label: "Setup iteration",     icon: GitBranch },
+      { to: "/philosophies",  label: "Setup philosophies",  icon: BookOpen },
+      { to: "/notes",         label: "Engineering notes",   icon: NotebookPen },
     ],
   },
   {
@@ -282,7 +291,6 @@ const ALL_NAV_GROUPS = [
   {
     label: "Tools",
     items: [
-      { to: "/analysis",    label: "Analysis",    icon: BarChart3 },
       { to: "/calculators", label: "Calculators", icon: Calculator },
     ],
   },

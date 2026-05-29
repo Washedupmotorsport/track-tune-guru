@@ -14,6 +14,7 @@ import { generateBaseline, type BaselineInput, type Drivetrain, type TireType, t
 import type { DisciplineId } from "@/lib/disciplines";
 import { DISCIPLINES } from "@/lib/disciplines";
 import { useUnits } from "@/lib/units";
+import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
 
 export const Route = createFileRoute("/_authenticated/baseline")({
   component: BaselinePage,
@@ -116,6 +117,7 @@ function BaselinePage() {
 
   return (
     <div>
+      <SetupWorkspaceNav />
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>

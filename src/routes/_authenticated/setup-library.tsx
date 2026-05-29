@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BookMarked, Pin, Trophy, Gauge, Cloud, Flame, Shield, Zap, Wand2, Search, Star } from "lucide-react";
 import { formatLapTime } from "@/lib/lap-time";
+import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
 
 export const Route = createFileRoute("/_authenticated/setup-library")({
   component: SetupLibrary,
@@ -160,6 +161,7 @@ function SetupLibrary() {
 
   return (
     <div>
+      <SetupWorkspaceNav />
       <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
         <BookMarked className="w-3 h-3" /> Setup library
       </div>

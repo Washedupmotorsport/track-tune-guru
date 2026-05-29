@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, NotebookPen, Plus, Trash2, Tag, Pencil, X, Save } from "lucide-react";
 import { toast } from "sonner";
+import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
 
 export const Route = createFileRoute("/_authenticated/notes")({
   component: NotesPage,
@@ -98,6 +99,7 @@ function NotesPage() {
 
   return (
     <div>
+      <SetupWorkspaceNav />
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
