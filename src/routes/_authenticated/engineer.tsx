@@ -33,6 +33,7 @@ type FeedbackRow = {
 type MemoryRow = {
   id: string; title: string; detail: string | null; category: string;
   occurrences: number; confidence: number; pinned: boolean; last_observed_at: string;
+  priority: string;
 };
 type TyreRow = {
   id: string; tire_set: string; compound: string | null;
@@ -135,12 +136,42 @@ function EngineerCockpit() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("engineering_memory")
-        .select("id, title, detail, category, occurrences, confidence, pinned, last_observed_at")
+        .select("id, title, detail, category, occurrences, confidence, pinned, last_observed_at, priority")
         .eq("status", "active")
         .order("pinned", { ascending: false }).order("last_observed_at", { ascending: false }).limit(5);
       if (error) throw error;
       return (data ?? []) as MemoryRow[];
     },
+  });
+
+  const prioritiesQ = useQuery({
+    queryKey: ["cockpit-priorities", user?.id], enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("engineering_memory")
+        .select("id, title, detail, category, occurrences, confidence, pinned, last_observed_at, priority")
+        .eq("status", "active")
+        .in("priority", ["critical", "testing", "monitor"])
+        .order("last_observed_at", { ascending: false })
+        .limit(40);
+      if (error) throw error;
+      return (data ?? []) as MemoryRow[];
+    },
+  });
+
+  const priorityM = useMutation({
+    mutationFn: async (vars: { id: string; priority: "critical" | "testing" | "monitor" | "resolved" }) => {
+      const patch: { priority: string; status?: string } = { priority: vars.priority };
+      if (vars.priority === "resolved") patch.status = "archived";
+      const { error } = await supabase.from("engineering_memory").update(patch).eq("id", vars.id);
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      toast.success(`Marked ${vars.priority}`);
+      qc.invalidateQueries({ queryKey: ["cockpit-priorities"] });
+      qc.invalidateQueries({ queryKey: ["cockpit-memory"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
   const tyresQ = useQuery({
@@ -223,6 +254,13 @@ function EngineerCockpit() {
   const confDelta = lastConf != null && prevConf != null ? lastConf - prevConf : null;
 
   const criticalFlags = (inboxQ.data ?? []).filter((f) => f.severity === "critical").length;
+  const priorities = prioritiesQ.data ?? [];
+  const priorityGroups = useMemo(() => {
+    const order: Array<"critical" | "testing" | "monitor"> = ["critical", "testing", "monitor"];
+    return order.map((p) => ({ key: p, items: priorities.filter((i) => i.priority === p) }));
+  }, [priorities]);
+  const criticalIssues = priorityGroups[0].items.length;
+  const testingIssues = priorityGroups[1].items.length;
   const session = sessionQ.data;
   const setup = activeSetupQ.data;
   const nextEvent = nextEventQ.data;
