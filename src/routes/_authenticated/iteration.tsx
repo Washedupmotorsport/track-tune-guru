@@ -489,11 +489,12 @@ function ChangeCard({
   const transition = useMutation({
     mutationFn: async (next: LifecycleStatus) => {
       const now = new Date().toISOString();
-      const patch: Record<string, unknown> = { outcome_status: next };
-      if (next === "testing")  patch.testing_started_at = now;
-      if (next === "archived") patch.archived_at = now;
-      if (next === "successful" || next === "rejected") patch.measured_at = now;
-      const { error } = await supabase.from("setup_changes").update(patch).eq("id", row.id);
+      const { error } = await supabase.from("setup_changes").update({
+        outcome_status: next,
+        ...(next === "testing"  ? { testing_started_at: now } : {}),
+        ...(next === "archived" ? { archived_at: now }        : {}),
+        ...(next === "successful" || next === "rejected" ? { measured_at: now } : {}),
+      }).eq("id", row.id);
       if (error) throw error;
     },
     onSuccess: (_d, next) => { toast.success(`Moved to ${STATUS_META[next].label}`); onUpdated(); },
