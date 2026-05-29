@@ -14,6 +14,7 @@ import { generateBaseline, type BaselineInput, type Drivetrain, type TireType, t
 import type { DisciplineId } from "@/lib/disciplines";
 import { DISCIPLINES } from "@/lib/disciplines";
 import { useUnits } from "@/lib/units";
+import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
 
 export const Route = createFileRoute("/_authenticated/baseline")({
   component: BaselinePage,
