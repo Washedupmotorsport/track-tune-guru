@@ -4,6 +4,7 @@ import {
   BookOpen, Wind, ShieldCheck, CloudRain, Zap, Mountain,
   Activity, Disc, Gauge, Sparkles, ThumbsUp, ThumbsDown, ChevronRight,
 } from "lucide-react";
+import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
 
 export const Route = createFileRoute("/_authenticated/philosophies")({
   component: PhilosophiesPage,
