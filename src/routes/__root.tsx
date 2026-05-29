@@ -141,7 +141,21 @@ function RootComponent() {
 
   useEffect(() => {
     if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
-    navigator.serviceWorker.register("/sw.js").catch(() => {});
+    // Only enable the offline shell on the published production origin.
+    // In preview / dev / lovable iframes, an active SW caches stale HTML that
+    // references old JS chunks, causing 404s and reload flashing.
+    const host = window.location.hostname;
+    const isProd = host === "track-tune-guru.lovable.app";
+    if (isProd) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    } else {
+      navigator.serviceWorker.getRegistrations().then((regs) => {
+        regs.forEach((r) => r.unregister().catch(() => {}));
+      }).catch(() => {});
+      if (window.caches) {
+        caches.keys().then((keys) => keys.forEach((k) => caches.delete(k))).catch(() => {});
+      }
+    }
   }, []);
 
   return (
