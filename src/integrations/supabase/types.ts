@@ -463,6 +463,7 @@ export type Database = {
           last_observed_at: string
           occurrences: number
           pinned: boolean
+          priority: string
           session_id: string | null
           setup_id: string | null
           status: string
@@ -482,6 +483,7 @@ export type Database = {
           last_observed_at?: string
           occurrences?: number
           pinned?: boolean
+          priority?: string
           session_id?: string | null
           setup_id?: string | null
           status?: string
@@ -501,6 +503,7 @@ export type Database = {
           last_observed_at?: string
           occurrences?: number
           pinned?: boolean
+          priority?: string
           session_id?: string | null
           setup_id?: string | null
           status?: string
