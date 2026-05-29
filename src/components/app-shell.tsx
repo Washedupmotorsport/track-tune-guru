@@ -168,7 +168,8 @@ function MobileTabBar() {
   const items = [
     { to: "/garage",     label: "Garage",    icon: Home,    matches: ["/garage", "/cars", "/calendar", "/weekends"] },
     { to: "/pitwall",    label: "Trackside", icon: Radio,   matches: ["/pitwall", "/racemode", "/sessions", "/track-evolution", "/debrief", "/flags", "/timeline"] },
-   { to: "/setups",     label: "Setup",     icon: Wand2,   matches: ["/setups", "/baseline", "/iteration", "/philosophies", "/corners", "/confidence", "/sympathy", "/notes"] },
+    { to: "/setup-library", label: "Setup",  icon: Wand2,   matches: ["/setup-library", "/setups", "/baseline", "/iteration", "/philosophies", "/notes"] },
+    { to: "/post-debrief",  label: "Debrief", icon: ClipboardList, matches: ["/post-debrief", "/debrief", "/confidence", "/sympathy", "/corners", "/analysis", "/engineering-memory"] },
     { to: "/tyre-setup", label: "Tyres",     icon: Disc,    matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
     { to: "/workshop",   label: "Workshop",  icon: HardHat, matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
   ] as const;
