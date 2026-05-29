@@ -182,13 +182,13 @@ function EngineerCockpit() {
 
   const verdictM = useMutation({
     mutationFn: async (vars: { id: string; status: "testing" | "successful" | "rejected" }) => {
-      const patch: Record<string, unknown> = {
-        outcome_status: vars.status,
-        measured_at: new Date().toISOString(),
-      };
-      if (vars.status === "testing") patch.testing_started_at = new Date().toISOString();
+      const now = new Date().toISOString();
       const { error } = await supabase.from("setup_changes")
-        .update(patch)
+        .update({
+          outcome_status: vars.status,
+          measured_at: now,
+          ...(vars.status === "testing" ? { testing_started_at: now } : {}),
+        })
         .eq("id", vars.id);
       if (error) throw error;
     },
