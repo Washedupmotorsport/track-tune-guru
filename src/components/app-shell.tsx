@@ -172,7 +172,7 @@ function MobileTabBar() {
     { to: "/setup-library", label: "Setup",  icon: Wand2,   matches: ["/setup-library", "/setups", "/baseline", "/iteration", "/philosophies", "/notes"] },
     { to: "/post-debrief",  label: "Debrief", icon: ClipboardList, matches: ["/post-debrief", "/debrief", "/confidence", "/sympathy", "/corners", "/analysis", "/engineering-memory"] },
     { to: "/tyre-setup", label: "Tyres",     icon: Disc,    matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
-    { to: "/workshop",   label: "Workshop",  icon: HardHat, matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
+    { to: "/workshop",   label: "Shop",      icon: Wrench,  matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
   ] as const;
   return (
     <nav
