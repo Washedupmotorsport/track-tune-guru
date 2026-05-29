@@ -378,7 +378,7 @@ function EngineerCockpit() {
                       <li key={f.corner} className="flex items-center gap-2">
                         <AlertTriangle className="w-3 h-3 text-accent" />
                         <span className="font-mono">{f.corner} {f.psi.toFixed(1)} psi</span>
-                        <span className="text-muted-foreground">· {f.reason === "under" ? "under-pressure (&lt;25)" : "over-pressure (&gt;33)"}</span>
+                        <span className="text-muted-foreground">· {f.reason === "under" ? "under-pressure (<25)" : "over-pressure (>33)"}</span>
                       </li>
                     ))}
                   </ul>
