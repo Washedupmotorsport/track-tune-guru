@@ -5,9 +5,10 @@ import { useAuth } from "@/lib/auth-context";
 import {
   GitBranch, Disc, Gauge, ArrowRight, Brain, MessageSquare, AlertTriangle,
   HardHat, CheckCircle2, CircleDot, XCircle, Pin, ClipboardList, Radio, Cloud,
+  Fuel, Timer, Wrench, Wand2, CalendarDays, TrendingUp, TrendingDown, Minus,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/engineer")({
   head: () => ({
