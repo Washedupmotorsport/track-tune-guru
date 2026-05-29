@@ -493,6 +493,24 @@ function EntryEditor({
           </span>
         </label>
 
+        <div>
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+            Priority
+          </Label>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {PRIORITIES.map((p) => (
+              <button
+                key={p.key}
+                type="button"
+                onClick={() => setPriority(p.key)}
+                className={`inline-flex items-center px-2 h-7 rounded border font-mono text-[10px] uppercase tracking-widest transition ${priority === p.key ? p.cls : "border-border bg-background/40 text-muted-foreground hover:border-primary/50"}`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="flex justify-end gap-2 pt-2">
           <Button variant="ghost" onClick={onCancel}>Cancel</Button>
           <Button onClick={save} disabled={saving}>
