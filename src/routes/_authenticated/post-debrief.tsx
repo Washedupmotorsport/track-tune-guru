@@ -40,9 +40,21 @@ type Debrief = {
 function PostDebriefPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const search = Route.useSearch();
   const [carFilter, setCarFilter] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  const [seedSessionId, setSeedSessionId] = useState<string | undefined>(undefined);
+
+  // Deep-link from a session detail page: ?sessionId=...&new=1
+  useEffect(() => {
+    if (search.new && search.sessionId) {
+      setSeedSessionId(search.sessionId);
+      setEditing(true);
+      setOpenId(null);
+      if (search.carId) setCarFilter(search.carId);
+    }
+  }, [search.new, search.sessionId, search.carId]);
 
   const carsQ = useQuery({
     queryKey: ["debrief-cars-pd", user?.id],
