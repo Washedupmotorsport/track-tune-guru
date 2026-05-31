@@ -169,16 +169,12 @@ function TyreSetupPage() {
             </Select>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Car + driver load (kg)</Label>
-              <Input type="number" inputMode="decimal" value={load}
-                onChange={(e) => setLoad(e.target.value)} className="font-mono" />
-            </div>
-            <div>
-              <Label>Track temp ({tempUnit})</Label>
-              <Input type="number" inputMode="decimal" value={trackTemp}
-                onChange={(e) => setTrackTemp(e.target.value)} className="font-mono" />
-            </div>
+            <Stepper label="Car + driver load" unit="kg"
+              value={load} step={10} min={400} max={2000} precision={0}
+              onChange={setLoad} />
+            <Stepper label="Track temp" unit={tempUnit}
+              value={trackTemp} step={1} min={-10} max={70} precision={0}
+              onChange={setTrackTemp} />
           </div>
           <div>
             <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">

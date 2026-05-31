@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import {
   Gauge, Thermometer, Droplets, Fuel, Timer, CloudSun, Activity,
-  Disc, TrendingDown, TrendingUp, Wind, Flame, ArrowRight,
+  Disc, TrendingDown, TrendingUp, Wind, Flame, ArrowRight, AlertTriangle,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/pitwall")({ component: PitWallPage });
@@ -33,6 +33,10 @@ type Tire = {
   ambient_c: number | null; track_c: number | null; recorded_at: string;
 };
 type Setup = { id: string; car_id: string; name: string; setup_data: Record<string, unknown>; updated_at: string };
+type Priority = {
+  id: string; title: string; category: string; priority: string;
+  detail: string | null; last_observed_at: string;
+};
 
 function fmtLap(ms: number | null | undefined) {
   if (ms == null) return "—";
@@ -130,6 +134,22 @@ function PitWallPage() {
     enabled: !!user,
   });
 
+  const prioritiesQ = useQuery({
+    queryKey: ["pw-priorities", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("engineering_memory")
+        .select("id,title,category,priority,detail,last_observed_at")
+        .eq("status", "active")
+        .in("priority", ["critical", "testing"])
+        .order("last_observed_at", { ascending: false })
+        .limit(6);
+      if (error) throw error;
+      return data as Priority[];
+    },
+    enabled: !!user,
+  });
+
   const latestTire = tireQ.data?.[0];
   const latestSetup = setupsQ.data?.[0];
 
@@ -193,6 +213,32 @@ function PitWallPage() {
 
   return (
     <div className="space-y-3">
+      {/* WATCH — active critical/testing priorities, race-weekend triage */}
+      {(prioritiesQ.data?.length ?? 0) > 0 && (
+        <div className="border-[1.5px] border-destructive/40 bg-destructive/5 rounded-md">
+          <div className="flex items-center gap-2 px-3 py-2 border-b border-destructive/30">
+            <AlertTriangle className="w-3.5 h-3.5 text-destructive" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-destructive">Watch · active priorities</span>
+            <Link to="/engineer" className="ml-auto font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary">
+              Cockpit →
+            </Link>
+          </div>
+          <ul className="divide-y divide-destructive/20">
+            {(prioritiesQ.data ?? []).map((p) => (
+              <li key={p.id} className="px-3 py-2 flex items-center gap-2">
+                <span className={`inline-flex items-center px-1.5 h-5 rounded text-[10px] font-mono uppercase tracking-widest ${
+                  p.priority === "critical"
+                    ? "bg-destructive text-destructive-foreground"
+                    : "bg-accent/80 text-accent-foreground"
+                }`}>{p.priority}</span>
+                <span className="text-[13px] font-semibold truncate flex-1 min-w-0">{p.title}</span>
+                <span className="hidden sm:inline text-[10px] font-mono text-muted-foreground uppercase">{p.category}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* Pit-wall header strip */}
       <div className="border border-border bg-card/60 rounded-md">
         <div className="flex items-center justify-between px-3 py-2 border-b border-border">

@@ -93,7 +93,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={toggle}
               title="Toggle metric / imperial"
               aria-label="Toggle units"
-              className="inline-flex items-center rounded-md border border-border bg-muted/30 px-2 py-1.5 text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden md:inline-flex items-center rounded-md border border-border bg-muted/30 px-2 py-1.5 text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40"
             >
               <span className={system === "metric" ? "text-primary" : ""}>SI</span>
               <span className="mx-1 opacity-40">/</span>
@@ -103,14 +103,14 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={toggleTheme}
               title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
               aria-label="Toggle theme"
-              className="inline-flex items-center justify-center rounded-md border border-border bg-muted/30 h-[34px] w-[34px] text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden md:inline-flex items-center justify-center rounded-md border border-border bg-muted/30 h-[34px] w-[34px] text-muted-foreground hover:text-primary hover:border-primary/40"
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             <Select value={currency} onValueChange={(v) => setCurrency(v as CurrencyCode)}>
               <SelectTrigger
                 aria-label="Currency"
-                className="h-[34px] w-[78px] rounded-md border border-border bg-muted/30 px-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40"
+                className="hidden md:flex h-[34px] w-[78px] rounded-md border border-border bg-muted/30 px-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40"
               >
                 <SelectValue />
               </SelectTrigger>
