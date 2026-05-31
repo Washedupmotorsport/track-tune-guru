@@ -17,11 +17,12 @@ export function QuickLogFab() {
   if (pathname === "/" || pathname.startsWith("/auth") || pathname.startsWith("/share")) return null;
 
   const actions = [
+    { to: "/engineering-memory", label: "Flag CRITICAL", icon: AlertTriangle, tone: "warn" },
     { to: "/tyre-setup",  label: "Tyre pressures", icon: Gauge,         tone: "primary" },
     { to: "/sessions",    label: "New lap",        icon: Timer,         tone: "primary" },
     { to: "/tires",       label: "Tyre log",       icon: Disc,          tone: "default" },
     { to: "/debrief",     label: "Driver debrief", icon: ClipboardList, tone: "default" },
-    { to: "/flags",       label: "Flag / incident",icon: AlertTriangle, tone: "warn" },
+    { to: "/flags",       label: "Track incident", icon: AlertTriangle, tone: "default" },
     { to: "/notes",       label: "Quick note",     icon: NotebookPen,   tone: "default" },
     { to: "/engineering-memory", label: "Notebook entry", icon: Brain, tone: "default" },
     { to: "/pitwall",     label: "Pit wall",       icon: Radio,         tone: "default" },
