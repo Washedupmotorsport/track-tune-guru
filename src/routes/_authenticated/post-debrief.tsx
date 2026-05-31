@@ -240,15 +240,21 @@ type Form = {
 };
 const EMPTY: Form = { improved: "", worsened: "", needs_work: "", confidence_issue: "", tyre_issue: "", balance_issue: "", suggested_changes: "", notes: "" };
 
-function DebriefEditor({ userId, cars, sessions, initialCarId, onSaved, onCancel }: {
-  userId: string; cars: Car[]; sessions: Session[]; initialCarId: string;
+function DebriefEditor({ userId, cars, sessions, initialCarId, initialSessionId, onSaved, onCancel }: {
+  userId: string; cars: Car[]; sessions: Session[]; initialCarId: string; initialSessionId?: string;
   onSaved: (id: string) => void; onCancel: () => void;
 }) {
   const [carId, setCarId] = useState(initialCarId);
-  const [sessionId, setSessionId] = useState<string>("");
+  const [sessionId, setSessionId] = useState<string>(initialSessionId ?? "");
   const [form, setForm] = useState<Form>(EMPTY);
 
   useEffect(() => { if (!carId && cars[0]) setCarId(cars[0].id); }, [cars, carId]);
+  // If we were deep-linked with a session, also lock the editor's car to it.
+  useEffect(() => {
+    if (!initialSessionId) return;
+    const s = sessions.find((x) => x.id === initialSessionId);
+    if (s) { setCarId(s.car_id); setSessionId(s.id); }
+  }, [initialSessionId, sessions]);
 
   const carSessions = sessions.filter((s) => s.car_id === carId);
 
