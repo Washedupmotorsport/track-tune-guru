@@ -159,14 +159,28 @@ function TyreSetupPage() {
           <h2 className="font-display text-lg font-bold uppercase tracking-wider">Inputs</h2>
           <div>
             <Label>Compound</Label>
-            <Select value={compound} onValueChange={setCompound}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {Object.entries(COMPOUND_BASE).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>{v.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {/* One-tap chip row — no dropdown, no keyboard. Sized for gloved thumbs. */}
+            <div className="mt-1 grid grid-cols-4 gap-1.5">
+              {Object.entries(COMPOUND_BASE).map(([k, v]) => {
+                const active = compound === k;
+                return (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setCompound(k)}
+                    className={
+                      "h-12 rounded-md border-[1.5px] font-display font-bold uppercase tracking-wider text-sm transition-colors active:scale-[0.97] " +
+                      (active
+                        ? "border-primary bg-primary text-primary-foreground shadow-glow"
+                        : "border-border bg-card text-foreground hover:border-primary/50")
+                    }
+                    aria-pressed={active}
+                  >
+                    {v.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <Stepper label="Car + driver load" unit="kg"
