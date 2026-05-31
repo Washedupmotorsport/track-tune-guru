@@ -197,7 +197,7 @@ function SessionsPage() {
             const fuel = s.fuel_start_l != null && s.fuel_end_l != null ? (s.fuel_start_l - s.fuel_end_l) : null;
             return (
             <Link key={s.id} to="/sessions/$sessionId" params={{ sessionId: s.id }}
-              className="block rounded-sm border border-border bg-card hover:border-primary transition-colors">
+              className="block rounded-sm border-[1.5px] border-border bg-card hover:border-primary active:scale-[0.997] transition-colors min-h-[4rem]">
               <div className="flex items-center gap-3 px-3 py-2.5 border-b border-border/60 bg-muted/20">
                 <span className="font-mono text-[10px] uppercase tracking-[0.15em] px-1.5 py-0.5 rounded-sm bg-primary/20 text-primary">{s.session_type}</span>
                 <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground truncate">{carName(s.car_id)}</span>
@@ -206,15 +206,19 @@ function SessionsPage() {
                 </div>
                 <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
               </div>
-              <div className="px-3 py-2.5 flex items-center gap-4 flex-wrap">
+              <div className="px-3 py-3 flex items-center gap-4 flex-wrap">
                 <div className="min-w-0 flex-1">
-                  <div className="font-display text-base font-bold uppercase tracking-tight truncate">{s.name}</div>
-                  <div className="mt-0.5 flex items-center gap-3 text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground flex-wrap">
+                  <div className="font-display text-lg font-bold uppercase tracking-tight truncate">{s.name}</div>
+                  <div className="mt-0.5 hidden sm:flex items-center gap-3 text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground flex-wrap">
                     {s.track && <span>{s.track}</span>}
                     {s.driver && <span>· {s.driver}</span>}
                     {s.weather && <span className="flex items-center gap-1"><Cloud className="w-3 h-3" />{s.weather}</span>}
                     {s.air_temp_c != null && <span className="flex items-center gap-1"><Thermometer className="w-3 h-3" />{s.air_temp_c}°C</span>}
                     {s.track_temp_c != null && <span>Track {s.track_temp_c}°C</span>}
+                  </div>
+                  <div className="mt-0.5 flex sm:hidden items-center gap-2 text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground truncate">
+                    {s.track && <span className="truncate">{s.track}</span>}
+                    {s.driver && <span className="truncate">· {s.driver}</span>}
                   </div>
                 </div>
                 <div className="flex items-center gap-4 font-mono tabular-nums text-xs shrink-0">
@@ -236,7 +240,7 @@ function Cell({ label, value, accent, icon }: { label: string; value: string; ac
   return (
     <div className="text-right">
       <div className="flex items-center justify-end gap-1 text-[9px] uppercase tracking-[0.15em] text-muted-foreground">{icon}{label}</div>
-      <div className={`text-sm font-bold ${accent ? "text-primary" : ""}`}>{value}</div>
+      <div className={`font-mono tabular-nums tracking-tight font-bold ${accent ? "text-primary text-lg" : "text-base"}`}>{value}</div>
     </div>
   );
 }
