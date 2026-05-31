@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import {
   ClipboardCheck, Plus, Save, Sparkles, Loader2, TrendingUp, TrendingDown,
-  AlertTriangle, Gauge, Disc, ShieldCheck, Wrench, Trash2, ChevronRight,
+  AlertTriangle, Gauge, Disc, ShieldCheck, Wrench, Trash2, ChevronRight, Pin, GitBranch,
 } from "lucide-react";
 import { toast } from "sonner";
 import { summarizeSessionDebrief, type SessionDebriefAI } from "@/lib/session-debrief.functions";
