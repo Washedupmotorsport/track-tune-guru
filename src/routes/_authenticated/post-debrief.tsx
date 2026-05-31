@@ -19,6 +19,11 @@ import { summarizeSessionDebrief, type SessionDebriefAI } from "@/lib/session-de
 
 export const Route = createFileRoute("/_authenticated/post-debrief")({
   component: PostDebriefPage,
+  validateSearch: (s: Record<string, unknown>) => ({
+    sessionId: typeof s.sessionId === "string" ? s.sessionId : undefined,
+    carId: typeof s.carId === "string" ? s.carId : undefined,
+    new: s.new === "1" || s.new === true ? true : undefined,
+  }),
 });
 
 type Car = { id: string; name: string };
