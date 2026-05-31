@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, AlertTriangle, Cloud, FileDown, Monitor, Table as TableIcon } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, AlertTriangle, Cloud, FileDown, Monitor, Table as TableIcon, ClipboardCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { parseLapTime, formatLapTime } from "@/lib/lap-time";
@@ -163,6 +163,14 @@ function SessionDetail() {
         <div className="flex items-center gap-2">
           <Link to="/sessions/$sessionId/pitboard" params={{ sessionId }}>
             <Button variant="outline" size="sm"><Monitor className="w-4 h-4 mr-1" /> Pit board</Button>
+          </Link>
+          <Link
+            to="/post-debrief"
+            search={{ sessionId, carId: sessionQ.data.car_id, new: true }}
+          >
+            <Button variant="outline" size="sm">
+              <ClipboardCheck className="w-4 h-4 mr-1" /> Debrief
+            </Button>
           </Link>
           <Button variant="outline" size="sm" onClick={fetchWeather} disabled={weatherLoading}>
             {weatherLoading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Cloud className="w-4 h-4 mr-1" />} Weather

@@ -12,13 +12,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import {
   ClipboardCheck, Plus, Save, Sparkles, Loader2, TrendingUp, TrendingDown,
-  AlertTriangle, Gauge, Disc, ShieldCheck, Wrench, Trash2, ChevronRight,
+  AlertTriangle, Gauge, Disc, ShieldCheck, Wrench, Trash2, ChevronRight, Pin, GitBranch,
 } from "lucide-react";
 import { toast } from "sonner";
 import { summarizeSessionDebrief, type SessionDebriefAI } from "@/lib/session-debrief.functions";
 
 export const Route = createFileRoute("/_authenticated/post-debrief")({
   component: PostDebriefPage,
+  validateSearch: (s: Record<string, unknown>) => ({
+    sessionId: typeof s.sessionId === "string" ? s.sessionId : undefined,
+    carId: typeof s.carId === "string" ? s.carId : undefined,
+    new: s.new === "1" || s.new === true ? true : undefined,
+  }),
 });
 
 type Car = { id: string; name: string };
@@ -35,9 +40,21 @@ type Debrief = {
 function PostDebriefPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const search = Route.useSearch();
   const [carFilter, setCarFilter] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  const [seedSessionId, setSeedSessionId] = useState<string | undefined>(undefined);
+
+  // Deep-link from a session detail page: ?sessionId=...&new=1
+  useEffect(() => {
+    if (search.new && search.sessionId) {
+      setSeedSessionId(search.sessionId);
+      setEditing(true);
+      setOpenId(null);
+      if (search.carId) setCarFilter(search.carId);
+    }
+  }, [search.new, search.sessionId, search.carId]);
 
   const carsQ = useQuery({
     queryKey: ["debrief-cars-pd", user?.id],
@@ -183,12 +200,14 @@ function PostDebriefPage() {
               cars={carsQ.data ?? []}
               sessions={sessionsQ.data ?? []}
               initialCarId={carFilter !== "all" ? carFilter : (carsQ.data?.[0]?.id ?? "")}
+              initialSessionId={seedSessionId}
               onSaved={(id) => {
                 qc.invalidateQueries({ queryKey: ["session-debriefs"] });
                 setEditing(false);
                 setOpenId(id);
+                setSeedSessionId(undefined);
               }}
-              onCancel={() => setEditing(false)}
+              onCancel={() => { setEditing(false); setSeedSessionId(undefined); }}
             />
           ) : opened ? (
             <DebriefDetail debrief={opened} sessions={sessionsQ.data ?? []} cars={carsQ.data ?? []} qc={qc} />
@@ -221,15 +240,21 @@ type Form = {
 };
 const EMPTY: Form = { improved: "", worsened: "", needs_work: "", confidence_issue: "", tyre_issue: "", balance_issue: "", suggested_changes: "", notes: "" };
 
-function DebriefEditor({ userId, cars, sessions, initialCarId, onSaved, onCancel }: {
-  userId: string; cars: Car[]; sessions: Session[]; initialCarId: string;
+function DebriefEditor({ userId, cars, sessions, initialCarId, initialSessionId, onSaved, onCancel }: {
+  userId: string; cars: Car[]; sessions: Session[]; initialCarId: string; initialSessionId?: string;
   onSaved: (id: string) => void; onCancel: () => void;
 }) {
   const [carId, setCarId] = useState(initialCarId);
-  const [sessionId, setSessionId] = useState<string>("");
+  const [sessionId, setSessionId] = useState<string>(initialSessionId ?? "");
   const [form, setForm] = useState<Form>(EMPTY);
 
   useEffect(() => { if (!carId && cars[0]) setCarId(cars[0].id); }, [cars, carId]);
+  // If we were deep-linked with a session, also lock the editor's car to it.
+  useEffect(() => {
+    if (!initialSessionId) return;
+    const s = sessions.find((x) => x.id === initialSessionId);
+    if (s) { setCarId(s.car_id); setSessionId(s.id); }
+  }, [initialSessionId, sessions]);
 
   const carSessions = sessions.filter((s) => s.car_id === carId);
 
@@ -434,6 +459,9 @@ function DebriefDetail({ debrief, sessions, cars, qc }: {
                         "bg-muted/40"
                       }`}>{a.priority}</Badge>
                       <span className="font-mono text-[10px] uppercase tracking-widest text-primary">{a.area}</span>
+                      <div className="ml-auto flex items-center gap-1">
+                        <PromoteButtons debrief={debrief} action={a} />
+                      </div>
                     </div>
                     <p className="text-sm mt-1">{a.advice}</p>
                   </li>
@@ -496,3 +524,86 @@ function TrendBlock({ label, icon, data }: { label: string; icon: React.ReactNod
 
 // Touch icon imports kept for tree-shaking awareness
 void AlertTriangle;
+
+/* ---------------- Promote AI suggestion → memory / setup change ---------------- */
+
+function mapAreaToCategory(area: string): string {
+  const a = area.toLowerCase();
+  if (a.includes("tyre") || a.includes("tire") || a.includes("pressure")) return "tyres";
+  if (a.includes("brake")) return "brakes";
+  if (a.includes("aero") || a.includes("wing")) return "aero";
+  if (a.includes("damp") || a.includes("spring") || a.includes("arb") || a.includes("ride")) return "suspension";
+  if (a.includes("balance") || a.includes("rotation") || a.includes("understeer") || a.includes("oversteer")) return "handling";
+  return "handling";
+}
+
+function PromoteButtons({
+  debrief,
+  action,
+}: {
+  debrief: { id: string; car_id: string; session_id: string | null; setup_id: string | null };
+  action: { area: string; advice: string; priority: "high" | "medium" | "low" };
+}) {
+  const { user } = useAuth();
+  const [busy, setBusy] = useState<"mem" | "set" | null>(null);
+
+  const pinToMemory = async () => {
+    if (!user) return;
+    setBusy("mem");
+    try {
+      const { error } = await supabase.from("engineering_memory").insert({
+        user_id: user.id,
+        car_id: debrief.car_id,
+        session_id: debrief.session_id,
+        setup_id: debrief.setup_id,
+        category: mapAreaToCategory(action.area),
+        title: action.area,
+        detail: action.advice,
+        priority: action.priority === "high" ? "critical" : action.priority === "medium" ? "testing" : "monitor",
+        tags: ["from-debrief"],
+        confidence: 3,
+      });
+      if (error) throw error;
+      toast.success("Pinned to Engineering Memory");
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally { setBusy(null); }
+  };
+
+  const logSetupChange = async () => {
+    if (!user) return;
+    if (!debrief.setup_id) { toast.error("Attach a setup to the session to log a change"); return; }
+    setBusy("set");
+    try {
+      const { error } = await supabase.from("setup_changes").insert({
+        user_id: user.id,
+        car_id: debrief.car_id,
+        setup_id: debrief.setup_id,
+        session_id: debrief.session_id,
+        area: mapAreaToCategory(action.area),
+        summary: action.advice.slice(0, 140),
+        reason: `From debrief — ${action.area}`,
+        expected_effect: action.advice,
+        changes: {},
+        outcome_status: "proposed",
+      });
+      if (error) throw error;
+      toast.success("Logged as proposed setup change");
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally { setBusy(null); }
+  };
+
+  return (
+    <>
+      <Button size="sm" variant="ghost" className="h-7 px-2 text-[10px]" onClick={pinToMemory} disabled={busy !== null}>
+        {busy === "mem" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Pin className="w-3 h-3 mr-1" />}
+        Memory
+      </Button>
+      <Button size="sm" variant="ghost" className="h-7 px-2 text-[10px]" onClick={logSetupChange} disabled={busy !== null}>
+        {busy === "set" ? <Loader2 className="w-3 h-3 animate-spin" /> : <GitBranch className="w-3 h-3 mr-1" />}
+        Setup
+      </Button>
+    </>
+  );
+}
