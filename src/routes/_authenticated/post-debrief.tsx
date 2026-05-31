@@ -524,3 +524,86 @@ function TrendBlock({ label, icon, data }: { label: string; icon: React.ReactNod
 
 // Touch icon imports kept for tree-shaking awareness
 void AlertTriangle;
+
+/* ---------------- Promote AI suggestion → memory / setup change ---------------- */
+
+function mapAreaToCategory(area: string): string {
+  const a = area.toLowerCase();
+  if (a.includes("tyre") || a.includes("tire") || a.includes("pressure")) return "tyres";
+  if (a.includes("brake")) return "brakes";
+  if (a.includes("aero") || a.includes("wing")) return "aero";
+  if (a.includes("damp") || a.includes("spring") || a.includes("arb") || a.includes("ride")) return "suspension";
+  if (a.includes("balance") || a.includes("rotation") || a.includes("understeer") || a.includes("oversteer")) return "handling";
+  return "handling";
+}
+
+function PromoteButtons({
+  debrief,
+  action,
+}: {
+  debrief: { id: string; car_id: string; session_id: string | null; setup_id: string | null };
+  action: { area: string; advice: string; priority: "high" | "medium" | "low" };
+}) {
+  const { user } = useAuth();
+  const [busy, setBusy] = useState<"mem" | "set" | null>(null);
+
+  const pinToMemory = async () => {
+    if (!user) return;
+    setBusy("mem");
+    try {
+      const { error } = await supabase.from("engineering_memory").insert({
+        user_id: user.id,
+        car_id: debrief.car_id,
+        session_id: debrief.session_id,
+        setup_id: debrief.setup_id,
+        category: mapAreaToCategory(action.area),
+        title: action.area,
+        detail: action.advice,
+        priority: action.priority === "high" ? "critical" : action.priority === "medium" ? "testing" : "monitor",
+        tags: ["from-debrief"],
+        confidence: 3,
+      });
+      if (error) throw error;
+      toast.success("Pinned to Engineering Memory");
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally { setBusy(null); }
+  };
+
+  const logSetupChange = async () => {
+    if (!user) return;
+    if (!debrief.setup_id) { toast.error("Attach a setup to the session to log a change"); return; }
+    setBusy("set");
+    try {
+      const { error } = await supabase.from("setup_changes").insert({
+        user_id: user.id,
+        car_id: debrief.car_id,
+        setup_id: debrief.setup_id,
+        session_id: debrief.session_id,
+        area: mapAreaToCategory(action.area),
+        summary: action.advice.slice(0, 140),
+        reason: `From debrief — ${action.area}`,
+        expected_effect: action.advice,
+        changes: {},
+        outcome_status: "proposed",
+      });
+      if (error) throw error;
+      toast.success("Logged as proposed setup change");
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally { setBusy(null); }
+  };
+
+  return (
+    <>
+      <Button size="sm" variant="ghost" className="h-7 px-2 text-[10px]" onClick={pinToMemory} disabled={busy !== null}>
+        {busy === "mem" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Pin className="w-3 h-3 mr-1" />}
+        Memory
+      </Button>
+      <Button size="sm" variant="ghost" className="h-7 px-2 text-[10px]" onClick={logSetupChange} disabled={busy !== null}>
+        {busy === "set" ? <Loader2 className="w-3 h-3 animate-spin" /> : <GitBranch className="w-3 h-3 mr-1" />}
+        Setup
+      </Button>
+    </>
+  );
+}
