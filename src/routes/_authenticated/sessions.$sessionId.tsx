@@ -350,6 +350,30 @@ function SessionDetail() {
           </div>
         )}
       </div>
+
+      {/* Sticky mobile action bar — pit-lane one-handed use */}
+      <div
+        className="md:hidden fixed inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur-md"
+        style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 4rem)" }}
+      >
+        <div className="grid grid-cols-2 gap-2 p-2">
+          <a
+            href="#add-lap"
+            className="h-12 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground font-display font-bold uppercase tracking-wider text-sm active:scale-[0.98]"
+          >
+            <Plus className="w-4 h-4" /> Log lap
+          </a>
+          <button
+            type="button"
+            onClick={() => save.mutate()}
+            disabled={save.isPending}
+            className="h-12 inline-flex items-center justify-center gap-2 rounded-md border-[1.5px] border-border bg-card font-display font-bold uppercase tracking-wider text-sm active:scale-[0.98] disabled:opacity-50"
+          >
+            {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
+          </button>
+        </div>
+      </div>
+      <div className="md:hidden h-20" aria-hidden />
     </div>
   );
 }
