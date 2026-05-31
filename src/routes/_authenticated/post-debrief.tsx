@@ -200,12 +200,14 @@ function PostDebriefPage() {
               cars={carsQ.data ?? []}
               sessions={sessionsQ.data ?? []}
               initialCarId={carFilter !== "all" ? carFilter : (carsQ.data?.[0]?.id ?? "")}
+              initialSessionId={seedSessionId}
               onSaved={(id) => {
                 qc.invalidateQueries({ queryKey: ["session-debriefs"] });
                 setEditing(false);
                 setOpenId(id);
+                setSeedSessionId(undefined);
               }}
-              onCancel={() => setEditing(false)}
+              onCancel={() => { setEditing(false); setSeedSessionId(undefined); }}
             />
           ) : opened ? (
             <DebriefDetail debrief={opened} sessions={sessionsQ.data ?? []} cars={carsQ.data ?? []} qc={qc} />
