@@ -595,6 +595,87 @@ export type Database = {
         }
         Relationships: []
       }
+      known_behaviours: {
+        Row: {
+          car_id: string
+          category: string
+          compound: string | null
+          confidence: number
+          created_at: string
+          description: string | null
+          fuel_state: string | null
+          id: string
+          last_observed_at: string
+          occurrences: number
+          pinned: boolean
+          setup_id: string | null
+          severity: string
+          status: string
+          tags: string[]
+          temp_max_c: number | null
+          temp_min_c: number | null
+          title: string
+          track: string | null
+          triggers: string[]
+          updated_at: string
+          user_id: string
+          weather: string | null
+          workaround: string | null
+        }
+        Insert: {
+          car_id: string
+          category?: string
+          compound?: string | null
+          confidence?: number
+          created_at?: string
+          description?: string | null
+          fuel_state?: string | null
+          id?: string
+          last_observed_at?: string
+          occurrences?: number
+          pinned?: boolean
+          setup_id?: string | null
+          severity?: string
+          status?: string
+          tags?: string[]
+          temp_max_c?: number | null
+          temp_min_c?: number | null
+          title: string
+          track?: string | null
+          triggers?: string[]
+          updated_at?: string
+          user_id: string
+          weather?: string | null
+          workaround?: string | null
+        }
+        Update: {
+          car_id?: string
+          category?: string
+          compound?: string | null
+          confidence?: number
+          created_at?: string
+          description?: string | null
+          fuel_state?: string | null
+          id?: string
+          last_observed_at?: string
+          occurrences?: number
+          pinned?: boolean
+          setup_id?: string | null
+          severity?: string
+          status?: string
+          tags?: string[]
+          temp_max_c?: number | null
+          temp_min_c?: number | null
+          title?: string
+          track?: string | null
+          triggers?: string[]
+          updated_at?: string
+          user_id?: string
+          weather?: string | null
+          workaround?: string | null
+        }
+        Relationships: []
+      }
       laps: {
         Row: {
           car_id: string
