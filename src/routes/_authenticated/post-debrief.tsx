@@ -459,6 +459,9 @@ function DebriefDetail({ debrief, sessions, cars, qc }: {
                         "bg-muted/40"
                       }`}>{a.priority}</Badge>
                       <span className="font-mono text-[10px] uppercase tracking-widest text-primary">{a.area}</span>
+                      <div className="ml-auto flex items-center gap-1">
+                        <PromoteButtons debrief={debrief} action={a} />
+                      </div>
                     </div>
                     <p className="text-sm mt-1">{a.advice}</p>
                   </li>
