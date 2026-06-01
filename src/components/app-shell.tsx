@@ -273,12 +273,6 @@ const ALL_NAV_GROUPS = [
     ],
   },
   {
-    label: "Session Debrief",
-    items: [
-      { to: "/post-debrief", label: "Debrief (improved / worse / next)", icon: ClipboardList },
-    ],
-  },
-  {
     label: "Setup",
     items: [
       { to: "/setup-library", label: "Setup library",       icon: BookMarked },
