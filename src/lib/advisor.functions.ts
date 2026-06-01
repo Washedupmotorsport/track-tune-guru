@@ -85,8 +85,8 @@ Respond with the JSON object only, no prose.`;
     });
 
     if (res.status === 429) throw new Error("Rate limited. Try again shortly.");
-    if (res.status === 402) throw new Error("AI credits exhausted. Add credits in workspace settings.");
-    if (!res.ok) throw new Error(`AI gateway error (${res.status})`);
+    if (res.status === 402) throw new Error("Out of engineer credits. Top up in workspace settings.");
+    if (!res.ok) throw new Error(`Race engineer service error (${res.status})`);
 
     const json = await res.json();
     const content: string = json?.choices?.[0]?.message?.content ?? "";
@@ -95,7 +95,7 @@ Respond with the JSON object only, no prose.`;
       parsed = JSON.parse(content);
     } catch {
       const match = content.match(/\{[\s\S]*\}/);
-      if (!match) throw new Error("AI returned invalid response");
+      if (!match) throw new Error("Race engineer returned a malformed response");
       parsed = JSON.parse(match[0]);
     }
 

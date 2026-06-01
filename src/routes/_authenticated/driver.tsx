@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/driver")({
   head: () => ({
     meta: [
       { title: "Driver — My Race Engineer" },
-      { name: "description", content: "Driver workflow: quick feedback, confidence scoring, debrief notes, and handling issues." },
+      { name: "description", content: "Driver workspace: in-car feedback, confidence scoring, debrief notes, and handling complaints." },
     ],
   }),
   component: DriverHub,

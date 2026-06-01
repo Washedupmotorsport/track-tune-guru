@@ -122,8 +122,8 @@ function AnalysisPage() {
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
       <div className="mt-4">
-        <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1"><BarChart3 className="w-3 h-3" /> Insights</div>
-        <h1 className="font-display text-4xl font-bold mt-1">Analysis</h1>
+        <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1"><BarChart3 className="w-3 h-3" /> Telemetry</div>
+        <h1 className="font-display text-4xl font-bold mt-1">Stint analysis</h1>
       </div>
 
       <div className="mt-6 rounded-lg border border-border bg-card p-5">

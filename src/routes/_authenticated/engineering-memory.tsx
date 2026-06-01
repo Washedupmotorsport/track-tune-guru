@@ -457,7 +457,7 @@ function EntryEditor({
         </div>
 
         <div>
-          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Trait / insight</Label>
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Trait / observation</Label>
           <Input value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1"
             placeholder={meta.hint} />
         </div>
