@@ -309,7 +309,7 @@ function SetupDetail() {
             <h2 className="font-display text-lg font-bold uppercase tracking-wider">Setup Advisor</h2>
           </div>
           <p className="text-sm text-muted-foreground mb-4">
-            AI race engineer. Tell it the weather and what you're trying to improve.
+            Race engineer in the loop. Give it the conditions and what the driver is chasing.
           </p>
           <div className="grid md:grid-cols-3 gap-4">
             <div>
