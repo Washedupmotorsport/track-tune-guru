@@ -169,10 +169,11 @@ function MobileTabBar() {
   const items = [
     { to: "/engineer",      label: "Cockpit",  icon: HardHat,       matches: ["/engineer"] },
     { to: "/pitwall",       label: "Race",     icon: Radio,         matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution"] },
-    { to: "/sessions",      label: "Sessions", icon: Timer,         matches: ["/sessions", "/timeline", "/analysis"] },
+    { to: "/sessions",      label: "Sessions", icon: Timer,         matches: ["/sessions", "/timeline", "/analysis", "/post-debrief"] },
     { to: "/tyre-setup",    label: "Tyres",    icon: Disc,          matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
     { to: "/driver",        label: "Driver",   icon: Mic,           matches: ["/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours", "/debrief"] },
-    { to: "/post-debrief",  label: "Debrief",  icon: ClipboardList, matches: ["/post-debrief"] },
+    { to: "/setup-library", label: "Setup",    icon: Wand2,         matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
+    { to: "/engineering-memory", label: "Log", icon: Brain,         matches: ["/engineering-memory", "/notes"] },
     { to: "/garage",        label: "Garage",   icon: Home,          matches: ["/garage", "/cars", "/calendar", "/weekends", "/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
   ] as const;
   return (
@@ -182,7 +183,7 @@ function MobileTabBar() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="h-[2px] w-full bg-primary/70" aria-hidden />
-      <ul className="grid grid-cols-7">
+      <ul className="grid grid-cols-8">
         {items.map((it) => {
           const Icon = it.icon;
           const active = it.matches.some((m) => pathname === m || pathname.startsWith(m + "/"));
@@ -211,17 +212,16 @@ function MobileTabBar() {
 // (where it makes sense) from the workspace front-door page.
 
 const WORKSPACES = [
-  // 10-stop primary nav. Each workspace has a front door; sister pages live under it.
+  // 8-stop primary nav. Debrief lives under Sessions (per-session workflow);
+  // Operations lives under Garage. Nothing merged that isn't a real duplicate.
   { key: "cockpit",  label: "Cockpit",   icon: HardHat,       to: "/engineer",       matches: ["/engineer"] },
   { key: "race",     label: "Race Mode", icon: Radio,         to: "/pitwall",        matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution"] },
   { key: "setup",    label: "Setup",     icon: Wand2,         to: "/setup-library",  matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-  { key: "sessions", label: "Sessions",  icon: Timer,         to: "/sessions",       matches: ["/sessions", "/timeline", "/analysis"] },
+  { key: "sessions", label: "Sessions",  icon: Timer,         to: "/sessions",       matches: ["/sessions", "/timeline", "/analysis", "/post-debrief"] },
   { key: "tyres",    label: "Tyres",     icon: Disc,          to: "/tyre-setup",     matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
   { key: "driver",   label: "Driver",    icon: Mic,           to: "/driver",         matches: ["/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours", "/debrief"] },
-  { key: "debrief",  label: "Debrief",   icon: ClipboardList, to: "/post-debrief",   matches: ["/post-debrief"] },
   { key: "log",      label: "Log",       icon: Brain,         to: "/engineering-memory", matches: ["/engineering-memory", "/notes"] },
-  { key: "garage",   label: "Garage",    icon: Home,          to: "/garage",         matches: ["/garage", "/cars", "/calendar", "/weekends"] },
-  { key: "ops",      label: "Operations", icon: Wrench,       to: "/workshop",       matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
+  { key: "garage",   label: "Garage",    icon: Home,          to: "/garage",         matches: ["/garage", "/cars", "/calendar", "/weekends", "/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
 ] as const;
 
 const ALL_NAV_GROUPS = [
@@ -248,6 +248,7 @@ const ALL_NAV_GROUPS = [
       { to: "/sessions",        label: "Sessions",         icon: Timer },
       { to: "/timeline",        label: "Weekend timeline", icon: ClipboardList },
       { to: "/analysis",        label: "Stint analysis",   icon: BarChart3 },
+      { to: "/post-debrief",    label: "Session debrief",  icon: ClipboardList },
     ],
   },
   {
@@ -270,12 +271,6 @@ const ALL_NAV_GROUPS = [
       { to: "/philosophies",     label: "Driving philosophy", icon: NotebookPen },
       { to: "/flags",            label: "Track flags",       icon: Flag },
       { to: "/corners",          label: "Corner notes",      icon: MapPin },
-    ],
-  },
-  {
-    label: "Session Debrief",
-    items: [
-      { to: "/post-debrief", label: "Debrief (improved / worse / next)", icon: ClipboardList },
     ],
   },
   {
