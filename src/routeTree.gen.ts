@@ -32,6 +32,7 @@ import { Route as AuthenticatedPitlaneRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedPhilosophiesRouteImport } from './routes/_authenticated/philosophies'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
 import { Route as AuthenticatedMaintenanceRouteImport } from './routes/_authenticated/maintenance'
+import { Route as AuthenticatedKnownBehavioursRouteImport } from './routes/_authenticated/known-behaviours'
 import { Route as AuthenticatedIterationRouteImport } from './routes/_authenticated/iteration'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedGarageRouteImport } from './routes/_authenticated/garage'
@@ -174,6 +175,12 @@ const AuthenticatedMaintenanceRoute =
   AuthenticatedMaintenanceRouteImport.update({
     id: '/maintenance',
     path: '/maintenance',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedKnownBehavioursRoute =
+  AuthenticatedKnownBehavioursRouteImport.update({
+    id: '/known-behaviours',
+    path: '/known-behaviours',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedIterationRoute = AuthenticatedIterationRouteImport.update({
@@ -319,6 +326,7 @@ export interface FileRoutesByFullPath {
   '/garage': typeof AuthenticatedGarageRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/iteration': typeof AuthenticatedIterationRoute
+  '/known-behaviours': typeof AuthenticatedKnownBehavioursRoute
   '/maintenance': typeof AuthenticatedMaintenanceRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/philosophies': typeof AuthenticatedPhilosophiesRoute
@@ -366,6 +374,7 @@ export interface FileRoutesByTo {
   '/garage': typeof AuthenticatedGarageRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/iteration': typeof AuthenticatedIterationRoute
+  '/known-behaviours': typeof AuthenticatedKnownBehavioursRoute
   '/maintenance': typeof AuthenticatedMaintenanceRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/philosophies': typeof AuthenticatedPhilosophiesRoute
@@ -415,6 +424,7 @@ export interface FileRoutesById {
   '/_authenticated/garage': typeof AuthenticatedGarageRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
   '/_authenticated/iteration': typeof AuthenticatedIterationRoute
+  '/_authenticated/known-behaviours': typeof AuthenticatedKnownBehavioursRoute
   '/_authenticated/maintenance': typeof AuthenticatedMaintenanceRoute
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
   '/_authenticated/philosophies': typeof AuthenticatedPhilosophiesRoute
@@ -464,6 +474,7 @@ export interface FileRouteTypes {
     | '/garage'
     | '/inventory'
     | '/iteration'
+    | '/known-behaviours'
     | '/maintenance'
     | '/notes'
     | '/philosophies'
@@ -511,6 +522,7 @@ export interface FileRouteTypes {
     | '/garage'
     | '/inventory'
     | '/iteration'
+    | '/known-behaviours'
     | '/maintenance'
     | '/notes'
     | '/philosophies'
@@ -559,6 +571,7 @@ export interface FileRouteTypes {
     | '/_authenticated/garage'
     | '/_authenticated/inventory'
     | '/_authenticated/iteration'
+    | '/_authenticated/known-behaviours'
     | '/_authenticated/maintenance'
     | '/_authenticated/notes'
     | '/_authenticated/philosophies'
@@ -756,6 +769,13 @@ declare module '@tanstack/react-router' {
       path: '/maintenance'
       fullPath: '/maintenance'
       preLoaderRoute: typeof AuthenticatedMaintenanceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/known-behaviours': {
+      id: '/_authenticated/known-behaviours'
+      path: '/known-behaviours'
+      fullPath: '/known-behaviours'
+      preLoaderRoute: typeof AuthenticatedKnownBehavioursRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/iteration': {
@@ -981,6 +1001,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedGarageRoute: typeof AuthenticatedGarageRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
   AuthenticatedIterationRoute: typeof AuthenticatedIterationRoute
+  AuthenticatedKnownBehavioursRoute: typeof AuthenticatedKnownBehavioursRoute
   AuthenticatedMaintenanceRoute: typeof AuthenticatedMaintenanceRoute
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
   AuthenticatedPhilosophiesRoute: typeof AuthenticatedPhilosophiesRoute
@@ -1022,6 +1043,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedGarageRoute: AuthenticatedGarageRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
   AuthenticatedIterationRoute: AuthenticatedIterationRoute,
+  AuthenticatedKnownBehavioursRoute: AuthenticatedKnownBehavioursRoute,
   AuthenticatedMaintenanceRoute: AuthenticatedMaintenanceRoute,
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
   AuthenticatedPhilosophiesRoute: AuthenticatedPhilosophiesRoute,

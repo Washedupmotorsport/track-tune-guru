@@ -8,6 +8,7 @@ import {
   ClipboardList, FileText,
   MapPin, CloudRain, ShieldAlert, BookOpen, GitBranch, Brain,
   Mic, BookMarked,
+  Sparkles,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
