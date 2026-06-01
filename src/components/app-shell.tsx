@@ -171,7 +171,7 @@ function MobileTabBar() {
     { to: "/garage",     label: "Garage",    icon: Home,    matches: ["/garage", "/cars", "/calendar", "/weekends"] },
     { to: "/pitwall",    label: "Trackside", icon: Radio,   matches: ["/pitwall", "/racemode", "/sessions", "/track-evolution", "/debrief", "/flags", "/timeline"] },
     { to: "/setup-library", label: "Setup",  icon: Wand2,   matches: ["/setup-library", "/setups", "/baseline", "/iteration", "/philosophies", "/notes"] },
-    { to: "/post-debrief",  label: "Debrief", icon: ClipboardList, matches: ["/post-debrief", "/debrief", "/confidence", "/sympathy", "/corners", "/analysis", "/engineering-memory"] },
+    { to: "/post-debrief",  label: "Debrief", icon: ClipboardList, matches: ["/post-debrief", "/debrief", "/confidence", "/sympathy", "/corners", "/analysis", "/engineering-memory", "/known-behaviours"] },
     { to: "/tyre-setup", label: "Tyres",     icon: Disc,    matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
     { to: "/workshop",   label: "Shop",      icon: Wrench,  matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
   ] as const;
@@ -214,7 +214,7 @@ const WORKSPACES = [
   // Race-weekend loop: Plan -> Track -> Debrief, with Setup / Tyres / Workshop as supporting workspaces.
   { key: "plan",      label: "Plan",     icon: CalendarDays, to: "/garage",        matches: ["/garage", "/cars", "/calendar", "/weekends"] },
   { key: "track",     label: "Track",    icon: Radio,        to: "/pitwall",       matches: ["/pitwall", "/pitlane", "/racemode", "/sessions", "/track-evolution", "/flags", "/timeline"] },
-  { key: "debrief",   label: "Debrief",  icon: ClipboardList, to: "/post-debrief", matches: ["/post-debrief", "/debrief", "/confidence", "/sympathy", "/corners", "/analysis", "/engineering-memory"] },
+  { key: "debrief",   label: "Debrief",  icon: ClipboardList, to: "/post-debrief", matches: ["/post-debrief", "/debrief", "/confidence", "/sympathy", "/corners", "/analysis", "/engineering-memory", "/known-behaviours"] },
   { key: "setup",     label: "Setup",    icon: Wand2,        to: "/setup-library", matches: ["/setup-library", "/setups", "/baseline", "/iteration", "/philosophies", "/notes"] },
   { key: "tyres",     label: "Tyres",    icon: Disc,         to: "/tyre-setup",    matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
   { key: "workshop",  label: "Workshop", icon: HardHat,      to: "/workshop",      matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
@@ -258,6 +258,7 @@ const ALL_NAV_GROUPS = [
       { to: "/corners",            label: "Corner analysis",      icon: MapPin },
       { to: "/analysis",           label: "Session analysis",     icon: BarChart3 },
       { to: "/engineering-memory", label: "Engineering memory",   icon: Brain },
+      { to: "/known-behaviours",   label: "Known behaviours",     icon: Sparkles },
     ],
   },
   {
