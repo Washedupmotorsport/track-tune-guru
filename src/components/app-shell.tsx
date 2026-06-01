@@ -169,10 +169,11 @@ function MobileTabBar() {
   const items = [
     { to: "/engineer",      label: "Cockpit",  icon: HardHat,       matches: ["/engineer"] },
     { to: "/pitwall",       label: "Race",     icon: Radio,         matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution"] },
-    { to: "/sessions",      label: "Sessions", icon: Timer,         matches: ["/sessions", "/timeline", "/analysis"] },
+    { to: "/sessions",      label: "Sessions", icon: Timer,         matches: ["/sessions", "/timeline", "/analysis", "/post-debrief"] },
     { to: "/tyre-setup",    label: "Tyres",    icon: Disc,          matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
     { to: "/driver",        label: "Driver",   icon: Mic,           matches: ["/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours", "/debrief"] },
-    { to: "/post-debrief",  label: "Debrief",  icon: ClipboardList, matches: ["/post-debrief"] },
+    { to: "/setup-library", label: "Setup",    icon: Wand2,         matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
+    { to: "/engineering-memory", label: "Log", icon: Brain,         matches: ["/engineering-memory", "/notes"] },
     { to: "/garage",        label: "Garage",   icon: Home,          matches: ["/garage", "/cars", "/calendar", "/weekends", "/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
   ] as const;
   return (
