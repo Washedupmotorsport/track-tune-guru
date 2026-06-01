@@ -3,10 +3,10 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
   LogOut, Calculator, Wand2, NotebookPen, Timer, Disc, Wrench,
-  Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon, Gauge, TrendingDown, GitCompare,
+  Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon,
   Home, Flag, AlertTriangle, HardHat, Radio,
   ClipboardList, FileText,
-  MapPin, CloudRain, ShieldAlert, BookOpen, GitBranch, Brain,
+  MapPin, CloudRain, GitBranch, Brain,
   Mic, BookMarked,
   Sparkles,
 } from "lucide-react";
@@ -169,9 +169,9 @@ function MobileTabBar() {
   const items = [
     { to: "/engineer",   label: "Cockpit",   icon: HardHat, matches: ["/engineer"] },
     { to: "/garage",     label: "Garage",    icon: Home,    matches: ["/garage", "/cars", "/calendar", "/weekends"] },
-    { to: "/pitwall",    label: "Trackside", icon: Radio,   matches: ["/pitwall", "/racemode", "/sessions", "/track-evolution", "/debrief", "/flags", "/timeline"] },
-    { to: "/setup-library", label: "Setup",  icon: Wand2,   matches: ["/setup-library", "/setups", "/baseline", "/iteration", "/philosophies", "/notes"] },
-    { to: "/post-debrief",  label: "Debrief", icon: ClipboardList, matches: ["/post-debrief", "/debrief", "/confidence", "/sympathy", "/corners", "/analysis", "/engineering-memory", "/known-behaviours"] },
+    { to: "/pitwall",    label: "Trackside", icon: Radio,   matches: ["/pitwall", "/sessions", "/track-evolution", "/debrief", "/timeline"] },
+    { to: "/setup-library", label: "Setup",  icon: Wand2,   matches: ["/setup-library", "/setups", "/baseline", "/iteration", "/notes"] },
+    { to: "/post-debrief",  label: "Debrief", icon: ClipboardList, matches: ["/post-debrief", "/debrief", "/corners", "/analysis", "/engineering-memory", "/known-behaviours"] },
     { to: "/tyre-setup", label: "Tyres",     icon: Disc,    matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
     { to: "/workshop",   label: "Shop",      icon: Wrench,  matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
   ] as const;
@@ -213,9 +213,9 @@ function MobileTabBar() {
 const WORKSPACES = [
   // Race-weekend loop: Plan -> Track -> Debrief, with Setup / Tyres / Workshop as supporting workspaces.
   { key: "plan",      label: "Plan",     icon: CalendarDays, to: "/garage",        matches: ["/garage", "/cars", "/calendar", "/weekends"] },
-  { key: "track",     label: "Track",    icon: Radio,        to: "/pitwall",       matches: ["/pitwall", "/pitlane", "/racemode", "/sessions", "/track-evolution", "/flags", "/timeline"] },
-  { key: "debrief",   label: "Debrief",  icon: ClipboardList, to: "/post-debrief", matches: ["/post-debrief", "/debrief", "/confidence", "/sympathy", "/corners", "/analysis", "/engineering-memory", "/known-behaviours"] },
-  { key: "setup",     label: "Setup",    icon: Wand2,        to: "/setup-library", matches: ["/setup-library", "/setups", "/baseline", "/iteration", "/philosophies", "/notes"] },
+  { key: "track",     label: "Track",    icon: Radio,        to: "/pitwall",       matches: ["/pitwall", "/sessions", "/track-evolution", "/timeline"] },
+  { key: "debrief",   label: "Debrief",  icon: ClipboardList, to: "/post-debrief", matches: ["/post-debrief", "/debrief", "/corners", "/analysis", "/engineering-memory", "/known-behaviours"] },
+  { key: "setup",     label: "Setup",    icon: Wand2,        to: "/setup-library", matches: ["/setup-library", "/setups", "/baseline", "/iteration", "/notes"] },
   { key: "tyres",     label: "Tyres",    icon: Disc,         to: "/tyre-setup",    matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
   { key: "workshop",  label: "Workshop", icon: HardHat,      to: "/workshop",      matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
 ] as const;
@@ -240,12 +240,9 @@ const ALL_NAV_GROUPS = [
     label: "Track — during the run",
     items: [
       { to: "/pitwall",         label: "Pit wall",         icon: Radio },
-      { to: "/pitlane",         label: "Pit lane mode",    icon: Flag },
-      { to: "/racemode",        label: "Race mode",        icon: Flag },
       { to: "/sessions",        label: "Sessions",         icon: Timer },
       { to: "/timeline",        label: "Weekend timeline", icon: ClipboardList },
       { to: "/track-evolution", label: "Track evolution",  icon: CloudRain },
-      { to: "/flags",           label: "Flags & incidents", icon: AlertTriangle },
     ],
   },
   {
@@ -253,8 +250,6 @@ const ALL_NAV_GROUPS = [
     items: [
       { to: "/post-debrief",       label: "Post-session debrief", icon: ClipboardList },
       { to: "/debrief",            label: "Driver debrief",       icon: ClipboardList },
-      { to: "/confidence",         label: "Driver confidence",    icon: Gauge },
-      { to: "/sympathy",           label: "Mechanical sympathy",  icon: ShieldAlert },
       { to: "/corners",            label: "Corner analysis",      icon: MapPin },
       { to: "/analysis",           label: "Session analysis",     icon: BarChart3 },
       { to: "/engineering-memory", label: "Engineering memory",   icon: Brain },
@@ -267,17 +262,13 @@ const ALL_NAV_GROUPS = [
       { to: "/setup-library", label: "Setup library",       icon: BookMarked },
       { to: "/baseline",      label: "Baseline generator",  icon: Wand2 },
       { to: "/iteration",     label: "Setup iteration",     icon: GitBranch },
-      { to: "/philosophies",  label: "Setup philosophies",  icon: BookOpen },
       { to: "/notes",         label: "Engineering notes",   icon: NotebookPen },
     ],
   },
   {
-    label: "Tyres",
+    label: "Tyres — pressures, wear, sets",
     items: [
-      { to: "/tyre-setup",   label: "Tyre pressures",  icon: Gauge },
-      { to: "/tyre-wear",    label: "Tyre wear",       icon: TrendingDown },
-      { to: "/tyre-compare", label: "Tyre compare",    icon: GitCompare },
-      { to: "/tires",        label: "Tyre sets",       icon: Disc },
+      { to: "/tyre-setup",   label: "Tyres",           icon: Disc },
     ],
   },
   {
