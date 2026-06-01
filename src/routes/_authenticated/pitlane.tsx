@@ -101,12 +101,8 @@ function PitLaneMode() {
     },
   });
 
-  const lastLap = lapsQ.data?.[0]?.lap_time_ms ?? null;
-  const bestLap = useMemo(
-    () => lapsQ.data?.reduce<number | null>((b, l) => (b === null || l.lap_time_ms < b ? l.lap_time_ms : b), null) ?? null,
-    [lapsQ.data]
-  );
-  const lastDelta = lastLap && bestLap ? lastLap - bestLap : null;
+  // Local stopwatch laps are declared below; combine with persisted laps
+  // so the top readouts reflect what the user is timing right now.
 
   // ---------- Local editable state ----------
   const [press, setPress] = useState<Record<string, number>>({ hot_fl: 0, hot_fr: 0, hot_rl: 0, hot_rr: 0 });
@@ -138,6 +134,13 @@ function PitLaneMode() {
   const startRef = useRef<number | null>(null);
   const [lapStart, setLapStart] = useState(0);
   const [laps, setLaps] = useState<number[]>([]);
+
+  const lastLap = laps[0] ?? lapsQ.data?.[0]?.lap_time_ms ?? null;
+  const bestLap = useMemo(() => {
+    const all = [...laps, ...((lapsQ.data ?? []).map((l) => l.lap_time_ms))];
+    return all.reduce<number | null>((b, ms) => (b === null || ms < b ? ms : b), null);
+  }, [laps, lapsQ.data]);
+  const lastDelta = lastLap !== null && bestLap !== null ? lastLap - bestLap : null;
   useEffect(() => {
     if (!running) return;
     startRef.current = Date.now() - elapsed;
