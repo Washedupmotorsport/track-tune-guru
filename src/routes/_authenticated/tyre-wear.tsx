@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { ArrowLeft, Disc, Plus, Trash2, TrendingDown, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { TyreTabs } from "@/components/tyre-tabs";
 
 export const Route = createFileRoute("/_authenticated/tyre-wear")({
   component: TyreWearPage,
@@ -141,6 +142,7 @@ function TyreWearPage() {
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
+      <TyreTabs />
       <div className="mt-4 flex items-end justify-between flex-wrap gap-4">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
