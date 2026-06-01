@@ -167,13 +167,13 @@ export function AppShell({ children }: { children: ReactNode }) {
 function MobileTabBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = [
-    { to: "/engineer",   label: "Cockpit",   icon: HardHat, matches: ["/engineer"] },
-    { to: "/garage",     label: "Garage",    icon: Home,    matches: ["/garage", "/cars", "/calendar", "/weekends"] },
-    { to: "/pitwall",    label: "Trackside", icon: Radio,   matches: ["/pitwall", "/sessions", "/track-evolution", "/debrief", "/timeline"] },
-    { to: "/setup-library", label: "Setup",  icon: Wand2,   matches: ["/setup-library", "/setups", "/baseline", "/iteration", "/notes"] },
-    { to: "/post-debrief",  label: "Debrief", icon: ClipboardList, matches: ["/post-debrief", "/debrief", "/corners", "/analysis", "/engineering-memory", "/known-behaviours"] },
-    { to: "/tyre-setup", label: "Tyres",     icon: Disc,    matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
-    { to: "/workshop",   label: "Shop",      icon: Wrench,  matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
+    { to: "/engineer",      label: "Cockpit",  icon: HardHat,       matches: ["/engineer"] },
+    { to: "/pitwall",       label: "Race",     icon: Radio,         matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution"] },
+    { to: "/sessions",      label: "Sessions", icon: Timer,         matches: ["/sessions", "/timeline", "/analysis"] },
+    { to: "/tyre-setup",    label: "Tyres",    icon: Disc,          matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
+    { to: "/driver",        label: "Driver",   icon: Mic,           matches: ["/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours", "/debrief"] },
+    { to: "/post-debrief",  label: "Debrief",  icon: ClipboardList, matches: ["/post-debrief"] },
+    { to: "/garage",        label: "Garage",   icon: Home,          matches: ["/garage", "/cars", "/calendar", "/weekends", "/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
   ] as const;
   return (
     <nav
