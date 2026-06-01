@@ -136,6 +136,8 @@ function PitLaneMode() {
   const [running, setRunning] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const startRef = useRef<number | null>(null);
+  const [lapStart, setLapStart] = useState(0);
+  const [laps, setLaps] = useState<number[]>([]);
   useEffect(() => {
     if (!running) return;
     startRef.current = Date.now() - elapsed;
@@ -145,6 +147,27 @@ function PitLaneMode() {
     return () => window.clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running]);
+
+  const handleStartStop = () => {
+    setRunning((r) => {
+      if (!r && elapsed === 0) setLapStart(0);
+      return !r;
+    });
+  };
+  const handleReset = () => {
+    setRunning(false);
+    setElapsed(0);
+    setLapStart(0);
+    setLaps([]);
+  };
+  const handleLap = () => {
+    if (!running) return;
+    const lapTime = elapsed - lapStart;
+    if (lapTime <= 0) return;
+    setLaps((l) => [lapTime, ...l]);
+    setLapStart(elapsed);
+    toast.success(`Lap ${laps.length + 1}: ${fmtLap(lapTime)}`);
+  };
 
   // Quick note
   const [note, setNote] = useState("");
@@ -250,17 +273,34 @@ function PitLaneMode() {
             {fmtLap(elapsed)}
           </div>
           <div className="grid grid-cols-3 gap-2">
-            <BigBtn onClick={() => setRunning((r) => !r)} tone={running ? "danger" : "primary"}>
+            <BigBtn onClick={handleStartStop} tone={running ? "danger" : "primary"}>
               {running ? <Pause className="w-7 h-7" /> : <Play className="w-7 h-7" />}
               {running ? "Stop" : "Start"}
             </BigBtn>
-            <BigBtn onClick={() => { setRunning(false); setElapsed(0); }} tone="neutral">
+            <BigBtn onClick={handleReset} tone="neutral">
               <RotateCcw className="w-7 h-7" /> Reset
             </BigBtn>
-            <BigBtn onClick={() => setElapsed((e) => e)} tone="neutral">
+            <BigBtn onClick={handleLap} tone="neutral">
               <Flag className="w-7 h-7" /> Lap
             </BigBtn>
           </div>
+          {laps.length > 0 && (
+            <div className="mt-3 max-h-40 overflow-y-auto border-t border-white/10 pt-2">
+              <table className="w-full text-sm font-mono">
+                <tbody>
+                  {laps.map((ms, i) => {
+                    const n = laps.length - i;
+                    return (
+                      <tr key={n} className="border-b border-white/5">
+                        <td className="py-1 text-white/50 w-12">#{n}</td>
+                        <td className="py-1 text-right tabular-nums text-yellow-300">{fmtLap(ms)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section>
 
         {/* Fuel calculator */}
