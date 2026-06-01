@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Disc, Plus, ArrowLeft, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { PressureCalculator } from "@/components/pressure-calculator";
+import { TyreTabs } from "@/components/tyre-tabs";
 
 export const Route = createFileRoute("/_authenticated/tires")({ component: TiresPage });
 
@@ -96,13 +97,14 @@ function TiresPage() {
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
+      <TyreTabs />
       <div className="mt-4 flex items-end justify-between flex-wrap gap-4">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
-            <Disc className="w-3 h-3" /> Rubber
+            <Disc className="w-3 h-3" /> Sets
           </div>
-          <h1 className="font-display text-4xl font-bold mt-1">Tire logs</h1>
-          <p className="text-sm text-muted-foreground mt-1">Cold/hot pressures, compound, heat cycles. Track set life and pressure delta.</p>
+          <h1 className="font-display text-4xl font-bold mt-1">Tyre sets</h1>
+          <p className="text-sm text-muted-foreground mt-1">Per-set log: cold/hot pressures, compound, heat cycles. Tracks set life and pressure delta over time.</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild><Button className="shadow-glow"><Plus className="w-4 h-4 mr-1" /> New log</Button></DialogTrigger>

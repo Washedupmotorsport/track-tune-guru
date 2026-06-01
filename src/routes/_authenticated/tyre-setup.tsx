@@ -6,6 +6,7 @@ import { ArrowLeft, Disc, Download, Gauge, Thermometer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUnits } from "@/lib/units";
 import { Stepper } from "@/components/stepper";
+import { TyreTabs } from "@/components/tyre-tabs";
 import jsPDF from "jspdf";
 
 export const Route = createFileRoute("/_authenticated/tyre-setup")({
@@ -137,6 +138,7 @@ function TyreSetupPage() {
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
+      <TyreTabs />
       <div className="mt-4 flex items-start justify-between gap-4 flex-wrap">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
