@@ -110,9 +110,9 @@ function PostDebriefPage() {
       <header className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="font-mono uppercase tracking-[0.2em] text-primary text-xs">Post-session debrief</h1>
-          <p className="text-foreground text-xl font-semibold">Engineering debrief workflow</p>
+          <p className="text-foreground text-xl font-semibold">Driver-in / engineer-out</p>
           <p className="text-muted-foreground text-xs font-mono mt-1">
-            Six questions. Structured answers. AI-generated summary, recurring trends, prioritised next changes.
+            Six questions per stint. Engineer's report, recurring trends, prioritised setup changes for the next run.
           </p>
         </div>
         <Button onClick={() => { setEditing(true); setOpenId(null); }} className="shadow-glow">
@@ -141,7 +141,7 @@ function PostDebriefPage() {
           </div>
           {(debriefsQ.data ?? []).length === 0 ? (
             <div className="border border-dashed border-border rounded-md p-6 text-center text-xs font-mono text-muted-foreground">
-              No debriefs yet. After every session, run the workflow to lock in lessons.
+              No debriefs logged. After every stint, write down what the car did so the next run learns from it.
             </div>
           ) : (
             <ul className="space-y-2">
@@ -167,7 +167,7 @@ function PostDebriefPage() {
                         {car?.name ?? "—"} · {sess?.track ?? "no track"} · {new Date(d.created_at).toLocaleDateString()}
                       </div>
                       <div className="flex gap-1 mt-2 flex-wrap">
-                        {d.ai_summary && <Badge variant="outline" className="text-[9px] bg-primary/10 text-primary border-transparent">AI summary</Badge>}
+                        {d.ai_summary && <Badge variant="outline" className="text-[9px] bg-primary/10 text-primary border-transparent">Engineer report</Badge>}
                         {d.balance_issue && <Badge variant="outline" className="text-[9px]">balance</Badge>}
                         {d.tyre_issue && <Badge variant="outline" className="text-[9px]">tyre</Badge>}
                         {d.confidence_issue && <Badge variant="outline" className="text-[9px]">confidence</Badge>}
@@ -397,7 +397,7 @@ function DebriefDetail({ debrief, sessions, cars, qc }: {
         <div className="flex items-center gap-2">
           <Button size="sm" onClick={() => gen.mutate()} disabled={gen.isPending} className="shadow-glow">
             {gen.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Sparkles className="w-4 h-4 mr-1" />}
-            {ai ? "Regenerate summary" : "Generate AI summary"}
+            {ai ? "Rebuild engineer report" : "Build engineer report"}
           </Button>
           <Button size="sm" variant="ghost" onClick={() => { if (confirm("Delete this debrief?")) del.mutate(); }}>
             <Trash2 className="w-4 h-4" />

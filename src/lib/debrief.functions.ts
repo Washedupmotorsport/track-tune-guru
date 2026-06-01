@@ -86,8 +86,8 @@ Respond with JSON only.`;
       }),
     });
     if (res.status === 429) throw new Error("Rate limited. Try again shortly.");
-    if (res.status === 402) throw new Error("AI credits exhausted.");
-    if (!res.ok) throw new Error(`AI error (${res.status})`);
+    if (res.status === 402) throw new Error("Out of engineer credits.");
+    if (!res.ok) throw new Error(`Race engineer service error (${res.status})`);
 
     const json = await res.json();
     const content: string = json?.choices?.[0]?.message?.content ?? "";
@@ -95,7 +95,7 @@ Respond with JSON only.`;
     try { parsed = JSON.parse(content); }
     catch {
       const m = content.match(/\{[\s\S]*\}/);
-      if (!m) throw new Error("AI returned invalid response");
+      if (!m) throw new Error("Race engineer returned a malformed response");
       parsed = JSON.parse(m[0]);
     }
     parsed.summary ??= "";

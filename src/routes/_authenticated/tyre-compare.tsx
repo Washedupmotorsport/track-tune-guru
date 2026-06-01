@@ -853,7 +853,7 @@ function SensitivityView({
           ))}
           <div className="ml-auto text-muted-foreground">
             {winnersInGrid.length === 1
-              ? "Robust — same pick across the whole range."
+              ? "Bulletproof — same pick across the whole range."
               : `${winnersInGrid.length} compounds win somewhere — pick is sensitive.`}
           </div>
         </div>

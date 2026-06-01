@@ -318,10 +318,10 @@ function SessionDetail() {
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
-            <h2 className="font-display text-lg font-bold uppercase tracking-wider">AI Debrief</h2>
+            <h2 className="font-display text-lg font-bold uppercase tracking-wider">Race engineer debrief</h2>
           </div>
           <Button size="sm" onClick={() => askDebrief.mutate()} disabled={askDebrief.isPending || laps.length === 0}>
-            {askDebrief.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Sparkles className="w-4 h-4 mr-1" />} Analyze session
+            {askDebrief.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Sparkles className="w-4 h-4 mr-1" />} Run debrief
           </Button>
         </div>
         {laps.length === 0 && <p className="text-sm text-muted-foreground">Log some laps first.</p>}
