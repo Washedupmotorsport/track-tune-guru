@@ -211,70 +211,100 @@ function MobileTabBar() {
 // (where it makes sense) from the workspace front-door page.
 
 const WORKSPACES = [
-  // Race-weekend loop: Plan -> Track -> Debrief, with Setup / Tyres / Workshop as supporting workspaces.
-  { key: "plan",      label: "Plan",     icon: CalendarDays, to: "/garage",        matches: ["/garage", "/cars", "/calendar", "/weekends"] },
-  { key: "track",     label: "Track",    icon: Radio,        to: "/pitwall",       matches: ["/pitwall", "/sessions", "/track-evolution", "/timeline"] },
-  { key: "debrief",   label: "Debrief",  icon: ClipboardList, to: "/post-debrief", matches: ["/post-debrief", "/debrief", "/corners", "/analysis", "/engineering-memory", "/known-behaviours"] },
-  { key: "setup",     label: "Setup",    icon: Wand2,        to: "/setup-library", matches: ["/setup-library", "/setups", "/baseline", "/iteration", "/notes"] },
-  { key: "tyres",     label: "Tyres",    icon: Disc,         to: "/tyre-setup",    matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
-  { key: "workshop",  label: "Workshop", icon: HardHat,      to: "/workshop",      matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
+  // 10-stop primary nav. Each workspace has a front door; sister pages live under it.
+  { key: "cockpit",  label: "Cockpit",   icon: HardHat,       to: "/engineer",       matches: ["/engineer"] },
+  { key: "race",     label: "Race Mode", icon: Radio,         to: "/pitwall",        matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution"] },
+  { key: "setup",    label: "Setup",     icon: Wand2,         to: "/setup-library",  matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
+  { key: "sessions", label: "Sessions",  icon: Timer,         to: "/sessions",       matches: ["/sessions", "/timeline", "/analysis"] },
+  { key: "tyres",    label: "Tyres",     icon: Disc,          to: "/tyre-setup",     matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
+  { key: "driver",   label: "Driver",    icon: Mic,           to: "/driver",         matches: ["/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours", "/debrief"] },
+  { key: "debrief",  label: "Debrief",   icon: ClipboardList, to: "/post-debrief",   matches: ["/post-debrief"] },
+  { key: "log",      label: "Log",       icon: Brain,         to: "/engineering-memory", matches: ["/engineering-memory", "/notes"] },
+  { key: "garage",   label: "Garage",    icon: Home,          to: "/garage",         matches: ["/garage", "/cars", "/calendar", "/weekends"] },
+  { key: "ops",      label: "Operations", icon: Wrench,       to: "/workshop",       matches: ["/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
 ] as const;
 
 const ALL_NAV_GROUPS = [
   {
-    label: "Roles",
+    label: "Pit wall",
     items: [
-      { to: "/driver",   label: "Driver workspace",   icon: Mic },
-      { to: "/engineer", label: "Engineer workspace", icon: HardHat },
+      { to: "/engineer", label: "Engineer cockpit", icon: HardHat },
+      { to: "/pitwall",  label: "Race mode — live", icon: Radio },
+      { to: "/driver",   label: "Driver hub",       icon: Mic },
     ],
   },
   {
-    label: "Plan — before the weekend",
+    label: "Race Mode — trackside",
     items: [
-      { to: "/garage",   label: "Garage",         icon: Home },
-      { to: "/calendar", label: "Calendar",       icon: CalendarDays },
-      { to: "/weekends", label: "Race weekends",  icon: Flag },
+      { to: "/pitwall",         label: "Live board",       icon: Radio },
+      { to: "/track-evolution", label: "Track evolution",  icon: CloudRain },
+      { to: "/racemode",        label: "Race mode (legacy)", icon: Radio },
+      { to: "/pitlane",         label: "Pit lane (legacy)",  icon: Radio },
     ],
   },
   {
-    label: "Track — during the run",
+    label: "Sessions",
     items: [
-      { to: "/pitwall",         label: "Pit wall",         icon: Radio },
       { to: "/sessions",        label: "Sessions",         icon: Timer },
       { to: "/timeline",        label: "Weekend timeline", icon: ClipboardList },
-      { to: "/track-evolution", label: "Track evolution",  icon: CloudRain },
+      { to: "/analysis",        label: "Stint analysis",   icon: BarChart3 },
     ],
   },
   {
-    label: "Debrief — after the run",
+    label: "Tyres",
     items: [
-      { to: "/post-debrief",       label: "Post-session debrief", icon: ClipboardList },
-      { to: "/debrief",            label: "Driver debrief",       icon: ClipboardList },
-      { to: "/corners",            label: "Corner analysis",      icon: MapPin },
-      { to: "/analysis",           label: "Session analysis",     icon: BarChart3 },
-      { to: "/engineering-memory", label: "Engineering memory",   icon: Brain },
-      { to: "/known-behaviours",   label: "Known behaviours",     icon: Sparkles },
+      { to: "/tyre-setup",   label: "Pressures",  icon: Disc },
+      { to: "/tyre-wear",    label: "Wear",       icon: Disc },
+      { to: "/tyre-compare", label: "Compare",    icon: Disc },
+      { to: "/tires",        label: "Sets",       icon: Disc },
     ],
   },
   {
-    label: "Setup — evolve the car",
+    label: "Driver Hub",
+    items: [
+      { to: "/driver",           label: "Driver workspace",  icon: Mic },
+      { to: "/confidence",       label: "Confidence",        icon: Brain },
+      { to: "/debrief",          label: "Driver feedback",   icon: ClipboardList },
+      { to: "/known-behaviours", label: "Known behaviours",  icon: Sparkles },
+      { to: "/sympathy",         label: "Mechanical sympathy", icon: Wrench },
+      { to: "/philosophies",     label: "Driving philosophy", icon: NotebookPen },
+      { to: "/flags",            label: "Track flags",       icon: Flag },
+      { to: "/corners",          label: "Corner notes",      icon: MapPin },
+    ],
+  },
+  {
+    label: "Session Debrief",
+    items: [
+      { to: "/post-debrief", label: "Debrief (improved / worse / next)", icon: ClipboardList },
+    ],
+  },
+  {
+    label: "Setup",
     items: [
       { to: "/setup-library", label: "Setup library",       icon: BookMarked },
       { to: "/baseline",      label: "Baseline generator",  icon: Wand2 },
       { to: "/iteration",     label: "Setup iteration",     icon: GitBranch },
-      { to: "/notes",         label: "Engineering notes",   icon: NotebookPen },
     ],
   },
   {
-    label: "Tyres — pressures, wear, sets",
+    label: "Engineering Log",
     items: [
-      { to: "/tyre-setup",   label: "Tyres",           icon: Disc },
+      { to: "/engineering-memory", label: "Engineering memory", icon: Brain },
+      { to: "/notes",              label: "Engineer notes",     icon: NotebookPen },
     ],
   },
   {
-    label: "Workshop",
+    label: "Garage",
     items: [
-      { to: "/workshop",    label: "Workshop hub", icon: HardHat },
+      { to: "/garage",   label: "Garage",        icon: Home },
+      { to: "/calendar", label: "Calendar",      icon: CalendarDays },
+      { to: "/weekends", label: "Race weekends", icon: Flag },
+    ],
+  },
+  {
+    label: "Operations (under Garage)",
+    items: [
+      { to: "/workshop",    label: "Workshop",     icon: HardHat },
       { to: "/maintenance", label: "Maintenance",  icon: Wrench },
       { to: "/damage",      label: "Damage log",   icon: AlertTriangle },
       { to: "/inventory",   label: "Inventory",    icon: Package },
