@@ -2,12 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
-import {
-  GitBranch, Disc, ArrowRight, Brain, MessageSquare, AlertTriangle,
-  HardHat, CheckCircle2, CircleDot, XCircle, Pin, Radio, Cloud,
-  Fuel, Timer, Wrench, Wand2, CalendarDays, TrendingUp, TrendingDown, Minus,
-  Activity, Flag,
-} from "lucide-react";
+import { GitBranch, Disc, ArrowRight, Brain, MessageSquare, TriangleAlert as AlertTriangle, HardHat, CircleCheck as CheckCircle2, CircleDot, Circle as XCircle, Pin, Radio, Cloud, Fuel, Timer, Wrench, Wand as Wand2, CalendarDays, TrendingUp, TrendingDown, Minus, Activity, Flag } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState, type ComponentType } from "react";
 
@@ -760,5 +755,3 @@ function trendLabel(delta: number) {
   if (delta < 0) return `▼ ${delta}`;
   return "→ flat";
 }
-
-export { Route }
