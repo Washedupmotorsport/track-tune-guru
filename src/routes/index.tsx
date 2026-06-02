@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Gauge, Wrench, LineChart, Flag } from "lucide-react";
+import { Gauge, Wrench, ChartLine as LineChart, Flag } from "lucide-react";
 import heroCar from "@/assets/hero-car.jpg";
 import { DISCIPLINES } from "@/lib/disciplines";
 import { useAuth } from "@/lib/auth-context";
@@ -35,7 +35,7 @@ function Landing() {
   const { user } = useAuth();
   return (
     <div className="min-h-screen text-foreground">
-      <header className="sticky top-0 z-30 backdrop-blur-md bg-background/70 border-b border-border">
+      <header className="fixed top-0 inset-x-0 z-30 backdrop-blur-md bg-background/70 border-b border-border">
         <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
           <Link to="/" aria-label="My Race Engineer — home" className="flex items-center">
             <img src={logoMre} alt="My Race Engineer" className="h-10 w-auto" />
@@ -52,6 +52,8 @@ function Landing() {
           </nav>
         </div>
       </header>
+
+      <div className="h-16" aria-hidden />
 
       <section className="relative overflow-hidden">
         {/* Checkered flag backdrop */}
