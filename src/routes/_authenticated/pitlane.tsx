@@ -380,9 +380,9 @@ function PitLaneMode() {
 // ---------- Primitives ----------
 function Readout({ label, value, accent }: { label: string; value: string; accent: string }) {
   return (
-    <div className="text-center">
+    <div className="text-center overflow-hidden">
       <div className="text-[10px] md:text-xs font-mono uppercase tracking-[0.3em] text-white/50">{label}</div>
-      <div className={`font-mono tabular-nums font-black text-4xl md:text-6xl leading-none mt-1 ${accent}`}>{value}</div>
+      <div className={`font-mono tabular-nums font-black text-2xl sm:text-3xl md:text-5xl leading-none mt-1 whitespace-nowrap ${accent}`}>{value}</div>
     </div>
   );
 }
