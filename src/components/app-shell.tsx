@@ -26,7 +26,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="h-[2px] w-full bg-primary" aria-hidden />
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
         <div className="mx-auto max-w-[1400px] px-4 h-12 flex items-center justify-between">
-          <Link to="/engineer" aria-label="My Race Engineer — cockpit" className="flex items-center">
+          <Link to="/" aria-label="My Race Engineer — home" className="flex items-center">
             <img src={logoMre} alt="My Race Engineer" className="h-7 w-auto" />
           </Link>
           <nav aria-label="Role" className="hidden md:flex items-center gap-1 ml-2">
@@ -151,7 +151,9 @@ export function AppShell({ children }: { children: ReactNode }) {
       <footer className="hidden md:fixed md:bottom-0 md:inset-x-0 md:flex z-20 border-t border-border bg-background/95 backdrop-blur-md">
         <div className="mx-auto max-w-[1400px] w-full px-4 h-10 flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-6">
-            <img src={logoMre} alt="My Race Engineer" className="h-4 w-auto opacity-70" />
+            <Link to="/" aria-label="My Race Engineer — home" className="flex items-center">
+              <img src={logoMre} alt="My Race Engineer" className="h-4 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+            </Link>
             <span>© {new Date().getFullYear()} My Race Engineer</span>
           </div>
           <div className="flex items-center gap-4">
