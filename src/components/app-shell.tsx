@@ -1,6 +1,15 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { Calculator, Wand as Wand2, NotebookPen, Timer, Disc, Wrench, Package, CalendarDays, Receipt, ChartBar as BarChart3, Menu, Search, Sun, Moon, Hop as Home, Flag, TriangleAlert as AlertTriangle, HardHat, Radio, ClipboardList, FileText, MapPin, CloudRain, GitBranch, Brain, Mic, BookMarked, Sparkles } from "lucide-react";
+import {
+  LogOut, Calculator, Wand2, NotebookPen, Timer, Disc, Wrench,
+  Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon,
+  Home, Flag, AlertTriangle, HardHat, Radio,
+  ClipboardList, FileText,
+  MapPin, CloudRain, GitBranch, Brain,
+  Mic, BookMarked,
+  Sparkles,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -15,6 +24,8 @@ import { ConnectionStatus } from "@/lib/offline";
 import { QuickLogFab } from "@/components/quick-log-fab";
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const { system, toggle, currency, setCurrency } = useUnits();
   const { theme, toggle: toggleTheme } = useTheme();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -135,6 +146,12 @@ export function AppShell({ children }: { children: ReactNode }) {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+            <span className="hidden xl:block text-xs font-mono uppercase tracking-widest text-muted-foreground">
+              {user?.email}
+            </span>
+            <Button size="sm" variant="ghost" onClick={async () => { await signOut(); navigate({ to: "/" }); }}>
+              <LogOut className="w-4 h-4 mr-1" /> Sign out
+            </Button>
           </div>
         </div>
       </header>

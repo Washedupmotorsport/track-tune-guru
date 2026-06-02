@@ -6,21 +6,27 @@ type ThemeContextValue = { theme: Theme; toggle: () => void; setTheme: (t: Theme
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 const STORAGE_KEY = "mre-theme";
 
+function applyTheme(t: Theme) {
+  if (typeof document === "undefined") return;
+  document.documentElement.classList.toggle("dark", t === "dark");
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", t === "dark" ? "#0a0a0a" : "#f7f7f5");
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("dark");
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    const initial: Theme = saved === "light" ? "light" : "dark";
+    const saved = (typeof localStorage !== "undefined" && localStorage.getItem(STORAGE_KEY)) as Theme | null;
+    // Default to dark to match the brand identity (deep black + racing red).
+    const initial: Theme = saved ?? "dark";
     setThemeState(initial);
-    document.documentElement.classList.toggle("dark", initial === "dark");
-    document.documentElement.classList.toggle("light", initial === "light");
+    applyTheme(initial);
   }, []);
 
   const setTheme = (t: Theme) => {
     setThemeState(t);
-    document.documentElement.classList.toggle("dark", t === "dark");
-    document.documentElement.classList.toggle("light", t === "light");
+    applyTheme(t);
     try { localStorage.setItem(STORAGE_KEY, t); } catch {}
   };
 

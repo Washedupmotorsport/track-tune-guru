@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Gauge, Wrench, ChartLine as LineChart, Flag } from "lucide-react";
+import { Gauge, Wrench, LineChart, Flag } from "lucide-react";
 import heroCar from "@/assets/hero-car.jpg";
 import { DISCIPLINES } from "@/lib/disciplines";
+import { useAuth } from "@/lib/auth-context";
 import logoMre from "@/assets/logo-mre.png";
 
 export const Route = createFileRoute("/")({
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
+  const { user } = useAuth();
   return (
     <div className="min-h-screen text-foreground">
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/70 border-b border-border">
@@ -39,7 +41,14 @@ function Landing() {
             <img src={logoMre} alt="My Race Engineer" className="h-10 w-auto" />
           </Link>
           <nav className="flex items-center gap-2">
-            <Link to="/engineer"><Button variant="default" size="sm">Open Cockpit</Button></Link>
+            {user ? (
+              <Link to="/engineer"><Button variant="default" size="sm">Open Cockpit</Button></Link>
+            ) : (
+              <>
+                <Link to="/auth"><Button variant="ghost" size="sm">Sign in</Button></Link>
+                <Link to="/auth"><Button size="sm">Get started</Button></Link>
+              </>
+            )}
           </nav>
         </div>
       </header>
@@ -73,9 +82,9 @@ function Landing() {
             Save baselines, log changes, never lose a winning setup again.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/engineer">
+            <Link to={user ? "/engineer" : "/auth"}>
               <Button size="lg" className="shadow-glow">
-                Enter Cockpit
+                {user ? "Enter Cockpit" : "Start free"}
               </Button>
             </Link>
             <a href="#disciplines">
