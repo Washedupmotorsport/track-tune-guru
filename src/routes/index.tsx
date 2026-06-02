@@ -72,9 +72,6 @@ function Landing() {
           className="absolute inset-0 w-full h-full object-cover z-10" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background z-20" />
         <div className="relative z-30 mx-auto max-w-6xl px-4 pt-24 pb-32">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs font-medium text-muted-foreground">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" /> Pit-lane ready
-          </div>
           <h1 className="mt-6 font-display text-5xl md:text-7xl font-bold leading-tight max-w-3xl">
             Dial in every <span className="text-primary text-glow">setup</span>.
             <br />Win every <span className="text-accent">session</span>.
