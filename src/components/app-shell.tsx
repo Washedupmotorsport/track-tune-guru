@@ -1,15 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import {
-  LogOut, Calculator, Wand2, NotebookPen, Timer, Disc, Wrench,
-  Package, CalendarDays, Receipt, BarChart3, Menu, Search, Sun, Moon,
-  Home, Flag, AlertTriangle, HardHat, Radio,
-  ClipboardList, FileText,
-  MapPin, CloudRain, GitBranch, Brain,
-  Mic, BookMarked,
-  Sparkles,
-} from "lucide-react";
+import { LogOut, Calculator, Wand as Wand2, NotebookPen, Timer, Disc, Wrench, Package, CalendarDays, Receipt, ChartBar as BarChart3, Menu, Search, Sun, Moon, Hop as Home, Flag, TriangleAlert as AlertTriangle, HardHat, Radio, ClipboardList, FileText, MapPin, CloudRain, GitBranch, Brain, Mic, BookMarked, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -40,7 +32,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <nav aria-label="Role" className="hidden md:flex items-center gap-1 ml-2">
             <Link
               to="/driver"
-              className={`inline-flex items-center gap-1 px-2 h-7 rounded-md text-[10px] font-mono uppercase tracking-widest border transition-colors ${
+              className={`inline-flex items-center gap-1 px-2.5 h-7 rounded-md text-xs font-medium border transition-colors ${
                 pathname.startsWith("/driver")
                   ? "bg-primary/15 text-primary border-primary/40"
                   : "text-muted-foreground border-border hover:text-primary hover:border-primary/40"
@@ -51,7 +43,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
             <Link
               to="/engineer"
-              className={`inline-flex items-center gap-1 px-2 h-7 rounded-md text-[10px] font-mono uppercase tracking-widest border transition-colors ${
+              className={`inline-flex items-center gap-1 px-2.5 h-7 rounded-md text-xs font-medium border transition-colors ${
                 pathname.startsWith("/engineer")
                   ? "bg-primary/15 text-primary border-primary/40"
                   : "text-muted-foreground border-border hover:text-primary hover:border-primary/40"
@@ -70,7 +62,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link
                   key={w.key}
                   to={w.to}
-                  className={`inline-flex items-center gap-1.5 px-2.5 h-8 rounded-md text-[11px] font-mono uppercase tracking-[0.18em] transition-colors ${
+                  className={`inline-flex items-center gap-1.5 px-2.5 h-8 rounded-md text-xs font-medium transition-colors ${
                     active
                       ? "bg-primary/15 text-primary border border-primary/30"
                       : "text-muted-foreground hover:text-primary border border-transparent hover:bg-muted/30"
@@ -85,7 +77,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <ConnectionStatus />
             <button
               onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
-              className="hidden md:inline-flex items-center gap-2 rounded-md border border-border bg-muted/30 px-2 py-1.5 text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden md:inline-flex items-center gap-2 rounded-md border border-border bg-muted/30 px-2 py-1.5 text-xs text-muted-foreground hover:text-primary hover:border-primary/40"
               aria-label="Search"
             >
               <Search className="w-3 h-3" /> <span className="opacity-70">⌘K</span>
@@ -94,7 +86,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={toggle}
               title="Toggle metric / imperial"
               aria-label="Toggle units"
-              className="hidden md:inline-flex items-center rounded-md border border-border bg-muted/30 px-2 py-1.5 text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden md:inline-flex items-center rounded-md border border-border bg-muted/30 px-2 py-1.5 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
             >
               <span className={system === "metric" ? "text-primary" : ""}>SI</span>
               <span className="mx-1 opacity-40">/</span>
@@ -111,7 +103,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Select value={currency} onValueChange={(v) => setCurrency(v as CurrencyCode)}>
               <SelectTrigger
                 aria-label="Currency"
-                className="hidden md:flex h-[34px] w-[78px] rounded-md border border-border bg-muted/30 px-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40"
+                className="hidden md:flex h-[34px] w-[78px] rounded-md border border-border bg-muted/30 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
               >
                 <SelectValue />
               </SelectTrigger>
@@ -125,14 +117,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Select>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="sm" variant="ghost" className="text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
+                <Button size="sm" variant="ghost" className="text-xs font-medium text-muted-foreground hover:text-primary">
                   <Menu className="w-4 h-4 mr-1" /> All
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-72">
                 {ALL_NAV_GROUPS.map((g) => (
                   <div key={g.label}>
-                    <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-widest text-primary">{g.label}</DropdownMenuLabel>
+                    <DropdownMenuLabel className="font-medium text-xs text-primary">{g.label}</DropdownMenuLabel>
                     {g.items.map((it) => {
                       const Icon = it.icon;
                       return (
@@ -146,7 +138,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            <span className="hidden xl:block text-xs font-mono uppercase tracking-widest text-muted-foreground">
+            <span className="hidden xl:block text-xs font-medium text-muted-foreground">
               {user?.email}
             </span>
             <Button size="sm" variant="ghost" onClick={async () => { await signOut(); navigate({ to: "/" }); }}>
@@ -191,7 +183,7 @@ function MobileTabBar() {
             <li key={it.to}>
               <Link
                 to={it.to}
-                className={`flex flex-col items-center justify-center gap-1 h-16 text-[9px] font-mono uppercase tracking-widest active:bg-primary/10 transition-colors ${
+                className={`flex flex-col items-center justify-center gap-1 h-16 text-[11px] font-medium active:bg-primary/10 transition-colors ${
                   active ? "text-primary" : "text-muted-foreground hover:text-primary"
                 }`}
               >

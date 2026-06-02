@@ -60,13 +60,13 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-grid: var(--grid);
-  --font-display: "Rajdhani", "Exo 2", "Inter", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
 :root {
   /* MRE brand — racing red on near-black. Light variant. */
-  --radius: 0.25rem;
+  --radius: 0.5rem;
   --background: oklch(0.97 0.003 250);
   --foreground: oklch(0.13 0.018 255); /* race-weekend: lift contrast vs paper */
   --card: oklch(1 0 0);
@@ -154,20 +154,17 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: "Exo 2", "Inter", system-ui, sans-serif;
-    font-feature-settings: "tnum" 1, "ss01" 1;
-    font-size: 14px;
-    background-image:
-      linear-gradient(var(--grid) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-    background-size: 80px 80px;
-    background-position: -1px -1px;
+    font-family: "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
+    font-feature-settings: "ss01" 1;
+    font-size: 15px;
+    line-height: 1.6;
   }
 
   h1, h2, h3, h4, .font-display {
     font-family: var(--font-display);
-    letter-spacing: 0.005em;
-    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    line-height: 1.2;
   }
 
   .font-mono { font-family: var(--font-mono); }
