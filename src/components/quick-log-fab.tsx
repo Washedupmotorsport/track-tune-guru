@@ -34,7 +34,7 @@ export function QuickLogFab() {
         type="button"
         aria-label="Pit-lane quick actions"
         onClick={() => setOpen(true)}
-        className="md:hidden fixed right-4 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-glow border-2 border-primary-foreground/20 flex items-center justify-center active:scale-95 transition touch-manipulation"
+        className="md:hidden fixed right-4 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-glow flex items-center justify-center active:scale-95 transition touch-manipulation"
         style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 5rem)" }}
       >
         <Zap className="w-6 h-6" />
@@ -78,3 +78,5 @@ export function QuickLogFab() {
     </>
   );
 }
+
+export { QuickLogFab }
