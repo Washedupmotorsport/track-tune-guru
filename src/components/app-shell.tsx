@@ -22,7 +22,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { theme, toggle: toggleTheme } = useTheme();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <div className="min-h-screen text-foreground">
+    <div className="min-h-screen pb-[40px] text-foreground">
       <div className="h-[2px] w-full bg-primary" aria-hidden />
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
         <div className="mx-auto max-w-[1400px] px-4 h-12 flex items-center justify-between">
@@ -148,40 +148,21 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <main className="mx-auto max-w-[1400px] px-4 py-4">{children}</main>
-      <footer className="hidden md:block border-t border-border bg-muted/20 mt-8">
-        <div className="mx-auto max-w-[1400px] px-4 py-6 flex flex-wrap items-start gap-8">
-          <div className="flex-1 min-w-[160px]">
-            <img src={logoMre} alt="My Race Engineer" className="h-6 w-auto mb-2 opacity-80" />
-            <p className="text-xs text-muted-foreground leading-relaxed max-w-xs">
-              Your personal race engineering platform — setup, sessions, tyres, and strategy in one cockpit.
-            </p>
-          </div>
-          <div className="grid grid-cols-3 gap-8 text-xs">
-            <FooterGroup label="Cockpit">
-              <FooterLink to="/engineer">Engineer</FooterLink>
-              <FooterLink to="/pitwall">Race mode</FooterLink>
-              <FooterLink to="/driver">Driver hub</FooterLink>
-            </FooterGroup>
-            <FooterGroup label="Engineering">
-              <FooterLink to="/setup-library">Setups</FooterLink>
-              <FooterLink to="/iteration">Iteration log</FooterLink>
-              <FooterLink to="/engineering-memory">Memory</FooterLink>
-              <FooterLink to="/notes">Notes</FooterLink>
-            </FooterGroup>
-            <FooterGroup label="Sessions &amp; Garage">
-              <FooterLink to="/sessions">Sessions</FooterLink>
-              <FooterLink to="/tyre-setup">Tyres</FooterLink>
-              <FooterLink to="/calendar">Calendar</FooterLink>
-              <FooterLink to="/garage">Garage</FooterLink>
-              <FooterLink to="/calculators">Calculators</FooterLink>
-            </FooterGroup>
-          </div>
-        </div>
-        <div className="border-t border-border">
-          <div className="mx-auto max-w-[1400px] px-4 py-3 flex items-center justify-between text-xs text-muted-foreground">
+      <footer className="hidden md:fixed md:bottom-0 md:inset-x-0 md:flex z-20 border-t border-border bg-background/95 backdrop-blur-md">
+        <div className="mx-auto max-w-[1400px] w-full px-4 h-10 flex items-center justify-between text-xs text-muted-foreground">
+          <div className="flex items-center gap-6">
+            <img src={logoMre} alt="My Race Engineer" className="h-4 w-auto opacity-70" />
             <span>© {new Date().getFullYear()} My Race Engineer</span>
-            <span>Built for the track.</span>
           </div>
+          <div className="flex items-center gap-4">
+            <FooterLink to="/engineer">Cockpit</FooterLink>
+            <FooterLink to="/sessions">Sessions</FooterLink>
+            <FooterLink to="/tyre-setup">Tyres</FooterLink>
+            <FooterLink to="/setup-library">Setup</FooterLink>
+            <FooterLink to="/garage">Garage</FooterLink>
+            <FooterLink to="/calculators">Calculators</FooterLink>
+          </div>
+          <span className="hidden lg:block">Built for the track.</span>
         </div>
       </footer>
       <CommandPalette />
@@ -343,21 +324,10 @@ const ALL_NAV_GROUPS = [
   },
 ] as const;
 
-function FooterGroup({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <div className="text-xs font-semibold text-foreground/70 mb-2">{label}</div>
-      <ul className="space-y-1.5">{children}</ul>
-    </div>
-  );
-}
-
 function FooterLink({ to, children }: { to: string; children: React.ReactNode }) {
   return (
-    <li>
-      <Link to={to} className="text-muted-foreground hover:text-primary transition-colors">
-        {children}
-      </Link>
-    </li>
+    <Link to={to} className="text-muted-foreground hover:text-primary transition-colors">
+      {children}
+    </Link>
   );
 }
