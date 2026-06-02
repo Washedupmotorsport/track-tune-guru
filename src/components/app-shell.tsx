@@ -22,7 +22,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { theme, toggle: toggleTheme } = useTheme();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <div className="min-h-screen pb-[40px] text-foreground">
+    <div className="min-h-screen pb-[90px] text-foreground">
       <div className="h-[2px] w-full bg-primary" aria-hidden />
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
         <div className="mx-auto max-w-[1400px] px-4 h-12 flex items-center justify-between">
@@ -149,7 +149,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
       <main className="mx-auto max-w-[1400px] px-4 py-4">{children}</main>
       <footer className="hidden md:fixed md:bottom-0 md:inset-x-0 md:flex z-20 border-t border-border bg-background/95 backdrop-blur-md">
-        <div className="mx-auto max-w-[1400px] w-full px-4 h-10 flex items-center justify-between text-xs text-muted-foreground">
+        <div className="mx-auto max-w-[1400px] w-full px-4 h-[90px] flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-6">
             <Link to="/" aria-label="My Race Engineer — home" className="flex items-center">
               <img src={logoMre} alt="My Race Engineer" className="h-4 w-auto opacity-70 hover:opacity-100 transition-opacity" />
