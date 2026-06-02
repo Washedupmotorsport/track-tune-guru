@@ -761,5 +761,4 @@ function trendLabel(delta: number) {
   return "→ flat";
 }
 
-
 export { Route }
