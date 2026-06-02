@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Gauge, Wrench, ChartLine as LineChart, Flag } from "lucide-react";
-import heroCar from "@/assets/hero-car.jpg";
 import { DISCIPLINES } from "@/lib/disciplines";
 import { useAuth } from "@/lib/auth-context";
 import logoMre from "@/assets/logo-mre.png";
@@ -68,7 +67,7 @@ function Landing() {
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/30 to-background" />
-        <img src={heroCar} alt="Race car at night" width={1920} height={1080}
+        <img src="https://cdn.discordapp.com/attachments/1128623717677813821/1511262075366932510/IMG_3323.jpg?ex=6a1fcffc&is=6a1e7e7c&hm=2033391684d0a86e4ef4841ac65379fc7889619b5b3967921a2f426ad1790f48" alt="Race car banner" width={1920} height={1080}
           className="absolute inset-0 w-full h-full object-cover z-10" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background z-20" />
         <div className="relative z-30 mx-auto max-w-6xl px-4 pt-24 pb-32">
