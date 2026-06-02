@@ -9,61 +9,57 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as AuthRouteImport } from './routes/auth'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as AuthenticatedAnalysisRouteImport } from './routes/_authenticated/analysis'
-import { Route as AuthenticatedBaselineRouteImport } from './routes/_authenticated/baseline'
-import { Route as AuthenticatedCalculatorsRouteImport } from './routes/_authenticated/calculators'
-import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
-import { Route as AuthenticatedConfidenceRouteImport } from './routes/_authenticated/confidence'
-import { Route as AuthenticatedCornersRouteImport } from './routes/_authenticated/corners'
-import { Route as AuthenticatedDamageRouteImport } from './routes/_authenticated/damage'
-import { Route as AuthenticatedDebriefRouteImport } from './routes/_authenticated/debrief'
-import { Route as AuthenticatedDriverRouteImport } from './routes/_authenticated/driver'
-import { Route as AuthenticatedEngineerRouteImport } from './routes/_authenticated/engineer'
-import { Route as AuthenticatedEngineeringMemoryRouteImport } from './routes/_authenticated/engineering-memory'
-import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated/expenses'
-import { Route as AuthenticatedFlagsRouteImport } from './routes/_authenticated/flags'
-import { Route as AuthenticatedGarageRouteImport } from './routes/_authenticated/garage'
-import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
-import { Route as AuthenticatedIterationRouteImport } from './routes/_authenticated/iteration'
-import { Route as AuthenticatedKnownBehavioursRouteImport } from './routes/_authenticated/known-behaviours'
-import { Route as AuthenticatedMaintenanceRouteImport } from './routes/_authenticated/maintenance'
-import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
-import { Route as AuthenticatedPhilosophiesRouteImport } from './routes/_authenticated/philosophies'
-import { Route as AuthenticatedPitlaneRouteImport } from './routes/_authenticated/pitlane'
-import { Route as AuthenticatedPitwallRouteImport } from './routes/_authenticated/pitwall'
-import { Route as AuthenticatedPostDebriefRouteImport } from './routes/_authenticated/post-debrief'
-import { Route as AuthenticatedRacemodeRouteImport } from './routes/_authenticated/racemode'
-import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
-import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
-import { Route as AuthenticatedSetupLibraryRouteImport } from './routes/_authenticated/setup-library'
-import { Route as AuthenticatedSympathyRouteImport } from './routes/_authenticated/sympathy'
-import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticated/timeline'
-import { Route as AuthenticatedTiresRouteImport } from './routes/_authenticated/tires'
-import { Route as AuthenticatedTrackEvolutionRouteImport } from './routes/_authenticated/track-evolution'
-import { Route as AuthenticatedTyreCompareRouteImport } from './routes/_authenticated/tyre-compare'
-import { Route as AuthenticatedTyreSetupRouteImport } from './routes/_authenticated/tyre-setup'
-import { Route as AuthenticatedTyreWearRouteImport } from './routes/_authenticated/tyre-wear'
-import { Route as AuthenticatedWeekendsRouteImport } from './routes/_authenticated/weekends'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedWorkshopRouteImport } from './routes/_authenticated/workshop'
-import { Route as AuthenticatedCarsCarIdRouteImport } from './routes/_authenticated/cars.$carId'
-import { Route as AuthenticatedSessionsSessionIdRouteImport } from './routes/_authenticated/sessions.$sessionId'
-import { Route as AuthenticatedSetupsSetupIdRouteImport } from './routes/_authenticated/setups.$setupId'
-import { Route as AuthenticatedWeekendsEventIdRouteImport } from './routes/_authenticated/weekends.$eventId'
-import { Route as ShareSessionTokenRouteImport } from './routes/share.session.$token'
+import { Route as AuthenticatedWeekendsRouteImport } from './routes/_authenticated/weekends'
+import { Route as AuthenticatedTyreWearRouteImport } from './routes/_authenticated/tyre-wear'
+import { Route as AuthenticatedTyreSetupRouteImport } from './routes/_authenticated/tyre-setup'
+import { Route as AuthenticatedTyreCompareRouteImport } from './routes/_authenticated/tyre-compare'
+import { Route as AuthenticatedTrackEvolutionRouteImport } from './routes/_authenticated/track-evolution'
+import { Route as AuthenticatedTiresRouteImport } from './routes/_authenticated/tires'
+import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticated/timeline'
+import { Route as AuthenticatedSympathyRouteImport } from './routes/_authenticated/sympathy'
+import { Route as AuthenticatedSetupLibraryRouteImport } from './routes/_authenticated/setup-library'
+import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedRacemodeRouteImport } from './routes/_authenticated/racemode'
+import { Route as AuthenticatedPostDebriefRouteImport } from './routes/_authenticated/post-debrief'
+import { Route as AuthenticatedPitwallRouteImport } from './routes/_authenticated/pitwall'
+import { Route as AuthenticatedPitlaneRouteImport } from './routes/_authenticated/pitlane'
+import { Route as AuthenticatedPhilosophiesRouteImport } from './routes/_authenticated/philosophies'
+import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
+import { Route as AuthenticatedMaintenanceRouteImport } from './routes/_authenticated/maintenance'
+import { Route as AuthenticatedKnownBehavioursRouteImport } from './routes/_authenticated/known-behaviours'
+import { Route as AuthenticatedIterationRouteImport } from './routes/_authenticated/iteration'
+import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
+import { Route as AuthenticatedGarageRouteImport } from './routes/_authenticated/garage'
+import { Route as AuthenticatedFlagsRouteImport } from './routes/_authenticated/flags'
+import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated/expenses'
+import { Route as AuthenticatedEngineeringMemoryRouteImport } from './routes/_authenticated/engineering-memory'
+import { Route as AuthenticatedEngineerRouteImport } from './routes/_authenticated/engineer'
+import { Route as AuthenticatedDriverRouteImport } from './routes/_authenticated/driver'
+import { Route as AuthenticatedDebriefRouteImport } from './routes/_authenticated/debrief'
+import { Route as AuthenticatedDamageRouteImport } from './routes/_authenticated/damage'
+import { Route as AuthenticatedCornersRouteImport } from './routes/_authenticated/corners'
+import { Route as AuthenticatedConfidenceRouteImport } from './routes/_authenticated/confidence'
+import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
+import { Route as AuthenticatedCalculatorsRouteImport } from './routes/_authenticated/calculators'
+import { Route as AuthenticatedBaselineRouteImport } from './routes/_authenticated/baseline'
+import { Route as AuthenticatedAnalysisRouteImport } from './routes/_authenticated/analysis'
 import { Route as AuthenticatedSetupsIndexRouteImport } from './routes/_authenticated/setups.index'
+import { Route as ShareSessionTokenRouteImport } from './routes/share.session.$token'
+import { Route as AuthenticatedWeekendsEventIdRouteImport } from './routes/_authenticated/weekends.$eventId'
+import { Route as AuthenticatedSetupsSetupIdRouteImport } from './routes/_authenticated/setups.$setupId'
+import { Route as AuthenticatedSessionsSessionIdRouteImport } from './routes/_authenticated/sessions.$sessionId'
+import { Route as AuthenticatedCarsCarIdRouteImport } from './routes/_authenticated/cars.$carId'
 import { Route as AuthenticatedSessionsSessionIdPitboardRouteImport } from './routes/_authenticated/sessions.$sessionId.pitboard'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -71,145 +67,60 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAnalysisRoute = AuthenticatedAnalysisRouteImport.update({
-  id: '/analysis',
-  path: '/analysis',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedWorkshopRoute = AuthenticatedWorkshopRouteImport.update({
+  id: '/workshop',
+  path: '/workshop',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedBaselineRoute = AuthenticatedBaselineRouteImport.update({
-  id: '/baseline',
-  path: '/baseline',
+const AuthenticatedWeekendsRoute = AuthenticatedWeekendsRouteImport.update({
+  id: '/weekends',
+  path: '/weekends',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedCalculatorsRoute =
-  AuthenticatedCalculatorsRouteImport.update({
-    id: '/calculators',
-    path: '/calculators',
+const AuthenticatedTyreWearRoute = AuthenticatedTyreWearRouteImport.update({
+  id: '/tyre-wear',
+  path: '/tyre-wear',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTyreSetupRoute = AuthenticatedTyreSetupRouteImport.update({
+  id: '/tyre-setup',
+  path: '/tyre-setup',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTyreCompareRoute =
+  AuthenticatedTyreCompareRouteImport.update({
+    id: '/tyre-compare',
+    path: '/tyre-compare',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
-  id: '/calendar',
-  path: '/calendar',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedConfidenceRoute = AuthenticatedConfidenceRouteImport.update({
-  id: '/confidence',
-  path: '/confidence',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedCornersRoute = AuthenticatedCornersRouteImport.update({
-  id: '/corners',
-  path: '/corners',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedDamageRoute = AuthenticatedDamageRouteImport.update({
-  id: '/damage',
-  path: '/damage',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedDebriefRoute = AuthenticatedDebriefRouteImport.update({
-  id: '/debrief',
-  path: '/debrief',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedDriverRoute = AuthenticatedDriverRouteImport.update({
-  id: '/driver',
-  path: '/driver',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedEngineerRoute = AuthenticatedEngineerRouteImport.update({
-  id: '/engineer',
-  path: '/engineer',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedEngineeringMemoryRoute =
-  AuthenticatedEngineeringMemoryRouteImport.update({
-    id: '/engineering-memory',
-    path: '/engineering-memory',
+const AuthenticatedTrackEvolutionRoute =
+  AuthenticatedTrackEvolutionRouteImport.update({
+    id: '/track-evolution',
+    path: '/track-evolution',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedExpensesRoute = AuthenticatedExpensesRouteImport.update({
-  id: '/expenses',
-  path: '/expenses',
+const AuthenticatedTiresRoute = AuthenticatedTiresRouteImport.update({
+  id: '/tires',
+  path: '/tires',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedFlagsRoute = AuthenticatedFlagsRouteImport.update({
-  id: '/flags',
-  path: '/flags',
+const AuthenticatedTimelineRoute = AuthenticatedTimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedGarageRoute = AuthenticatedGarageRouteImport.update({
-  id: '/garage',
-  path: '/garage',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedInventoryRoute = AuthenticatedInventoryRouteImport.update({
-  id: '/inventory',
-  path: '/inventory',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedIterationRoute = AuthenticatedIterationRouteImport.update({
-  id: '/iteration',
-  path: '/iteration',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedKnownBehavioursRoute =
-  AuthenticatedKnownBehavioursRouteImport.update({
-    id: '/known-behaviours',
-    path: '/known-behaviours',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedMaintenanceRoute =
-  AuthenticatedMaintenanceRouteImport.update({
-    id: '/maintenance',
-    path: '/maintenance',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedNotesRoute = AuthenticatedNotesRouteImport.update({
-  id: '/notes',
-  path: '/notes',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedPhilosophiesRoute =
-  AuthenticatedPhilosophiesRouteImport.update({
-    id: '/philosophies',
-    path: '/philosophies',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedPitlaneRoute = AuthenticatedPitlaneRouteImport.update({
-  id: '/pitlane',
-  path: '/pitlane',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedPitwallRoute = AuthenticatedPitwallRouteImport.update({
-  id: '/pitwall',
-  path: '/pitwall',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedPostDebriefRoute =
-  AuthenticatedPostDebriefRouteImport.update({
-    id: '/post-debrief',
-    path: '/post-debrief',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedRacemodeRoute = AuthenticatedRacemodeRouteImport.update({
-  id: '/racemode',
-  path: '/racemode',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
-  id: '/sessions',
-  path: '/sessions',
+const AuthenticatedSympathyRoute = AuthenticatedSympathyRouteImport.update({
+  id: '/sympathy',
+  path: '/sympathy',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSetupLibraryRoute =
@@ -218,80 +129,141 @@ const AuthenticatedSetupLibraryRoute =
     path: '/setup-library',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedSympathyRoute = AuthenticatedSympathyRouteImport.update({
-  id: '/sympathy',
-  path: '/sympathy',
+const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
+  id: '/sessions',
+  path: '/sessions',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedTimelineRoute = AuthenticatedTimelineRouteImport.update({
-  id: '/timeline',
-  path: '/timeline',
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedTiresRoute = AuthenticatedTiresRouteImport.update({
-  id: '/tires',
-  path: '/tires',
+const AuthenticatedRacemodeRoute = AuthenticatedRacemodeRouteImport.update({
+  id: '/racemode',
+  path: '/racemode',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedTrackEvolutionRoute =
-  AuthenticatedTrackEvolutionRouteImport.update({
-    id: '/track-evolution',
-    path: '/track-evolution',
+const AuthenticatedPostDebriefRoute =
+  AuthenticatedPostDebriefRouteImport.update({
+    id: '/post-debrief',
+    path: '/post-debrief',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedTyreCompareRoute =
-  AuthenticatedTyreCompareRouteImport.update({
-    id: '/tyre-compare',
-    path: '/tyre-compare',
+const AuthenticatedPitwallRoute = AuthenticatedPitwallRouteImport.update({
+  id: '/pitwall',
+  path: '/pitwall',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPitlaneRoute = AuthenticatedPitlaneRouteImport.update({
+  id: '/pitlane',
+  path: '/pitlane',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPhilosophiesRoute =
+  AuthenticatedPhilosophiesRouteImport.update({
+    id: '/philosophies',
+    path: '/philosophies',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedTyreSetupRoute = AuthenticatedTyreSetupRouteImport.update({
-  id: '/tyre-setup',
-  path: '/tyre-setup',
+const AuthenticatedNotesRoute = AuthenticatedNotesRouteImport.update({
+  id: '/notes',
+  path: '/notes',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedTyreWearRoute = AuthenticatedTyreWearRouteImport.update({
-  id: '/tyre-wear',
-  path: '/tyre-wear',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedWeekendsRoute = AuthenticatedWeekendsRouteImport.update({
-  id: '/weekends',
-  path: '/weekends',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedWorkshopRoute = AuthenticatedWorkshopRouteImport.update({
-  id: '/workshop',
-  path: '/workshop',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedCarsCarIdRoute = AuthenticatedCarsCarIdRouteImport.update({
-  id: '/cars/$carId',
-  path: '/cars/$carId',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedSessionsSessionIdRoute =
-  AuthenticatedSessionsSessionIdRouteImport.update({
-    id: '/$sessionId',
-    path: '/$sessionId',
-    getParentRoute: () => AuthenticatedSessionsRoute,
-  } as any)
-const AuthenticatedSetupsSetupIdRoute =
-  AuthenticatedSetupsSetupIdRouteImport.update({
-    id: '/setups/$setupId',
-    path: '/setups/$setupId',
+const AuthenticatedMaintenanceRoute =
+  AuthenticatedMaintenanceRouteImport.update({
+    id: '/maintenance',
+    path: '/maintenance',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedWeekendsEventIdRoute =
-  AuthenticatedWeekendsEventIdRouteImport.update({
-    id: '/$eventId',
-    path: '/$eventId',
-    getParentRoute: () => AuthenticatedWeekendsRoute,
+const AuthenticatedKnownBehavioursRoute =
+  AuthenticatedKnownBehavioursRouteImport.update({
+    id: '/known-behaviours',
+    path: '/known-behaviours',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const ShareSessionTokenRoute = ShareSessionTokenRouteImport.update({
-  id: '/share/session/$token',
-  path: '/share/session/$token',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedIterationRoute = AuthenticatedIterationRouteImport.update({
+  id: '/iteration',
+  path: '/iteration',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedInventoryRoute = AuthenticatedInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedGarageRoute = AuthenticatedGarageRouteImport.update({
+  id: '/garage',
+  path: '/garage',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedFlagsRoute = AuthenticatedFlagsRouteImport.update({
+  id: '/flags',
+  path: '/flags',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedExpensesRoute = AuthenticatedExpensesRouteImport.update({
+  id: '/expenses',
+  path: '/expenses',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedEngineeringMemoryRoute =
+  AuthenticatedEngineeringMemoryRouteImport.update({
+    id: '/engineering-memory',
+    path: '/engineering-memory',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedEngineerRoute = AuthenticatedEngineerRouteImport.update({
+  id: '/engineer',
+  path: '/engineer',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDriverRoute = AuthenticatedDriverRouteImport.update({
+  id: '/driver',
+  path: '/driver',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDebriefRoute = AuthenticatedDebriefRouteImport.update({
+  id: '/debrief',
+  path: '/debrief',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDamageRoute = AuthenticatedDamageRouteImport.update({
+  id: '/damage',
+  path: '/damage',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCornersRoute = AuthenticatedCornersRouteImport.update({
+  id: '/corners',
+  path: '/corners',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedConfidenceRoute = AuthenticatedConfidenceRouteImport.update({
+  id: '/confidence',
+  path: '/confidence',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCalculatorsRoute =
+  AuthenticatedCalculatorsRouteImport.update({
+    id: '/calculators',
+    path: '/calculators',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedBaselineRoute = AuthenticatedBaselineRouteImport.update({
+  id: '/baseline',
+  path: '/baseline',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAnalysisRoute = AuthenticatedAnalysisRouteImport.update({
+  id: '/analysis',
+  path: '/analysis',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSetupsIndexRoute =
   AuthenticatedSetupsIndexRouteImport.update({
@@ -299,6 +271,34 @@ const AuthenticatedSetupsIndexRoute =
     path: '/setups/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const ShareSessionTokenRoute = ShareSessionTokenRouteImport.update({
+  id: '/share/session/$token',
+  path: '/share/session/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedWeekendsEventIdRoute =
+  AuthenticatedWeekendsEventIdRouteImport.update({
+    id: '/$eventId',
+    path: '/$eventId',
+    getParentRoute: () => AuthenticatedWeekendsRoute,
+  } as any)
+const AuthenticatedSetupsSetupIdRoute =
+  AuthenticatedSetupsSetupIdRouteImport.update({
+    id: '/setups/$setupId',
+    path: '/setups/$setupId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSessionsSessionIdRoute =
+  AuthenticatedSessionsSessionIdRouteImport.update({
+    id: '/$sessionId',
+    path: '/$sessionId',
+    getParentRoute: () => AuthenticatedSessionsRoute,
+  } as any)
+const AuthenticatedCarsCarIdRoute = AuthenticatedCarsCarIdRouteImport.update({
+  id: '/cars/$carId',
+  path: '/cars/$carId',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedSessionsSessionIdPitboardRoute =
   AuthenticatedSessionsSessionIdPitboardRouteImport.update({
     id: '/pitboard',
@@ -610,18 +610,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -631,249 +624,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/analysis': {
-      id: '/_authenticated/analysis'
-      path: '/analysis'
-      fullPath: '/analysis'
-      preLoaderRoute: typeof AuthenticatedAnalysisRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/baseline': {
-      id: '/_authenticated/baseline'
-      path: '/baseline'
-      fullPath: '/baseline'
-      preLoaderRoute: typeof AuthenticatedBaselineRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/calculators': {
-      id: '/_authenticated/calculators'
-      path: '/calculators'
-      fullPath: '/calculators'
-      preLoaderRoute: typeof AuthenticatedCalculatorsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/calendar': {
-      id: '/_authenticated/calendar'
-      path: '/calendar'
-      fullPath: '/calendar'
-      preLoaderRoute: typeof AuthenticatedCalendarRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/confidence': {
-      id: '/_authenticated/confidence'
-      path: '/confidence'
-      fullPath: '/confidence'
-      preLoaderRoute: typeof AuthenticatedConfidenceRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/corners': {
-      id: '/_authenticated/corners'
-      path: '/corners'
-      fullPath: '/corners'
-      preLoaderRoute: typeof AuthenticatedCornersRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/damage': {
-      id: '/_authenticated/damage'
-      path: '/damage'
-      fullPath: '/damage'
-      preLoaderRoute: typeof AuthenticatedDamageRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/debrief': {
-      id: '/_authenticated/debrief'
-      path: '/debrief'
-      fullPath: '/debrief'
-      preLoaderRoute: typeof AuthenticatedDebriefRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/driver': {
-      id: '/_authenticated/driver'
-      path: '/driver'
-      fullPath: '/driver'
-      preLoaderRoute: typeof AuthenticatedDriverRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/engineer': {
-      id: '/_authenticated/engineer'
-      path: '/engineer'
-      fullPath: '/engineer'
-      preLoaderRoute: typeof AuthenticatedEngineerRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/engineering-memory': {
-      id: '/_authenticated/engineering-memory'
-      path: '/engineering-memory'
-      fullPath: '/engineering-memory'
-      preLoaderRoute: typeof AuthenticatedEngineeringMemoryRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/expenses': {
-      id: '/_authenticated/expenses'
-      path: '/expenses'
-      fullPath: '/expenses'
-      preLoaderRoute: typeof AuthenticatedExpensesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/flags': {
-      id: '/_authenticated/flags'
-      path: '/flags'
-      fullPath: '/flags'
-      preLoaderRoute: typeof AuthenticatedFlagsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/garage': {
-      id: '/_authenticated/garage'
-      path: '/garage'
-      fullPath: '/garage'
-      preLoaderRoute: typeof AuthenticatedGarageRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/inventory': {
-      id: '/_authenticated/inventory'
-      path: '/inventory'
-      fullPath: '/inventory'
-      preLoaderRoute: typeof AuthenticatedInventoryRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/iteration': {
-      id: '/_authenticated/iteration'
-      path: '/iteration'
-      fullPath: '/iteration'
-      preLoaderRoute: typeof AuthenticatedIterationRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/known-behaviours': {
-      id: '/_authenticated/known-behaviours'
-      path: '/known-behaviours'
-      fullPath: '/known-behaviours'
-      preLoaderRoute: typeof AuthenticatedKnownBehavioursRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/maintenance': {
-      id: '/_authenticated/maintenance'
-      path: '/maintenance'
-      fullPath: '/maintenance'
-      preLoaderRoute: typeof AuthenticatedMaintenanceRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/notes': {
-      id: '/_authenticated/notes'
-      path: '/notes'
-      fullPath: '/notes'
-      preLoaderRoute: typeof AuthenticatedNotesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/philosophies': {
-      id: '/_authenticated/philosophies'
-      path: '/philosophies'
-      fullPath: '/philosophies'
-      preLoaderRoute: typeof AuthenticatedPhilosophiesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/pitlane': {
-      id: '/_authenticated/pitlane'
-      path: '/pitlane'
-      fullPath: '/pitlane'
-      preLoaderRoute: typeof AuthenticatedPitlaneRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/pitwall': {
-      id: '/_authenticated/pitwall'
-      path: '/pitwall'
-      fullPath: '/pitwall'
-      preLoaderRoute: typeof AuthenticatedPitwallRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/post-debrief': {
-      id: '/_authenticated/post-debrief'
-      path: '/post-debrief'
-      fullPath: '/post-debrief'
-      preLoaderRoute: typeof AuthenticatedPostDebriefRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/racemode': {
-      id: '/_authenticated/racemode'
-      path: '/racemode'
-      fullPath: '/racemode'
-      preLoaderRoute: typeof AuthenticatedRacemodeRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/reports': {
-      id: '/_authenticated/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof AuthenticatedReportsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/sessions': {
-      id: '/_authenticated/sessions'
-      path: '/sessions'
-      fullPath: '/sessions'
-      preLoaderRoute: typeof AuthenticatedSessionsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/setup-library': {
-      id: '/_authenticated/setup-library'
-      path: '/setup-library'
-      fullPath: '/setup-library'
-      preLoaderRoute: typeof AuthenticatedSetupLibraryRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/sympathy': {
-      id: '/_authenticated/sympathy'
-      path: '/sympathy'
-      fullPath: '/sympathy'
-      preLoaderRoute: typeof AuthenticatedSympathyRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/timeline': {
-      id: '/_authenticated/timeline'
-      path: '/timeline'
-      fullPath: '/timeline'
-      preLoaderRoute: typeof AuthenticatedTimelineRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/tires': {
-      id: '/_authenticated/tires'
-      path: '/tires'
-      fullPath: '/tires'
-      preLoaderRoute: typeof AuthenticatedTiresRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/track-evolution': {
-      id: '/_authenticated/track-evolution'
-      path: '/track-evolution'
-      fullPath: '/track-evolution'
-      preLoaderRoute: typeof AuthenticatedTrackEvolutionRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/tyre-compare': {
-      id: '/_authenticated/tyre-compare'
-      path: '/tyre-compare'
-      fullPath: '/tyre-compare'
-      preLoaderRoute: typeof AuthenticatedTyreCompareRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/tyre-setup': {
-      id: '/_authenticated/tyre-setup'
-      path: '/tyre-setup'
-      fullPath: '/tyre-setup'
-      preLoaderRoute: typeof AuthenticatedTyreSetupRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/tyre-wear': {
-      id: '/_authenticated/tyre-wear'
-      path: '/tyre-wear'
-      fullPath: '/tyre-wear'
-      preLoaderRoute: typeof AuthenticatedTyreWearRouteImport
+    '/_authenticated/workshop': {
+      id: '/_authenticated/workshop'
+      path: '/workshop'
+      fullPath: '/workshop'
+      preLoaderRoute: typeof AuthenticatedWorkshopRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/weekends': {
@@ -883,18 +652,270 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWeekendsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/workshop': {
-      id: '/_authenticated/workshop'
-      path: '/workshop'
-      fullPath: '/workshop'
-      preLoaderRoute: typeof AuthenticatedWorkshopRouteImport
+    '/_authenticated/tyre-wear': {
+      id: '/_authenticated/tyre-wear'
+      path: '/tyre-wear'
+      fullPath: '/tyre-wear'
+      preLoaderRoute: typeof AuthenticatedTyreWearRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/cars/$carId': {
-      id: '/_authenticated/cars/$carId'
-      path: '/cars/$carId'
-      fullPath: '/cars/$carId'
-      preLoaderRoute: typeof AuthenticatedCarsCarIdRouteImport
+    '/_authenticated/tyre-setup': {
+      id: '/_authenticated/tyre-setup'
+      path: '/tyre-setup'
+      fullPath: '/tyre-setup'
+      preLoaderRoute: typeof AuthenticatedTyreSetupRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/tyre-compare': {
+      id: '/_authenticated/tyre-compare'
+      path: '/tyre-compare'
+      fullPath: '/tyre-compare'
+      preLoaderRoute: typeof AuthenticatedTyreCompareRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/track-evolution': {
+      id: '/_authenticated/track-evolution'
+      path: '/track-evolution'
+      fullPath: '/track-evolution'
+      preLoaderRoute: typeof AuthenticatedTrackEvolutionRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/tires': {
+      id: '/_authenticated/tires'
+      path: '/tires'
+      fullPath: '/tires'
+      preLoaderRoute: typeof AuthenticatedTiresRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/timeline': {
+      id: '/_authenticated/timeline'
+      path: '/timeline'
+      fullPath: '/timeline'
+      preLoaderRoute: typeof AuthenticatedTimelineRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/sympathy': {
+      id: '/_authenticated/sympathy'
+      path: '/sympathy'
+      fullPath: '/sympathy'
+      preLoaderRoute: typeof AuthenticatedSympathyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/setup-library': {
+      id: '/_authenticated/setup-library'
+      path: '/setup-library'
+      fullPath: '/setup-library'
+      preLoaderRoute: typeof AuthenticatedSetupLibraryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/sessions': {
+      id: '/_authenticated/sessions'
+      path: '/sessions'
+      fullPath: '/sessions'
+      preLoaderRoute: typeof AuthenticatedSessionsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/racemode': {
+      id: '/_authenticated/racemode'
+      path: '/racemode'
+      fullPath: '/racemode'
+      preLoaderRoute: typeof AuthenticatedRacemodeRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/post-debrief': {
+      id: '/_authenticated/post-debrief'
+      path: '/post-debrief'
+      fullPath: '/post-debrief'
+      preLoaderRoute: typeof AuthenticatedPostDebriefRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/pitwall': {
+      id: '/_authenticated/pitwall'
+      path: '/pitwall'
+      fullPath: '/pitwall'
+      preLoaderRoute: typeof AuthenticatedPitwallRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/pitlane': {
+      id: '/_authenticated/pitlane'
+      path: '/pitlane'
+      fullPath: '/pitlane'
+      preLoaderRoute: typeof AuthenticatedPitlaneRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/philosophies': {
+      id: '/_authenticated/philosophies'
+      path: '/philosophies'
+      fullPath: '/philosophies'
+      preLoaderRoute: typeof AuthenticatedPhilosophiesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/notes': {
+      id: '/_authenticated/notes'
+      path: '/notes'
+      fullPath: '/notes'
+      preLoaderRoute: typeof AuthenticatedNotesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/maintenance': {
+      id: '/_authenticated/maintenance'
+      path: '/maintenance'
+      fullPath: '/maintenance'
+      preLoaderRoute: typeof AuthenticatedMaintenanceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/known-behaviours': {
+      id: '/_authenticated/known-behaviours'
+      path: '/known-behaviours'
+      fullPath: '/known-behaviours'
+      preLoaderRoute: typeof AuthenticatedKnownBehavioursRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/iteration': {
+      id: '/_authenticated/iteration'
+      path: '/iteration'
+      fullPath: '/iteration'
+      preLoaderRoute: typeof AuthenticatedIterationRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/inventory': {
+      id: '/_authenticated/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof AuthenticatedInventoryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/garage': {
+      id: '/_authenticated/garage'
+      path: '/garage'
+      fullPath: '/garage'
+      preLoaderRoute: typeof AuthenticatedGarageRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/flags': {
+      id: '/_authenticated/flags'
+      path: '/flags'
+      fullPath: '/flags'
+      preLoaderRoute: typeof AuthenticatedFlagsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/expenses': {
+      id: '/_authenticated/expenses'
+      path: '/expenses'
+      fullPath: '/expenses'
+      preLoaderRoute: typeof AuthenticatedExpensesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/engineering-memory': {
+      id: '/_authenticated/engineering-memory'
+      path: '/engineering-memory'
+      fullPath: '/engineering-memory'
+      preLoaderRoute: typeof AuthenticatedEngineeringMemoryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/engineer': {
+      id: '/_authenticated/engineer'
+      path: '/engineer'
+      fullPath: '/engineer'
+      preLoaderRoute: typeof AuthenticatedEngineerRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/driver': {
+      id: '/_authenticated/driver'
+      path: '/driver'
+      fullPath: '/driver'
+      preLoaderRoute: typeof AuthenticatedDriverRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/debrief': {
+      id: '/_authenticated/debrief'
+      path: '/debrief'
+      fullPath: '/debrief'
+      preLoaderRoute: typeof AuthenticatedDebriefRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/damage': {
+      id: '/_authenticated/damage'
+      path: '/damage'
+      fullPath: '/damage'
+      preLoaderRoute: typeof AuthenticatedDamageRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/corners': {
+      id: '/_authenticated/corners'
+      path: '/corners'
+      fullPath: '/corners'
+      preLoaderRoute: typeof AuthenticatedCornersRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/confidence': {
+      id: '/_authenticated/confidence'
+      path: '/confidence'
+      fullPath: '/confidence'
+      preLoaderRoute: typeof AuthenticatedConfidenceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/calendar': {
+      id: '/_authenticated/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof AuthenticatedCalendarRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/calculators': {
+      id: '/_authenticated/calculators'
+      path: '/calculators'
+      fullPath: '/calculators'
+      preLoaderRoute: typeof AuthenticatedCalculatorsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/baseline': {
+      id: '/_authenticated/baseline'
+      path: '/baseline'
+      fullPath: '/baseline'
+      preLoaderRoute: typeof AuthenticatedBaselineRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/analysis': {
+      id: '/_authenticated/analysis'
+      path: '/analysis'
+      fullPath: '/analysis'
+      preLoaderRoute: typeof AuthenticatedAnalysisRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/setups/': {
+      id: '/_authenticated/setups/'
+      path: '/setups'
+      fullPath: '/setups/'
+      preLoaderRoute: typeof AuthenticatedSetupsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/share/session/$token': {
+      id: '/share/session/$token'
+      path: '/share/session/$token'
+      fullPath: '/share/session/$token'
+      preLoaderRoute: typeof ShareSessionTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/weekends/$eventId': {
+      id: '/_authenticated/weekends/$eventId'
+      path: '/$eventId'
+      fullPath: '/weekends/$eventId'
+      preLoaderRoute: typeof AuthenticatedWeekendsEventIdRouteImport
+      parentRoute: typeof AuthenticatedWeekendsRoute
+    }
+    '/_authenticated/setups/$setupId': {
+      id: '/_authenticated/setups/$setupId'
+      path: '/setups/$setupId'
+      fullPath: '/setups/$setupId'
+      preLoaderRoute: typeof AuthenticatedSetupsSetupIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/sessions/$sessionId': {
@@ -904,32 +925,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSessionsSessionIdRouteImport
       parentRoute: typeof AuthenticatedSessionsRoute
     }
-    '/_authenticated/setups/$setupId': {
-      id: '/_authenticated/setups/$setupId'
-      path: '/setups/$setupId'
-      fullPath: '/setups/$setupId'
-      preLoaderRoute: typeof AuthenticatedSetupsSetupIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/weekends/$eventId': {
-      id: '/_authenticated/weekends/$eventId'
-      path: '/$eventId'
-      fullPath: '/weekends/$eventId'
-      preLoaderRoute: typeof AuthenticatedWeekendsEventIdRouteImport
-      parentRoute: typeof AuthenticatedWeekendsRoute
-    }
-    '/share/session/$token': {
-      id: '/share/session/$token'
-      path: '/share/session/$token'
-      fullPath: '/share/session/$token'
-      preLoaderRoute: typeof ShareSessionTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/setups/': {
-      id: '/_authenticated/setups/'
-      path: '/setups'
-      fullPath: '/setups/'
-      preLoaderRoute: typeof AuthenticatedSetupsIndexRouteImport
+    '/_authenticated/cars/$carId': {
+      id: '/_authenticated/cars/$carId'
+      path: '/cars/$carId'
+      fullPath: '/cars/$carId'
+      preLoaderRoute: typeof AuthenticatedCarsCarIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/sessions/$sessionId/pitboard': {
