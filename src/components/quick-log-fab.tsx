@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
-import {
-  Zap, Gauge, Timer, Disc, Radio, ClipboardList, AlertTriangle, NotebookPen, Brain,
-} from "lucide-react";
+import { Zap, Gauge, Timer, Disc, Radio, ClipboardList, TriangleAlert as AlertTriangle, NotebookPen, Brain } from "lucide-react";
 
 /**
  * Pit-lane shortcut. Mobile-only floating button.
@@ -78,5 +76,3 @@ export function QuickLogFab() {
     </>
   );
 }
-
-export { QuickLogFab }
