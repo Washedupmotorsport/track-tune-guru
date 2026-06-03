@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Loader2, Sparkles, AlertTriangle, Timer, Trash2, Plus, Trophy, Download } from "lucide-react";
+import { ArrowLeft, Save, Loader as Loader2, Sparkles, TriangleAlert as AlertTriangle, Timer, Trash2, Plus, Trophy, Download } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getDiscipline } from "@/lib/disciplines";
@@ -216,7 +216,7 @@ function SetupDetail() {
       <div className="mt-4 rounded-lg border border-border bg-card p-5 shadow-card">
         <div className="flex items-center gap-2 mb-3">
           <BookMarked className="w-4 h-4 text-primary" />
-          <h3 className="font-display text-sm font-bold uppercase tracking-wider">Library</h3>
+          <h2 className="font-display text-sm font-bold uppercase tracking-wider">Library</h2>
           {presetMeta(library.preset_type) && (
             <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${presetMeta(library.preset_type)!.tone}`}>
               {presetMeta(library.preset_type)!.label}

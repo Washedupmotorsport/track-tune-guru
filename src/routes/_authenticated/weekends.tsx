@@ -74,7 +74,7 @@ function WeekendsPage() {
       {events.length === 0 && (
         <div className="mt-6 rounded-sm border border-dashed border-border p-12 text-center">
           <Flag className="w-10 h-10 mx-auto text-muted-foreground" />
-          <h3 className="mt-4 font-display text-xl font-bold uppercase tracking-tight">No race weekends yet</h3>
+          <h2 className="mt-4 font-display text-xl font-bold uppercase tracking-tight">No race weekends yet</h2>
           <p className="text-sm text-muted-foreground mt-1">Create a race or test event from the calendar to start a weekend plan.</p>
           <Link to="/calendar" className="inline-flex items-center gap-1 mt-4 text-sm text-primary hover:underline">
             <CalendarDays className="w-4 h-4" /> Open calendar
