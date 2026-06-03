@@ -68,6 +68,7 @@ export type Database = {
       calendar_events: {
         Row: {
           car_id: string | null
+          checklist: Json
           created_at: string
           ends_at: string | null
           event_type: string
@@ -75,6 +76,7 @@ export type Database = {
           location: string | null
           notes: string | null
           starts_at: string
+          status: string
           title: string
           track: string | null
           updated_at: string
@@ -82,6 +84,7 @@ export type Database = {
         }
         Insert: {
           car_id?: string | null
+          checklist?: Json
           created_at?: string
           ends_at?: string | null
           event_type?: string
@@ -89,6 +92,7 @@ export type Database = {
           location?: string | null
           notes?: string | null
           starts_at: string
+          status?: string
           title: string
           track?: string | null
           updated_at?: string
@@ -96,6 +100,7 @@ export type Database = {
         }
         Update: {
           car_id?: string | null
+          checklist?: Json
           created_at?: string
           ends_at?: string | null
           event_type?: string
@@ -103,6 +108,7 @@ export type Database = {
           location?: string | null
           notes?: string | null
           starts_at?: string
+          status?: string
           title?: string
           track?: string | null
           updated_at?: string
@@ -154,6 +160,7 @@ export type Database = {
           model: string | null
           name: string
           notes: string | null
+          photo_path: string | null
           updated_at: string
           user_id: string
           year: number | null
@@ -166,6 +173,7 @@ export type Database = {
           model?: string | null
           name: string
           notes?: string | null
+          photo_path?: string | null
           updated_at?: string
           user_id: string
           year?: number | null
@@ -178,9 +186,202 @@ export type Database = {
           model?: string | null
           name?: string
           notes?: string | null
+          photo_path?: string | null
           updated_at?: string
           user_id?: string
           year?: number | null
+        }
+        Relationships: []
+      }
+      damage_reports: {
+        Row: {
+          car_id: string
+          component: string
+          created_at: string
+          description: string | null
+          event_id: string | null
+          id: string
+          notes: string | null
+          occurred_at: string
+          parts_used: string | null
+          repair_cost: number | null
+          resolved_at: string | null
+          session_id: string | null
+          severity: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          component: string
+          created_at?: string
+          description?: string | null
+          event_id?: string | null
+          id?: string
+          notes?: string | null
+          occurred_at?: string
+          parts_used?: string | null
+          repair_cost?: number | null
+          resolved_at?: string | null
+          session_id?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          component?: string
+          created_at?: string
+          description?: string | null
+          event_id?: string | null
+          id?: string
+          notes?: string | null
+          occurred_at?: string
+          parts_used?: string | null
+          repair_cost?: number | null
+          resolved_at?: string | null
+          session_id?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      driver_confidence: {
+        Row: {
+          air_temp_c: number | null
+          best_lap_ms: number | null
+          brakes: number | null
+          car_id: string
+          created_at: string
+          front: number | null
+          hot_fl: number | null
+          hot_fr: number | null
+          hot_rl: number | null
+          hot_rr: number | null
+          id: string
+          notes: string | null
+          overall: number
+          rear: number | null
+          recorded_at: string
+          session_id: string | null
+          setup_id: string | null
+          track_temp_c: number | null
+          traction: number | null
+          updated_at: string
+          user_id: string
+          weather: string | null
+        }
+        Insert: {
+          air_temp_c?: number | null
+          best_lap_ms?: number | null
+          brakes?: number | null
+          car_id: string
+          created_at?: string
+          front?: number | null
+          hot_fl?: number | null
+          hot_fr?: number | null
+          hot_rl?: number | null
+          hot_rr?: number | null
+          id?: string
+          notes?: string | null
+          overall: number
+          rear?: number | null
+          recorded_at?: string
+          session_id?: string | null
+          setup_id?: string | null
+          track_temp_c?: number | null
+          traction?: number | null
+          updated_at?: string
+          user_id: string
+          weather?: string | null
+        }
+        Update: {
+          air_temp_c?: number | null
+          best_lap_ms?: number | null
+          brakes?: number | null
+          car_id?: string
+          created_at?: string
+          front?: number | null
+          hot_fl?: number | null
+          hot_fr?: number | null
+          hot_rl?: number | null
+          hot_rr?: number | null
+          id?: string
+          notes?: string | null
+          overall?: number
+          rear?: number | null
+          recorded_at?: string
+          session_id?: string | null
+          setup_id?: string | null
+          track_temp_c?: number | null
+          traction?: number | null
+          updated_at?: string
+          user_id?: string
+          weather?: string | null
+        }
+        Relationships: []
+      }
+      driver_feedback: {
+        Row: {
+          balance: string | null
+          car_id: string
+          category: string
+          confidence: number | null
+          corner: string | null
+          created_at: string
+          description: string
+          id: string
+          phase: string | null
+          recommendation: string | null
+          recorded_at: string
+          session_id: string | null
+          setup_id: string | null
+          severity: string
+          tags: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: string | null
+          car_id: string
+          category?: string
+          confidence?: number | null
+          corner?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          phase?: string | null
+          recommendation?: string | null
+          recorded_at?: string
+          session_id?: string | null
+          setup_id?: string | null
+          severity?: string
+          tags?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: string | null
+          car_id?: string
+          category?: string
+          confidence?: number | null
+          corner?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          phase?: string | null
+          recommendation?: string | null
+          recorded_at?: string
+          session_id?: string | null
+          setup_id?: string | null
+          severity?: string
+          tags?: string[]
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -188,9 +389,14 @@ export type Database = {
         Row: {
           body: string | null
           car_id: string | null
+          category: string
+          corner: string | null
           created_at: string
           id: string
+          phase: string | null
+          session_id: string | null
           setup_id: string | null
+          severity: string
           tags: string[] | null
           title: string
           updated_at: string
@@ -199,9 +405,14 @@ export type Database = {
         Insert: {
           body?: string | null
           car_id?: string | null
+          category?: string
+          corner?: string | null
           created_at?: string
           id?: string
+          phase?: string | null
+          session_id?: string | null
           setup_id?: string | null
+          severity?: string
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -210,9 +421,14 @@ export type Database = {
         Update: {
           body?: string | null
           car_id?: string | null
+          category?: string
+          corner?: string | null
           created_at?: string
           id?: string
+          phase?: string | null
+          session_id?: string | null
           setup_id?: string | null
+          severity?: string
           tags?: string[] | null
           title?: string
           updated_at?: string
@@ -234,6 +450,69 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      engineering_memory: {
+        Row: {
+          car_id: string
+          category: string
+          conditions: string | null
+          confidence: number
+          created_at: string
+          detail: string | null
+          id: string
+          last_observed_at: string
+          occurrences: number
+          pinned: boolean
+          priority: string
+          session_id: string | null
+          setup_id: string | null
+          status: string
+          tags: string[]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          category?: string
+          conditions?: string | null
+          confidence?: number
+          created_at?: string
+          detail?: string | null
+          id?: string
+          last_observed_at?: string
+          occurrences?: number
+          pinned?: boolean
+          priority?: string
+          session_id?: string | null
+          setup_id?: string | null
+          status?: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          category?: string
+          conditions?: string | null
+          confidence?: number
+          created_at?: string
+          detail?: string | null
+          id?: string
+          last_observed_at?: string
+          occurrences?: number
+          pinned?: boolean
+          priority?: string
+          session_id?: string | null
+          setup_id?: string | null
+          status?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       expenses: {
         Row: {
@@ -313,6 +592,87 @@ export type Database = {
           occurred_at?: string
           session_id?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      known_behaviours: {
+        Row: {
+          car_id: string
+          category: string
+          compound: string | null
+          confidence: number
+          created_at: string
+          description: string | null
+          fuel_state: string | null
+          id: string
+          last_observed_at: string
+          occurrences: number
+          pinned: boolean
+          setup_id: string | null
+          severity: string
+          status: string
+          tags: string[]
+          temp_max_c: number | null
+          temp_min_c: number | null
+          title: string
+          track: string | null
+          triggers: string[]
+          updated_at: string
+          user_id: string
+          weather: string | null
+          workaround: string | null
+        }
+        Insert: {
+          car_id: string
+          category?: string
+          compound?: string | null
+          confidence?: number
+          created_at?: string
+          description?: string | null
+          fuel_state?: string | null
+          id?: string
+          last_observed_at?: string
+          occurrences?: number
+          pinned?: boolean
+          setup_id?: string | null
+          severity?: string
+          status?: string
+          tags?: string[]
+          temp_max_c?: number | null
+          temp_min_c?: number | null
+          title: string
+          track?: string | null
+          triggers?: string[]
+          updated_at?: string
+          user_id: string
+          weather?: string | null
+          workaround?: string | null
+        }
+        Update: {
+          car_id?: string
+          category?: string
+          compound?: string | null
+          confidence?: number
+          created_at?: string
+          description?: string | null
+          fuel_state?: string | null
+          id?: string
+          last_observed_at?: string
+          occurrences?: number
+          pinned?: boolean
+          setup_id?: string | null
+          severity?: string
+          status?: string
+          tags?: string[]
+          temp_max_c?: number | null
+          temp_min_c?: number | null
+          title?: string
+          track?: string | null
+          triggers?: string[]
+          updated_at?: string
+          user_id?: string
+          weather?: string | null
+          workaround?: string | null
         }
         Relationships: []
       }
@@ -402,6 +762,7 @@ export type Database = {
           last_service_date: string | null
           last_service_value: number | null
           notes: string | null
+          priority: string
           service_interval: number | null
           unit: string
           updated_at: string
@@ -418,6 +779,7 @@ export type Database = {
           last_service_date?: string | null
           last_service_value?: number | null
           notes?: string | null
+          priority?: string
           service_interval?: number | null
           unit?: string
           updated_at?: string
@@ -434,6 +796,7 @@ export type Database = {
           last_service_date?: string | null
           last_service_value?: number | null
           notes?: string | null
+          priority?: string
           service_interval?: number | null
           unit?: string
           updated_at?: string
@@ -514,6 +877,63 @@ export type Database = {
         }
         Relationships: []
       }
+      session_debriefs: {
+        Row: {
+          ai_summary: Json | null
+          balance_issue: string | null
+          car_id: string
+          confidence_issue: string | null
+          created_at: string
+          id: string
+          improved: string | null
+          needs_work: string | null
+          notes: string | null
+          session_id: string | null
+          setup_id: string | null
+          suggested_changes: string | null
+          tyre_issue: string | null
+          updated_at: string
+          user_id: string
+          worsened: string | null
+        }
+        Insert: {
+          ai_summary?: Json | null
+          balance_issue?: string | null
+          car_id: string
+          confidence_issue?: string | null
+          created_at?: string
+          id?: string
+          improved?: string | null
+          needs_work?: string | null
+          notes?: string | null
+          session_id?: string | null
+          setup_id?: string | null
+          suggested_changes?: string | null
+          tyre_issue?: string | null
+          updated_at?: string
+          user_id: string
+          worsened?: string | null
+        }
+        Update: {
+          ai_summary?: Json | null
+          balance_issue?: string | null
+          car_id?: string
+          confidence_issue?: string | null
+          created_at?: string
+          id?: string
+          improved?: string | null
+          needs_work?: string | null
+          notes?: string | null
+          session_id?: string | null
+          setup_id?: string | null
+          suggested_changes?: string | null
+          tyre_issue?: string | null
+          updated_at?: string
+          user_id?: string
+          worsened?: string | null
+        }
+        Relationships: []
+      }
       session_shares: {
         Row: {
           car_id: string
@@ -550,6 +970,7 @@ export type Database = {
           car_id: string
           created_at: string
           driver: string | null
+          event_id: string | null
           fuel_end_l: number | null
           fuel_start_l: number | null
           id: string
@@ -569,6 +990,7 @@ export type Database = {
           car_id: string
           created_at?: string
           driver?: string | null
+          event_id?: string | null
           fuel_end_l?: number | null
           fuel_start_l?: number | null
           id?: string
@@ -588,6 +1010,7 @@ export type Database = {
           car_id?: string
           created_at?: string
           driver?: string | null
+          event_id?: string | null
           fuel_end_l?: number | null
           fuel_start_l?: number | null
           id?: string
@@ -604,6 +1027,78 @@ export type Database = {
         }
         Relationships: []
       }
+      setup_changes: {
+        Row: {
+          archived_at: string | null
+          area: string
+          car_id: string
+          changes: Json
+          confidence_delta: number | null
+          created_at: string
+          driver_response: string | null
+          expected_effect: string | null
+          id: string
+          lap_delta_ms: number | null
+          measured_at: string | null
+          outcome_notes: string | null
+          outcome_status: string
+          parent_setup_id: string | null
+          reason: string | null
+          session_id: string | null
+          setup_id: string
+          summary: string
+          testing_started_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          area?: string
+          car_id: string
+          changes?: Json
+          confidence_delta?: number | null
+          created_at?: string
+          driver_response?: string | null
+          expected_effect?: string | null
+          id?: string
+          lap_delta_ms?: number | null
+          measured_at?: string | null
+          outcome_notes?: string | null
+          outcome_status?: string
+          parent_setup_id?: string | null
+          reason?: string | null
+          session_id?: string | null
+          setup_id: string
+          summary: string
+          testing_started_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          area?: string
+          car_id?: string
+          changes?: Json
+          confidence_delta?: number | null
+          created_at?: string
+          driver_response?: string | null
+          expected_effect?: string | null
+          id?: string
+          lap_delta_ms?: number | null
+          measured_at?: string | null
+          outcome_notes?: string | null
+          outcome_status?: string
+          parent_setup_id?: string | null
+          reason?: string | null
+          session_id?: string | null
+          setup_id?: string
+          summary?: string
+          testing_started_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       setups: {
         Row: {
           car_id: string
@@ -611,8 +1106,11 @@ export type Database = {
           created_at: string
           discipline: string
           id: string
+          ideal_conditions: string | null
+          is_baseline: boolean
           name: string
           notes: string | null
+          preset_type: string
           setup_data: Json
           track: string | null
           updated_at: string
@@ -624,8 +1122,11 @@ export type Database = {
           created_at?: string
           discipline?: string
           id?: string
+          ideal_conditions?: string | null
+          is_baseline?: boolean
           name: string
           notes?: string | null
+          preset_type?: string
           setup_data?: Json
           track?: string | null
           updated_at?: string
@@ -637,8 +1138,11 @@ export type Database = {
           created_at?: string
           discipline?: string
           id?: string
+          ideal_conditions?: string | null
+          is_baseline?: boolean
           name?: string
           notes?: string | null
+          preset_type?: string
           setup_data?: Json
           track?: string | null
           updated_at?: string

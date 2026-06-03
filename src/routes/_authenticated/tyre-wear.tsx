@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { ArrowLeft, Disc, Plus, Trash2, TrendingDown, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { TyreTabs } from "@/components/tyre-tabs";
 
 export const Route = createFileRoute("/_authenticated/tyre-wear")({
   component: TyreWearPage,
@@ -141,6 +142,7 @@ function TyreWearPage() {
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
+      <TyreTabs />
       <div className="mt-4 flex items-end justify-between flex-wrap gap-4">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
@@ -186,7 +188,7 @@ function TyreWearPage() {
       <div className="mt-6 space-y-4">
         {stintsQ.isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
         {!stintsQ.isLoading && grouped.length === 0 && (
-          <div className="rounded-lg border border-dashed border-border p-10 text-center">
+          <div className="rounded-lg border border-dashed border-border p-6 text-center">
             <Disc className="w-8 h-8 mx-auto text-muted-foreground" />
             <p className="mt-3 text-sm text-muted-foreground">No stints yet. Log one to start tracking wear.</p>
           </div>
@@ -222,7 +224,7 @@ function TyreWearPage() {
                   {c.currentMm != null && (
                     <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
                       <div
-                        className={`h-full ${c.currentMm <= MIN_TREAD_MM ? "bg-destructive" : c.currentMm <= MIN_TREAD_MM + 1 ? "bg-chart-4" : "bg-chart-3"}`}
+                        className={`h-full ${c.currentMm <= MIN_TREAD_MM ? "bg-destructive" : c.currentMm <= MIN_TREAD_MM + 1 ? "bg-destructive/70" : "bg-chart-3"}`}
                         style={{ width: `${Math.max(4, Math.min(100, (c.currentMm / NEW_TREAD_MM) * 100))}%` }}
                       />
                     </div>
@@ -261,7 +263,7 @@ function StatusBadge({ status, minRemaining }: { status: "ok" | "warn" | "change
     </div>
   );
   if (status === "warn") return (
-    <div className="flex items-center gap-2 rounded-md border border-chart-4/40 bg-chart-4/10 px-3 py-1.5 text-chart-4">
+    <div className="flex items-center gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-1.5 text-destructive">
       <AlertTriangle className="w-4 h-4" />
       <span className="font-mono text-xs uppercase tracking-widest">~{minRemaining} laps left</span>
     </div>

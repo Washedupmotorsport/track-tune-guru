@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /tmp/cc-agent/67440093/project && output=$(npm run build 2>&1); code=$?; if [ $code -ne 0 ]; then echo \"{\\\"systemMessage\\\": \\\"Build failed:\\\\n$output\\\"}\"; else echo \"{\\\"systemMessage\\\": \\\"Build passed.\\\"}\"; fi",
+            "timeout": 120,
+            "statusMessage": "Running npm run build..."
+          }
+        ]
+      }
+    ]
+  }
+}

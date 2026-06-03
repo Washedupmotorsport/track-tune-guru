@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Disc, Plus, ArrowLeft, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { PressureCalculator } from "@/components/pressure-calculator";
+import { TyreTabs } from "@/components/tyre-tabs";
 
 export const Route = createFileRoute("/_authenticated/tires")({ component: TiresPage });
 
@@ -96,13 +97,14 @@ function TiresPage() {
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
+      <TyreTabs />
       <div className="mt-4 flex items-end justify-between flex-wrap gap-4">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
-            <Disc className="w-3 h-3" /> Rubber
+            <Disc className="w-3 h-3" /> Sets
           </div>
-          <h1 className="font-display text-4xl font-bold mt-1">Tire logs</h1>
-          <p className="text-sm text-muted-foreground mt-1">Cold/hot pressures, compound, heat cycles. Track set life and pressure delta.</p>
+          <h1 className="font-display text-4xl font-bold mt-1">Tyre sets</h1>
+          <p className="text-sm text-muted-foreground mt-1">Per-set log: cold/hot pressures, compound, heat cycles. Tracks set life and pressure delta over time.</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild><Button className="shadow-glow"><Plus className="w-4 h-4 mr-1" /> New log</Button></DialogTrigger>
@@ -137,9 +139,24 @@ function TiresPage() {
 
       <div className="mt-6 space-y-3">
         <PressureCalculator />
+        {(logsQ.data ?? []).length > 0 && (() => {
+          const logs = logsQ.data!;
+          const sets = new Set(logs.map((l) => `${l.car_id}|${l.tire_set}`)).size;
+          const cycles = logs.reduce((s, l) => s + (l.heat_cycles ?? 0), 0);
+          const allCold = logs.flatMap((l) => [l.cold_fl, l.cold_fr, l.cold_rl, l.cold_rr]).filter((v): v is number => v != null);
+          const avgCold = allCold.length ? (allCold.reduce((a, b) => a + b, 0) / allCold.length) : null;
+          return (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <SummaryTile label="Total logs" value={String(logs.length)} />
+              <SummaryTile label="Unique sets" value={String(sets)} />
+              <SummaryTile label="Heat cycles" value={String(cycles)} accent />
+              <SummaryTile label="Avg cold psi" value={avgCold != null ? avgCold.toFixed(1) : "—"} accent />
+            </div>
+          );
+        })()}
         {logsQ.isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
         {!logsQ.isLoading && (logsQ.data ?? []).length === 0 && (
-          <div className="rounded-lg border border-dashed border-border p-10 text-center">
+          <div className="rounded-lg border border-dashed border-border p-6 text-center">
             <Disc className="w-8 h-8 mx-auto text-muted-foreground" />
             <p className="mt-3 text-sm text-muted-foreground">No tire logs yet.</p>
           </div>
@@ -189,6 +206,15 @@ function ReadGrid({ label, v }: { label: string; v: (number | null)[] }) {
         <div>FL: {v[0] ?? "—"}</div><div>FR: {v[1] ?? "—"}</div>
         <div>RL: {v[2] ?? "—"}</div><div>RR: {v[3] ?? "—"}</div>
       </div>
+    </div>
+  );
+}
+
+function SummaryTile({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  return (
+    <div className="rounded-sm border border-border bg-card px-3 py-2">
+      <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-muted-foreground">{label}</div>
+      <div className={`mt-0.5 text-lg font-bold font-mono tabular-nums ${accent ? "text-primary" : ""}`}>{value}</div>
     </div>
   );
 }

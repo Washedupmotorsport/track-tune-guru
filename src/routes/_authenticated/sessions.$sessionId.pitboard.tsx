@@ -55,7 +55,7 @@ function PitBoard() {
 
   return (
     <div className="fixed inset-0 bg-background text-foreground overflow-auto">
-      <div className="px-6 py-4 flex items-center justify-between border-b border-border">
+      <div className="px-4 py-4 flex items-center justify-between border-b border-border">
         <Link to="/sessions/$sessionId" params={{ sessionId }} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
           <ArrowLeft className="w-4 h-4 mr-1" /> Back
         </Link>
@@ -63,7 +63,7 @@ function PitBoard() {
         <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">{s.track ?? ""}</div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4 p-6">
+      <div className="grid md:grid-cols-2 gap-4 p-4">
         <Tile label="LAST LAP" value={last ? formatLapTime(last.lap_time_ms) : "—"} accent />
         <Tile label="BEST LAP" value={best ? formatLapTime(best) : "—"} icon={<Trophy className="w-8 h-8 text-primary" />} />
         <Tile label="DELTA TO BEST" value={delta == null ? "—" : (delta === 0 ? "0.000" : `${delta > 0 ? "+" : ""}${(delta / 1000).toFixed(3)}`)}
@@ -73,7 +73,7 @@ function PitBoard() {
         <Tile label="BURN / LAP" value={burnPerLap != null ? `${burnPerLap.toFixed(2)} L` : "—"} icon={<Fuel className="w-8 h-8 text-primary" />} />
       </div>
 
-      <div className="px-6 pb-6">
+      <div className="px-4 pb-6">
         <div className="rounded-lg border border-border bg-card p-4">
           <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Recent laps</div>
           <div className="flex flex-wrap gap-2">
@@ -92,7 +92,7 @@ function PitBoard() {
 
 function Tile({ label, value, icon, accent, color }: { label: string; value: string; icon?: React.ReactNode; accent?: boolean; color?: string }) {
   return (
-    <div className={"rounded-lg border p-6 flex items-center gap-4 " + (accent ? "border-primary/60 bg-card shadow-glow" : "border-border bg-card")}>
+    <div className={"rounded-lg border p-4 flex items-center gap-4 " + (accent ? "border-primary/60 bg-card shadow-glow" : "border-border bg-card")}>
       {icon}
       <div className="min-w-0 flex-1">
         <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">{label}</div>

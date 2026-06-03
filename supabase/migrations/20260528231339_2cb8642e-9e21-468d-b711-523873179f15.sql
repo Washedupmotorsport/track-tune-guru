@@ -1,0 +1,1 @@
+ALTER TABLE public.setup_changes ADD COLUMN IF NOT EXISTS driver_response text;

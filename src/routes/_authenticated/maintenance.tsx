@@ -18,14 +18,16 @@ type Item = {
   id: string; car_id: string; component: string; description: string | null;
   unit: string; current_value: number; service_interval: number | null;
   last_service_value: number | null; warn_threshold: number | null; notes: string | null;
+  priority: string;
 };
 const UNITS = ["hours", "cycles", "km", "miles", "days"];
+const PRIORITIES = ["low", "normal", "high", "critical"];
 
 function MaintenancePage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ car_id: "", component: "", description: "", unit: "hours", current_value: "0", service_interval: "", last_service_value: "0", warn_threshold: "0.2", notes: "" });
+  const [form, setForm] = useState({ car_id: "", component: "", description: "", unit: "hours", current_value: "0", service_interval: "", last_service_value: "0", warn_threshold: "0.2", notes: "", priority: "normal" });
 
   const carsQ = useQuery({
     queryKey: ["cars-min", user?.id],
@@ -55,14 +57,14 @@ function MaintenancePage() {
         service_interval: form.service_interval ? Number(form.service_interval) : null,
         last_service_value: form.last_service_value ? Number(form.last_service_value) : 0,
         warn_threshold: form.warn_threshold ? Number(form.warn_threshold) : 0.2,
-        notes: form.notes || null,
+        notes: form.notes || null, priority: form.priority,
       });
       if (error) throw error;
     },
     onSuccess: () => {
       toast.success("Item added");
       setOpen(false);
-      setForm({ car_id: "", component: "", description: "", unit: "hours", current_value: "0", service_interval: "", last_service_value: "0", warn_threshold: "0.2", notes: "" });
+      setForm({ car_id: "", component: "", description: "", unit: "hours", current_value: "0", service_interval: "", last_service_value: "0", warn_threshold: "0.2", notes: "", priority: "normal" });
       qc.invalidateQueries({ queryKey: ["maintenance"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
@@ -126,7 +128,16 @@ function MaintenancePage() {
                 <div><Label>Last service</Label><Input type="number" step="any" value={form.last_service_value} onChange={(e) => setForm({ ...form, last_service_value: e.target.value })} /></div>
                 <div><Label>Interval</Label><Input type="number" step="any" value={form.service_interval} onChange={(e) => setForm({ ...form, service_interval: e.target.value })} placeholder="20" /></div>
               </div>
-              <div><Label>Warn at (0.2 = 20% remaining)</Label><Input type="number" step="0.05" value={form.warn_threshold} onChange={(e) => setForm({ ...form, warn_threshold: e.target.value })} /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Warn at (0.2 = 20% remaining)</Label><Input type="number" step="0.05" value={form.warn_threshold} onChange={(e) => setForm({ ...form, warn_threshold: e.target.value })} /></div>
+                <div>
+                  <Label>Priority</Label>
+                  <Select value={form.priority} onValueChange={(v) => setForm({ ...form, priority: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{PRIORITIES.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+              </div>
               <div><Label>Notes</Label><Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
             </div>
             <DialogFooter><Button onClick={() => create.mutate()} disabled={create.isPending}>Add</Button></DialogFooter>
@@ -137,7 +148,7 @@ function MaintenancePage() {
       <div className="mt-6 space-y-3">
         {itemsQ.isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
         {!itemsQ.isLoading && (itemsQ.data ?? []).length === 0 && (
-          <div className="rounded-lg border border-dashed border-border p-10 text-center">
+          <div className="rounded-lg border border-dashed border-border p-6 text-center">
             <Wrench className="w-8 h-8 mx-auto text-muted-foreground" />
             <p className="mt-3 text-sm text-muted-foreground">No maintenance items yet.</p>
           </div>
@@ -156,6 +167,9 @@ function MaintenancePage() {
                   <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{carName(it.car_id)}</div>
                   <div className="flex items-center gap-2 mt-1">
                     <h2 className="font-display text-xl font-bold">{it.component}</h2>
+                    {it.priority && it.priority !== "normal" && (
+                      <span className={"text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded border " + (it.priority === "critical" ? "bg-destructive/20 text-destructive border-destructive/60" : it.priority === "high" ? "bg-primary/15 text-primary border-primary/50" : "bg-muted text-muted-foreground border-border")}>{it.priority}</span>
+                    )}
                     {overdue && <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded bg-destructive/20 text-destructive flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Overdue</span>}
                     {!overdue && warn && <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded bg-primary/20 text-primary flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Due soon</span>}
                     {!overdue && !warn && interval > 0 && <CheckCircle2 className="w-4 h-4 text-muted-foreground" />}

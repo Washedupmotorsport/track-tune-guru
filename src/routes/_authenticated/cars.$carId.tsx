@@ -6,12 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Plus, ArrowLeft, FileText, ChevronRight, Trash2, Copy } from "lucide-react";
+import { Plus, ArrowLeft, FileText, ChevronRight, Trash2, Copy, Timer, Trophy, Disc } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { getDiscipline } from "@/lib/disciplines";
 import { ShareDialog } from "@/components/share-dialog";
 import { useCarAccess, canEdit } from "@/lib/use-car-access";
+import { formatLapTime } from "@/lib/lap-time";
 
 export const Route = createFileRoute("/_authenticated/cars/$carId")({
   component: CarDetail,
@@ -41,6 +42,36 @@ function CarDetail() {
     queryFn: async () => {
       const { data, error } = await supabase.from("setups").select("*").eq("car_id", carId).order("updated_at", { ascending: false });
       if (error) throw error; return data;
+    },
+  });
+
+  const statsQ = useQuery({
+    queryKey: ["car-stats", carId],
+    queryFn: async () => {
+      const [sessions, laps, tires] = await Promise.all([
+        supabase.from("sessions").select("id, started_at").eq("car_id", carId),
+        supabase.from("laps").select("lap_time_ms, setup_id").eq("car_id", carId),
+        supabase.from("tire_logs").select("id").eq("car_id", carId),
+      ]);
+      const best = (laps.data ?? []).reduce<number | null>((b, l) => b == null || l.lap_time_ms < b ? l.lap_time_ms : b, null);
+      const lastOut = (sessions.data ?? []).reduce<string | null>((m, s) => !m || s.started_at > m ? s.started_at : m, null);
+      const bestBySetup = new Map<string, number>();
+      (laps.data ?? []).forEach((l) => {
+        if (!l.setup_id) return;
+        const cur = bestBySetup.get(l.setup_id);
+        if (cur == null || l.lap_time_ms < cur) bestBySetup.set(l.setup_id, l.lap_time_ms);
+      });
+      const lapsBySetup = new Map<string, number>();
+      (laps.data ?? []).forEach((l) => {
+        if (!l.setup_id) return;
+        lapsBySetup.set(l.setup_id, (lapsBySetup.get(l.setup_id) ?? 0) + 1);
+      });
+      return {
+        sessions: sessions.data?.length ?? 0,
+        laps: laps.data?.length ?? 0,
+        tireSets: tires.data?.length ?? 0,
+        best, lastOut, bestBySetup, lapsBySetup,
+      };
     },
   });
 
@@ -130,28 +161,56 @@ function CarDetail() {
         </div>
       </div>
 
+      <div className="mt-4 grid grid-cols-2 sm:grid-cols-5 gap-2">
+        <StatTile icon={<FileText className="w-3 h-3" />} label="Setups" value={String(setupsQ.data?.length ?? 0)} />
+        <StatTile icon={<Timer className="w-3 h-3" />} label="Sessions" value={String(statsQ.data?.sessions ?? 0)} />
+        <StatTile icon={<Trophy className="w-3 h-3" />} label="Best lap" value={formatLapTime(statsQ.data?.best ?? null)} mono accent />
+        <StatTile label="Laps logged" value={String(statsQ.data?.laps ?? 0)} mono />
+        <StatTile icon={<Disc className="w-3 h-3" />} label="Tyre sets" value={String(statsQ.data?.tireSets ?? 0)} />
+      </div>
+
       <div className="mt-8">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="h-px flex-1 bg-border" />
+          <h2 className="font-display text-sm font-bold uppercase tracking-[0.15em] text-muted-foreground">Setups</h2>
+          <div className="h-px flex-1 bg-border" />
+        </div>
         {setupsQ.isLoading ? (
           <div className="text-muted-foreground">Loading…</div>
         ) : setupsQ.data && setupsQ.data.length > 0 ? (
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="rounded-sm border border-border bg-card divide-y divide-border/60">
             {setupsQ.data.map((s) => (
-              <div key={s.id} className="group rounded-lg border border-border bg-card p-5 shadow-card hover:border-primary transition-colors">
-                <div className="flex items-start justify-between">
-                  <FileText className="w-5 h-5 text-primary" />
-                  {writable && (
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => cloneSetup.mutate(s.id)} className="text-muted-foreground hover:text-accent p-1"><Copy className="w-4 h-4" /></button>
-                      <button onClick={() => { if (confirm("Delete this setup?")) del.mutate(s.id); }} className="text-muted-foreground hover:text-destructive p-1"><Trash2 className="w-4 h-4" /></button>
+              <div key={s.id} className="group flex items-center gap-3 px-3 py-2.5 hover:bg-muted/20 transition-colors">
+                <FileText className="w-4 h-4 text-primary shrink-0" />
+                <Link to="/setups/$setupId" params={{ setupId: s.id }} className="flex-1 min-w-0">
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <div className="font-display font-bold uppercase tracking-tight truncate">{s.name}</div>
+                    <div className="text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground truncate">
+                      {[s.track, s.conditions].filter(Boolean).join(" · ") || "—"}
                     </div>
-                  )}
-                </div>
-                <div className="font-display text-xl font-bold mt-3">{s.name}</div>
-                <div className="text-sm text-muted-foreground">{[s.track, s.conditions].filter(Boolean).join(" · ") || "—"}</div>
-                <div className="text-xs font-mono text-muted-foreground mt-2">Updated {new Date(s.updated_at).toLocaleDateString()}</div>
-                <Link to="/setups/$setupId" params={{ setupId: s.id }} className="mt-3 inline-flex items-center text-sm text-accent hover:text-primary">
-                  Open setup <ChevronRight className="w-4 h-4 ml-1" />
+                  </div>
                 </Link>
+                <div className="hidden sm:flex items-center gap-4 text-[11px] font-mono tabular-nums shrink-0">
+                  <div className="text-right">
+                    <div className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground">Best</div>
+                    <div className="text-primary font-bold">{formatLapTime(statsQ.data?.bestBySetup.get(s.id) ?? null)}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground">Laps</div>
+                    <div>{statsQ.data?.lapsBySetup.get(s.id) ?? 0}</div>
+                  </div>
+                  <div className="text-right text-muted-foreground">
+                    <div className="text-[9px] uppercase tracking-[0.15em]">Updated</div>
+                    <div>{new Date(s.updated_at).toLocaleDateString()}</div>
+                  </div>
+                </div>
+                {writable && (
+                  <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => cloneSetup.mutate(s.id)} className="text-muted-foreground hover:text-accent p-1"><Copy className="w-4 h-4" /></button>
+                    <button onClick={() => { if (confirm("Delete this setup?")) del.mutate(s.id); }} className="text-muted-foreground hover:text-destructive p-1"><Trash2 className="w-4 h-4" /></button>
+                  </div>
+                )}
+                <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
               </div>
             ))}
           </div>
@@ -163,6 +222,17 @@ function CarDetail() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function StatTile({ icon, label, value, mono, accent }: { icon?: React.ReactNode; label: string; value: string; mono?: boolean; accent?: boolean }) {
+  return (
+    <div className="rounded-sm border border-border bg-card px-3 py-2">
+      <div className="flex items-center gap-1 text-[9px] font-mono uppercase tracking-[0.15em] text-muted-foreground">
+        {icon}{label}
+      </div>
+      <div className={`mt-0.5 text-lg font-bold truncate ${mono ? "font-mono tabular-nums" : "font-display"} ${accent ? "text-primary" : ""}`}>{value}</div>
     </div>
   );
 }

@@ -60,15 +60,15 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-grid: var(--grid);
-  --font-display: "Rajdhani", "Inter", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
 :root {
   /* MRE brand — racing red on near-black. Light variant. */
-  --radius: 0.375rem;
+  --radius: 0.5rem;
   --background: oklch(0.97 0.003 250);
-  --foreground: oklch(0.18 0.014 255);
+  --foreground: oklch(0.13 0.018 255); /* race-weekend: lift contrast vs paper */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.18 0.014 255);
   --popover: oklch(1 0 0);
@@ -78,12 +78,12 @@
   --secondary: oklch(0.95 0.008 250);
   --secondary-foreground: oklch(0.20 0.014 255);
   --muted: oklch(0.96 0.006 250);
-  --muted-foreground: oklch(0.48 0.02 250);
+  --muted-foreground: oklch(0.38 0.022 250); /* race-weekend: sunlight-legible */
   --accent: oklch(0.512 0.135 244);          /* ocean blue #006BB3 */
   --accent-foreground: oklch(0.99 0.005 250);
   --destructive: oklch(0.58 0.24 27);
   --destructive-foreground: oklch(0.99 0.005 250);
-  --border: oklch(0.86 0.008 250);
+  --border: oklch(0.78 0.012 250); /* race-weekend: sharper rule */
   --input: oklch(0.92 0.008 250);
   --ring: oklch(0.58 0.245 26);
   --grid: oklch(0.74 0.012 250 / 0.7);
@@ -101,47 +101,47 @@
   --sidebar-accent-foreground: oklch(0.20 0.014 255);
   --sidebar-border: oklch(0.90 0.008 250);
   --sidebar-ring: oklch(0.58 0.245 26);
-  --gradient-hero: linear-gradient(135deg, oklch(0.58 0.245 26) 0%, oklch(0.48 0.22 22) 100%);
+  --gradient-hero: linear-gradient(180deg, oklch(0.96 0.004 250) 0%, oklch(0.92 0.005 250) 100%);
   --shadow-glow: 0 0 40px -8px oklch(0.58 0.245 26 / 0.45);
   --shadow-card: 0 1px 0 oklch(1 0 0 / 0.6) inset, 0 8px 24px -12px oklch(0.20 0.02 255 / 0.18);
 }
 
 .dark {
   /* MRE brand — pure black with racing red, matches key art. */
-  --background: oklch(0.10 0.003 250);
-  --foreground: oklch(0.97 0.004 250);
-  --card: oklch(0.14 0.004 250);
+  --background: oklch(0.10 0.004 250);   /* deeper graphite for sunlight contrast */
+  --foreground: oklch(1.00 0.003 250);
+  --card: oklch(0.17 0.005 250);         /* panel */
   --card-foreground: oklch(0.97 0.004 250);
-  --popover: oklch(0.14 0.004 250);
+  --popover: oklch(0.17 0.005 250);
   --popover-foreground: oklch(0.96 0.005 250);
   --primary: oklch(0.62 0.248 26);          /* MRE racing red #E30613 */
   --primary-foreground: oklch(0.99 0.005 250);
-  --secondary: oklch(0.18 0.006 250);
+  --secondary: oklch(0.19 0.006 250);
   --secondary-foreground: oklch(0.96 0.005 250);
-  --muted: oklch(0.17 0.006 250);
-  --muted-foreground: oklch(0.72 0.012 250);
+  --muted: oklch(0.18 0.006 250);
+  --muted-foreground: oklch(0.88 0.012 250); /* race-weekend: outdoor legible */
   --accent: oklch(0.62 0.14 244);
   --accent-foreground: oklch(0.99 0.005 250);
   --destructive: oklch(0.62 0.22 27);
   --destructive-foreground: oklch(0.99 0.005 250);
-  --border: oklch(0.24 0.008 250);
-  --input: oklch(0.22 0.008 250);
+  --border: oklch(0.42 0.012 250);         /* race-weekend: even sharper rule */
+  --input: oklch(0.30 0.008 250);
   --ring: oklch(0.62 0.248 26);
-  --grid: oklch(0.28 0.008 250 / 0.35);
-  --sidebar: oklch(0.12 0.004 250);
+  --grid: oklch(0.30 0.008 250 / 0.18);  /* faint telemetry grid */
+  --sidebar: oklch(0.11 0.004 250);
   --sidebar-foreground: oklch(0.96 0.005 250);
   --sidebar-primary: oklch(0.62 0.248 26);
   --sidebar-primary-foreground: oklch(0.14 0.01 250);
   --sidebar-accent: oklch(0.18 0.006 250);
   --sidebar-accent-foreground: oklch(0.96 0.005 250);
-  --sidebar-border: oklch(0.24 0.008 250);
+  --sidebar-border: oklch(0.26 0.01 250);
   --sidebar-ring: oklch(0.62 0.248 26);
   --chart-1: oklch(0.68 0.245 26);
   --chart-2: oklch(0.68 0.14 244);
   --chart-3: oklch(0.70 0.14 155);
   --chart-4: oklch(0.75 0.16 85);
   --chart-5: oklch(0.68 0.16 305);
-  --gradient-hero: linear-gradient(135deg, oklch(0.62 0.248 26) 0%, oklch(0.46 0.22 22) 100%);
+  --gradient-hero: linear-gradient(180deg, oklch(0.20 0.01 250) 0%, oklch(0.13 0.004 250) 100%);
   --shadow-glow: 0 0 48px -8px oklch(0.62 0.248 26 / 0.55);
   --shadow-card: 0 1px 0 oklch(1 0 0 / 0.04) inset, 0 8px 24px -12px oklch(0 0 0 / 0.6);
 }
@@ -154,17 +154,17 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: "Inter", system-ui, sans-serif;
-    background-image:
-      linear-gradient(var(--grid) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-    background-size: 56px 56px;
-    background-position: -1px -1px;
+    font-family: "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
+    font-feature-settings: "ss01" 1;
+    font-size: 15px;
+    line-height: 1.6;
   }
 
   h1, h2, h3, h4, .font-display {
     font-family: var(--font-display);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    line-height: 1.2;
   }
 
   .font-mono { font-family: var(--font-mono); }
@@ -176,3 +176,79 @@
   .shadow-glow { box-shadow: var(--shadow-glow); }
   .shadow-card { box-shadow: var(--shadow-card); }
 }
+
+@layer utilities {
+  /* Telemetry number display — large, condensed, tabular */
+  .telemetry-value {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+    line-height: 1;
+  }
+  .telemetry-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted-foreground);
+  }
+  .telemetry-panel {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.02);
+  }
+  /* Tighten any leftover SaaS shadows on cards */
+  .shadow, .shadow-sm, .shadow-md, .shadow-lg {
+    box-shadow: none !important;
+  }
+  .telemetry-rule {
+    border-top: 1px solid var(--border);
+  }
+  .telemetry-accent-bar {
+    border-left: 2px solid var(--primary);
+  }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+}
+
+@layer utilities {
+  /* Bottom-nav safe area for mobile pit-lane use */
+  .pb-safe-nav { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4.25rem); }
+  @media (min-width: 768px) { .pb-safe-nav { padding-bottom: 0; } }
+}
+
+/* ===== Print / engineering document export ===== */
+@media print {
+  @page { size: A4; margin: 12mm 12mm 14mm 12mm; }
+  html, body {
+    background: #ffffff !important;
+    color: #0a0a0a !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .no-print, .no-print * { display: none !important; }
+  .print-only { display: block !important; }
+  .print-sheet {
+    background: #ffffff !important;
+    color: #0a0a0a !important;
+    box-shadow: none !important;
+    border: none !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .print-sheet * {
+    color: #0a0a0a !important;
+    border-color: #c8c8c8 !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+  .print-sheet .print-accent { background-color: #0a0a0a !important; color: #ffffff !important; }
+  .print-sheet .print-zebra > tr:nth-child(even) td,
+  .print-sheet .print-zebra > tbody > tr:nth-child(even) td { background-color: #f3f3f3 !important; }
+  .print-page-break { break-after: page; page-break-after: always; }
+  .avoid-break { break-inside: avoid; page-break-inside: avoid; }
+}
+.print-only { display: none; }

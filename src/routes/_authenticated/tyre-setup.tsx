@@ -2,10 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Disc, Download, Gauge, Thermometer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUnits } from "@/lib/units";
+import { Stepper } from "@/components/stepper";
+import { TyreTabs } from "@/components/tyre-tabs";
 import jsPDF from "jspdf";
 
 export const Route = createFileRoute("/_authenticated/tyre-setup")({
@@ -137,6 +138,7 @@ function TyreSetupPage() {
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
+      <TyreTabs />
       <div className="mt-4 flex items-start justify-between gap-4 flex-wrap">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
@@ -153,41 +155,51 @@ function TyreSetupPage() {
         </Button>
       </div>
 
-      <div className="mt-6 grid lg:grid-cols-2 gap-6">
+      <div className="mt-6 grid lg:grid-cols-2 gap-3">
         <div className="rounded-lg border border-border bg-card p-5 shadow-card space-y-4">
           <h2 className="font-display text-lg font-bold uppercase tracking-wider">Inputs</h2>
           <div>
             <Label>Compound</Label>
-            <Select value={compound} onValueChange={setCompound}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {Object.entries(COMPOUND_BASE).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>{v.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {/* One-tap chip row — no dropdown, no keyboard. Sized for gloved thumbs. */}
+            <div className="mt-1 grid grid-cols-4 gap-1.5">
+              {Object.entries(COMPOUND_BASE).map(([k, v]) => {
+                const active = compound === k;
+                return (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setCompound(k)}
+                    className={
+                      "h-12 rounded-md border-[1.5px] font-display font-bold uppercase tracking-wider text-sm transition-colors active:scale-[0.97] " +
+                      (active
+                        ? "border-primary bg-primary text-primary-foreground shadow-glow"
+                        : "border-border bg-card text-foreground hover:border-primary/50")
+                    }
+                    aria-pressed={active}
+                  >
+                    {v.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Car + driver load (kg)</Label>
-              <Input type="number" inputMode="decimal" value={load}
-                onChange={(e) => setLoad(e.target.value)} className="font-mono" />
-            </div>
-            <div>
-              <Label>Track temp ({tempUnit})</Label>
-              <Input type="number" inputMode="decimal" value={trackTemp}
-                onChange={(e) => setTrackTemp(e.target.value)} className="font-mono" />
-            </div>
+            <Stepper label="Car + driver load" unit="kg"
+              value={load} step={10} min={400} max={2000} precision={0}
+              onChange={setLoad} />
+            <Stepper label="Track temp" unit={tempUnit}
+              value={trackTemp} step={1} min={-10} max={70} precision={0}
+              onChange={setTrackTemp} />
           </div>
           <div>
             <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-              Current cold pressures ({pressureUnit}) — optional
+              Current cold pressures ({pressureUnit}) — tap ± to adjust
             </Label>
-            <div className="grid grid-cols-4 gap-2 mt-1">
+            <div className="grid grid-cols-2 gap-2 mt-2">
               {(["fl","fr","rl","rr"] as const).map((k) => (
-                <Input key={k} className="font-mono text-center" placeholder={k.toUpperCase()}
-                  type="number" step="any" value={currentCold[k]}
-                  onChange={(e) => setCurrentCold({ ...currentCold, [k]: e.target.value })} />
+                <Stepper key={k} label={k.toUpperCase()} unit={pressureUnit}
+                  value={currentCold[k]} step={0.1} min={10} max={45} precision={1}
+                  onChange={(v) => setCurrentCold({ ...currentCold, [k]: v })} />
               ))}
             </div>
           </div>
@@ -319,13 +331,13 @@ function StintProjector({ base }: { base: { hotMin: number; hotMax: number; labe
 
       <div className="mt-4">
         <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-          Cold-set pressures ({pressureUnit})
+          Cold-set pressures ({pressureUnit}) — tap ± to adjust
         </Label>
-        <div className="grid grid-cols-4 gap-2 mt-1">
+        <div className="grid grid-cols-2 gap-2 mt-2">
           {(["fl","fr","rl","rr"] as const).map((k) => (
-            <Input key={k} placeholder={k.toUpperCase()} type="number" step="any"
-              value={cold[k]} onChange={(e) => setCold({ ...cold, [k]: e.target.value })}
-              className="font-mono text-center" />
+            <Stepper key={k} label={k.toUpperCase()} unit={pressureUnit}
+              value={cold[k]} step={0.1} min={10} max={45} precision={1}
+              onChange={(v) => setCold({ ...cold, [k]: v })} />
           ))}
         </div>
       </div>

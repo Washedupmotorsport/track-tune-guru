@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, AlertTriangle, Cloud, FileDown, Monitor, Table as TableIcon } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, AlertTriangle, Cloud, FileDown, Monitor, Table as TableIcon, ClipboardCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { parseLapTime, formatLapTime } from "@/lib/lap-time";
@@ -164,6 +164,14 @@ function SessionDetail() {
           <Link to="/sessions/$sessionId/pitboard" params={{ sessionId }}>
             <Button variant="outline" size="sm"><Monitor className="w-4 h-4 mr-1" /> Pit board</Button>
           </Link>
+          <Link
+            to="/post-debrief"
+            search={{ sessionId, carId: sessionQ.data.car_id, new: true }}
+          >
+            <Button variant="outline" size="sm">
+              <ClipboardCheck className="w-4 h-4 mr-1" /> Debrief
+            </Button>
+          </Link>
           <Button variant="outline" size="sm" onClick={fetchWeather} disabled={weatherLoading}>
             {weatherLoading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Cloud className="w-4 h-4 mr-1" />} Weather
           </Button>
@@ -249,7 +257,7 @@ function SessionDetail() {
 
       <div className="mt-6 rounded-lg border border-border bg-card p-5">
         <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-3">Add lap</h2>
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+        <div id="add-lap" className="grid grid-cols-2 md:grid-cols-6 gap-3">
           <div><Label>#</Label><Input value={lapForm.lap_number} onChange={(e) => setLapForm({ ...lapForm, lap_number: e.target.value })} className="font-mono" /></div>
           <div><Label>Lap *</Label><Input value={lapForm.lap_time} onChange={(e) => setLapForm({ ...lapForm, lap_time: e.target.value })} className="font-mono" placeholder="1:23.456" /></div>
           <div><Label>S1</Label><Input value={lapForm.s1} onChange={(e) => setLapForm({ ...lapForm, s1: e.target.value })} className="font-mono" /></div>
@@ -310,10 +318,10 @@ function SessionDetail() {
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
-            <h2 className="font-display text-lg font-bold uppercase tracking-wider">AI Debrief</h2>
+            <h2 className="font-display text-lg font-bold uppercase tracking-wider">Race engineer debrief</h2>
           </div>
           <Button size="sm" onClick={() => askDebrief.mutate()} disabled={askDebrief.isPending || laps.length === 0}>
-            {askDebrief.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Sparkles className="w-4 h-4 mr-1" />} Analyze session
+            {askDebrief.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Sparkles className="w-4 h-4 mr-1" />} Run debrief
           </Button>
         </div>
         {laps.length === 0 && <p className="text-sm text-muted-foreground">Log some laps first.</p>}
@@ -350,6 +358,30 @@ function SessionDetail() {
           </div>
         )}
       </div>
+
+      {/* Sticky mobile action bar — pit-lane one-handed use */}
+      <div
+        className="md:hidden fixed inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur-md"
+        style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 4rem)" }}
+      >
+        <div className="grid grid-cols-2 gap-2 p-2">
+          <a
+            href="#add-lap"
+            className="h-12 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground font-display font-bold uppercase tracking-wider text-sm active:scale-[0.98]"
+          >
+            <Plus className="w-4 h-4" /> Log lap
+          </a>
+          <button
+            type="button"
+            onClick={() => save.mutate()}
+            disabled={save.isPending}
+            className="h-12 inline-flex items-center justify-center gap-2 rounded-md border-[1.5px] border-border bg-card font-display font-bold uppercase tracking-wider text-sm active:scale-[0.98] disabled:opacity-50"
+          >
+            {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
+          </button>
+        </div>
+      </div>
+      <div className="md:hidden h-20" aria-hidden />
     </div>
   );
 }
