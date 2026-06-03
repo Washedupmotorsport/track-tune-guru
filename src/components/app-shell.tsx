@@ -96,9 +96,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={toggleTheme}
               title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
               aria-label="Toggle theme"
-              className="hidden md:inline-flex items-center justify-center rounded-md border border-border bg-muted/30 h-[34px] w-[34px] text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden md:inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-muted/30 h-[34px] px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
             </button>
             <Select value={currency} onValueChange={(v) => setCurrency(v as CurrencyCode)}>
               <SelectTrigger
