@@ -167,7 +167,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-4">
             <FooterLink to="/terms">Terms of Service</FooterLink>
             <a
-              href="https://www.facebook.com"
+              href="https://www.facebook.com/people/My-Motorsport-engineer/61590792381151/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
