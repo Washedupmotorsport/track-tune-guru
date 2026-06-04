@@ -84,6 +84,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link
                   key={w.key}
                   to={w.to}
+                  title={"tooltip" in w ? (w as { tooltip: string }).tooltip : undefined}
                   className={`inline-flex items-center gap-1.5 px-2.5 h-8 rounded-md text-xs font-medium transition-colors ${
                     active
                       ? "bg-primary/15 text-primary border border-primary/30"
@@ -140,7 +141,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Select>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="sm" variant="ghost" className="text-xs font-medium text-muted-foreground hover:text-primary">
+                <Button size="sm" variant="ghost" title="All navigation pages" className="text-xs font-medium text-muted-foreground hover:text-primary">
                   <Menu className="w-4 h-4 mr-1" /> All
                 </Button>
               </DropdownMenuTrigger>
@@ -252,7 +253,7 @@ function MobileTabBar() {
     { to: "/tyre-setup",    label: "Tyres",    icon: Disc,          matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
     { to: "/driver",        label: "Driver",   icon: Mic,           matches: ["/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours", "/debrief"] },
     { to: "/setup-library", label: "Setup",    icon: Wand2,         matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-    { to: "/engineering-memory", label: "Log", icon: Brain,         matches: ["/engineering-memory", "/notes"] },
+    { to: "/engineering-memory", label: "Log", icon: Brain,         matches: ["/engineering-memory", "/notes"], tooltip: "Engineering notebook log" },
     { to: "/garage",        label: "Garage",   icon: Home,          matches: ["/garage", "/cars", "/calendar", "/weekends", "/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
   ] as const;
   return (
@@ -270,6 +271,7 @@ function MobileTabBar() {
             <li key={it.to}>
               <Link
                 to={it.to}
+                title={"tooltip" in it ? (it as { tooltip: string }).tooltip : undefined}
                 className={`flex flex-col items-center justify-center gap-0.5 h-12 text-[11px] font-medium active:bg-primary/10 transition-colors ${
                   active ? "text-primary" : "text-muted-foreground hover:text-primary"
                 }`}
@@ -299,7 +301,7 @@ const WORKSPACES = [
   { key: "sessions", label: "Sessions",  icon: Timer,         to: "/sessions",       matches: ["/sessions", "/timeline", "/analysis", "/post-debrief"] },
   { key: "tyres",    label: "Tyres",     icon: Disc,          to: "/tyre-setup",     matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
   { key: "driver",   label: "Driver",    icon: Mic,           to: "/driver",         matches: ["/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours", "/debrief"] },
-  { key: "log",      label: "Log",       icon: Brain,         to: "/engineering-memory", matches: ["/engineering-memory", "/notes"] },
+  { key: "log",      label: "Log",       icon: Brain,         to: "/engineering-memory", matches: ["/engineering-memory", "/notes"], tooltip: "Engineering notebook log" },
   { key: "garage",   label: "Garage",    icon: Home,          to: "/garage",         matches: ["/garage", "/cars", "/calendar", "/weekends", "/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
 ] as const;
 
@@ -343,11 +345,11 @@ const ALL_NAV_GROUPS = [
     label: "Driver Hub",
     items: [
       { to: "/driver",           label: "Driver workspace",  icon: Mic },
-      { to: "/confidence",       label: "Confidence",        icon: Brain },
+      { to: "/confidence",       label: "Driver Confidence",   icon: Brain },
       { to: "/debrief",          label: "Driver feedback",   icon: ClipboardList },
       { to: "/known-behaviours", label: "Known behaviours",  icon: Sparkles },
-      { to: "/sympathy",         label: "Mechanical sympathy", icon: Wrench },
-      { to: "/philosophies",     label: "Driving philosophy", icon: NotebookPen },
+      { to: "/sympathy",         label: "Reliability", icon: Wrench },
+      { to: "/philosophies",     label: "Setup Notes", icon: NotebookPen },
       { to: "/flags",            label: "Track flags",       icon: Flag },
       { to: "/corners",          label: "Corner notes",      icon: MapPin },
     ],
