@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState, type ComponentType } from "react";
+import { FirstTimeCallout } from "@/components/first-time-callout";
+import { GuidedTour } from "@/components/guided-tour";
 
 export const Route = createFileRoute("/_authenticated/engineer")({
   head: () => ({
@@ -272,6 +274,8 @@ function EngineerCockpit() {
 
   return (
     <div className="space-y-3">
+      <FirstTimeCallout />
+      <GuidedTour tourKey="cockpit" />
       {/* ENGINEERING PRIORITIES — top of screen, race-weekend triage ===== */}
       <Panel
         icon={AlertTriangle}
