@@ -2,9 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
-import { GitBranch, Disc, ArrowRight, Brain, MessageSquare, TriangleAlert as AlertTriangle, HardHat, CircleCheck as CheckCircle2, CircleDot, Circle as XCircle, Pin, Radio, Cloud, Fuel, Timer, Wrench, Wand as Wand2, CalendarDays, TrendingUp, TrendingDown, Minus, Activity, Flag } from "lucide-react";
+import { GitBranch, Disc, ArrowRight, Brain, MessageSquare, TriangleAlert as AlertTriangle, HardHat, CircleCheck as CheckCircle2, CircleDot, Circle as XCircle, Pin, Radio, Cloud, Fuel, Timer, Wrench, Wand as Wand2, CalendarDays, TrendingUp, TrendingDown, Minus, Activity, Flag, Plus, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
-import { useEffect, useMemo, useState, type ComponentType } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/_authenticated/engineer")({
   head: () => ({
@@ -144,25 +145,35 @@ function EngineerCockpit() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("engineering_memory")
-        .select("id, title, detail, category, occurrences, confidence, pinned, last_observed_at, priority")
-        .eq("status", "active")
-        .in("priority", ["critical", "testing", "monitor"])
+        .select("id, title, detail, category, occurrences, confidence, pinned, last_observed_at, priority, status")
+        .in("priority", ["critical", "testing", "monitor", "resolved"])
         .order("last_observed_at", { ascending: false })
         .limit(40);
       if (error) throw error;
-      return (data ?? []) as MemoryRow[];
+      return (data ?? []) as (MemoryRow & { status: string })[];
     },
   });
 
   const priorityM = useMutation({
     mutationFn: async (vars: { id: string; priority: "critical" | "testing" | "monitor" | "resolved" }) => {
-      const patch: { priority: string; status?: string } = { priority: vars.priority };
-      if (vars.priority === "resolved") patch.status = "archived";
-      const { error } = await supabase.from("engineering_memory").update(patch).eq("id", vars.id);
+      const { error } = await supabase.from("engineering_memory").update({ priority: vars.priority }).eq("id", vars.id);
       if (error) throw error;
     },
     onSuccess: (_d, vars) => {
       toast.success(`Marked ${vars.priority}`);
+      qc.invalidateQueries({ queryKey: ["cockpit-priorities"] });
+      qc.invalidateQueries({ queryKey: ["cockpit-memory"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const deletePriorityM = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("engineering_memory").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Deleted");
       qc.invalidateQueries({ queryKey: ["cockpit-priorities"] });
       qc.invalidateQueries({ queryKey: ["cockpit-memory"] });
     },
@@ -250,12 +261,12 @@ function EngineerCockpit() {
 
   const criticalFlags = (inboxQ.data ?? []).filter((f) => f.severity === "critical").length;
   const priorities = prioritiesQ.data ?? [];
-  const priorityGroups = useMemo(() => {
-    const order: Array<"critical" | "testing" | "monitor"> = ["critical", "testing", "monitor"];
-    return order.map((p) => ({ key: p, items: priorities.filter((i) => i.priority === p) }));
+  const sortedPriorities = useMemo(() => {
+    const order: Record<string, number> = { critical: 0, testing: 1, monitor: 2, resolved: 3 };
+    return [...priorities].sort((a, b) => (order[a.priority] ?? 9) - (order[b.priority] ?? 9));
   }, [priorities]);
-  const criticalIssues = priorityGroups[0].items.length;
-  const testingIssues = priorityGroups[1].items.length;
+  const criticalIssues = priorities.filter((p) => p.priority === "critical").length;
+  const testingIssues = priorities.filter((p) => p.priority === "testing").length;
   const session = sessionQ.data;
   const setup = activeSetupQ.data;
   const nextEvent = nextEventQ.data;
@@ -265,70 +276,40 @@ function EngineerCockpit() {
   const fuelUsed = session && session.fuel_start_l != null && session.fuel_end_l != null
     ? Math.max(0, session.fuel_start_l - session.fuel_end_l) : null;
 
+  const isMobile = useIsMobile();
+  const [detailsOpen, setDetailsOpen] = useState<boolean | null>(null);
+  const showDetails = detailsOpen ?? !isMobile;
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-16">
       {/* ENGINEERING PRIORITIES — top of screen, race-weekend triage ===== */}
-      <Panel
-        icon={AlertTriangle}
-        title="Engineering priorities"
-        count={priorities.length}
-        action={{ to: "/engineering-memory", label: "Manage" }}
-        tone={criticalIssues > 0 ? "alert" : testingIssues > 0 ? "warn" : undefined}
-      >
+      <section className="rounded-xl border border-border bg-card overflow-hidden">
+        <div className={`flex items-center gap-2 px-4 py-2.5 border-b ${criticalIssues > 0 ? "bg-destructive/10 border-destructive/40" : testingIssues > 0 ? "bg-accent/10 border-accent/40" : "bg-muted/30 border-border"}`}>
+          <AlertTriangle className="w-4 h-4 text-primary" />
+          <h2 className="font-display text-sm font-bold">Engineering priorities</h2>
+          <span className="text-xs text-muted-foreground">· {sortedPriorities.length}</span>
+          <Link to="/engineering-memory" className="ml-auto text-xs font-medium text-muted-foreground hover:text-primary">
+            Manage →
+          </Link>
+        </div>
         {prioritiesQ.isLoading && <PanelEmpty>Loading…</PanelEmpty>}
-        {!prioritiesQ.isLoading && priorities.length === 0 && (
+        {!prioritiesQ.isLoading && sortedPriorities.length === 0 && (
           <PanelEmpty>No active priorities. Flag a recurring issue from the memory page.</PanelEmpty>
         )}
-        {priorities.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border">
-            {priorityGroups.map((g) => (
-              <div key={g.key} className="min-w-0">
-                <div className={`flex items-center gap-2 px-4 py-2 border-b border-border ${priorityHeadTone(g.key)}`}>
-                  <span className={`inline-flex items-center px-2.5 h-6 rounded text-xs font-semibold uppercase ${priorityBadgeTone(g.key)}`}>
-                    {g.key}
-                  </span>
-                  <span className="text-sm text-muted-foreground">· {g.items.length}</span>
-                </div>
-                {g.items.length === 0 ? (
-                  <div className="px-4 py-5 text-sm text-muted-foreground">—</div>
-                ) : (
-                  <ul className="divide-y divide-border">
-                    {g.items.slice(0, 6).map((m) => (
-                      <li key={m.id} className="p-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold leading-snug flex-1 min-w-0">{m.title}</span>
-                          <span className="text-xs text-muted-foreground shrink-0">×{m.occurrences}</span>
-                        </div>
-                        {m.detail && <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{m.detail}</p>}
-                        <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
-                          {g.key !== "critical" && (
-                            <Verdict tone="bad" icon={AlertTriangle} label="Critical"
-                              onClick={() => priorityM.mutate({ id: m.id, priority: "critical" })}
-                              disabled={priorityM.isPending} />
-                          )}
-                          {g.key !== "testing" && (
-                            <Verdict tone="warn" icon={CircleDot} label="Testing"
-                              onClick={() => priorityM.mutate({ id: m.id, priority: "testing" })}
-                              disabled={priorityM.isPending} />
-                          )}
-                          {g.key !== "monitor" && (
-                            <Verdict tone="ok" icon={Brain} label="Monitor"
-                              onClick={() => priorityM.mutate({ id: m.id, priority: "monitor" })}
-                              disabled={priorityM.isPending} />
-                          )}
-                          <Verdict tone="ok" icon={CheckCircle2} label="Resolved"
-                            onClick={() => priorityM.mutate({ id: m.id, priority: "resolved" })}
-                            disabled={priorityM.isPending} />
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+        {sortedPriorities.length > 0 && (
+          <ul className="divide-y divide-border">
+            {sortedPriorities.map((m) => (
+              <PriorityRow
+                key={m.id}
+                item={m}
+                onCycle={(id, next) => priorityM.mutate({ id, priority: next })}
+                onDelete={(id) => deletePriorityM.mutate(id)}
+                disabled={priorityM.isPending || deletePriorityM.isPending}
+              />
             ))}
-          </div>
+          </ul>
         )}
-      </Panel>
+      </section>
 
       {/* HEADER BAR ====================================================== */}
       <header className="rounded-xl border border-border bg-card">
@@ -397,6 +378,15 @@ function EngineerCockpit() {
       </div>
 
       {/* COCKPIT GRID =================================================== */}
+      <button
+        type="button"
+        onClick={() => setDetailsOpen((v) => !(v ?? !isMobile))}
+        className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary md:hidden"
+      >
+        <ChevronRight className={`w-4 h-4 transition-transform ${showDetails ? "rotate-90" : ""}`} />
+        Details
+      </button>
+      {showDetails && (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* COL A — verdicts + driver inbox */}
         <section className="space-y-4">
@@ -580,6 +570,7 @@ function EngineerCockpit() {
           )}
         </section>
       </div>
+      )}
 
       {/* SUPPORTING TOOLS (thin) */}
       <div className="pt-4 border-t border-border flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
@@ -594,6 +585,24 @@ function EngineerCockpit() {
         <Link to="/weekends"      className="hover:text-primary">Weekends</Link>
         <Link to="/flags"         className="hover:text-primary"><Flag className="w-3.5 h-3.5 inline -mt-0.5 mr-0.5" />Incidents</Link>
         <span className="ml-auto inline-flex items-center gap-1.5"><Timer className="w-3.5 h-3.5" />{now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+      </div>
+
+      {/* STICKY BOTTOM ACTION BAR */}
+      <div className="fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-md md:bottom-[90px]" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
+        <div className="mx-auto max-w-[1400px] px-4 h-12 flex items-center gap-2">
+          <Link
+            to="/engineering-memory"
+            className="flex-1 h-12 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold active:scale-[0.98] transition"
+          >
+            <Plus className="w-4 h-4" /> Priority
+          </Link>
+          <Link
+            to="/pitwall"
+            className="flex-1 h-12 inline-flex items-center justify-center gap-2 rounded-md border border-border bg-card text-foreground text-sm font-semibold hover:bg-muted/30 active:scale-[0.98] transition"
+          >
+            <Radio className="w-4 h-4" /> Open Pitwall
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -714,19 +723,6 @@ function severityTone(s: string) {
   return "border-border bg-muted/30 text-muted-foreground";
 }
 
-function priorityBadgeTone(p: string) {
-  if (p === "critical") return "border border-destructive/50 bg-destructive/15 text-destructive";
-  if (p === "testing") return "border border-accent/50 bg-accent/15 text-accent";
-  if (p === "resolved") return "border border-border bg-muted/40 text-muted-foreground";
-  return "border border-primary/40 bg-primary/10 text-primary";
-}
-
-function priorityHeadTone(p: string) {
-  if (p === "critical") return "bg-destructive/10";
-  if (p === "testing") return "bg-accent/10";
-  return "bg-muted/30";
-}
-
 function shortDate(iso: string) {
   return new Date(iso).toLocaleDateString([], { month: "short", day: "numeric" });
 }
@@ -754,4 +750,77 @@ function trendLabel(delta: number) {
   if (delta > 0) return `▲ +${delta}`;
   if (delta < 0) return `▼ ${delta}`;
   return "→ flat";
+}
+
+const PRIORITY_ORDER: Array<"critical" | "testing" | "monitor" | "resolved"> = ["critical", "testing", "monitor", "resolved"];
+
+function nextPriority(current: string): "critical" | "testing" | "monitor" | "resolved" {
+  const idx = PRIORITY_ORDER.indexOf(current as typeof PRIORITY_ORDER[number]);
+  return PRIORITY_ORDER[(idx + 1) % PRIORITY_ORDER.length];
+}
+
+function priorityPillClass(p: string) {
+  if (p === "critical") return "bg-destructive text-destructive-foreground";
+  if (p === "testing") return "bg-amber-500 text-white";
+  if (p === "monitor") return "bg-blue-500 text-white";
+  return "bg-emerald-500 text-white";
+}
+
+function PriorityRow({ item, onCycle, onDelete, disabled }: {
+  item: MemoryRow;
+  onCycle: (id: string, next: "critical" | "testing" | "monitor" | "resolved") => void;
+  onDelete: (id: string) => void;
+  disabled: boolean;
+}) {
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const didLongPress = useRef(false);
+
+  const handlePointerDown = useCallback(() => {
+    didLongPress.current = false;
+    pressTimer.current = setTimeout(() => {
+      didLongPress.current = true;
+      if (confirm("Delete this priority?")) {
+        onDelete(item.id);
+      }
+    }, 600);
+  }, [item.id, onDelete]);
+
+  const handlePointerUp = useCallback(() => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current);
+      pressTimer.current = null;
+    }
+    if (!didLongPress.current) {
+      onCycle(item.id, nextPriority(item.priority));
+    }
+  }, [item.id, item.priority, onCycle]);
+
+  const handlePointerLeave = useCallback(() => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current);
+      pressTimer.current = null;
+    }
+  }, []);
+
+  return (
+    <li className="flex items-center h-16 px-4 gap-3">
+      <span className={`shrink-0 inline-flex items-center px-2.5 h-6 rounded-full text-[11px] font-bold uppercase tracking-wider ${priorityPillClass(item.priority)}`}>
+        {item.priority}
+      </span>
+      <span className="font-mono font-semibold text-sm truncate flex-1 min-w-0">
+        {item.title}
+      </span>
+      <button
+        type="button"
+        disabled={disabled}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerLeave}
+        className="shrink-0 min-h-11 min-w-11 flex items-center justify-center rounded-md border border-border hover:bg-muted/30 active:scale-95 transition disabled:opacity-50 touch-manipulation select-none"
+        title="Tap to advance status, hold to delete"
+      >
+        <ChevronRight className="w-4 h-4" />
+      </button>
+    </li>
+  );
 }
