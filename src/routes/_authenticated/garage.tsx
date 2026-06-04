@@ -17,6 +17,7 @@ import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { ShareDialog } from "@/components/share-dialog";
 import { formatLapTime } from "@/lib/lap-time";
+import { GuidedTour } from "@/components/guided-tour";
 
 export const Route = createFileRoute("/_authenticated/garage")({
   component: Garage,
@@ -106,6 +107,7 @@ function Garage() {
 
   return (
     <div>
+      <GuidedTour tourKey="garage" />
       <div className="flex items-center justify-between mb-8">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary">Paddock</div>

@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Timer, Plus, ArrowLeft, ChevronRight, Cloud, Thermometer, Droplet } from "lucide-react";
 import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
+import { GuidedTour } from "@/components/guided-tour";
 
 export const Route = createFileRoute("/_authenticated/sessions")({ component: SessionsPage });
 
@@ -117,6 +118,7 @@ function SessionsPage() {
 
   return (
     <div>
+      <GuidedTour tourKey="sessions" />
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>

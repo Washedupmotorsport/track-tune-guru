@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import {
+import { GuidedTour } from "@/components/guided-tour";
   Gauge, Thermometer, Droplets, Fuel, Timer, CloudSun, Activity,
   Disc, TrendingDown, TrendingUp, Wind, Flame, ArrowRight, AlertTriangle,
 } from "lucide-react";
@@ -213,6 +214,7 @@ function PitWallPage() {
 
   return (
     <div className="space-y-3">
+      <GuidedTour tourKey="race-mode" />
       {/* WATCH — active critical/testing priorities, race-weekend triage */}
       {(prioritiesQ.data?.length ?? 0) > 0 && (
         <div className="border-[1.5px] border-destructive/40 bg-destructive/5 rounded-md">

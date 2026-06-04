@@ -7,6 +7,7 @@ import {
   Radio, Flag, Disc, Mic, ArrowRight, Zap, CalendarDays, History, Activity,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { GuidedTour } from "@/components/guided-tour";
 
 export const Route = createFileRoute("/_authenticated/driver")({
   head: () => ({
@@ -69,6 +70,7 @@ function DriverHub() {
 
   return (
     <div>
+      <GuidedTour tourKey="driver" />
       <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary inline-flex items-center gap-1">

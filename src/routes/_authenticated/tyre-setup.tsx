@@ -8,6 +8,7 @@ import { useUnits } from "@/lib/units";
 import { Stepper } from "@/components/stepper";
 import { TyreTabs } from "@/components/tyre-tabs";
 import jsPDF from "jspdf";
+import { GuidedTour } from "@/components/guided-tour";
 
 export const Route = createFileRoute("/_authenticated/tyre-setup")({
   component: TyreSetupPage,
@@ -135,6 +136,7 @@ function TyreSetupPage() {
 
   return (
     <div>
+      <GuidedTour tourKey="tyres" />
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
