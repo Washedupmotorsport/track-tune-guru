@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Loader as Loader2, Sparkles, TriangleAlert as AlertTriangle, Timer, Trash2, Plus, Trophy, Download } from "lucide-react";
+import { ArrowLeft, Save, Loader as Loader2, Sparkles, TriangleAlert as AlertTriangle, Timer, Trash2, Plus, Trophy, Download, Copy, GitCompare } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getDiscipline } from "@/lib/disciplines";
@@ -17,6 +17,7 @@ import { exportSetupPdf } from "@/lib/setup-pdf";
 import { useCarAccess, canEdit } from "@/lib/use-car-access";
 import { LapImportDialog } from "@/components/lap-import-dialog";
 import { SetupConsole } from "@/components/setup-console";
+import { Stepper } from "@/components/stepper";
 import { PRESET_TYPES, presetMeta } from "./setup-library";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
@@ -38,9 +39,11 @@ function SetupDetail() {
   const qc = useQueryClient();
   const { user } = useAuth();
   const adviseFn = useServerFn(getSetupAdvice);
+  const navigate = useNavigate();
 
   const [advisor, setAdvisor] = useState({ weather: "", goal: "", driverNotes: "" });
   const [advice, setAdvice] = useState<AdvisorResult | null>(null);
+  const [activeSection, setActiveSection] = useState(0);
 
   const advise = useMutation({
     mutationFn: async () => adviseFn({ data: { setupId, ...advisor } }),
@@ -127,6 +130,34 @@ function SetupDetail() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
+  const duplicate = useMutation({
+    mutationFn: async () => {
+      const { data: src, error: e1 } = await supabase.from("setups").select("*").eq("id", setupId).single();
+      if (e1) throw e1;
+      const { data: newRow, error } = await supabase.from("setups").insert({
+        user_id: user!.id,
+        car_id: src.car_id,
+        name: `${meta.name} (copy)`,
+        discipline: src.discipline,
+        track: meta.track || null,
+        conditions: meta.conditions || null,
+        setup_data: data,
+        notes: meta.notes || null,
+        preset_type: library.preset_type,
+        ideal_conditions: library.ideal_conditions || null,
+        is_baseline: false,
+      }).select("id").single();
+      if (error) throw error;
+      return newRow;
+    },
+    onSuccess: (row) => {
+      toast.success("Setup duplicated");
+      qc.invalidateQueries({ queryKey: ["setups"] });
+      if (row?.id) navigate({ to: "/setups/$setupId", params: { setupId: row.id } });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Duplicate failed"),
+  });
+
   if (setupQ.isLoading || !setupQ.data) {
     return <div className="text-muted-foreground">Loading…</div>;
   }
@@ -134,7 +165,7 @@ function SetupDetail() {
   const disc = getDiscipline(setupQ.data.discipline);
 
   return (
-    <div>
+    <div className="pb-20">
       <Link to="/cars/$carId" params={{ carId: setupQ.data.car_id }} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to car
       </Link>
@@ -150,14 +181,6 @@ function SetupDetail() {
           <Input value={meta.name} readOnly={!writable} onChange={(e) => setMeta({ ...meta, name: e.target.value })}
             className="mt-1 font-display !text-3xl font-bold !h-auto !py-2 !px-3 bg-transparent border-transparent hover:border-border focus-visible:border-primary" />
         </div>
-        {writable && (
-          <Button onClick={() => save.mutate()} disabled={save.isPending} className="shadow-glow">
-            {save.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />} Save
-          </Button>
-        )}
-      </div>
-
-      <div className="mt-4 flex justify-end">
         <Button variant="outline" size="sm" onClick={async () => {
           try {
             const { data: car } = await supabase.from("cars").select("name, make, model, year").eq("id", setupQ.data!.car_id).single();
@@ -171,7 +194,7 @@ function SetupDetail() {
             toast.error(e instanceof Error ? e.message : "Export failed");
           }
         }}>
-          <Download className="w-4 h-4 mr-1" /> Export PDF
+          <Download className="w-4 h-4 mr-1" /> PDF
         </Button>
       </div>
 
@@ -184,28 +207,6 @@ function SetupDetail() {
           carName={carNameQ.data ?? ""}
         />
       </div>
-
-      {writable && (
-        <>
-          {/* Mobile sticky save bar — sits above the bottom tab bar */}
-          <div
-            className="md:hidden fixed inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-md px-3 py-2"
-            style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 64px)" }}
-          >
-            <Button
-              size="lg"
-              onClick={() => save.mutate()}
-              disabled={save.isPending}
-              className="w-full h-12 shadow-glow font-display uppercase tracking-widest"
-            >
-              {save.isPending
-                ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Saving…</>
-                : <><Save className="w-5 h-5 mr-2" /> Save setup</>}
-            </Button>
-          </div>
-          <div className="md:hidden h-16" aria-hidden />
-        </>
-      )}
 
       <div className="mt-6 grid md:grid-cols-3 gap-4 rounded-lg border border-border bg-card p-5">
         <div><Label>Track</Label><Input readOnly={!writable} value={meta.track} onChange={(e) => setMeta({ ...meta, track: e.target.value })} /></div>
@@ -233,7 +234,7 @@ function SetupDetail() {
             >
               <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">— Untagged —</SelectItem>
+                <SelectItem value="none">-- Untagged --</SelectItem>
                 {PRESET_TYPES.map((p) => (
                   <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
                 ))}
@@ -246,7 +247,7 @@ function SetupDetail() {
               readOnly={!writable}
               value={library.ideal_conditions}
               onChange={(e) => setLibrary((s) => ({ ...s, ideal_conditions: e.target.value }))}
-              placeholder="Cool/dry, high grip, 18–24°C"
+              placeholder="Cool/dry, high grip, 18-24 C"
               className="mt-1"
             />
           </div>
@@ -267,38 +268,71 @@ function SetupDetail() {
         </div>
       </div>
 
-      <div className="mt-6 space-y-3">
-        {disc.sections.map((section) => (
-          <div key={section.title} className="rounded-lg border border-border bg-card p-5 shadow-card">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-px flex-1 bg-border" />
-              <h2 className="font-display text-lg font-bold uppercase tracking-wider">{section.title}</h2>
-              <div className="h-px flex-1 bg-border" />
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {section.fields.map((f) => (
-                <div key={f.key}>
-                  <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-                    {f.label}{f.unit && <span className="text-primary"> ({f.unit})</span>}
-                  </Label>
-                  <Input
-                    type={f.type === "number" ? "number" : "text"}
-                    step="any"
-                    readOnly={!writable}
-                    value={data[f.key] ?? ""}
-                    onChange={(e) => setData({ ...data, [f.key]: e.target.value })}
-                    className="mt-1 font-mono"
-                  />
-                </div>
+      {/* DISCIPLINE SECTIONS — horizontal scroll tab strip on mobile */}
+      {disc.sections.length > 0 && (
+        <div className="mt-6 space-y-3">
+          <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+            <div className="flex gap-1 min-w-max md:flex-wrap">
+              {disc.sections.map((section, idx) => (
+                <button
+                  key={section.title}
+                  type="button"
+                  onClick={() => setActiveSection(idx)}
+                  className={
+                    "shrink-0 h-10 px-4 rounded-md text-xs font-mono font-bold uppercase tracking-wider transition whitespace-nowrap " +
+                    (activeSection === idx
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted/40 border border-border text-muted-foreground hover:text-primary hover:border-primary/40")
+                  }
+                >
+                  {section.title}
+                </button>
               ))}
             </div>
           </div>
-        ))}
 
+          {disc.sections[activeSection] && (
+            <div className="rounded-lg border border-border bg-card p-5 shadow-card">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {disc.sections[activeSection].fields.map((f) => (
+                  f.type === "number" ? (
+                    <Stepper
+                      key={f.key}
+                      label={f.label}
+                      unit={f.unit}
+                      value={data[f.key] ?? ""}
+                      onChange={(v) => setData({ ...data, [f.key]: v })}
+                      step={f.unit === "°" ? 0.1 : f.unit === "mm" ? 1 : f.unit === "%" ? 0.5 : 1}
+                      fineStep={f.unit === "°" ? 0.05 : f.unit === "mm" ? 0.5 : f.unit === "%" ? 0.1 : 0.5}
+                      precision={f.unit === "°" ? 2 : f.unit === "%" ? 1 : f.unit === "kg/mm" ? 1 : 0}
+                      disabled={!writable}
+                      className="[&_>_div:last-child]:!h-12"
+                    />
+                  ) : (
+                    <div key={f.key}>
+                      <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+                        {f.label}{f.unit && <span className="text-primary"> ({f.unit})</span>}
+                      </Label>
+                      <Input
+                        readOnly={!writable}
+                        value={data[f.key] ?? ""}
+                        onChange={(e) => setData({ ...data, [f.key]: e.target.value })}
+                        className="mt-1 font-mono"
+                      />
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="mt-6 space-y-3">
         <div className="rounded-lg border border-border bg-card p-5">
           <Label>Session notes</Label>
           <Textarea rows={4} readOnly={!writable} value={meta.notes} onChange={(e) => setMeta({ ...meta, notes: e.target.value })}
-            placeholder="What changed, what felt better, next steps…" />
+            placeholder="What changed, what felt better, next steps..." />
         </div>
 
         <LapLog setupId={setupId} carId={setupQ.data.car_id} userId={user?.id ?? ""} defaultConditions={meta.conditions} canEdit={writable} />
@@ -315,7 +349,7 @@ function SetupDetail() {
             <div>
               <Label>Weather / track</Label>
               <Input value={advisor.weather} onChange={(e) => setAdvisor({ ...advisor, weather: e.target.value })}
-                placeholder="Wet, 14°C, falling temp" />
+                placeholder="Wet, 14 C, falling temp" />
             </div>
             <div>
               <Label>Goal</Label>
@@ -331,7 +365,7 @@ function SetupDetail() {
           <div className="mt-4 flex justify-end">
             <Button onClick={() => advise.mutate()} disabled={advise.isPending} className="shadow-glow">
               {advise.isPending
-                ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Analyzing…</>
+                ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Analyzing...</>
                 : <><Sparkles className="w-4 h-4 mr-1" /> Get recommendations</>}
             </Button>
           </div>
@@ -373,14 +407,41 @@ function SetupDetail() {
         </div>
       </div>
 
-      <div className="mt-6 flex justify-end">
-        {writable && (
-          <Button onClick={() => save.mutate()} disabled={save.isPending} className="shadow-glow">
-            {save.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />} Save setup
-          </Button>
-        )}
-      </div>
-
+      {/* STICKY BOTTOM SPLIT BAR */}
+      {writable && (
+        <div
+          className="fixed inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-md px-3 py-2"
+          style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 64px)" }}
+        >
+          <div className="grid grid-cols-3 gap-2 max-w-3xl mx-auto">
+            <button
+              type="button"
+              onClick={() => save.mutate()}
+              disabled={save.isPending}
+              className="h-12 rounded-md bg-primary text-primary-foreground font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 active:scale-[0.97] transition disabled:opacity-50 touch-manipulation"
+            >
+              {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => duplicate.mutate()}
+              disabled={duplicate.isPending}
+              className="h-12 rounded-md border border-border bg-card text-foreground font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 active:scale-[0.97] transition disabled:opacity-50 hover:border-primary/50 touch-manipulation"
+            >
+              {duplicate.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4" />}
+              Duplicate
+            </button>
+            <Link
+              to="/reports"
+              className="h-12 rounded-md border border-border bg-card text-foreground font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 active:scale-[0.97] transition hover:border-primary/50 touch-manipulation"
+            >
+              <GitCompare className="w-4 h-4" />
+              Compare
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
