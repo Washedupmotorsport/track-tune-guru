@@ -47,7 +47,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen pb-[90px] text-foreground">
       <div className="h-[2px] w-full bg-primary" aria-hidden />
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
-        <div className="mx-auto max-w-[1400px] px-4 h-12 flex items-center justify-between">
+        <div className="mx-auto max-w-[1400px] px-4 h-11 md:h-12 flex items-center justify-between">
           <Link to="/" aria-label="My Race Engineer — home" className="flex items-center">
             <img src={logoMre} alt="My Race Engineer" className="h-7 w-auto" />
           </Link>
@@ -99,7 +99,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <ConnectionStatus />
             <button
               onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
-              className="hidden md:inline-flex items-center gap-2 rounded-md border border-border bg-muted/30 px-2 py-1.5 text-xs text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden md:inline-flex items-center gap-2 rounded-md border border-border bg-muted/30 min-h-11 px-2 text-xs text-muted-foreground hover:text-primary hover:border-primary/40"
               aria-label="Search"
             >
               <Search className="w-3 h-3" /> <span className="opacity-70">⌘K</span>
@@ -108,7 +108,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={toggle}
               title="Toggle metric / imperial"
               aria-label="Toggle units"
-              className="hidden md:inline-flex items-center rounded-md border border-border bg-muted/30 px-2 py-1.5 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden md:inline-flex items-center rounded-md border border-border bg-muted/30 min-h-11 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
             >
               <span className={system === "metric" ? "text-primary" : ""}>SI</span>
               <span className="mx-1 opacity-40">/</span>
@@ -118,7 +118,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={toggleTheme}
               title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
               aria-label="Toggle theme"
-              className="hidden md:inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-muted/30 h-[34px] px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden md:inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-muted/30 min-h-11 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
@@ -126,7 +126,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Select value={currency} onValueChange={(v) => setCurrency(v as CurrencyCode)}>
               <SelectTrigger
                 aria-label="Currency"
-                className="hidden md:flex h-[34px] w-[78px] rounded-md border border-border bg-muted/30 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
+                className="hidden md:flex min-h-11 w-[78px] rounded-md border border-border bg-muted/30 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
               >
                 <SelectValue />
               </SelectTrigger>
@@ -145,6 +145,25 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-72">
+                {/* Mobile-only settings (hidden from desktop header) */}
+                <div className="md:hidden">
+                  <DropdownMenuLabel className="font-medium text-xs text-primary">Settings</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={toggle}>
+                    <span className="text-xs">Units: <span className="font-semibold">{system === "metric" ? "SI (metric)" : "US (imperial)"}</span></span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={toggleTheme}>
+                    {theme === "dark" ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
+                    {theme === "dark" ? "Light mode" : "Dark mode"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {
+                    const codes = CURRENCIES.map(c => c.code);
+                    const idx = codes.indexOf(currency);
+                    setCurrency(codes[(idx + 1) % codes.length] as CurrencyCode);
+                  }}>
+                    <span className="text-xs">Currency: <span className="font-semibold">{currency}</span></span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </div>
                 {ALL_NAV_GROUPS.map((g) => (
                   <div key={g.label}>
                     <DropdownMenuLabel className="font-medium text-xs text-primary">{g.label}</DropdownMenuLabel>
@@ -219,7 +238,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <CommandPalette />
       <QuickLogFab />
       <MobileTabBar />
-      <div className="md:hidden h-[68px]" aria-hidden />
+      <div className="md:hidden h-14" aria-hidden />
     </div>
   );
 }
@@ -251,7 +270,7 @@ function MobileTabBar() {
             <li key={it.to}>
               <Link
                 to={it.to}
-                className={`flex flex-col items-center justify-center gap-1 h-16 text-[11px] font-medium active:bg-primary/10 transition-colors ${
+                className={`flex flex-col items-center justify-center gap-0.5 h-12 text-[11px] font-medium active:bg-primary/10 transition-colors ${
                   active ? "text-primary" : "text-muted-foreground hover:text-primary"
                 }`}
               >
