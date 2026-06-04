@@ -8,7 +8,7 @@ import {
   ClipboardList, FileText,
   MapPin, CloudRain, GitBranch, Brain,
   Mic, BookMarked,
-  Sparkles,
+  Sparkles, BookOpen,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
@@ -22,6 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import logoMre from "@/assets/logo-mre.png";
 import { ConnectionStatus } from "@/lib/offline";
 import { QuickLogFab } from "@/components/quick-log-fab";
+import { HelpButton } from "@/components/help-button";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
@@ -108,6 +109,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
+            <HelpButton />
             <Select value={currency} onValueChange={(v) => setCurrency(v as CurrencyCode)}>
               <SelectTrigger
                 aria-label="Currency"
