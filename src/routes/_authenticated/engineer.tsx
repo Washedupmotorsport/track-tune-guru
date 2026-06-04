@@ -582,7 +582,7 @@ function EngineerCockpit() {
                 {confDelta != null && confDelta <= -2 && <li>Confidence down {Math.abs(confDelta)} pt vs prior</li>}
               </ul>
               <div className="mt-2 flex flex-wrap gap-1.5">
-                <Link to="/post-debrief" search={{}} className="border border-border rounded px-2 h-6 inline-flex items-center text-[10px] font-mono uppercase tracking-widest hover:border-primary hover:text-primary">Open debrief</Link>
+                <Link to="/post-debrief" search={{ sessionId: undefined, carId: undefined, new: undefined }} className="border border-border rounded px-2 h-6 inline-flex items-center text-[10px] font-mono uppercase tracking-widest hover:border-primary hover:text-primary">Open debrief</Link>
                 <Link to="/iteration"   className="border border-border rounded px-2 h-6 inline-flex items-center text-[10px] font-mono uppercase tracking-widest hover:border-primary hover:text-primary">Plan change</Link>
               </div>
             </div>
