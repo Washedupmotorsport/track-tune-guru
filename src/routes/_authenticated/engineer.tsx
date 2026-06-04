@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState, type ComponentType } from "react";
+import { FirstTimeCallout } from "@/components/first-time-callout";
+import { GuidedTour } from "@/components/guided-tour";
 
 export const Route = createFileRoute("/_authenticated/engineer")({
   head: () => ({
@@ -272,6 +274,8 @@ function EngineerCockpit() {
 
   return (
     <div className="space-y-3">
+      <FirstTimeCallout />
+      <GuidedTour tourKey="cockpit" />
       {/* ENGINEERING PRIORITIES — top of screen, race-weekend triage ===== */}
       <Panel
         icon={AlertTriangle}
@@ -578,7 +582,7 @@ function EngineerCockpit() {
                 {confDelta != null && confDelta <= -2 && <li>Confidence down {Math.abs(confDelta)} pt vs prior</li>}
               </ul>
               <div className="mt-2 flex flex-wrap gap-1.5">
-                <Link to="/post-debrief" className="border border-border rounded px-2 h-6 inline-flex items-center text-[10px] font-mono uppercase tracking-widest hover:border-primary hover:text-primary">Open debrief</Link>
+                <Link to="/post-debrief" search={{ sessionId: undefined, carId: undefined, new: undefined }} className="border border-border rounded px-2 h-6 inline-flex items-center text-[10px] font-mono uppercase tracking-widest hover:border-primary hover:text-primary">Open debrief</Link>
                 <Link to="/iteration"   className="border border-border rounded px-2 h-6 inline-flex items-center text-[10px] font-mono uppercase tracking-widest hover:border-primary hover:text-primary">Plan change</Link>
               </div>
             </div>

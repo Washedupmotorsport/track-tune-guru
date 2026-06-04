@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { GuidedTour } from "@/components/guided-tour";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -213,6 +214,7 @@ function PitWallPage() {
 
   return (
     <div className="space-y-3">
+      <GuidedTour tourKey="race-mode" />
       {/* WATCH — active critical/testing priorities, race-weekend triage */}
       {(prioritiesQ.data?.length ?? 0) > 0 && (
         <div className="border-[1.5px] border-destructive/40 bg-destructive/5 rounded-md">

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { GuidedTour } from "@/components/guided-tour";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -106,6 +107,7 @@ function Garage() {
 
   return (
     <div>
+      <GuidedTour tourKey="garage" />
       <div className="flex items-center justify-between mb-8">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary">Paddock</div>

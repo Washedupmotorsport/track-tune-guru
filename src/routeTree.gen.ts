@@ -31,6 +31,7 @@ import { Route as AuthenticatedPitwallRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedPitlaneRouteImport } from './routes/_authenticated/pitlane'
 import { Route as AuthenticatedPhilosophiesRouteImport } from './routes/_authenticated/philosophies'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
+import { Route as AuthenticatedManualRouteImport } from './routes/_authenticated/manual'
 import { Route as AuthenticatedMaintenanceRouteImport } from './routes/_authenticated/maintenance'
 import { Route as AuthenticatedKnownBehavioursRouteImport } from './routes/_authenticated/known-behaviours'
 import { Route as AuthenticatedIterationRouteImport } from './routes/_authenticated/iteration'
@@ -169,6 +170,11 @@ const AuthenticatedPhilosophiesRoute =
 const AuthenticatedNotesRoute = AuthenticatedNotesRouteImport.update({
   id: '/notes',
   path: '/notes',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedManualRoute = AuthenticatedManualRouteImport.update({
+  id: '/manual',
+  path: '/manual',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedMaintenanceRoute =
@@ -328,6 +334,7 @@ export interface FileRoutesByFullPath {
   '/iteration': typeof AuthenticatedIterationRoute
   '/known-behaviours': typeof AuthenticatedKnownBehavioursRoute
   '/maintenance': typeof AuthenticatedMaintenanceRoute
+  '/manual': typeof AuthenticatedManualRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/philosophies': typeof AuthenticatedPhilosophiesRoute
   '/pitlane': typeof AuthenticatedPitlaneRoute
@@ -376,6 +383,7 @@ export interface FileRoutesByTo {
   '/iteration': typeof AuthenticatedIterationRoute
   '/known-behaviours': typeof AuthenticatedKnownBehavioursRoute
   '/maintenance': typeof AuthenticatedMaintenanceRoute
+  '/manual': typeof AuthenticatedManualRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/philosophies': typeof AuthenticatedPhilosophiesRoute
   '/pitlane': typeof AuthenticatedPitlaneRoute
@@ -426,6 +434,7 @@ export interface FileRoutesById {
   '/_authenticated/iteration': typeof AuthenticatedIterationRoute
   '/_authenticated/known-behaviours': typeof AuthenticatedKnownBehavioursRoute
   '/_authenticated/maintenance': typeof AuthenticatedMaintenanceRoute
+  '/_authenticated/manual': typeof AuthenticatedManualRoute
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
   '/_authenticated/philosophies': typeof AuthenticatedPhilosophiesRoute
   '/_authenticated/pitlane': typeof AuthenticatedPitlaneRoute
@@ -476,6 +485,7 @@ export interface FileRouteTypes {
     | '/iteration'
     | '/known-behaviours'
     | '/maintenance'
+    | '/manual'
     | '/notes'
     | '/philosophies'
     | '/pitlane'
@@ -524,6 +534,7 @@ export interface FileRouteTypes {
     | '/iteration'
     | '/known-behaviours'
     | '/maintenance'
+    | '/manual'
     | '/notes'
     | '/philosophies'
     | '/pitlane'
@@ -573,6 +584,7 @@ export interface FileRouteTypes {
     | '/_authenticated/iteration'
     | '/_authenticated/known-behaviours'
     | '/_authenticated/maintenance'
+    | '/_authenticated/manual'
     | '/_authenticated/notes'
     | '/_authenticated/philosophies'
     | '/_authenticated/pitlane'
@@ -762,6 +774,13 @@ declare module '@tanstack/react-router' {
       path: '/notes'
       fullPath: '/notes'
       preLoaderRoute: typeof AuthenticatedNotesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/manual': {
+      id: '/_authenticated/manual'
+      path: '/manual'
+      fullPath: '/manual'
+      preLoaderRoute: typeof AuthenticatedManualRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/maintenance': {
@@ -1003,6 +1022,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedIterationRoute: typeof AuthenticatedIterationRoute
   AuthenticatedKnownBehavioursRoute: typeof AuthenticatedKnownBehavioursRoute
   AuthenticatedMaintenanceRoute: typeof AuthenticatedMaintenanceRoute
+  AuthenticatedManualRoute: typeof AuthenticatedManualRoute
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
   AuthenticatedPhilosophiesRoute: typeof AuthenticatedPhilosophiesRoute
   AuthenticatedPitlaneRoute: typeof AuthenticatedPitlaneRoute
@@ -1045,6 +1065,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedIterationRoute: AuthenticatedIterationRoute,
   AuthenticatedKnownBehavioursRoute: AuthenticatedKnownBehavioursRoute,
   AuthenticatedMaintenanceRoute: AuthenticatedMaintenanceRoute,
+  AuthenticatedManualRoute: AuthenticatedManualRoute,
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
   AuthenticatedPhilosophiesRoute: AuthenticatedPhilosophiesRoute,
   AuthenticatedPitlaneRoute: AuthenticatedPitlaneRoute,
@@ -1082,13 +1103,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

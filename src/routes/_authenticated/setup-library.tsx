@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { GuidedTour } from "@/components/guided-tour";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -161,6 +162,7 @@ function SetupLibrary() {
 
   return (
     <div>
+      <GuidedTour tourKey="setup" />
       <SetupWorkspaceNav />
       <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
         <BookMarked className="w-3 h-3" /> Setup library

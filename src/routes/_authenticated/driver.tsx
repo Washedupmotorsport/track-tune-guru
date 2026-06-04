@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { GuidedTour } from "@/components/guided-tour";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -69,6 +70,7 @@ function DriverHub() {
 
   return (
     <div>
+      <GuidedTour tourKey="driver" />
       <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary inline-flex items-center gap-1">
