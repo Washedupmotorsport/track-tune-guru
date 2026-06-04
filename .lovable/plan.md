@@ -1,69 +1,66 @@
-## Race Weekend Usability Audit — pass 2
+# Tutorial system — A + B + C
 
-Goal: every screen survives 5 minutes between sessions, sun on the screen, gloves on hands, one thumb free. Verdict on each change driven by: **fewer taps · bigger targets · louder primary action · quieter secondary info.**
+A complete in-app learning system: a searchable manual, a first-run guided tour, and embedded video walkthroughs.
 
-### A. Global quick wins (every screen inherits)
+## A — In-app Manual (`/manual`)
 
-1. **Contrast lift in `src/styles.css`** — raise `--foreground` and `--muted-foreground` luminance, push `--border` from low-alpha to 1.5px solid token, brighten `--primary` for outdoor legibility. Both themes.
-2. **`.telemetry-value` utility** — `font-mono tabular-nums tracking-tight text-[18px] md:text-[20px] font-semibold`. Apply to lap times, pressures, temps, deltas wherever they render.
-3. **Tap-target floor** — audit `size="icon"` buttons and small `<button>`s app-wide; enforce `min-h-11 min-w-11`. Sticky bottom bars get `h-12`.
-4. **Headers shrink on mobile** — sticky top header drops to 44px and hides the SI/US, currency, and theme controls behind the `All` menu on <768px. Reclaims ~80px of vertical space per screen.
-5. **Terminology sweep (light, non-breaking)** — `Sympathy` → `Reliability`, `Confidence` → `Driver Confidence`, `Philosophies` → `Setup Notes` in nav labels only (routes unchanged). Tooltips on any abbreviation under 4 chars.
-6. **Quick-Log FAB** — already exists; promote it to also appear on Cockpit, Pitwall, Sessions detail, Debrief. Add a 6th chip: "Flag issue → Critical".
+New route under Cockpit with a sectioned, searchable handbook.
 
-### B. Top 5 hotspot rebuilds
+- **Layout:** left sidebar (sections), main content (markdown-style cards), top search bar (client-side filter over titles + body).
+- **Sections (one per workspace):** Getting Started, Cockpit, Race Mode (Pitwall / Race Mode / Pit Lane / Track Evolution), Setup, Sessions (incl. Debrief), Tyres, Driver Hub, Engineering Log, Garage & Operations, Tools (Calculators), Keyboard Shortcuts, FAQ.
+- **Per section:** what it's for, when to use it during a race weekend, key buttons, common pitfalls, "Open this screen" deep link, embed slot for a video.
+- **Content source:** static TS data file `src/lib/manual-content.ts` — easy to edit, no backend needed.
+- **`?` Help button in header:** opens the manual section relevant to the current route (path → section map).
+- **Nav entry:** added to `app-shell.tsx` All-routes menu under a new "Help" group, plus a small "First-time here? Read the manual" callout on `/engineer` (Cockpit) that dismisses to localStorage.
 
-**1. Engineer Cockpit (`/engineer`)**
-- Engineering Priorities (just added) moves to the TOP of the screen, above the fold, sorted Critical → Testing → Monitor → Resolved.
-- Each priority row: h-16, status chip on the left in solid color (red/amber/blue/green), title in `.telemetry-value`, one-tap status cycle button on the right (long-press = delete).
-- Collapse the "What changed since last session" and "Recent notes" cards behind a single `Details` toggle on mobile.
-- Sticky bottom action: `[+ Priority] [Open Pitwall]`.
+## B — Guided Tour overlay
 
-**2. Pitwall (`/pitwall`)**
-- Replace the current multi-card grid with a 3-zone stack: **Now** (current session + lap timer), **Next** (upcoming session, weather, tyre allocation left), **Watch** (top 3 active Critical/Testing priorities pulled from Cockpit).
-- Lap timer becomes the hero: full-width, 56px digits, single big `[Lap]` button h-16 at the bottom.
-- Move flags/incidents and track evolution into a `More` accordion.
+Coachmark step-through for first-run onboarding on each workspace.
 
-**3. Tyre setup (`/tyre-setup`)**
-- Already on corner-grid steppers per the plan file. Audit: confirm auto-save works without the Save button on mobile, confirm cold/optimal/hot color baked into each cell, confirm long-press for 0.1psi step.
-- Add a sticky top chip row: `[Compound] [Heat cycles] [Set #]` — one tap each, no dropdowns.
-- Hide the history table behind a `History` toggle on <768px.
+- **Library:** lightweight custom overlay (no extra dependency) — fixed-position spotlight + tooltip card, driven by an array of `{ selector, title, body, route }` steps.
+- **Trigger:** auto-runs once per workspace on first visit (tracked in `tutorial_progress` table, scoped to `user_id` + `tour_key`). Manually re-runnable from manual page or `?` menu ("Replay tour").
+- **Tours shipped:** `cockpit`, `race-mode`, `sessions`, `setup`, `tyres`, `driver`, `garage` — 4–6 steps each.
+- **Backend:** new `tutorial_progress` table — `user_id`, `tour_key`, `completed_at`. RLS scoped to `auth.uid()`. GRANTs to authenticated + service_role.
 
-**4. Setup console (`/setups/$setupId` via `setup-console.tsx`)**
-- All numeric fields → steppers (camber, toe, ride height, spring rate, ARB, brake bias). h-12 cells.
-- Driver-feedback chips: full-width, h-14, large icon + label, pressed state has a 2px ring.
-- Sticky bottom split bar: `[Save] [Duplicate] [Compare]` h-12 — replaces scattered buttons.
-- Tabs (suspension/aero/brakes/etc.) become a horizontal scroll strip on mobile, not a wrap.
+## C — Video walkthroughs (C1 embedded + C2 generated intros)
 
-**5. Sessions list + detail (`/sessions`, `/sessions/$sessionId`)**
-- List rows: h-16, lap-time in `.telemetry-value` as primary, driver/track muted secondary.
-- Detail screen: sticky bottom `[+ Lap] [End session]` h-12 full-width split.
-- "Add lap" opens a number-pad sheet, not a keyboard input — minutes/seconds/millis steppers.
+- **C1 — Embeds:** each manual section has an optional `videoUrl` field. Renders a `<video>` (or YouTube/Vimeo iframe if URL is a known host). You/the user uploads MP4 to Lovable Cloud Storage `tutorials` bucket (public read) or pastes a YouTube/Vimeo link. Empty by default — placeholders show "Video coming soon".
+- **C2 — AI-generated workspace intros (optional, ship 1 as proof):** generate a 5–10 s motion-graphics clip for the Cockpit section using the video skill, store under `public/tutorials/cockpit-intro.mp4`. User can request more later.
 
-### C. Out of scope (this pass)
+## Technical details
 
-- No nav restructure — bottom tab bar stays at 7 slots per your call.
-- No new theme — contrast lift goes into existing dark/light tokens.
-- No DB schema changes.
-- No renames of route paths, just nav-label copy.
+**Files added**
+- `src/routes/_authenticated/manual.tsx` — manual page with sidebar + search + section renderer.
+- `src/lib/manual-content.ts` — section data (id, title, route, body markdown-ish, bullets, videoUrl?).
+- `src/lib/route-to-manual.ts` — map current pathname → manual section id (for context `?` button).
+- `src/components/help-button.tsx` — `?` icon button in header; navigates to `/manual?section=<id>`.
+- `src/components/guided-tour.tsx` — overlay component; reads tour from `src/lib/tours.ts`, persists completion via server fn.
+- `src/lib/tours.ts` — tour definitions keyed by workspace.
+- `src/lib/tutorial-progress.functions.ts` — `getCompletedTours` + `markTourComplete` server functions (uses `requireSupabaseAuth`).
+- `src/components/first-time-callout.tsx` — Cockpit banner.
 
-### Files touched
+**Files edited**
+- `src/components/app-shell.tsx` — add Help button next to theme toggle; add "Help" group to All-routes menu with Manual + Replay tour.
+- `src/routes/_authenticated/engineer.tsx` — mount `<FirstTimeCallout />` at top.
+- Workspace front-door routes — mount `<GuidedTour tourKey="..." />` (no UI until triggered).
 
-```
-src/styles.css                                — tokens + .telemetry-value
-src/components/app-shell.tsx                  — slimmer mobile header
-src/components/quick-log-fab.tsx              — visible on more screens, +1 chip
-src/components/setup-console.tsx              — steppers, sticky bar, chip feedback
-src/components/stepper.tsx                    — confirm long-press behavior
-src/routes/_authenticated/engineer.tsx        — priorities to top, sticky bar
-src/routes/_authenticated/pitwall.tsx         — Now / Next / Watch zones
-src/routes/_authenticated/tyre-setup.tsx      — sticky chip row, history toggle
-src/routes/_authenticated/sessions.tsx        — row sizing
-src/routes/_authenticated/sessions.$sessionId.tsx — sticky bar, numpad lap input
-```
+**Bucket**
+- Create `tutorials` storage bucket (public read) for user-uploaded clips.
 
-### Verification
+**Migration**
+- `tutorial_progress` table + RLS + GRANTs.
 
-After shipping I'll open the preview at 390×844 (phone) and 864×608 (your current viewport), spot-check Cockpit, Pitwall, Tyres, and Sessions, and report what looks right vs needs another pass.
+## Build order
 
-Approve and I'll ship it in one go.
+1. Migration: `tutorial_progress` + storage bucket.
+2. Manual content + route + sidebar/search/section UI.
+3. Header `?` button + route→section mapping.
+4. Tutorial progress server fns + guided tour overlay + tours data.
+5. Mount tours on workspace front doors + first-time callout on Cockpit.
+6. Generate 1 sample intro video for Cockpit (proof of C2).
+
+## Out of scope (for now)
+
+- Per-user manual bookmarks / progress tracking.
+- Multi-language manual.
+- Recording user-narrated walkthroughs (you supply MP4s when ready).
