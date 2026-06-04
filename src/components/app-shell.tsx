@@ -315,4 +315,10 @@ const ALL_NAV_GROUPS = [
       { to: "/calculators", label: "Calculators", icon: Calculator },
     ],
   },
+  {
+    label: "Help",
+    items: [
+      { to: "/manual", label: "User manual", icon: BookOpen },
+    ],
+  },
 ] as const;
