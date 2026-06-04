@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, AlertTriangle, Cloud, FileDown, Monitor, Table as TableIcon, ClipboardCheck } from "lucide-react";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { ArrowLeft, Save, Loader as Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, TriangleAlert as AlertTriangle, Cloud, FileDown, Monitor, Table as TableIcon, ClipboardCheck, Square } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { parseLapTime, formatLapTime } from "@/lib/lap-time";
@@ -21,6 +22,7 @@ import { LapTimer } from "@/components/lap-timer";
 import { IncidentLog } from "@/components/incident-log";
 import { SessionShareDialog } from "@/components/session-share-dialog";
 import { toCSV, downloadCSV } from "@/lib/csv";
+import { Stepper } from "@/components/stepper";
 
 export const Route = createFileRoute("/_authenticated/sessions/$sessionId")({ component: SessionDetail });
 
@@ -41,10 +43,15 @@ function SessionDetail() {
   const { sessionId } = Route.useParams();
   const { user } = useAuth();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const debriefFn = useServerFn(getDebrief);
   const [meta, setMeta] = useState<Partial<Session>>({});
   const [lapForm, setLapForm] = useState({ lap_number: "", lap_time: "", s1: "", s2: "", s3: "", notes: "" });
   const [debrief, setDebrief] = useState<DebriefResult | null>(null);
+  const [lapDrawerOpen, setLapDrawerOpen] = useState(false);
+  const [lapMins, setLapMins] = useState("1");
+  const [lapSecs, setLapSecs] = useState("30");
+  const [lapMs, setLapMs] = useState("000");
 
   const sessionQ = useQuery({
     queryKey: ["session", sessionId],
@@ -103,6 +110,36 @@ function SessionDetail() {
     onSuccess: () => {
       setLapForm({ ...lapForm, lap_time: "", s1: "", s2: "", s3: "", notes: "",
         lap_number: lapForm.lap_number ? String(parseInt(lapForm.lap_number, 10) + 1) : "" });
+      qc.invalidateQueries({ queryKey: ["session-laps", sessionId] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const addLapFromDrawer = useMutation({
+    mutationFn: async () => {
+      if (!sessionQ.data) throw new Error("No session");
+      if (!sessionQ.data.setup_id) throw new Error("Attach a setup to this session before logging laps");
+      const mins = parseInt(lapMins, 10) || 0;
+      const secs = parseInt(lapSecs, 10) || 0;
+      const msVal = parseInt(lapMs.padEnd(3, "0").slice(0, 3), 10) || 0;
+      const totalMs = mins * 60000 + secs * 1000 + msVal;
+      if (totalMs <= 0) throw new Error("Enter a valid lap time");
+      const nextNum = (lapsQ.data?.length ?? 0) + 1;
+      const { error } = await supabase.from("laps").insert({
+        user_id: user!.id,
+        setup_id: sessionQ.data.setup_id,
+        car_id: sessionQ.data.car_id,
+        session_id: sessionId,
+        lap_number: nextNum,
+        lap_time_ms: totalMs,
+        conditions: sessionQ.data.weather,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Lap logged");
+      setLapDrawerOpen(false);
+      setLapMins("1"); setLapSecs("30"); setLapMs("000");
       qc.invalidateQueries({ queryKey: ["session-laps", sessionId] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
@@ -359,29 +396,70 @@ function SessionDetail() {
         )}
       </div>
 
-      {/* Sticky mobile action bar — pit-lane one-handed use */}
+      {/* LAP ENTRY BOTTOM SHEET */}
+      <Drawer open={lapDrawerOpen} onOpenChange={setLapDrawerOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle className="font-display uppercase tracking-wider">Add lap</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 pb-6 space-y-4">
+            <div className="text-center">
+              <div className="font-mono text-3xl font-bold tabular-nums">
+                {lapMins}:{lapSecs.padStart(2, "0")}.{lapMs.padEnd(3, "0").slice(0, 3)}
+              </div>
+              <div className="text-xs text-muted-foreground font-mono uppercase tracking-widest mt-1">min : sec . ms</div>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <Stepper label="MIN" value={lapMins}
+                onChange={setLapMins} step={1} min={0} max={9} precision={0}
+                className="[&_>_div:last-child]:!h-14" />
+              <Stepper label="SEC" value={lapSecs}
+                onChange={setLapSecs} step={1} min={0} max={59} precision={0}
+                className="[&_>_div:last-child]:!h-14" />
+              <Stepper label="MS" value={lapMs}
+                onChange={(v) => setLapMs(String(Math.max(0, Math.min(999, parseInt(v, 10) || 0))).padStart(3, "0"))}
+                step={10} min={0} max={999} precision={0}
+                className="[&_>_div:last-child]:!h-14" />
+            </div>
+            <Button
+              className="w-full h-12 font-display uppercase tracking-wider"
+              onClick={() => addLapFromDrawer.mutate()}
+              disabled={addLapFromDrawer.isPending}
+            >
+              {addLapFromDrawer.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
+              Confirm lap
+            </Button>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* STICKY BOTTOM BAR */}
       <div
-        className="md:hidden fixed inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur-md"
+        className="fixed inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur-md"
         style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 4rem)" }}
       >
-        <div className="grid grid-cols-2 gap-2 p-2">
-          <a
-            href="#add-lap"
-            className="h-12 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground font-display font-bold uppercase tracking-wider text-sm active:scale-[0.98]"
-          >
-            <Plus className="w-4 h-4" /> Log lap
-          </a>
+        <div className="grid grid-cols-2 gap-2 p-2 max-w-3xl mx-auto">
           <button
             type="button"
-            onClick={() => save.mutate()}
-            disabled={save.isPending}
-            className="h-12 inline-flex items-center justify-center gap-2 rounded-md border-[1.5px] border-border bg-card font-display font-bold uppercase tracking-wider text-sm active:scale-[0.98] disabled:opacity-50"
+            onClick={() => setLapDrawerOpen(true)}
+            className="h-12 flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground font-display font-bold uppercase tracking-wider text-sm active:scale-[0.97] transition touch-manipulation"
           >
-            {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
+            <Plus className="w-5 h-5" /> Lap
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              await save.mutateAsync();
+              navigate({ to: "/sessions" });
+            }}
+            disabled={save.isPending}
+            className="h-12 flex items-center justify-center gap-2 rounded-md border-[1.5px] border-border bg-card text-foreground font-display font-bold uppercase tracking-wider text-sm active:scale-[0.97] transition disabled:opacity-50 touch-manipulation"
+          >
+            <Square className="w-4 h-4" /> End session
           </button>
         </div>
       </div>
-      <div className="md:hidden h-20" aria-hidden />
+      <div className="h-20" aria-hidden />
     </div>
   );
 }
