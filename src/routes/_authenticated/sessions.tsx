@@ -205,7 +205,7 @@ function SessionsPage() {
                 </div>
               </div>
               <div className="shrink-0 text-right">
-                <div className="telemetry-value text-xl tabular-nums">{formatLapTime(agg?.best ?? null)}</div>
+                <div className="telemetry-value text-sm sm:text-base tabular-nums">{formatLapTime(agg?.best ?? null)}</div>
                 <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-muted-foreground">
                   {agg?.count ?? 0} laps
                 </div>
