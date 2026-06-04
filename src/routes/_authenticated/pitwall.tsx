@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { GuidedTour } from "@/components/guided-tour";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import {
-import { GuidedTour } from "@/components/guided-tour";
   Gauge, Thermometer, Droplets, Fuel, Timer, CloudSun, Activity,
   Disc, TrendingDown, TrendingUp, Wind, Flame, ArrowRight, AlertTriangle,
 } from "lucide-react";

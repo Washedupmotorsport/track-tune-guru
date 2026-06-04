@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { GuidedTour } from "@/components/guided-tour";
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,7 +9,6 @@ import { useUnits } from "@/lib/units";
 import { Stepper } from "@/components/stepper";
 import { TyreTabs } from "@/components/tyre-tabs";
 import jsPDF from "jspdf";
-import { GuidedTour } from "@/components/guided-tour";
 
 export const Route = createFileRoute("/_authenticated/tyre-setup")({
   component: TyreSetupPage,
