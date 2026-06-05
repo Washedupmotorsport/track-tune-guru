@@ -182,7 +182,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </DropdownMenuContent>
             </DropdownMenu>
             <span className="hidden xl:block text-xs font-medium text-muted-foreground">
-              {user?.email}
+              {user?.email?.slice(0, 4)}
             </span>
             <Button size="sm" variant="ghost" onClick={async () => { await signOut(); navigate({ to: "/" }); }}>
               <LogOut className="w-4 h-4 mr-1" /> Sign out
