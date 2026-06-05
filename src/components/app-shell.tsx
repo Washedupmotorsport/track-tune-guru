@@ -1,8 +1,30 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { LogOut, Calculator, Wand as Wand2, NotebookPen, Timer, Disc, Wrench, Package, CalendarDays, Receipt, ChartBar as BarChart3, Menu, Search, Sun, Moon, Hop as Home, Flag, TriangleAlert as AlertTriangle, HardHat, Radio, ClipboardList, FileText, MapPin, CloudRain, GitBranch, Brain, Mic, BookMarked, Sparkles } from "lucide-react";
+import { LogOut, Calculator, Wand as Wand2, NotebookPen, Timer, Disc, Wrench, Package, CalendarDays, Receipt, ChartBar as BarChart3, Menu, Search, Sun, Moon, Flag, TriangleAlert as AlertTriangle, HardHat, Radio, ClipboardList, FileText, MapPin, CloudRain, GitBranch, Brain, Mic, BookMarked, Sparkles } from "lucide-react";
 import React, { type ReactNode } from "react";
+
+const GARAGE_ICON_URL = "https://uxwing.com/wp-content/themes/uxwing/download/buildings-architecture-real-estate/garage-door-icon.png";
+
+function Home({ className }: { className?: string }) {
+  return (
+    <span
+      role="img"
+      aria-hidden="true"
+      className={`inline-block bg-current ${className ?? ""}`}
+      style={{
+        WebkitMaskImage: `url(${GARAGE_ICON_URL})`,
+        maskImage: `url(${GARAGE_ICON_URL})`,
+        WebkitMaskRepeat: "no-repeat",
+        maskRepeat: "no-repeat",
+        WebkitMaskPosition: "center",
+        maskPosition: "center",
+        WebkitMaskSize: "contain",
+        maskSize: "contain",
+      }}
+    />
+  );
+}
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
   DropdownMenuSeparator, DropdownMenuLabel,
@@ -25,7 +47,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen pb-[90px] text-foreground">
       <div className="h-[2px] w-full bg-primary" aria-hidden />
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
-        <div className="mx-auto max-w-[1400px] px-4 h-12 flex items-center justify-between">
+        <div className="mx-auto max-w-[1400px] px-4 h-11 md:h-12 flex items-center justify-between">
           <Link to="/" aria-label="My Race Engineer — home" className="flex items-center">
             <img src={logoMre} alt="My Race Engineer" className="h-7 w-auto" />
           </Link>
@@ -62,6 +84,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link
                   key={w.key}
                   to={w.to}
+                  title={"tooltip" in w ? (w as { tooltip: string }).tooltip : undefined}
                   className={`inline-flex items-center gap-1.5 px-2.5 h-8 rounded-md text-xs font-medium transition-colors ${
                     active
                       ? "bg-primary/15 text-primary border border-primary/30"
@@ -77,7 +100,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <ConnectionStatus />
             <button
               onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
-              className="hidden md:inline-flex items-center gap-2 rounded-md border border-border bg-muted/30 px-2 py-1.5 text-xs text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden md:inline-flex items-center gap-2 rounded-md border border-border bg-muted/30 min-h-11 px-2 text-xs text-muted-foreground hover:text-primary hover:border-primary/40"
               aria-label="Search"
             >
               <Search className="w-3 h-3" /> <span className="opacity-70">⌘K</span>
@@ -86,7 +109,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={toggle}
               title="Toggle metric / imperial"
               aria-label="Toggle units"
-              className="hidden md:inline-flex items-center rounded-md border border-border bg-muted/30 px-2 py-1.5 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden md:inline-flex items-center rounded-md border border-border bg-muted/30 min-h-11 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
             >
               <span className={system === "metric" ? "text-primary" : ""}>SI</span>
               <span className="mx-1 opacity-40">/</span>
@@ -96,14 +119,15 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={toggleTheme}
               title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
               aria-label="Toggle theme"
-              className="hidden md:inline-flex items-center justify-center rounded-md border border-border bg-muted/30 h-[34px] w-[34px] text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden md:inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-muted/30 min-h-11 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
             </button>
             <Select value={currency} onValueChange={(v) => setCurrency(v as CurrencyCode)}>
               <SelectTrigger
                 aria-label="Currency"
-                className="hidden md:flex h-[34px] w-[78px] rounded-md border border-border bg-muted/30 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
+                className="hidden md:flex min-h-11 w-[78px] rounded-md border border-border bg-muted/30 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
               >
                 <SelectValue />
               </SelectTrigger>
@@ -117,11 +141,30 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Select>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="sm" variant="ghost" className="text-xs font-medium text-muted-foreground hover:text-primary">
+                <Button size="sm" variant="ghost" title="All navigation pages" className="text-xs font-medium text-muted-foreground hover:text-primary">
                   <Menu className="w-4 h-4 mr-1" /> All
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-72">
+                {/* Mobile-only settings (hidden from desktop header) */}
+                <div className="md:hidden">
+                  <DropdownMenuLabel className="font-medium text-xs text-primary">Settings</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={toggle}>
+                    <span className="text-xs">Units: <span className="font-semibold">{system === "metric" ? "SI (metric)" : "US (imperial)"}</span></span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={toggleTheme}>
+                    {theme === "dark" ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
+                    {theme === "dark" ? "Light mode" : "Dark mode"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {
+                    const codes = CURRENCIES.map(c => c.code);
+                    const idx = codes.indexOf(currency);
+                    setCurrency(codes[(idx + 1) % codes.length] as CurrencyCode);
+                  }}>
+                    <span className="text-xs">Currency: <span className="font-semibold">{currency}</span></span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </div>
                 {ALL_NAV_GROUPS.map((g) => (
                   <div key={g.label}>
                     <DropdownMenuLabel className="font-medium text-xs text-primary">{g.label}</DropdownMenuLabel>
@@ -139,7 +182,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </DropdownMenuContent>
             </DropdownMenu>
             <span className="hidden xl:block text-xs font-medium text-muted-foreground">
-              {user?.email}
+              {user?.email?.slice(0, 4)}
             </span>
             <Button size="sm" variant="ghost" onClick={async () => { await signOut(); navigate({ to: "/" }); }}>
               <LogOut className="w-4 h-4 mr-1" /> Sign out
@@ -167,7 +210,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-4">
             <FooterLink to="/terms">Terms of Service</FooterLink>
             <a
-              href="https://www.facebook.com"
+              href="https://www.facebook.com/people/My-Motorsport-engineer/61590792381151/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
@@ -196,7 +239,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <CommandPalette />
       <QuickLogFab />
       <MobileTabBar />
-      <div className="md:hidden h-[68px]" aria-hidden />
+      <div className="md:hidden h-14" aria-hidden />
     </div>
   );
 }
@@ -210,7 +253,7 @@ function MobileTabBar() {
     { to: "/tyre-setup",    label: "Tyres",    icon: Disc,          matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
     { to: "/driver",        label: "Driver",   icon: Mic,           matches: ["/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours", "/debrief"] },
     { to: "/setup-library", label: "Setup",    icon: Wand2,         matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-    { to: "/engineering-memory", label: "Log", icon: Brain,         matches: ["/engineering-memory", "/notes"] },
+    { to: "/engineering-memory", label: "Log", icon: Brain,         matches: ["/engineering-memory", "/notes"], tooltip: "Engineering notebook log" },
     { to: "/garage",        label: "Garage",   icon: Home,          matches: ["/garage", "/cars", "/calendar", "/weekends", "/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
   ] as const;
   return (
@@ -228,7 +271,8 @@ function MobileTabBar() {
             <li key={it.to}>
               <Link
                 to={it.to}
-                className={`flex flex-col items-center justify-center gap-1 h-16 text-[11px] font-medium active:bg-primary/10 transition-colors ${
+                title={"tooltip" in it ? (it as { tooltip: string }).tooltip : undefined}
+                className={`flex flex-col items-center justify-center gap-0.5 h-12 text-[11px] font-medium active:bg-primary/10 transition-colors ${
                   active ? "text-primary" : "text-muted-foreground hover:text-primary"
                 }`}
               >
@@ -257,7 +301,7 @@ const WORKSPACES = [
   { key: "sessions", label: "Sessions",  icon: Timer,         to: "/sessions",       matches: ["/sessions", "/timeline", "/analysis", "/post-debrief"] },
   { key: "tyres",    label: "Tyres",     icon: Disc,          to: "/tyre-setup",     matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
   { key: "driver",   label: "Driver",    icon: Mic,           to: "/driver",         matches: ["/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours", "/debrief"] },
-  { key: "log",      label: "Log",       icon: Brain,         to: "/engineering-memory", matches: ["/engineering-memory", "/notes"] },
+  { key: "log",      label: "Log",       icon: Brain,         to: "/engineering-memory", matches: ["/engineering-memory", "/notes"], tooltip: "Engineering notebook log" },
   { key: "garage",   label: "Garage",    icon: Home,          to: "/garage",         matches: ["/garage", "/cars", "/calendar", "/weekends", "/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
 ] as const;
 
@@ -301,11 +345,11 @@ const ALL_NAV_GROUPS = [
     label: "Driver Hub",
     items: [
       { to: "/driver",           label: "Driver workspace",  icon: Mic },
-      { to: "/confidence",       label: "Confidence",        icon: Brain },
+      { to: "/confidence",       label: "Driver Confidence",   icon: Brain },
       { to: "/debrief",          label: "Driver feedback",   icon: ClipboardList },
       { to: "/known-behaviours", label: "Known behaviours",  icon: Sparkles },
-      { to: "/sympathy",         label: "Mechanical sympathy", icon: Wrench },
-      { to: "/philosophies",     label: "Driving philosophy", icon: NotebookPen },
+      { to: "/sympathy",         label: "Reliability", icon: Wrench },
+      { to: "/philosophies",     label: "Setup Notes", icon: NotebookPen },
       { to: "/flags",            label: "Track flags",       icon: Flag },
       { to: "/corners",          label: "Corner notes",      icon: MapPin },
     ],

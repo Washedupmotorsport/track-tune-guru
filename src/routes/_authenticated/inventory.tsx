@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Package, Plus, ArrowLeft, Trash2, AlertTriangle, Minus } from "lucide-react";
+import { Package, Plus, ArrowLeft, Trash2, TriangleAlert as AlertTriangle, Minus } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/inventory")({ component: InventoryPage });
@@ -157,14 +157,14 @@ function InventoryPage() {
                   <td className="py-3 px-4 text-muted-foreground">{p.location ?? "—"}</td>
                   <td className="py-3 px-4 font-mono">
                     <div className="flex items-center gap-1">
-                      <button onClick={() => adjustQty.mutate({ id: p.id, delta: -1 })} className="w-6 h-6 rounded border border-border hover:bg-muted flex items-center justify-center"><Minus className="w-3 h-3" /></button>
+                      <button onClick={() => adjustQty.mutate({ id: p.id, delta: -1 })} className="min-h-11 min-w-11 rounded border border-border hover:bg-muted flex items-center justify-center"><Minus className="w-3 h-3" /></button>
                       <span className={"w-8 text-center font-bold " + (low ? "text-destructive" : "")}>{p.quantity}</span>
-                      <button onClick={() => adjustQty.mutate({ id: p.id, delta: 1 })} className="w-6 h-6 rounded border border-border hover:bg-muted flex items-center justify-center"><Plus className="w-3 h-3" /></button>
+                      <button onClick={() => adjustQty.mutate({ id: p.id, delta: 1 })} className="min-h-11 min-w-11 rounded border border-border hover:bg-muted flex items-center justify-center"><Plus className="w-3 h-3" /></button>
                     </div>
                   </td>
                   <td className="py-3 px-4 font-mono text-muted-foreground">{p.min_quantity}</td>
                   <td className="py-3 px-4 text-right">
-                    <button onClick={() => { if (confirm("Delete?")) del.mutate(p.id); }} className="text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => { if (confirm("Delete?")) del.mutate(p.id); }} className="min-h-11 min-w-11 flex items-center justify-center text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></button>
                   </td>
                 </tr>
               );

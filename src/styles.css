@@ -68,22 +68,22 @@
   /* MRE brand — racing red on near-black. Light variant. */
   --radius: 0.5rem;
   --background: oklch(0.97 0.003 250);
-  --foreground: oklch(0.13 0.018 255); /* race-weekend: lift contrast vs paper */
+  --foreground: oklch(0.08 0.018 255); /* sunlight-legible: high contrast on light bg */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.18 0.014 255);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.014 255);
-  --primary: oklch(0.58 0.245 26);         /* MRE racing red #E30613 */
+  --primary: oklch(0.54 0.245 26);         /* MRE racing red — boosted for outdoor glare */
   --primary-foreground: oklch(0.99 0.005 250);
   --secondary: oklch(0.95 0.008 250);
   --secondary-foreground: oklch(0.20 0.014 255);
   --muted: oklch(0.96 0.006 250);
-  --muted-foreground: oklch(0.38 0.022 250); /* race-weekend: sunlight-legible */
+  --muted-foreground: oklch(0.32 0.022 250); /* sunlight-legible: boosted secondary text */
   --accent: oklch(0.512 0.135 244);          /* ocean blue #006BB3 */
   --accent-foreground: oklch(0.99 0.005 250);
   --destructive: oklch(0.58 0.24 27);
   --destructive-foreground: oklch(0.99 0.005 250);
-  --border: oklch(0.78 0.012 250); /* race-weekend: sharper rule */
+  --border: oklch(0.72 0.012 250 / 0.75); /* sunlight: raised alpha for outdoor visibility */
   --input: oklch(0.92 0.008 250);
   --ring: oklch(0.58 0.245 26);
   --grid: oklch(0.74 0.012 250 / 0.7);
@@ -109,22 +109,22 @@
 .dark {
   /* MRE brand — pure black with racing red, matches key art. */
   --background: oklch(0.10 0.004 250);   /* deeper graphite for sunlight contrast */
-  --foreground: oklch(1.00 0.003 250);
+  --foreground: oklch(1.00 0.000 0);       /* pure white for max sunlight readability */
   --card: oklch(0.17 0.005 250);         /* panel */
   --card-foreground: oklch(0.97 0.004 250);
   --popover: oklch(0.17 0.005 250);
   --popover-foreground: oklch(0.96 0.005 250);
-  --primary: oklch(0.62 0.248 26);          /* MRE racing red #E30613 */
+  --primary: oklch(0.66 0.248 26);          /* MRE racing red — brighter for outdoor */
   --primary-foreground: oklch(0.99 0.005 250);
   --secondary: oklch(0.19 0.006 250);
   --secondary-foreground: oklch(0.96 0.005 250);
   --muted: oklch(0.18 0.006 250);
-  --muted-foreground: oklch(0.88 0.012 250); /* race-weekend: outdoor legible */
+  --muted-foreground: oklch(0.92 0.008 250); /* sunlight: brighter secondary text */
   --accent: oklch(0.62 0.14 244);
   --accent-foreground: oklch(0.99 0.005 250);
   --destructive: oklch(0.62 0.22 27);
   --destructive-foreground: oklch(0.99 0.005 250);
-  --border: oklch(0.42 0.012 250);         /* race-weekend: even sharper rule */
+  --border: oklch(0.48 0.012 250 / 0.70);  /* sunlight: higher alpha for dark borders */
   --input: oklch(0.30 0.008 250);
   --ring: oklch(0.62 0.248 26);
   --grid: oklch(0.30 0.008 250 / 0.18);  /* faint telemetry grid */
@@ -180,11 +180,17 @@
 @layer utilities {
   /* Telemetry number display — large, condensed, tabular */
   .telemetry-value {
-    font-family: var(--font-display);
-    font-weight: 700;
+    font-family: var(--font-mono);
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.01em;
+    letter-spacing: -0.02em;
+    font-size: 18px;
     line-height: 1;
+  }
+  @media (min-width: 768px) {
+    .telemetry-value {
+      font-size: 20px;
+    }
   }
   .telemetry-label {
     font-family: var(--font-mono);
