@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { LogOut, Calculator, Wand as Wand2, NotebookPen, Timer, Disc, Wrench, Package, CalendarDays, Receipt, ChartBar as BarChart3, Menu, Search, Sun, Moon, Flag, TriangleAlert as AlertTriangle, HardHat, Radio, ClipboardList, FileText, MapPin, CloudRain, GitBranch, Brain, Mic, BookMarked, Sparkles } from "lucide-react";
+import { LogOut, Calculator, Wand as Wand2, NotebookPen, Timer, Disc, Wrench, Package, CalendarDays, Receipt, ChartBar as BarChart3, Menu, Search, Sun, Moon, Flag, TriangleAlert as AlertTriangle, HardHat, Radio, ClipboardList, FileText, MapPin, CloudRain, GitBranch, Brain, Mic, BookMarked, Sparkles, BookOpen } from "lucide-react";
 import React, { type ReactNode } from "react";
 
 const GARAGE_ICON_URL = "https://uxwing.com/wp-content/themes/uxwing/download/buildings-architecture-real-estate/garage-door-icon.png";
@@ -36,6 +36,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import logoMre from "@/assets/logo-mre.png";
 import { ConnectionStatus } from "@/lib/offline";
 import { QuickLogFab } from "@/components/quick-log-fab";
+import { HelpButton } from "@/components/help-button";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
