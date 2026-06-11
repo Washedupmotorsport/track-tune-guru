@@ -211,21 +211,20 @@ export function AppShell({ children }: { children: ReactNode }) {
 function MobileTabBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = [
-    { to: "/weekends",      label: "Weekend",  icon: Flag,    matches: ["/weekends", "/calendar", "/garage", "/cars"] },
-    { to: "/sessions",      label: "Sessions", icon: Timer,   matches: ["/sessions", "/timeline", "/analysis"] },
-    { to: "/tyre-setup",    label: "Tyres",    icon: Disc,    matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
-    { to: "/setup-library", label: "Setup",    icon: Wand2,   matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-    { to: "/pitwall",       label: "Pitwall",  icon: Radio,   matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution", "/engineer"] },
-    { to: "/debrief",       label: "Debrief",  icon: ClipboardList, matches: ["/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours"] },
+    { to: "/weekends",      label: "Weekend",  icon: Flag,  matches: ["/weekends", "/calendar", "/garage", "/cars", "/tracks"] },
+    { to: "/sessions",      label: "Sessions", icon: Timer, matches: ["/sessions", "/timeline", "/analysis", "/debrief", "/post-debrief"] },
+    { to: "/tyre-setup",    label: "Tyres",    icon: Disc,  matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
+    { to: "/setup-library", label: "Setup",    icon: Wand2, matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
+    { to: "/pitwall",       label: "Pitwall",  icon: Radio, matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution", "/engineer"] },
   ] as const;
   return (
     <nav
       aria-label="Primary"
-      className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur-md"
+      className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur-md"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="h-[2px] w-full bg-primary/70" aria-hidden />
-      <ul className="grid grid-cols-6">
+      <ul className="grid grid-cols-5">
         {items.map((it) => {
           const Icon = it.icon;
           const active = it.matches.some((m) => pathname === m || pathname.startsWith(m + "/"));
@@ -234,12 +233,13 @@ function MobileTabBar() {
               <Link
                 to={it.to}
                 title={"tooltip" in it ? (it as { tooltip: string }).tooltip : undefined}
-                className={`flex flex-col items-center justify-center gap-0.5 h-12 text-[11px] font-medium active:bg-primary/10 transition-colors ${
+                className={`relative flex flex-col items-center justify-center gap-0.5 h-14 text-[11px] font-medium active:bg-primary/10 transition-colors ${
                   active ? "text-primary" : "text-muted-foreground hover:text-primary"
                 }`}
               >
-                <Icon className="w-[18px] h-[18px]" />
-                <span>{it.label}</span>
+                {active && <span aria-hidden className="absolute top-0 left-1/2 -translate-x-1/2 h-[2px] w-8 bg-primary rounded-b" />}
+                <Icon className="w-[20px] h-[20px]" />
+                <span className="font-mono uppercase tracking-[0.1em] text-[10px]">{it.label}</span>
               </Link>
             </li>
           );
