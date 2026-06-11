@@ -169,7 +169,6 @@ export function AppShell({ children }: { children: ReactNode }) {
             <FooterLink to="/tyre-setup">Tyres</FooterLink>
             <FooterLink to="/setup-library">Setup</FooterLink>
             <FooterLink to="/pitwall">Pitwall</FooterLink>
-            <FooterLink to="/debrief">Debrief</FooterLink>
           </div>
           <div className="flex items-center gap-4">
             <FooterLink to="/terms">Terms of Service</FooterLink>
