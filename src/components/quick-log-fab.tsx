@@ -1,20 +1,35 @@
 import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
-import {
-  Zap, Gauge, Timer, Disc, Radio, ClipboardList, AlertTriangle, NotebookPen, Brain,
-} from "lucide-react";
+import { Zap, Gauge, Timer, Disc, Radio, ClipboardList, TriangleAlert as AlertTriangle, NotebookPen, Brain, ShieldAlert } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
-/**
- * Pit-lane shortcut. Mobile-only floating button.
- * One tap → bottom sheet with the 6 actions an engineer reaches for
- * between sessions. Designed for one-handed use in race kit.
- */
 export function QuickLogFab() {
   const [open, setOpen] = useState(false);
+  const { user } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  // Hide on auth, landing, and share routes — pit-lane only.
-  if (pathname === "/" || pathname.startsWith("/auth") || pathname.startsWith("/share")) return null;
+  if (pathname === "/" || pathname.startsWith("/auth") || pathname.startsWith("/share") || pathname.startsWith("/terms")) return null;
+
+  const flagCritical = async () => {
+    const title = prompt("Describe the critical issue:");
+    if (!title?.trim()) return;
+    if (!user?.id) { toast.error("Not signed in"); return; }
+    const { error } = await supabase.from("engineering_memory" as never).insert({
+      user_id: user.id,
+      title: title.trim(),
+      priority: "critical",
+      status: "active",
+      category: "handling",
+      confidence: 5,
+      pinned: true,
+      occurrences: 1,
+    } as never);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Critical issue flagged");
+    setOpen(false);
+  };
 
   const actions = [
     { to: "/engineering-memory", label: "Flag CRITICAL", icon: AlertTriangle, tone: "warn" },
@@ -34,7 +49,7 @@ export function QuickLogFab() {
         type="button"
         aria-label="Pit-lane quick actions"
         onClick={() => setOpen(true)}
-        className="md:hidden fixed right-4 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-glow border-2 border-primary-foreground/20 flex items-center justify-center active:scale-95 transition touch-manipulation"
+        className="md:hidden fixed right-4 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-glow flex items-center justify-center active:scale-95 transition touch-manipulation"
         style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 5rem)" }}
       >
         <Zap className="w-6 h-6" />
@@ -50,6 +65,16 @@ export function QuickLogFab() {
             </p>
           </DrawerHeader>
           <div className="grid grid-cols-2 gap-2 p-4 pt-0 pb-6">
+            <button
+              type="button"
+              onClick={flagCritical}
+              className="flex flex-col items-center justify-center gap-2 h-24 rounded-md border-[1.5px] active:scale-[0.98] transition border-destructive/50 bg-destructive/10 text-destructive"
+            >
+              <ShieldAlert className="w-7 h-7" />
+              <span className="font-mono text-[11px] uppercase tracking-widest text-center leading-tight px-1">
+                Flag issue → Critical
+              </span>
+            </button>
             {actions.map((a) => {
               const Icon = a.icon;
               const tone =
@@ -60,7 +85,7 @@ export function QuickLogFab() {
                   : "border-border bg-card text-foreground";
               return (
                 <Link
-                  key={a.to}
+                  key={a.label}
                   to={a.to}
                   onClick={() => setOpen(false)}
                   className={`flex flex-col items-center justify-center gap-2 h-24 rounded-md border-[1.5px] active:scale-[0.98] transition ${tone}`}

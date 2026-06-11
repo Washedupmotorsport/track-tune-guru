@@ -1,9 +1,8 @@
 import { useMemo } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Stepper } from "@/components/stepper";
-import { Gauge, Thermometer, Fuel, Wind, Activity, AlertTriangle } from "lucide-react";
+import { Gauge, Thermometer, Fuel, Wind, Activity, TriangleAlert as AlertTriangle, OctagonAlert as AlertOctagon, CircleArrowUp, CircleArrowDown, Disc, RotateCcw, Zap } from "lucide-react";
 
 type Data = Record<string, string>;
 
@@ -12,17 +11,18 @@ const num = (v: string | undefined, fallback = 0) => {
   return Number.isFinite(n) ? n : fallback;
 };
 
-const psiColor = (psi: number) => {
-  if (!psi) return "var(--muted-foreground)";
-  if (psi < 25) return "oklch(0.62 0.18 244)"; // cold - blue
-  if (psi > 32) return "oklch(0.62 0.22 27)"; // hot - red
-  return "oklch(0.70 0.16 145)"; // optimal - green
-};
 const psiAccent = (psi: number): "cold" | "ok" | "hot" | "none" => {
   if (!psi) return "none";
   if (psi < 25) return "cold";
   if (psi > 32) return "hot";
   return "ok";
+};
+
+const psiColor = (psi: number) => {
+  if (!psi) return "var(--muted-foreground)";
+  if (psi < 25) return "oklch(0.62 0.18 244)";
+  if (psi > 32) return "oklch(0.62 0.22 27)";
+  return "oklch(0.70 0.16 145)";
 };
 
 const tempColor = (t: number) => {
@@ -38,6 +38,7 @@ const COMPLAINTS = [
   {
     id: "understeer_entry",
     label: "Understeer Entry",
+    icon: CircleArrowUp,
     changes: [
       "Soften front ARB 1 step",
       "Front rebound −2 clicks",
@@ -48,6 +49,7 @@ const COMPLAINTS = [
   {
     id: "mid_corner_push",
     label: "Mid-Corner Push",
+    icon: CircleArrowDown,
     changes: [
       "Increase rear ride height +2 mm",
       "Stiffen rear ARB 1 step",
@@ -58,6 +60,7 @@ const COMPLAINTS = [
   {
     id: "exit_oversteer",
     label: "Exit Oversteer",
+    icon: RotateCcw,
     changes: [
       "Soften rear springs 1 step",
       "Diff power-side −5%",
@@ -68,6 +71,7 @@ const COMPLAINTS = [
   {
     id: "brake_instability",
     label: "Brake Instability",
+    icon: AlertOctagon,
     changes: [
       "Move brake bias forward 1.5%",
       "Front compression +1 click",
@@ -78,6 +82,7 @@ const COMPLAINTS = [
   {
     id: "poor_traction",
     label: "Poor Traction",
+    icon: Zap,
     changes: [
       "Soften rear springs 0.5 kg/mm",
       "Diff preload −5 Nm",
@@ -88,6 +93,7 @@ const COMPLAINTS = [
   {
     id: "kerb_sensitivity",
     label: "Kerb Sensitivity",
+    icon: Disc,
     changes: [
       "Soften compression damping 1 click all round",
       "Raise ride height +2 mm",
@@ -112,10 +118,9 @@ export function SetupConsole({
   const cLF = num(data.camber_lf), cRF = num(data.camber_rf), cLR = num(data.camber_lr), cRR = num(data.camber_rr);
   const toeF = num(data.toe_front), toeR = num(data.toe_rear);
   const rhF = num(data.ride_front), rhR = num(data.ride_rear);
-  const sprF = num(data.spring_front), sprR = num(data.spring_rear);
   const bias = num(data.brake_bias, 55);
   const rake = rhR - rhF;
-  const aeroBal = num(data.aero_balance, 42); // % front
+  const aeroBal = num(data.aero_balance, 42);
 
   const selectedComplaints = (data.complaints ?? "").split(",").filter(Boolean);
   const toggleComplaint = (id: string) => {
@@ -157,11 +162,11 @@ export function SetupConsole({
         </div>
       </div>
 
-      {/* TYRE PRESSURE QUICK-EDIT — pit lane priority #1 */}
+      {/* TYRE PRESSURE QUICK-EDIT */}
       <div className="telemetry-panel telemetry-accent-bar p-3">
         <div className="flex items-center justify-between mb-2">
           <div className="telemetry-label flex items-center gap-1"><Gauge className="w-3 h-3 text-primary" /> Tyre Pressures — psi</div>
-          <div className="telemetry-label hidden sm:block">tap ± to adjust · auto-saves</div>
+          <div className="telemetry-label hidden sm:block">tap +/- · hold for fine</div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           {tyres.map((t) => (
@@ -171,32 +176,68 @@ export function SetupConsole({
               unit="PSI"
               value={data[`psi_${t.id}`]}
               onChange={(v) => set(`psi_${t.id}`, v)}
-              step={0.1}
+              step={0.5}
+              fineStep={0.1}
               min={15}
               max={45}
               precision={1}
               disabled={!writable}
               accent={psiAccent(t.psi)}
+              className="[&_>_div:last-child]:!h-12"
             />
           ))}
         </div>
       </div>
 
+      {/* ALIGNMENT — Camber & Toe via steppers */}
+      <div className="telemetry-panel p-3">
+        <div className="telemetry-label mb-2">Alignment — Camber ° & Toe °</div>
+        <div className="grid grid-cols-2 gap-3">
+          {tyres.map((t) => (
+            <Stepper
+              key={`cam-${t.id}`}
+              label={`Camber ${t.label}`}
+              unit="°"
+              value={data[`camber_${t.id}`]}
+              onChange={(v) => set(`camber_${t.id}`, v)}
+              step={0.1}
+              fineStep={0.05}
+              min={-6}
+              max={1}
+              precision={2}
+              disabled={!writable}
+              className="[&_>_div:last-child]:!h-12"
+            />
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-3 mt-3">
+          <Stepper label="Toe Front" unit="°" value={data.toe_front}
+            onChange={(v) => set("toe_front", v)} step={0.05} fineStep={0.01} min={-1} max={1} precision={2}
+            disabled={!writable} className="[&_>_div:last-child]:!h-12" />
+          <Stepper label="Toe Rear" unit="°" value={data.toe_rear}
+            onChange={(v) => set("toe_rear", v)} step={0.05} fineStep={0.01} min={-1} max={1} precision={2}
+            disabled={!writable} className="[&_>_div:last-child]:!h-12" />
+        </div>
+      </div>
+
       {/* CENTERPIECE: Car schematic + side panels */}
       <div className="grid lg:grid-cols-12 gap-3">
-        {/* Left rail — front numbers */}
+        {/* Left rail — suspension numbers */}
         <div className="lg:col-span-3 space-y-3">
           <div className="telemetry-panel p-3 space-y-2">
             <div className="telemetry-label">Brake Bias %F</div>
             <Stepper value={data.brake_bias} onChange={(v) => set("brake_bias", v)}
-              step={0.5} min={45} max={70} precision={1} disabled={!writable} />
+              step={0.5} fineStep={0.1} min={45} max={70} precision={1} disabled={!writable}
+              className="[&_>_div:last-child]:!h-12" />
           </div>
           <div className="telemetry-panel p-3 space-y-2">
             <div className="telemetry-label">Spring Rates kg/mm</div>
             <Stepper label="FRONT" value={data.spring_front} onChange={(v) => set("spring_front", v)}
-              step={0.5} min={20} max={250} precision={1} disabled={!writable} />
+              step={0.5} fineStep={0.1} min={20} max={250} precision={1} disabled={!writable}
+              className="[&_>_div:last-child]:!h-12" />
             <Stepper label="REAR" value={data.spring_rear} onChange={(v) => set("spring_rear", v)}
-              step={0.5} min={20} max={250} precision={1} disabled={!writable} />
+              step={0.5} fineStep={0.1} min={20} max={250} precision={1} disabled={!writable}
+              className="[&_>_div:last-child]:!h-12" />
           </div>
           <div className="telemetry-panel p-3 space-y-2">
             <div className="telemetry-label flex items-center justify-between">
@@ -206,9 +247,20 @@ export function SetupConsole({
               </span>
             </div>
             <Stepper label="FRONT" value={data.ride_front} onChange={(v) => set("ride_front", v)}
-              step={1} min={20} max={120} precision={0} disabled={!writable} />
+              step={1} fineStep={0.5} min={20} max={120} precision={0} disabled={!writable}
+              className="[&_>_div:last-child]:!h-12" />
             <Stepper label="REAR" value={data.ride_rear} onChange={(v) => set("ride_rear", v)}
-              step={1} min={20} max={120} precision={0} disabled={!writable} />
+              step={1} fineStep={0.5} min={20} max={120} precision={0} disabled={!writable}
+              className="[&_>_div:last-child]:!h-12" />
+          </div>
+          <div className="telemetry-panel p-3 space-y-2">
+            <div className="telemetry-label">ARB (Anti-Roll Bar)</div>
+            <Stepper label="FRONT" value={data.arb_front} onChange={(v) => set("arb_front", v)}
+              step={1} fineStep={0.5} min={0} max={20} precision={0} disabled={!writable}
+              className="[&_>_div:last-child]:!h-12" />
+            <Stepper label="REAR" value={data.arb_rear} onChange={(v) => set("arb_rear", v)}
+              step={1} fineStep={0.5} min={0} max={20} precision={0} disabled={!writable}
+              className="[&_>_div:last-child]:!h-12" />
           </div>
         </div>
 
@@ -277,19 +329,26 @@ export function SetupConsole({
           <AlertTriangle className="w-4 h-4 text-primary" />
           <div className="telemetry-label">Driver Feedback — quick select</div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 gap-2">
           {COMPLAINTS.map((c) => {
             const active = selectedComplaints.includes(c.id);
+            const Icon = c.icon;
             return (
-              <Button
+              <button
                 key={c.id}
+                type="button"
                 disabled={!writable}
                 onClick={() => toggleComplaint(c.id)}
-                variant={active ? "default" : "outline"}
-                className={"h-14 font-mono uppercase text-[11px] tracking-wider whitespace-normal text-center leading-tight " + (active ? "shadow-glow" : "")}
+                className={
+                  "flex items-center gap-3 w-full h-14 px-4 rounded-md border-[1.5px] font-mono text-sm uppercase tracking-wider transition touch-manipulation active:scale-[0.98] disabled:opacity-50 " +
+                  (active
+                    ? "border-primary bg-primary/10 ring-2 ring-primary text-primary font-bold"
+                    : "border-border bg-card text-foreground hover:border-primary/50")
+                }
               >
-                {c.label}
-              </Button>
+                <Icon className="w-5 h-5 shrink-0" />
+                <span className="truncate">{c.label}</span>
+              </button>
             );
           })}
         </div>
@@ -343,17 +402,7 @@ function EditCell({
   );
 }
 
-function TelemetryStat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
-  return (
-    <div className={"telemetry-panel p-3 " + (accent ? "telemetry-accent-bar" : "")}>
-      <div className="telemetry-label">{label}</div>
-      <div className="telemetry-value text-3xl mt-1">{value}</div>
-    </div>
-  );
-}
-
 function CarSchematic({ tyres }: { tyres: { id: string; label: string; psi: number; camber: number; x: number; y: number }[] }) {
-  // SVG canvas
   const W = 360, H = 520;
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" preserveAspectRatio="xMidYMid meet">
@@ -363,20 +412,15 @@ function CarSchematic({ tyres }: { tyres: { id: string; label: string; psi: numb
           <stop offset="100%" stopColor="oklch(0.15 0.005 250)" />
         </linearGradient>
       </defs>
-      {/* chassis silhouette */}
       <path
         d="M120 40 Q180 20 240 40 L260 120 L275 220 L275 340 L260 440 Q180 480 100 440 L85 340 L85 220 L100 120 Z"
         fill="url(#bodyGrad)"
         stroke="oklch(0.30 0.01 250)"
         strokeWidth="1.2"
       />
-      {/* center spine */}
       <line x1="180" y1="60" x2="180" y2="460" stroke="oklch(0.30 0.01 250)" strokeDasharray="4 4" strokeWidth="1" />
-      {/* cockpit */}
       <rect x="150" y="200" width="60" height="120" rx="6" fill="oklch(0.18 0.008 250)" stroke="oklch(0.30 0.01 250)" />
-      {/* front wing */}
       <rect x="90" y="32" width="180" height="6" fill="var(--primary)" opacity="0.85" />
-      {/* rear wing */}
       <rect x="80" y="460" width="200" height="8" fill="var(--primary)" opacity="0.85" />
       <line x1="90" y1="470" x2="270" y2="470" stroke="oklch(0.40 0.01 250)" strokeWidth="1" />
 
@@ -388,10 +432,8 @@ function CarSchematic({ tyres }: { tyres: { id: string; label: string; psi: numb
         const fill = psiColor(t.psi);
         return (
           <g key={t.id}>
-            {/* tyre */}
             <rect x={cx - 16} y={cy - 34} width="32" height="68" rx="4"
               fill="oklch(0.13 0.004 250)" stroke={fill} strokeWidth="2" />
-            {/* psi bar */}
             <rect x={cx - 12} y={cy - 30} width="24" height="60" rx="2"
               fill={fill} opacity="0.18" />
             <text x={cx} y={cy - 6} textAnchor="middle"
@@ -400,11 +442,9 @@ function CarSchematic({ tyres }: { tyres: { id: string; label: string; psi: numb
             <text x={cx} y={cy + 12} textAnchor="middle"
               fill="var(--muted-foreground)" fontFamily="JetBrains Mono, monospace"
               fontSize="8" letterSpacing="1.5">PSI</text>
-            {/* corner badge */}
             <text x={cx} y={cy - 42} textAnchor="middle"
               fill="var(--primary)" fontFamily="JetBrains Mono, monospace"
               fontWeight="700" fontSize="10" letterSpacing="2">{t.label}</text>
-            {/* camber readout */}
             <text x={labelX} y={cy + 30} textAnchor={anchor}
               fill="var(--muted-foreground)" fontFamily="JetBrains Mono, monospace"
               fontSize="9">CAM {t.camber ? t.camber.toFixed(2) : "0.00"}°</text>
@@ -473,7 +513,6 @@ function WearBar({
 
 function RakeViz({ rhF, rhR }: { rhF: number; rhR: number }) {
   const rake = rhR - rhF;
-  // visualize as a side-view bar tilt
   const angle = Math.max(-4, Math.min(4, rake * 0.6));
   return (
     <div>
@@ -494,7 +533,6 @@ function RakeViz({ rhF, rhR }: { rhF: number; rhR: number }) {
 }
 
 function StabilityIndicator({ bias, aeroBal, rake }: { bias: number; aeroBal: number; rake: number }) {
-  // rough scoring: balanced bias ~ 55-58, aero 40-46, rake +2..+6
   const biasScore = 1 - Math.min(1, Math.abs(bias - 56) / 6);
   const aeroScore = 1 - Math.min(1, Math.abs(aeroBal - 43) / 8);
   const rakeScore = 1 - Math.min(1, Math.abs(rake - 4) / 5);

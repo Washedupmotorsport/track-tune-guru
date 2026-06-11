@@ -3,7 +3,7 @@ import { useIsRestoring, useIsMutating, IsRestoringProvider } from "@tanstack/re
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import type { QueryClient } from "@tanstack/react-query";
-import { Wifi, WifiOff, CloudUpload, HardDrive } from "lucide-react";
+import { WifiOff, CloudUpload, HardDrive } from "lucide-react";
 
 /**
  * Client-only persister. Mounts the localStorage persister AFTER hydration so
@@ -84,9 +84,5 @@ export function ConnectionStatus() {
       </span>
     );
   }
-  return (
-    <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/30 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-muted-foreground" title="Online">
-      <Wifi className="w-3 h-3 text-accent" /> Live
-    </span>
-  );
+  return null;
 }

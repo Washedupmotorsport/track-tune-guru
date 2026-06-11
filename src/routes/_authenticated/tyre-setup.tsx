@@ -1,13 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { GuidedTour } from "@/components/guided-tour";
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Disc, Download, Gauge, Thermometer } from "lucide-react";
+import { ArrowLeft, ChevronDown, Disc, Download, Gauge, Thermometer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUnits } from "@/lib/units";
 import { Stepper } from "@/components/stepper";
 import { TyreTabs } from "@/components/tyre-tabs";
+import { useIsMobile } from "@/hooks/use-mobile";
 import jsPDF from "jspdf";
 
 export const Route = createFileRoute("/_authenticated/tyre-setup")({
@@ -27,19 +27,25 @@ const COMPOUND_BASE: Record<string, { cold: number; hotMin: number; hotMax: numb
   hard:   { cold: 29, hotMin: 32, hotMax: 35, label: "Hard" },
   wet:    { cold: 24, hotMin: 28, hotMax: 31, label: "Wet" },
 };
+const COMPOUND_KEYS = Object.keys(COMPOUND_BASE);
 const TRACK_REF_C = 25;
 const LOAD_REF_KG = 1000;
-// Heuristics: every +10°C of track temp drops cold target ~0.5 psi (rubber gains more heat).
-// Every +100 kg above reference adds ~0.5 psi to support the extra load.
 const PSI_PER_C = 0.05;
 const PSI_PER_KG = 0.005;
 
+const SET_OPTIONS = ["A", "B", "C", "D", "E"];
+
 function TyreSetupPage() {
   const { pressureUnit, tempUnit, system, toDisplayPressure } = useUnits();
+  const isMobile = useIsMobile();
   const [compound, setCompound] = useState("medium");
+  const [heatCycles, setHeatCycles] = useState(0);
+  const [setNumber, setSetNumber] = useState("A");
   const [load, setLoad] = useState("1100");
   const [trackTemp, setTrackTemp] = useState("28");
   const [currentCold, setCurrentCold] = useState({ fl: "", fr: "", rl: "", rr: "" });
+  const [historyOpen, setHistoryOpen] = useState<boolean | null>(null);
+  const showHistory = historyOpen ?? !isMobile;
 
   const base = COMPOUND_BASE[compound];
 
@@ -47,7 +53,6 @@ function TyreSetupPage() {
     const loadN = parseFloat(load);
     const trackN = parseFloat(trackTemp);
     if (!base) return null;
-    // Inputs assumed metric (°C, kg). Apply both corrections then convert for display.
     const tempDelta = isNaN(trackN) ? 0 : (trackN - TRACK_REF_C) * -PSI_PER_C;
     const loadDelta = isNaN(loadN) ? 0 : ((loadN - LOAD_REF_KG) / 100) * (PSI_PER_KG * 100);
     const coldPsi = base.cold + tempDelta + loadDelta;
@@ -55,8 +60,33 @@ function TyreSetupPage() {
     const hotMaxPsi = base.hotMax + tempDelta + loadDelta;
     const fmt = (psi: number) =>
       (system === "imperial" ? psi : toDisplayPressure(psi)).toFixed(1);
-    return { cold: fmt(coldPsi), hotMin: fmt(hotMinPsi), hotMax: fmt(hotMaxPsi) };
+    return { cold: fmt(coldPsi), hotMin: fmt(hotMinPsi), hotMax: fmt(hotMaxPsi), coldPsi, hotMinPsi, hotMaxPsi };
   }, [base, load, trackTemp, system, toDisplayPressure]);
+
+  const cycleCompound = () => {
+    const idx = COMPOUND_KEYS.indexOf(compound);
+    setCompound(COMPOUND_KEYS[(idx + 1) % COMPOUND_KEYS.length]);
+  };
+
+  const cycleSet = () => {
+    const idx = SET_OPTIONS.indexOf(setNumber);
+    setSetNumber(SET_OPTIONS[(idx + 1) % SET_OPTIONS.length]);
+  };
+
+  const cycleHeatCycles = () => {
+    setHeatCycles((v) => (v >= 10 ? 0 : v + 1));
+  };
+
+  const getPressureTone = (value: string): "cold" | "optimal" | "hot" | undefined => {
+    if (!recommendation) return undefined;
+    const v = parseFloat(value);
+    if (isNaN(v)) return undefined;
+    const target = parseFloat(recommendation.cold);
+    const diff = v - target;
+    if (diff < -1.5) return "cold";
+    if (diff > 1.5) return "hot";
+    return "optimal";
+  };
 
   const downloadReport = () => {
     if (!recommendation || !base) return;
@@ -94,6 +124,8 @@ function TyreSetupPage() {
 
     section("Inputs");
     row("Compound", base.label);
+    row("Set", setNumber);
+    row("Heat cycles", String(heatCycles));
     row("Car + driver load", `${load} kg`);
     row("Track temperature", `${trackTemp} ${tempUnit}`);
     const anyCold = Object.values(currentCold).some((v) => v);
@@ -136,12 +168,44 @@ function TyreSetupPage() {
 
   return (
     <div>
-      <GuidedTour tourKey="tyres" />
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
       <TyreTabs />
-      <div className="mt-4 flex items-start justify-between gap-4 flex-wrap">
+
+      {/* STICKY CHIP ROW */}
+      <div className="sticky top-0 z-20 -mx-4 px-4 py-2 bg-background/95 backdrop-blur-md border-b border-border mb-4">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={cycleCompound}
+            className="h-9 px-3 rounded-full bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider active:scale-95 transition touch-manipulation"
+          >
+            {COMPOUND_BASE[compound].label}
+          </button>
+          <button
+            type="button"
+            onClick={cycleHeatCycles}
+            className="h-9 px-3 rounded-full border border-border bg-card text-xs font-bold font-mono active:scale-95 transition touch-manipulation"
+          >
+            {heatCycles} HC
+          </button>
+          <button
+            type="button"
+            onClick={cycleSet}
+            className="h-9 px-3 rounded-full border border-border bg-card text-xs font-bold font-mono active:scale-95 transition touch-manipulation"
+          >
+            Set {setNumber}
+          </button>
+          <div className="ml-auto">
+            <Button onClick={downloadReport} disabled={!recommendation} size="sm" variant="outline" className="h-9">
+              <Download className="w-3.5 h-3.5 mr-1.5" /> PDF
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
             <Disc className="w-3 h-3" /> Baseline
@@ -152,9 +216,6 @@ function TyreSetupPage() {
             You get a recommended cold-set baseline plus the hot window to aim for.
           </p>
         </div>
-        <Button onClick={downloadReport} disabled={!recommendation} className="shrink-0">
-          <Download className="w-4 h-4 mr-2" /> Download PDF report
-        </Button>
       </div>
 
       <div className="mt-6 grid lg:grid-cols-2 gap-3">
@@ -162,7 +223,6 @@ function TyreSetupPage() {
           <h2 className="font-display text-lg font-bold uppercase tracking-wider">Inputs</h2>
           <div>
             <Label>Compound</Label>
-            {/* One-tap chip row — no dropdown, no keyboard. Sized for gloved thumbs. */}
             <div className="mt-1 grid grid-cols-4 gap-1.5">
               {Object.entries(COMPOUND_BASE).map(([k, v]) => {
                 const active = compound === k;
@@ -195,12 +255,13 @@ function TyreSetupPage() {
           </div>
           <div>
             <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-              Current cold pressures ({pressureUnit}) — tap ± to adjust
+              Current cold pressures ({pressureUnit}) — tap +/-, hold for fine (0.1)
             </Label>
             <div className="grid grid-cols-2 gap-2 mt-2">
               {(["fl","fr","rl","rr"] as const).map((k) => (
                 <Stepper key={k} label={k.toUpperCase()} unit={pressureUnit}
-                  value={currentCold[k]} step={0.1} min={10} max={45} precision={1}
+                  value={currentCold[k]} step={0.5} fineStep={0.1} min={10} max={45} precision={1}
+                  bgTone={getPressureTone(currentCold[k])}
                   onChange={(v) => setCurrentCold({ ...currentCold, [k]: v })} />
               ))}
             </div>
@@ -257,7 +318,18 @@ function TyreSetupPage() {
         </div>
       </div>
 
-      <StintProjector base={base} />
+      {/* History / Stint Projector — collapsible on mobile */}
+      <div className="mt-6">
+        <button
+          type="button"
+          onClick={() => setHistoryOpen((v) => !(v ?? !isMobile))}
+          className="md:hidden flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary mb-3"
+        >
+          <ChevronDown className={`w-4 h-4 transition-transform ${showHistory ? "rotate-180" : ""}`} />
+          History / Stint projection
+        </button>
+        {showHistory && <StintProjector base={base} />}
+      </div>
     </div>
   );
 }
@@ -266,9 +338,9 @@ function TyreSetupPage() {
 // model as gain = G_max * (1 - exp(-t/tau)), tau ≈ 6 min.
 // G_max grows with track temp and the gap between track and ambient (radiative load).
 const TAU_MIN = 6;
-const GAIN_PER_TRACK_C = 0.08;     // psi per °C of track temp
-const GAIN_PER_DELTA_C = 0.04;     // psi per °C of (track - ambient)
-const GAIN_BASE_PSI = 2.5;          // floor heat gain on a warm day, short stint
+const GAIN_PER_TRACK_C = 0.08;
+const GAIN_PER_DELTA_C = 0.04;
+const GAIN_BASE_PSI = 2.5;
 
 function StintProjector({ base }: { base: { hotMin: number; hotMax: number; label: string } | undefined }) {
   const { pressureUnit, tempUnit, system, toDisplayPressure } = useUnits();
@@ -291,7 +363,6 @@ function StintProjector({ base }: { base: { hotMin: number; hotMax: number; labe
   const projection = (corner: keyof typeof cold) => {
     const c = parseFloat(cold[corner]);
     if (isNaN(c)) return null;
-    // cold is in display units already; convert gain to display units too
     const gainDisplay = system === "imperial" ? gainPsi : gainPsi / 14.5038;
     const hot = c + gainDisplay;
     let advice: "low" | "ok" | "high" = "ok";
@@ -306,7 +377,7 @@ function StintProjector({ base }: { base: { hotMin: number; hotMax: number; labe
   };
 
   return (
-    <div className="mt-6 rounded-lg border border-primary/30 bg-card p-5 shadow-card">
+    <div className="rounded-lg border border-primary/30 bg-card p-5 shadow-card">
       <div className="flex items-center gap-2 mb-3">
         <Thermometer className="w-4 h-4 text-primary" />
         <h2 className="font-display text-lg font-bold uppercase tracking-wider">Stint pressure projection</h2>
@@ -333,12 +404,12 @@ function StintProjector({ base }: { base: { hotMin: number; hotMax: number; labe
 
       <div className="mt-4">
         <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-          Cold-set pressures ({pressureUnit}) — tap ± to adjust
+          Cold-set pressures ({pressureUnit}) — tap +/-, hold for fine (0.1)
         </Label>
         <div className="grid grid-cols-2 gap-2 mt-2">
           {(["fl","fr","rl","rr"] as const).map((k) => (
             <Stepper key={k} label={k.toUpperCase()} unit={pressureUnit}
-              value={cold[k]} step={0.1} min={10} max={45} precision={1}
+              value={cold[k]} step={0.5} fineStep={0.1} min={10} max={45} precision={1}
               onChange={(v) => setCold({ ...cold, [k]: v })} />
           ))}
         </div>
@@ -353,7 +424,7 @@ function StintProjector({ base }: { base: { hotMin: number; hotMax: number; labe
             </div>
           </div>
           <div className="text-xs text-muted-foreground">
-            Saturates at ~{fmt(gMax)} {pressureUnit} after a long stint · τ ≈ {TAU_MIN} min
+            Saturates at ~{fmt(gMax)} {pressureUnit} after a long stint
           </div>
         </div>
 
@@ -364,7 +435,7 @@ function StintProjector({ base }: { base: { hotMin: number; hotMax: number; labe
               : p.advice === "low" ? "text-chart-2"
               : p.advice === "high" ? "text-chart-1"
               : "text-chart-3";
-            const tag = !p ? "" : p.advice === "low" ? "↓ low" : p.advice === "high" ? "↑ high" : "✓ in band";
+            const tag = !p ? "" : p.advice === "low" ? "low" : p.advice === "high" ? "high" : "in band";
             return (
               <div key={k} className="rounded-md border border-border bg-background/30 p-2">
                 <div className="font-display font-bold uppercase text-xs">{k}</div>

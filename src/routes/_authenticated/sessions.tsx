@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { GuidedTour } from "@/components/guided-tour";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Timer, Plus, ArrowLeft, ChevronRight, Cloud, Thermometer, Droplet } from "lucide-react";
+import { Timer, Plus, ArrowLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
 
@@ -113,12 +112,10 @@ function SessionsPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
-  const carName = (id: string) => carsQ.data?.find((c) => c.id === id)?.name ?? "—";
   const filteredSetups = form.car_id ? (setupsQ.data ?? []).filter((s) => s.car_id === form.car_id) : [];
 
   return (
     <div>
-      <GuidedTour tourKey="sessions" />
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
@@ -185,64 +182,39 @@ function SessionsPage() {
         </Dialog>
       </div>
 
-      <div className="mt-6 space-y-3">
-        {sessionsQ.isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
+      <div className="mt-6 space-y-2">
+        {sessionsQ.isLoading && <div className="text-sm text-muted-foreground">Loading...</div>}
         {!sessionsQ.isLoading && (sessionsQ.data ?? []).length === 0 && (
           <div className="rounded-lg border border-dashed border-border p-6 text-center">
             <Timer className="w-8 h-8 mx-auto text-muted-foreground" />
             <p className="mt-3 text-sm text-muted-foreground">No sessions yet. Create one when you head out.</p>
           </div>
         )}
-        {(sessionsQ.data ?? []).map((s) => (
-          (() => {
-            const agg = lapsQ.data?.get(s.id);
-            const fuel = s.fuel_start_l != null && s.fuel_end_l != null ? (s.fuel_start_l - s.fuel_end_l) : null;
-            return (
+        {(sessionsQ.data ?? []).map((s) => {
+          const agg = lapsQ.data?.get(s.id);
+          return (
             <Link key={s.id} to="/sessions/$sessionId" params={{ sessionId: s.id }}
-              className="block rounded-sm border-[1.5px] border-border bg-card hover:border-primary active:scale-[0.997] transition-colors min-h-[4rem]">
-              <div className="flex items-center gap-3 px-3 py-2.5 border-b border-border/60 bg-muted/20">
-                <span className="font-mono text-[10px] uppercase tracking-[0.15em] px-1.5 py-0.5 rounded-sm bg-primary/20 text-primary">{s.session_type}</span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground truncate">{carName(s.car_id)}</span>
-                <div className="ml-auto text-[10px] font-mono tabular-nums text-muted-foreground">
-                  {new Date(s.started_at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}
-                </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-              </div>
-              <div className="px-3 py-3 flex items-center gap-4 flex-wrap">
-                <div className="min-w-0 flex-1">
-                  <div className="font-display text-lg font-bold uppercase tracking-tight truncate">{s.name}</div>
-                  <div className="mt-0.5 hidden sm:flex items-center gap-3 text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground flex-wrap">
-                    {s.track && <span>{s.track}</span>}
-                    {s.driver && <span>· {s.driver}</span>}
-                    {s.weather && <span className="flex items-center gap-1"><Cloud className="w-3 h-3" />{s.weather}</span>}
-                    {s.air_temp_c != null && <span className="flex items-center gap-1"><Thermometer className="w-3 h-3" />{s.air_temp_c}°C</span>}
-                    {s.track_temp_c != null && <span>Track {s.track_temp_c}°C</span>}
-                  </div>
-                  <div className="mt-0.5 flex sm:hidden items-center gap-2 text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground truncate">
-                    {s.track && <span className="truncate">{s.track}</span>}
-                    {s.driver && <span className="truncate">· {s.driver}</span>}
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 font-mono tabular-nums text-xs shrink-0">
-                  <Cell label="Laps" value={String(agg?.count ?? 0)} />
-                  <Cell label="Best" value={formatLapTime(agg?.best ?? null)} accent />
-                  {fuel != null && <Cell label="Fuel" value={`${fuel.toFixed(1)}L`} icon={<Droplet className="w-3 h-3" />} />}
+              className="flex items-center h-16 px-3 rounded-md border-[1.5px] border-border bg-card hover:border-primary active:scale-[0.997] transition-colors gap-3">
+              <span className="font-mono text-[10px] uppercase tracking-[0.15em] px-1.5 py-0.5 rounded-sm bg-primary/20 text-primary shrink-0">{s.session_type.slice(0, 4)}</span>
+              <div className="min-w-0 flex-1">
+                <div className="font-display font-bold uppercase tracking-tight truncate text-sm">{s.name}</div>
+                <div className="text-[10px] font-mono uppercase tracking-[0.12em] text-muted-foreground truncate">
+                  {s.driver && <span>{s.driver}</span>}
+                  {s.driver && s.track && <span> · </span>}
+                  {s.track && <span>{s.track}</span>}
                 </div>
               </div>
+              <div className="shrink-0 text-right">
+                <div className="telemetry-value text-sm sm:text-base tabular-nums">{formatLapTime(agg?.best ?? null)}</div>
+                <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-muted-foreground">
+                  {agg?.count ?? 0} laps
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
             </Link>
-            );
-          })()
-        ))}
+          );
+        })}
       </div>
-    </div>
-  );
-}
-
-function Cell({ label, value, accent, icon }: { label: string; value: string; accent?: boolean; icon?: React.ReactNode }) {
-  return (
-    <div className="text-right">
-      <div className="flex items-center justify-end gap-1 text-[9px] uppercase tracking-[0.15em] text-muted-foreground">{icon}{label}</div>
-      <div className={`font-mono tabular-nums tracking-tight font-bold ${accent ? "text-primary text-lg" : "text-base"}`}>{value}</div>
     </div>
   );
 }
