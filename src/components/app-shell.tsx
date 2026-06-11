@@ -225,14 +225,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 function MobileTabBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = [
-    { to: "/engineer",      label: "Cockpit",  icon: HardHat,       matches: ["/engineer"] },
-    { to: "/pitwall",       label: "Race",     icon: Radio,         matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution"] },
-    { to: "/sessions",      label: "Sessions", icon: Timer,         matches: ["/sessions", "/timeline", "/analysis", "/post-debrief"] },
-    { to: "/tyre-setup",    label: "Tyres",    icon: Disc,          matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
-    { to: "/driver",        label: "Driver",   icon: Mic,           matches: ["/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours", "/debrief"] },
-    { to: "/setup-library", label: "Setup",    icon: Wand2,         matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-    { to: "/engineering-memory", label: "Log", icon: Brain,         matches: ["/engineering-memory", "/notes"], tooltip: "Engineering notebook log" },
-    { to: "/garage",        label: "Garage",   icon: Home,          matches: ["/garage", "/cars", "/calendar", "/weekends", "/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
+    { to: "/weekends",      label: "Weekend",  icon: Flag,    matches: ["/weekends", "/calendar", "/garage", "/cars"] },
+    { to: "/sessions",      label: "Sessions", icon: Timer,   matches: ["/sessions", "/timeline", "/analysis"] },
+    { to: "/tyre-setup",    label: "Tyres",    icon: Disc,    matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
+    { to: "/setup-library", label: "Setup",    icon: Wand2,   matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
+    { to: "/pitwall",       label: "Pitwall",  icon: Radio,   matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution", "/engineer"] },
+    { to: "/debrief",       label: "Debrief",  icon: ClipboardList, matches: ["/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours"] },
   ] as const;
   return (
     <nav
@@ -241,7 +239,7 @@ function MobileTabBar() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="h-[2px] w-full bg-primary/70" aria-hidden />
-      <ul className="grid grid-cols-8">
+      <ul className="grid grid-cols-6">
         {items.map((it) => {
           const Icon = it.icon;
           const active = it.matches.some((m) => pathname === m || pathname.startsWith(m + "/"));
