@@ -37,6 +37,7 @@ import logoMre from "@/assets/logo-mre.png";
 import { ConnectionStatus } from "@/lib/offline";
 import { QuickLogFab } from "@/components/quick-log-fab";
 import { HelpButton } from "@/components/help-button";
+import { TracksideContext } from "@/components/trackside-context";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
@@ -48,36 +49,21 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen pb-[90px] text-foreground">
       <div className="h-[2px] w-full bg-primary" aria-hidden />
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
-        <div className="mx-auto max-w-[1400px] px-4 h-11 md:h-12 flex items-center justify-between">
-          <Link to="/" aria-label="My Race Engineer — home" className="flex items-center">
-            <img src={logoMre} alt="My Race Engineer" className="h-7 w-auto" />
+        <div className="mx-auto max-w-[1400px] px-3 md:px-4 h-12 md:h-14 grid grid-cols-[auto_1fr_auto] items-center gap-3">
+          <Link to="/" aria-label="My Race Engineer — home" className="flex items-center shrink-0">
+            <img src={logoMre} alt="My Race Engineer" className="h-7 md:h-8 w-auto" />
           </Link>
-          {/* Workspace tabs (desktop) — race weekend workflow */}
-          <nav aria-label="Workspaces" className="hidden lg:flex items-center gap-1 mx-3">
-            {WORKSPACES.map((w) => {
-              const Icon = w.icon;
-              const active = w.matches.some((m) => pathname === m || pathname.startsWith(m + "/"));
-              return (
-                <Link
-                  key={w.key}
-                  to={w.to}
-                  title={"tooltip" in w ? (w as { tooltip: string }).tooltip : undefined}
-                  className={`inline-flex items-center gap-1.5 px-2.5 h-8 rounded-md text-xs font-medium transition-colors ${
-                    active
-                      ? "bg-primary/15 text-primary border border-primary/30"
-                      : "text-muted-foreground hover:text-primary border border-transparent hover:bg-muted/30"
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" /> {w.label}
-                </Link>
-              );
-            })}
-          </nav>
-          <div className="flex items-center gap-2">
+
+          {/* Trackside context strip — desktop */}
+          <div className="min-w-0 flex justify-center">
+            <TracksideContext />
+          </div>
+
+          <div className="flex items-center gap-1.5 justify-end shrink-0">
             <ConnectionStatus />
             <button
               onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
-              className="hidden md:inline-flex items-center gap-2 rounded-md border border-border bg-muted/30 min-h-11 px-2 text-xs text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden md:inline-flex items-center gap-2 rounded-md border border-border bg-muted/30 h-8 px-2 text-xs text-muted-foreground hover:text-primary hover:border-primary/40"
               aria-label="Search"
             >
               <Search className="w-3 h-3" /> <span className="opacity-70">⌘K</span>
@@ -86,7 +72,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={toggle}
               title="Toggle metric / imperial"
               aria-label="Toggle units"
-              className="hidden md:inline-flex items-center rounded-md border border-border bg-muted/30 min-h-11 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden lg:inline-flex items-center rounded-md border border-border bg-muted/30 h-8 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
             >
               <span className={system === "metric" ? "text-primary" : ""}>SI</span>
               <span className="mx-1 opacity-40">/</span>
@@ -96,15 +82,15 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={toggleTheme}
               title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
               aria-label="Toggle theme"
-              className="hidden md:inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-muted/30 min-h-11 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden lg:inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-muted/30 h-8 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+              <span className="hidden xl:inline">{theme === "dark" ? "Light" : "Dark"}</span>
             </button>
             <Select value={currency} onValueChange={(v) => setCurrency(v as CurrencyCode)}>
               <SelectTrigger
                 aria-label="Currency"
-                className="hidden md:flex min-h-11 w-[78px] rounded-md border border-border bg-muted/30 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
+                className="hidden lg:flex h-8 w-[72px] rounded-md border border-border bg-muted/30 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
               >
                 <SelectValue />
               </SelectTrigger>
@@ -119,8 +105,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             <HelpButton />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="sm" variant="ghost" title="All navigation pages" className="text-xs font-medium text-muted-foreground hover:text-primary">
-                  <Menu className="w-4 h-4 mr-1" /> All
+                <Button size="sm" variant="ghost" title="All navigation pages" className="text-xs font-medium text-muted-foreground hover:text-primary h-8 px-2">
+                  <Menu className="w-4 h-4 md:mr-1" /> <span className="hidden md:inline">All</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-72">
