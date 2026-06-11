@@ -6,6 +6,8 @@ import { GitBranch, Disc, ArrowRight, Brain, MessageSquare, TriangleAlert as Ale
 import { toast } from "sonner";
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { FirstTimeCallout } from "@/components/first-time-callout";
+import { GuidedTour } from "@/components/guided-tour";
 
 export const Route = createFileRoute("/_authenticated/engineer")({
   head: () => ({
