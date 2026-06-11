@@ -178,12 +178,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span>© {new Date().getFullYear()} My Race Engineer</span>
           </div>
           <div className="flex items-center gap-4">
-            <FooterLink to="/engineer">Cockpit</FooterLink>
+            <FooterLink to="/weekends">Weekend</FooterLink>
             <FooterLink to="/sessions">Sessions</FooterLink>
             <FooterLink to="/tyre-setup">Tyres</FooterLink>
             <FooterLink to="/setup-library">Setup</FooterLink>
-            <FooterLink to="/garage">Garage</FooterLink>
-            <FooterLink to="/calculators">Calculators</FooterLink>
+            <FooterLink to="/pitwall">Pitwall</FooterLink>
+            <FooterLink to="/debrief">Debrief</FooterLink>
           </div>
           <div className="flex items-center gap-4">
             <FooterLink to="/terms">Terms of Service</FooterLink>
