@@ -3,10 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import {
-import { GuidedTour } from "@/components/guided-tour";
   Gauge, MessageSquare, AlertTriangle, ClipboardList, NotebookPen,
   Radio, Flag, Disc, Mic, ArrowRight, Zap, CalendarDays, History, Activity,
 } from "lucide-react";
+import { GuidedTour } from "@/components/guided-tour";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/driver")({
