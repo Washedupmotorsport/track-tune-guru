@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import {
+import { GuidedTour } from "@/components/guided-tour";
   Gauge, MessageSquare, AlertTriangle, ClipboardList, NotebookPen,
   Radio, Flag, Disc, Mic, ArrowRight, Zap, CalendarDays, History, Activity,
 } from "lucide-react";
@@ -69,6 +70,7 @@ function DriverHub() {
 
   return (
     <div>
+      <GuidedTour tourKey="driver" />
       <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary inline-flex items-center gap-1">

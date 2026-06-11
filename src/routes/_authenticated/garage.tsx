@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { DISCIPLINES } from "@/lib/disciplines";
 import {
+import { GuidedTour } from "@/components/guided-tour";
   Plus, Car, Trash2, Users, Share2, Timer, FileText, Trophy,
   Radio, Flag, ClipboardList, ChevronRight, Disc, Wand2, Camera, Loader2,
 } from "lucide-react";
@@ -106,6 +107,7 @@ function Garage() {
 
   return (
     <div>
+      <GuidedTour tourKey="garage" />
       <div className="flex items-center justify-between mb-8">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary">Paddock</div>
