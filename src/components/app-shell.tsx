@@ -37,6 +37,7 @@ import logoMre from "@/assets/logo-mre.png";
 import { ConnectionStatus } from "@/lib/offline";
 import { QuickLogFab } from "@/components/quick-log-fab";
 import { HelpButton } from "@/components/help-button";
+import { TracksideContext } from "@/components/trackside-context";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
@@ -48,36 +49,21 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen pb-[90px] text-foreground">
       <div className="h-[2px] w-full bg-primary" aria-hidden />
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
-        <div className="mx-auto max-w-[1400px] px-4 h-11 md:h-12 flex items-center justify-between">
-          <Link to="/" aria-label="My Race Engineer — home" className="flex items-center">
-            <img src={logoMre} alt="My Race Engineer" className="h-7 w-auto" />
+        <div className="mx-auto max-w-[1400px] px-3 md:px-4 h-12 md:h-14 grid grid-cols-[auto_1fr_auto] items-center gap-3">
+          <Link to="/" aria-label="My Race Engineer — home" className="flex items-center shrink-0">
+            <img src={logoMre} alt="My Race Engineer" className="h-7 md:h-8 w-auto" />
           </Link>
-          {/* Workspace tabs (desktop) — race weekend workflow */}
-          <nav aria-label="Workspaces" className="hidden lg:flex items-center gap-1 mx-3">
-            {WORKSPACES.map((w) => {
-              const Icon = w.icon;
-              const active = w.matches.some((m) => pathname === m || pathname.startsWith(m + "/"));
-              return (
-                <Link
-                  key={w.key}
-                  to={w.to}
-                  title={"tooltip" in w ? (w as { tooltip: string }).tooltip : undefined}
-                  className={`inline-flex items-center gap-1.5 px-2.5 h-8 rounded-md text-xs font-medium transition-colors ${
-                    active
-                      ? "bg-primary/15 text-primary border border-primary/30"
-                      : "text-muted-foreground hover:text-primary border border-transparent hover:bg-muted/30"
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" /> {w.label}
-                </Link>
-              );
-            })}
-          </nav>
-          <div className="flex items-center gap-2">
+
+          {/* Trackside context strip — desktop */}
+          <div className="min-w-0 flex justify-center">
+            <TracksideContext />
+          </div>
+
+          <div className="flex items-center gap-1.5 justify-end shrink-0">
             <ConnectionStatus />
             <button
               onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
-              className="hidden md:inline-flex items-center gap-2 rounded-md border border-border bg-muted/30 min-h-11 px-2 text-xs text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden md:inline-flex items-center gap-2 rounded-md border border-border bg-muted/30 h-8 px-2 text-xs text-muted-foreground hover:text-primary hover:border-primary/40"
               aria-label="Search"
             >
               <Search className="w-3 h-3" /> <span className="opacity-70">⌘K</span>
@@ -86,7 +72,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={toggle}
               title="Toggle metric / imperial"
               aria-label="Toggle units"
-              className="hidden md:inline-flex items-center rounded-md border border-border bg-muted/30 min-h-11 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden lg:inline-flex items-center rounded-md border border-border bg-muted/30 h-8 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
             >
               <span className={system === "metric" ? "text-primary" : ""}>SI</span>
               <span className="mx-1 opacity-40">/</span>
@@ -96,15 +82,15 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={toggleTheme}
               title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
               aria-label="Toggle theme"
-              className="hidden md:inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-muted/30 min-h-11 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
+              className="hidden lg:inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-muted/30 h-8 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+              <span className="hidden xl:inline">{theme === "dark" ? "Light" : "Dark"}</span>
             </button>
             <Select value={currency} onValueChange={(v) => setCurrency(v as CurrencyCode)}>
               <SelectTrigger
                 aria-label="Currency"
-                className="hidden md:flex min-h-11 w-[78px] rounded-md border border-border bg-muted/30 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
+                className="hidden lg:flex h-8 w-[72px] rounded-md border border-border bg-muted/30 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
               >
                 <SelectValue />
               </SelectTrigger>
@@ -119,8 +105,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             <HelpButton />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="sm" variant="ghost" title="All navigation pages" className="text-xs font-medium text-muted-foreground hover:text-primary">
-                  <Menu className="w-4 h-4 mr-1" /> All
+                <Button size="sm" variant="ghost" title="All navigation pages" className="text-xs font-medium text-muted-foreground hover:text-primary h-8 px-2">
+                  <Menu className="w-4 h-4 md:mr-1" /> <span className="hidden md:inline">All</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-72">
@@ -183,7 +169,6 @@ export function AppShell({ children }: { children: ReactNode }) {
             <FooterLink to="/tyre-setup">Tyres</FooterLink>
             <FooterLink to="/setup-library">Setup</FooterLink>
             <FooterLink to="/pitwall">Pitwall</FooterLink>
-            <FooterLink to="/debrief">Debrief</FooterLink>
           </div>
           <div className="flex items-center gap-4">
             <FooterLink to="/terms">Terms of Service</FooterLink>
@@ -225,12 +210,11 @@ export function AppShell({ children }: { children: ReactNode }) {
 function MobileTabBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = [
-    { to: "/weekends",      label: "Weekend",  icon: Flag,    matches: ["/weekends", "/calendar", "/garage", "/cars"] },
-    { to: "/sessions",      label: "Sessions", icon: Timer,   matches: ["/sessions", "/timeline", "/analysis"] },
-    { to: "/tyre-setup",    label: "Tyres",    icon: Disc,    matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
-    { to: "/setup-library", label: "Setup",    icon: Wand2,   matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-    { to: "/pitwall",       label: "Pitwall",  icon: Radio,   matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution", "/engineer"] },
-    { to: "/debrief",       label: "Debrief",  icon: ClipboardList, matches: ["/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours"] },
+    { to: "/weekends",      label: "Weekend",  icon: Flag,  matches: ["/weekends", "/calendar", "/garage", "/cars", "/tracks"] },
+    { to: "/sessions",      label: "Sessions", icon: Timer, matches: ["/sessions", "/timeline", "/analysis", "/debrief", "/post-debrief"] },
+    { to: "/tyre-setup",    label: "Tyres",    icon: Disc,  matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
+    { to: "/setup-library", label: "Setup",    icon: Wand2, matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
+    { to: "/pitwall",       label: "Pitwall",  icon: Radio, matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution", "/engineer"] },
   ] as const;
   return (
     <nav
@@ -239,7 +223,7 @@ function MobileTabBar() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="h-[2px] w-full bg-primary/70" aria-hidden />
-      <ul className="grid grid-cols-6">
+      <ul className="grid grid-cols-5">
         {items.map((it) => {
           const Icon = it.icon;
           const active = it.matches.some((m) => pathname === m || pathname.startsWith(m + "/"));
@@ -248,12 +232,13 @@ function MobileTabBar() {
               <Link
                 to={it.to}
                 title={"tooltip" in it ? (it as { tooltip: string }).tooltip : undefined}
-                className={`flex flex-col items-center justify-center gap-0.5 h-12 text-[11px] font-medium active:bg-primary/10 transition-colors ${
+                className={`relative flex flex-col items-center justify-center gap-0.5 h-14 text-[11px] font-medium active:bg-primary/10 transition-colors ${
                   active ? "text-primary" : "text-muted-foreground hover:text-primary"
                 }`}
               >
-                <Icon className="w-[18px] h-[18px]" />
-                <span>{it.label}</span>
+                {active && <span aria-hidden className="absolute top-0 left-1/2 -translate-x-1/2 h-[2px] w-8 bg-primary rounded-b" />}
+                <Icon className="w-[20px] h-[20px]" />
+                <span className="font-mono uppercase tracking-[0.1em] text-[10px]">{it.label}</span>
               </Link>
             </li>
           );
