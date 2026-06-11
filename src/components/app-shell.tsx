@@ -140,6 +140,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 ))}
               </SelectContent>
             </Select>
+            <HelpButton />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size="sm" variant="ghost" title="All navigation pages" className="text-xs font-medium text-muted-foreground hover:text-primary">
@@ -393,6 +394,12 @@ const ALL_NAV_GROUPS = [
     label: "Tools",
     items: [
       { to: "/calculators", label: "Calculators", icon: Calculator },
+    ],
+  },
+  {
+    label: "Help",
+    items: [
+      { to: "/manual", label: "User manual", icon: BookOpen },
     ],
   },
 ] as const;
