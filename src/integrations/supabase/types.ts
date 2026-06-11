@@ -79,6 +79,7 @@ export type Database = {
           status: string
           title: string
           track: string | null
+          track_id: string | null
           updated_at: string
           user_id: string
         }
@@ -95,6 +96,7 @@ export type Database = {
           status?: string
           title: string
           track?: string | null
+          track_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -111,10 +113,19 @@ export type Database = {
           status?: string
           title?: string
           track?: string | null
+          track_id?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "calendar_events_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       car_shares: {
         Row: {
@@ -980,6 +991,7 @@ export type Database = {
           setup_id: string | null
           started_at: string
           track: string | null
+          track_id: string | null
           track_temp_c: number | null
           updated_at: string
           user_id: string
@@ -1000,6 +1012,7 @@ export type Database = {
           setup_id?: string | null
           started_at?: string
           track?: string | null
+          track_id?: string | null
           track_temp_c?: number | null
           updated_at?: string
           user_id: string
@@ -1020,12 +1033,21 @@ export type Database = {
           setup_id?: string | null
           started_at?: string
           track?: string | null
+          track_id?: string | null
           track_temp_c?: number | null
           updated_at?: string
           user_id?: string
           weather?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sessions_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       setup_changes: {
         Row: {
@@ -1299,6 +1321,107 @@ export type Database = {
           tread_rr?: number | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      track_notes: {
+        Row: {
+          created_at: string
+          id: string
+          note: string
+          track_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note: string
+          track_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string
+          track_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "track_notes_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tracks: {
+        Row: {
+          brake_bias_start: string | null
+          camber_toe_notes: string | null
+          corner_count: number | null
+          country: string
+          created_at: string
+          created_by: string | null
+          direction: string | null
+          gearing_notes: string | null
+          id: string
+          is_seed: boolean
+          layout_notes: string | null
+          length_m: number | null
+          name: string
+          region: string | null
+          setup_tips: string | null
+          slug: string
+          tyre_pressure_notes: string | null
+          updated_at: string
+          weather_sensitivity: string | null
+        }
+        Insert: {
+          brake_bias_start?: string | null
+          camber_toe_notes?: string | null
+          corner_count?: number | null
+          country: string
+          created_at?: string
+          created_by?: string | null
+          direction?: string | null
+          gearing_notes?: string | null
+          id?: string
+          is_seed?: boolean
+          layout_notes?: string | null
+          length_m?: number | null
+          name: string
+          region?: string | null
+          setup_tips?: string | null
+          slug: string
+          tyre_pressure_notes?: string | null
+          updated_at?: string
+          weather_sensitivity?: string | null
+        }
+        Update: {
+          brake_bias_start?: string | null
+          camber_toe_notes?: string | null
+          corner_count?: number | null
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          direction?: string | null
+          gearing_notes?: string | null
+          id?: string
+          is_seed?: boolean
+          layout_notes?: string | null
+          length_m?: number | null
+          name?: string
+          region?: string | null
+          setup_tips?: string | null
+          slug?: string
+          tyre_pressure_notes?: string | null
+          updated_at?: string
+          weather_sensitivity?: string | null
         }
         Relationships: []
       }

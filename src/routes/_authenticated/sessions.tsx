@@ -34,7 +34,7 @@ function SessionsPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     name: "", session_type: "practice", car_id: "", setup_id: "none",
-    track: "", driver: "", weather: "", air_temp_c: "", track_temp_c: "",
+    track: "", track_id: "none", driver: "", weather: "", air_temp_c: "", track_temp_c: "",
     fuel_start_l: "", notes: "",
   });
 
@@ -54,6 +54,16 @@ function SessionsPage() {
       const { data, error } = await supabase.from("setups").select("id, name, car_id");
       if (error) throw error;
       return data as Setup[];
+    },
+    enabled: !!user,
+  });
+
+  const tracksQ = useQuery({
+    queryKey: ["tracks-min", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("tracks").select("id, name, country").order("name");
+      if (error) throw error;
+      return data as { id: string; name: string; country: string }[];
     },
     enabled: !!user,
   });
@@ -95,6 +105,7 @@ function SessionsPage() {
         name: form.name || `${form.session_type} session`,
         session_type: form.session_type,
         track: form.track || null,
+        track_id: form.track_id === "none" ? null : form.track_id,
         driver: form.driver || null,
         weather: form.weather || null,
         air_temp_c: form.air_temp_c ? Number(form.air_temp_c) : null,
@@ -107,7 +118,7 @@ function SessionsPage() {
     onSuccess: () => {
       toast.success("Session created");
       setOpen(false);
-      setForm({ ...form, name: "", track: "", driver: "", weather: "", air_temp_c: "", track_temp_c: "", fuel_start_l: "", notes: "" });
+      setForm({ ...form, name: "", track: "", track_id: "none", driver: "", weather: "", air_temp_c: "", track_temp_c: "", fuel_start_l: "", notes: "" });
       qc.invalidateQueries({ queryKey: ["sessions"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
@@ -165,8 +176,26 @@ function SessionsPage() {
                   </Select>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div><Label>Track</Label><Input value={form.track} onChange={(e) => setForm({ ...form, track: e.target.value })} /></div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <Label>Track database</Label>
+                  <Select
+                    value={form.track_id}
+                    onValueChange={(v) => {
+                      const t = (tracksQ.data ?? []).find((x) => x.id === v);
+                      setForm({ ...form, track_id: v, track: t ? t.name : form.track });
+                    }}
+                  >
+                    <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">— none —</SelectItem>
+                      {(tracksQ.data ?? []).map((t) => (
+                        <SelectItem key={t.id} value={t.id}>{t.name} <span className="text-muted-foreground">· {t.country}</span></SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div><Label>Track (free text)</Label><Input value={form.track} onChange={(e) => setForm({ ...form, track: e.target.value })} /></div>
                 <div><Label>Driver</Label><Input value={form.driver} onChange={(e) => setForm({ ...form, driver: e.target.value })} /></div>
               </div>
               <div className="grid grid-cols-4 gap-3">
