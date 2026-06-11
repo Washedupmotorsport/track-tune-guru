@@ -4,10 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import {
-import { GuidedTour } from "@/components/guided-tour";
   Gauge, Thermometer, Droplets, Fuel, Timer, CloudSun, Activity,
   Disc, TrendingDown, TrendingUp, Wind, Flame, ArrowRight, AlertTriangle,
 } from "lucide-react";
+import { GuidedTour } from "@/components/guided-tour";
 
 export const Route = createFileRoute("/_authenticated/pitwall")({ component: PitWallPage });
 

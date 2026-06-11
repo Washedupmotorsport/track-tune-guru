@@ -10,10 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { DISCIPLINES } from "@/lib/disciplines";
 import {
-import { GuidedTour } from "@/components/guided-tour";
   Plus, Car, Trash2, Users, Share2, Timer, FileText, Trophy,
   Radio, Flag, ClipboardList, ChevronRight, Disc, Wand2, Camera, Loader2,
 } from "lucide-react";
+import { GuidedTour } from "@/components/guided-tour";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { ShareDialog } from "@/components/share-dialog";
