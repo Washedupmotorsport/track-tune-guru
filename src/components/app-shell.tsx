@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { LogOut, Calculator, Wand as Wand2, NotebookPen, Timer, Disc, Wrench, Package, CalendarDays, Receipt, ChartBar as BarChart3, Menu, Search, Sun, Moon, Flag, TriangleAlert as AlertTriangle, HardHat, Radio, ClipboardList, FileText, MapPin, CloudRain, GitBranch, Brain, Mic, BookMarked, Sparkles, BookOpen } from "lucide-react";
+import { LogOut, Calculator, Wand as Wand2, NotebookPen, Timer, Disc, Wrench, Package, CalendarDays, Receipt, ChartBar as BarChart3, Menu, Search, Sun, Moon, Flag, TriangleAlert as AlertTriangle, HardHat, Radio, ClipboardList, FileText, MapPin, CloudRain, GitBranch, Brain, BookMarked, Sparkles, BookOpen } from "lucide-react";
 import React, { type ReactNode } from "react";
 
 const GARAGE_ICON_URL = "https://uxwing.com/wp-content/themes/uxwing/download/buildings-architecture-real-estate/garage-door-icon.png";
@@ -52,31 +52,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Link to="/" aria-label="My Race Engineer — home" className="flex items-center">
             <img src={logoMre} alt="My Race Engineer" className="h-7 w-auto" />
           </Link>
-          <nav aria-label="Role" className="hidden md:flex items-center gap-1 ml-2">
-            <Link
-              to="/driver"
-              className={`inline-flex items-center gap-1 px-2.5 h-7 rounded-md text-xs font-medium border transition-colors ${
-                pathname.startsWith("/driver")
-                  ? "bg-primary/15 text-primary border-primary/40"
-                  : "text-muted-foreground border-border hover:text-primary hover:border-primary/40"
-              }`}
-              title="Driver workspace"
-            >
-              <Mic className="w-3 h-3" /> Driver
-            </Link>
-            <Link
-              to="/engineer"
-              className={`inline-flex items-center gap-1 px-2.5 h-7 rounded-md text-xs font-medium border transition-colors ${
-                pathname.startsWith("/engineer")
-                  ? "bg-primary/15 text-primary border-primary/40"
-                  : "text-muted-foreground border-border hover:text-primary hover:border-primary/40"
-              }`}
-              title="Engineer workspace"
-            >
-              <HardHat className="w-3 h-3" /> Engineer
-            </Link>
-          </nav>
-          {/* Workspace tabs (desktop) — 5 race-team workspaces */}
+          {/* Workspace tabs (desktop) — race weekend workflow */}
           <nav aria-label="Workspaces" className="hidden lg:flex items-center gap-1 mx-3">
             {WORKSPACES.map((w) => {
               const Icon = w.icon;
@@ -202,12 +178,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span>© {new Date().getFullYear()} My Race Engineer</span>
           </div>
           <div className="flex items-center gap-4">
-            <FooterLink to="/engineer">Cockpit</FooterLink>
+            <FooterLink to="/weekends">Weekend</FooterLink>
             <FooterLink to="/sessions">Sessions</FooterLink>
             <FooterLink to="/tyre-setup">Tyres</FooterLink>
             <FooterLink to="/setup-library">Setup</FooterLink>
-            <FooterLink to="/garage">Garage</FooterLink>
-            <FooterLink to="/calculators">Calculators</FooterLink>
+            <FooterLink to="/pitwall">Pitwall</FooterLink>
+            <FooterLink to="/debrief">Debrief</FooterLink>
           </div>
           <div className="flex items-center gap-4">
             <FooterLink to="/terms">Terms of Service</FooterLink>
@@ -249,14 +225,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 function MobileTabBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = [
-    { to: "/engineer",      label: "Cockpit",  icon: HardHat,       matches: ["/engineer"] },
-    { to: "/pitwall",       label: "Race",     icon: Radio,         matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution"] },
-    { to: "/sessions",      label: "Sessions", icon: Timer,         matches: ["/sessions", "/timeline", "/analysis", "/post-debrief"] },
-    { to: "/tyre-setup",    label: "Tyres",    icon: Disc,          matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
-    { to: "/driver",        label: "Driver",   icon: Mic,           matches: ["/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours", "/debrief"] },
-    { to: "/setup-library", label: "Setup",    icon: Wand2,         matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-    { to: "/engineering-memory", label: "Log", icon: Brain,         matches: ["/engineering-memory", "/notes"], tooltip: "Engineering notebook log" },
-    { to: "/garage",        label: "Garage",   icon: Home,          matches: ["/garage", "/cars", "/calendar", "/weekends", "/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
+    { to: "/weekends",      label: "Weekend",  icon: Flag,    matches: ["/weekends", "/calendar", "/garage", "/cars"] },
+    { to: "/sessions",      label: "Sessions", icon: Timer,   matches: ["/sessions", "/timeline", "/analysis"] },
+    { to: "/tyre-setup",    label: "Tyres",    icon: Disc,    matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
+    { to: "/setup-library", label: "Setup",    icon: Wand2,   matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
+    { to: "/pitwall",       label: "Pitwall",  icon: Radio,   matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution", "/engineer"] },
+    { to: "/debrief",       label: "Debrief",  icon: ClipboardList, matches: ["/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours"] },
   ] as const;
   return (
     <nav
@@ -265,7 +239,7 @@ function MobileTabBar() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="h-[2px] w-full bg-primary/70" aria-hidden />
-      <ul className="grid grid-cols-8">
+      <ul className="grid grid-cols-6">
         {items.map((it) => {
           const Icon = it.icon;
           const active = it.matches.some((m) => pathname === m || pathname.startsWith(m + "/"));
@@ -295,34 +269,22 @@ function MobileTabBar() {
 // (where it makes sense) from the workspace front-door page.
 
 const WORKSPACES = [
-  // 8-stop primary nav. Debrief lives under Sessions (per-session workflow);
-  // Operations lives under Garage. Nothing merged that isn't a real duplicate.
-  { key: "cockpit",  label: "Cockpit",   icon: HardHat,       to: "/engineer",       matches: ["/engineer"] },
-  { key: "race",     label: "Race Mode", icon: Radio,         to: "/pitwall",        matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution"] },
-  { key: "setup",    label: "Setup",     icon: Wand2,         to: "/setup-library",  matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-  { key: "sessions", label: "Sessions",  icon: Timer,         to: "/sessions",       matches: ["/sessions", "/timeline", "/analysis", "/post-debrief"] },
-  { key: "tyres",    label: "Tyres",     icon: Disc,          to: "/tyre-setup",     matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
-  { key: "driver",   label: "Driver",    icon: Mic,           to: "/driver",         matches: ["/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours", "/debrief"] },
-  { key: "log",      label: "Log",       icon: Brain,         to: "/engineering-memory", matches: ["/engineering-memory", "/notes"], tooltip: "Engineering notebook log" },
-  { key: "garage",   label: "Garage",    icon: Home,          to: "/garage",         matches: ["/garage", "/cars", "/calendar", "/weekends", "/workshop", "/maintenance", "/damage", "/inventory", "/expenses", "/reports"] },
+  // 6-stop primary nav — race weekend workflow.
+  { key: "weekend",  label: "Weekend",  icon: Flag,          to: "/weekends",       matches: ["/weekends", "/calendar", "/garage", "/cars"], tooltip: "Plan the race weekend" },
+  { key: "sessions", label: "Sessions", icon: Timer,         to: "/sessions",       matches: ["/sessions", "/timeline", "/analysis"] },
+  { key: "tyres",    label: "Tyres",    icon: Disc,          to: "/tyre-setup",     matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
+  { key: "setup",    label: "Setup",    icon: Wand2,         to: "/setup-library",  matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
+  { key: "pitwall",  label: "Pitwall",  icon: Radio,         to: "/pitwall",        matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution", "/engineer"], tooltip: "Trackside live ops" },
+  { key: "debrief",  label: "Debrief",  icon: ClipboardList, to: "/debrief",        matches: ["/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours"], tooltip: "Driver feedback & notes" },
 ] as const;
 
 const ALL_NAV_GROUPS = [
   {
-    label: "Pit wall",
+    label: "Weekend",
     items: [
-      { to: "/engineer", label: "Engineer cockpit", icon: HardHat },
-      { to: "/pitwall",  label: "Race mode — live", icon: Radio },
-      { to: "/driver",   label: "Driver hub",       icon: Mic },
-    ],
-  },
-  {
-    label: "Race Mode — trackside",
-    items: [
-      { to: "/pitwall",         label: "Live board",       icon: Radio },
-      { to: "/track-evolution", label: "Track evolution",  icon: CloudRain },
-      { to: "/racemode",        label: "Race mode (legacy)", icon: Radio },
-      { to: "/pitlane",         label: "Pit lane (legacy)",  icon: Radio },
+      { to: "/weekends", label: "Race weekends", icon: Flag },
+      { to: "/calendar", label: "Calendar",      icon: CalendarDays },
+      { to: "/garage",   label: "Garage & cars", icon: Home },
     ],
   },
   {
@@ -331,7 +293,6 @@ const ALL_NAV_GROUPS = [
       { to: "/sessions",        label: "Sessions",         icon: Timer },
       { to: "/timeline",        label: "Weekend timeline", icon: ClipboardList },
       { to: "/analysis",        label: "Stint analysis",   icon: BarChart3 },
-      { to: "/post-debrief",    label: "Session debrief",  icon: ClipboardList },
     ],
   },
   {
@@ -344,19 +305,6 @@ const ALL_NAV_GROUPS = [
     ],
   },
   {
-    label: "Driver Hub",
-    items: [
-      { to: "/driver",           label: "Driver workspace",  icon: Mic },
-      { to: "/confidence",       label: "Driver Confidence",   icon: Brain },
-      { to: "/debrief",          label: "Driver feedback",   icon: ClipboardList },
-      { to: "/known-behaviours", label: "Known behaviours",  icon: Sparkles },
-      { to: "/sympathy",         label: "Reliability", icon: Wrench },
-      { to: "/philosophies",     label: "Setup Notes", icon: NotebookPen },
-      { to: "/flags",            label: "Track flags",       icon: Flag },
-      { to: "/corners",          label: "Corner notes",      icon: MapPin },
-    ],
-  },
-  {
     label: "Setup",
     items: [
       { to: "/setup-library", label: "Setup library",       icon: BookMarked },
@@ -365,35 +313,38 @@ const ALL_NAV_GROUPS = [
     ],
   },
   {
-    label: "Engineering Log",
+    label: "Pitwall",
     items: [
+      { to: "/pitwall",         label: "Live board",       icon: Radio },
+      { to: "/track-evolution", label: "Track evolution",  icon: CloudRain },
+      { to: "/engineer",        label: "Engineer cockpit", icon: HardHat },
+    ],
+  },
+  {
+    label: "Debrief",
+    items: [
+      { to: "/debrief",            label: "Driver feedback",    icon: ClipboardList },
+      { to: "/post-debrief",       label: "Session debrief",    icon: ClipboardList },
       { to: "/engineering-memory", label: "Engineering memory", icon: Brain },
       { to: "/notes",              label: "Engineer notes",     icon: NotebookPen },
+      { to: "/confidence",         label: "Driver confidence",  icon: Brain },
+      { to: "/known-behaviours",   label: "Known behaviours",   icon: Sparkles },
+      { to: "/philosophies",       label: "Setup notes",        icon: NotebookPen },
+      { to: "/flags",              label: "Track flags",        icon: Flag },
+      { to: "/corners",            label: "Corner notes",       icon: MapPin },
     ],
   },
   {
-    label: "Garage",
-    items: [
-      { to: "/garage",   label: "Garage",        icon: Home },
-      { to: "/calendar", label: "Calendar",      icon: CalendarDays },
-      { to: "/weekends", label: "Race weekends", icon: Flag },
-    ],
-  },
-  {
-    label: "Operations (under Garage)",
-    items: [
-      { to: "/workshop",    label: "Workshop",     icon: HardHat },
-      { to: "/maintenance", label: "Maintenance",  icon: Wrench },
-      { to: "/damage",      label: "Damage log",   icon: AlertTriangle },
-      { to: "/inventory",   label: "Inventory",    icon: Package },
-      { to: "/expenses",    label: "Expenses",     icon: Receipt },
-      { to: "/reports",     label: "Reports",      icon: FileText },
-    ],
-  },
-  {
-    label: "Tools",
+    label: "More",
     items: [
       { to: "/calculators", label: "Calculators", icon: Calculator },
+      { to: "/damage",      label: "Damage log",  icon: AlertTriangle },
+      { to: "/sympathy",    label: "Reliability", icon: Wrench },
+      { to: "/workshop",    label: "Workshop",    icon: HardHat },
+      { to: "/maintenance", label: "Maintenance", icon: Wrench },
+      { to: "/inventory",   label: "Inventory",   icon: Package },
+      { to: "/expenses",    label: "Expenses",    icon: Receipt },
+      { to: "/reports",     label: "Reports",     icon: FileText },
     ],
   },
   {
