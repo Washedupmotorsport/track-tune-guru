@@ -52,31 +52,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Link to="/" aria-label="My Race Engineer — home" className="flex items-center">
             <img src={logoMre} alt="My Race Engineer" className="h-7 w-auto" />
           </Link>
-          <nav aria-label="Role" className="hidden md:flex items-center gap-1 ml-2">
-            <Link
-              to="/driver"
-              className={`inline-flex items-center gap-1 px-2.5 h-7 rounded-md text-xs font-medium border transition-colors ${
-                pathname.startsWith("/driver")
-                  ? "bg-primary/15 text-primary border-primary/40"
-                  : "text-muted-foreground border-border hover:text-primary hover:border-primary/40"
-              }`}
-              title="Driver workspace"
-            >
-              <Mic className="w-3 h-3" /> Driver
-            </Link>
-            <Link
-              to="/engineer"
-              className={`inline-flex items-center gap-1 px-2.5 h-7 rounded-md text-xs font-medium border transition-colors ${
-                pathname.startsWith("/engineer")
-                  ? "bg-primary/15 text-primary border-primary/40"
-                  : "text-muted-foreground border-border hover:text-primary hover:border-primary/40"
-              }`}
-              title="Engineer workspace"
-            >
-              <HardHat className="w-3 h-3" /> Engineer
-            </Link>
-          </nav>
-          {/* Workspace tabs (desktop) — 5 race-team workspaces */}
+          {/* Workspace tabs (desktop) — race weekend workflow */}
           <nav aria-label="Workspaces" className="hidden lg:flex items-center gap-1 mx-3">
             {WORKSPACES.map((w) => {
               const Icon = w.icon;
