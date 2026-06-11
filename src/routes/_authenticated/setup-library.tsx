@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { GuidedTour } from "@/components/guided-tour";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { BookMarked, Pin, Trophy, Gauge, Cloud, Flame, Shield, Zap, Wand2, Search, Star } from "lucide-react";
 import { formatLapTime } from "@/lib/lap-time";
 import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
+import { GuidedTour } from "@/components/guided-tour";
 
 export const Route = createFileRoute("/_authenticated/setup-library")({
   component: SetupLibrary,

@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { GuidedTour } from "@/components/guided-tour";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import {
+import { GuidedTour } from "@/components/guided-tour";
   Gauge, MessageSquare, AlertTriangle, ClipboardList, NotebookPen,
   Radio, Flag, Disc, Mic, ArrowRight, Zap, CalendarDays, History, Activity,
 } from "lucide-react";
