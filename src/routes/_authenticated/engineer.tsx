@@ -592,7 +592,7 @@ function EngineerCockpit() {
       </div>
 
       {/* STICKY BOTTOM ACTION BAR */}
-      <div className="fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-md md:bottom-[90px]" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
+      <div className="fixed inset-x-0 z-20 border-t border-border bg-background/95 backdrop-blur-md md:static md:border-none md:bg-transparent md:backdrop-blur-none" style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 3.5rem)" }}>
         <div className="mx-auto max-w-[1400px] px-4 h-12 flex items-center gap-2">
           <Link
             to="/engineering-memory"
