@@ -8,6 +8,7 @@ import {
   Disc, TrendingDown, TrendingUp, Wind, Flame, ArrowRight, AlertTriangle,
 } from "lucide-react";
 import { GuidedTour } from "@/components/guided-tour";
+import { StandaloneStopwatch } from "@/components/standalone-stopwatch";
 
 export const Route = createFileRoute("/_authenticated/pitwall")({ component: PitWallPage });
 
