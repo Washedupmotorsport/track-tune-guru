@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import {
   ArrowLeft, Flag, MapPin, Plus, Timer, Trophy, AlertTriangle, Disc,
   Droplet, Cloud, ClipboardCheck, ChevronRight, NotebookPen,
+  Brain, GitBranch, BookMarked, Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
@@ -183,7 +184,12 @@ function WeekendHub() {
           <div className="min-w-0">
             <h1 className="font-display text-3xl font-bold uppercase tracking-tight leading-tight">{e.title}</h1>
             <div className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mt-1 flex items-center gap-3 flex-wrap">
-              {e.track && <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" />{e.track}</span>}
+              {e.track && (
+                <Link to="/tracks" className="inline-flex items-center gap-1 hover:text-primary transition-colors">
+                  <MapPin className="w-3 h-3" />{e.track}
+                  <span className="text-[9px] opacity-60">· profile</span>
+                </Link>
+              )}
               {e.location && <span>{e.location}</span>}
             </div>
           </div>
