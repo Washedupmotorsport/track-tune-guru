@@ -274,6 +274,16 @@ function PitWallPage() {
           <Stat label="Last" value={fmtLap(lapStats?.last.lap_time_ms ?? null)} sub={lapStats ? fmtDelta(lapStats.delta) : ""} mono />
           <Stat label="Laps" value={String(lapStats?.count ?? 0)} sub="completed" mono />
         </div>
+        <div className="border-t border-border p-2">
+          <Link to="/sessions" className="flex items-center justify-center gap-2 h-12 w-full rounded-md bg-primary/10 border border-primary/30 text-primary font-mono text-xs uppercase tracking-widest hover:bg-primary/20 active:scale-[0.98] transition">
+            <Timer className="w-4 h-4" /> Log lap
+          </Link>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 px-1">
+        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-muted-foreground">Now</span>
+        <div className="flex-1 h-px bg-border" />
       </div>
 
       {/* Main grid */}
@@ -621,4 +631,3 @@ function FootLink({ to, label }: { to: string; label: string }) {
 }
 
 // Suppress unused import warnings for icons reserved for future widgets
-void Timer;
