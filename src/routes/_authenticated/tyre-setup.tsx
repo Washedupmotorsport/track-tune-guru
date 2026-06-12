@@ -390,18 +390,9 @@ function StintProjector({ base }: { base: { hotMin: number; hotMax: number; labe
       </p>
 
       <div className="grid sm:grid-cols-3 gap-3">
-        <div>
-          <Label>Track temp ({tempUnit})</Label>
-          <Input type="number" inputMode="decimal" value={trackC} onChange={(e) => setTrackC(e.target.value)} className="font-mono" />
-        </div>
-        <div>
-          <Label>Ambient temp ({tempUnit})</Label>
-          <Input type="number" inputMode="decimal" value={ambientC} onChange={(e) => setAmbientC(e.target.value)} className="font-mono" />
-        </div>
-        <div>
-          <Label>Stint duration (min)</Label>
-          <Input type="number" inputMode="decimal" value={stintMin} onChange={(e) => setStintMin(e.target.value)} className="font-mono" />
-        </div>
+        <Stepper label={`Track temp (${tempUnit})`} value={trackC} onChange={setTrackC} step={1} min={-10} max={70} precision={0} />
+        <Stepper label={`Ambient temp (${tempUnit})`} value={ambientC} onChange={setAmbientC} step={1} min={-10} max={55} precision={0} />
+        <Stepper label="Stint duration (min)" value={stintMin} onChange={setStintMin} step={5} min={5} max={120} precision={0} />
       </div>
 
       <div className="mt-4">
