@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import {
   ArrowLeft, Flag, MapPin, Plus, Timer, Trophy, AlertTriangle, Disc,
   Droplet, Cloud, ClipboardCheck, ChevronRight, NotebookPen,
+  Brain, GitBranch, BookMarked, Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
@@ -183,7 +184,12 @@ function WeekendHub() {
           <div className="min-w-0">
             <h1 className="font-display text-3xl font-bold uppercase tracking-tight leading-tight">{e.title}</h1>
             <div className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mt-1 flex items-center gap-3 flex-wrap">
-              {e.track && <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" />{e.track}</span>}
+              {e.track && (
+                <Link to="/tracks" className="inline-flex items-center gap-1 hover:text-primary transition-colors">
+                  <MapPin className="w-3 h-3" />{e.track}
+                  <span className="text-[9px] opacity-60">· profile</span>
+                </Link>
+              )}
               {e.location && <span>{e.location}</span>}
             </div>
           </div>
@@ -333,6 +339,40 @@ function WeekendHub() {
               <Button variant="outline" size="sm" asChild>
                 <Link to="/tires">Tyre logs</Link>
               </Button>
+            </div>
+          </div>
+
+          <div className="rounded-sm border border-border bg-card">
+            <div className="px-3 py-2 border-b border-border/60 bg-muted/20 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="font-display text-xs font-bold uppercase tracking-[0.15em]">Race engineering</span>
+            </div>
+            <div className="p-2 grid gap-1">
+              <Link to="/engineer" className="flex items-center gap-2 px-2 py-2 rounded-sm hover:bg-muted/30 text-sm">
+                <Brain className="w-4 h-4 text-primary" />
+                <span className="flex-1">AI race engineer</span>
+                <ChevronRight className="w-3 h-3 text-muted-foreground" />
+              </Link>
+              <Link to="/engineering-memory" className="flex items-center gap-2 px-2 py-2 rounded-sm hover:bg-muted/30 text-sm">
+                <BookMarked className="w-4 h-4 text-primary" />
+                <span className="flex-1">Engineering memory</span>
+                <ChevronRight className="w-3 h-3 text-muted-foreground" />
+              </Link>
+              <Link to="/timeline" className="flex items-center gap-2 px-2 py-2 rounded-sm hover:bg-muted/30 text-sm">
+                <GitBranch className="w-4 h-4 text-primary" />
+                <span className="flex-1">Setup change timeline</span>
+                <ChevronRight className="w-3 h-3 text-muted-foreground" />
+              </Link>
+              <Link to="/tracks" className="flex items-center gap-2 px-2 py-2 rounded-sm hover:bg-muted/30 text-sm">
+                <MapPin className="w-4 h-4 text-primary" />
+                <span className="flex-1">Track database</span>
+                <ChevronRight className="w-3 h-3 text-muted-foreground" />
+              </Link>
+              <Link to="/confidence" className="flex items-center gap-2 px-2 py-2 rounded-sm hover:bg-muted/30 text-sm">
+                <Trophy className="w-4 h-4 text-primary" />
+                <span className="flex-1">Driver feedback trends</span>
+                <ChevronRight className="w-3 h-3 text-muted-foreground" />
+              </Link>
             </div>
           </div>
 
