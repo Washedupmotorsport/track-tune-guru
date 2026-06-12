@@ -234,8 +234,10 @@ export function WeekendTimeline({
             return (
               <li key={it.id} className="hover:bg-muted/20 transition-colors">
                 {it.href ? (
-                  // @ts-expect-error dynamic href shape
-                  <Link to={it.href.to} params={it.href.params}>{inner}</Link>
+                  <Link
+                    to={it.href.to as "/sessions/$sessionId"}
+                    params={it.href.params as { sessionId: string }}
+                  >{inner}</Link>
                 ) : inner}
               </li>
             );
