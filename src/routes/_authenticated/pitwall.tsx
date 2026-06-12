@@ -278,6 +278,10 @@ function PitWallPage() {
 
       {/* Main grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+        {/* Quick stopwatch — paddock lap timing without opening a session */}
+        <div className="lg:col-span-3">
+          <StandaloneStopwatch />
+        </div>
         {/* Lap delta widget */}
         <Panel title="Lap delta" icon={<Activity className="w-3.5 h-3.5" />} hint="vs personal best">
           {lapStats ? (
