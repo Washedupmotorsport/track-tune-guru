@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
+import { WeekendTimeline } from "@/components/weekend-timeline";
 
 export const Route = createFileRoute("/_authenticated/weekends/$eventId")({ component: WeekendHub });
 
@@ -213,6 +214,8 @@ function WeekendHub() {
 
       <div className="mt-4 grid lg:grid-cols-[1fr_320px] gap-3">
         <div className="space-y-3">
+          <WeekendTimeline sessions={sessions as Parameters<typeof WeekendTimeline>[0]["sessions"]} carId={e.car_id} />
+
           {SESSION_GROUPS.map((g) => {
             const rows = sessions.filter((s) => g.types.includes(s.session_type));
             const groupLaps = laps.filter((l) => rows.some((r) => r.id === l.session_id));
