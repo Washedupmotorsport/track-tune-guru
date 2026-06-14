@@ -259,7 +259,7 @@ function PitWallPage() {
             <Timer className="w-5 h-5" /> Log lap
           </Link>
           <Link to="/pitlane" className="flex items-center justify-center gap-2 h-14 w-full rounded-md border border-border bg-muted/30 text-foreground font-mono text-sm uppercase tracking-widest hover:border-primary/40 hover:text-primary active:scale-[0.98] transition">
-            <Timer className="w-5 h-5" /> Pit Lane timing
+            <Timer className="w-5 h-5" /> Pit Lane
           </Link>
         </div>
       </div>

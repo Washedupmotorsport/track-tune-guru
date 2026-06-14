@@ -164,11 +164,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span>© {new Date().getFullYear()} My Race Engineer</span>
           </div>
           <div className="flex items-center gap-4">
-            <FooterLink to="/weekends">Weekend</FooterLink>
-            <FooterLink to="/sessions">Sessions</FooterLink>
-            <FooterLink to="/tyre-setup">Tyres</FooterLink>
-            <FooterLink to="/setup-library">Setup</FooterLink>
-            <FooterLink to="/pitwall">Pitwall</FooterLink>
+            <FooterLink to="/weekends" pathname={pathname}>Weekend</FooterLink>
+            <FooterLink to="/sessions" pathname={pathname}>Sessions</FooterLink>
+            <FooterLink to="/tyre-setup" pathname={pathname}>Tyres</FooterLink>
+            <FooterLink to="/setup-library" pathname={pathname}>Setup</FooterLink>
+            <FooterLink to="/pitwall" pathname={pathname} matches={["/pitwall", "/pitlane", "/engineer", "/track-evolution", "/racemode"]}>Pitwall</FooterLink>
           </div>
           <div className="flex items-center gap-4">
             <FooterLink to="/terms">Terms of Service</FooterLink>
@@ -232,12 +232,13 @@ function MobileTabBar() {
               <Link
                 to={it.to}
                 title={"tooltip" in it ? (it as { tooltip: string }).tooltip : undefined}
+                aria-current={active ? "page" : undefined}
                 className={`relative flex flex-col items-center justify-center gap-0.5 h-14 text-[11px] font-medium active:bg-primary/10 transition-colors ${
-                  active ? "text-primary" : "text-muted-foreground hover:text-primary"
+                  active ? "text-primary font-semibold bg-primary/10" : "text-muted-foreground hover:text-primary"
                 }`}
               >
-                {active && <span aria-hidden className="absolute top-0 left-1/2 -translate-x-1/2 h-[2px] w-8 bg-primary rounded-b" />}
-                <Icon className="w-[20px] h-[20px]" />
+                {active && <span aria-hidden className="absolute top-0 left-2 right-2 h-[3px] bg-primary rounded-b" />}
+                <Icon className={`w-[20px] h-[20px] ${active ? "drop-shadow-[0_0_6px_hsl(var(--primary)/0.6)]" : ""}`} />
                 <span className="font-mono uppercase tracking-[0.1em] text-[10px]">{it.label}</span>
               </Link>
             </li>
@@ -301,10 +302,10 @@ const ALL_NAV_GROUPS = [
   {
     label: "Pitwall",
     items: [
-      { to: "/pitwall",         label: "Live board",       icon: Radio },
-      { to: "/pitlane",         label: "Pit Lane timing",  icon: Timer },
+      { to: "/pitwall",         label: "Pitwall",          icon: Radio },
+      { to: "/pitlane",         label: "Pit Lane",         icon: Timer },
+      { to: "/engineer",        label: "Engineer",         icon: HardHat },
       { to: "/track-evolution", label: "Track evolution",  icon: CloudRain },
-      { to: "/engineer",        label: "Engineer cockpit", icon: HardHat },
     ],
   },
   {
@@ -342,10 +343,16 @@ const ALL_NAV_GROUPS = [
   },
 ] as const;
 
-function FooterLink({ to, children }: { to: string; children: React.ReactNode }) {
+function FooterLink({ to, children, pathname, matches }: { to: string; children: React.ReactNode; pathname?: string; matches?: string[] }) {
+  const ms = matches ?? [to];
+  const active = !!pathname && ms.some((m) => pathname === m || pathname.startsWith(m + "/"));
   return (
-    <Link to={to} className="text-muted-foreground hover:text-primary transition-colors">
+    <Link
+      to={to}
+      className={`relative pb-0.5 transition-colors ${active ? "text-primary font-semibold" : "text-muted-foreground hover:text-primary"}`}
+    >
       {children}
+      {active && <span aria-hidden className="absolute -bottom-0.5 left-0 right-0 h-[2px] bg-primary rounded" />}
     </Link>
   );
 }
