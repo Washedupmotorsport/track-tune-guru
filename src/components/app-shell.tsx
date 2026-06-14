@@ -232,12 +232,13 @@ function MobileTabBar() {
               <Link
                 to={it.to}
                 title={"tooltip" in it ? (it as { tooltip: string }).tooltip : undefined}
+                aria-current={active ? "page" : undefined}
                 className={`relative flex flex-col items-center justify-center gap-0.5 h-14 text-[11px] font-medium active:bg-primary/10 transition-colors ${
-                  active ? "text-primary" : "text-muted-foreground hover:text-primary"
+                  active ? "text-primary font-semibold bg-primary/10" : "text-muted-foreground hover:text-primary"
                 }`}
               >
-                {active && <span aria-hidden className="absolute top-0 left-1/2 -translate-x-1/2 h-[2px] w-8 bg-primary rounded-b" />}
-                <Icon className="w-[20px] h-[20px]" />
+                {active && <span aria-hidden className="absolute top-0 left-2 right-2 h-[3px] bg-primary rounded-b" />}
+                <Icon className={`w-[20px] h-[20px] ${active ? "drop-shadow-[0_0_6px_hsl(var(--primary)/0.6)]" : ""}`} />
                 <span className="font-mono uppercase tracking-[0.1em] text-[10px]">{it.label}</span>
               </Link>
             </li>
