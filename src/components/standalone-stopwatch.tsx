@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Square, Flag, RotateCcw } from "lucide-react";
+import { Play, Square, Flag, RotateCcw, ArrowRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { formatLapTime } from "@/lib/lap-time";
 
 type Capture = { n: number; ms: number };
@@ -41,15 +42,20 @@ export function StandaloneStopwatch() {
   const best = captures.length ? Math.min(...captures.map((c) => c.ms)) : null;
 
   return (
-    <div className="rounded-lg border border-primary/40 bg-card p-5 shadow-card">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="font-display text-lg font-bold uppercase tracking-wider">Stopwatch</h2>
-        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+    <div className="rounded-lg border border-primary/40 bg-card p-4 sm:p-5 shadow-card">
+      <div className="flex items-center justify-between mb-2 gap-2">
+        <div className="min-w-0">
+          <h2 className="font-display text-lg font-bold uppercase tracking-wider leading-none">Stopwatch</h2>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
+            Quick stopwatch · not saved
+          </p>
+        </div>
+        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground shrink-0">
           Total {formatLapTime(total)}
         </span>
       </div>
-      <div className="text-center py-4 select-none">
-        <div className="font-mono text-6xl font-bold tabular-nums text-primary">{formatLapTime(elapsed)}</div>
+      <div className="text-center py-3 sm:py-4 select-none">
+        <div className="font-mono text-5xl sm:text-6xl font-bold tabular-nums text-primary">{formatLapTime(elapsed)}</div>
         {best != null && (
           <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground mt-1">
             Best {formatLapTime(best)}
@@ -58,16 +64,22 @@ export function StandaloneStopwatch() {
       </div>
       <div className="grid grid-cols-3 gap-2">
         {!running ? (
-          <Button onClick={start} className="col-span-2 shadow-glow"><Play className="w-4 h-4 mr-1" /> Start</Button>
+          <Button size="lg" onClick={start} className="col-span-2 shadow-glow h-14 text-base"><Play className="w-5 h-5 mr-1" /> Start</Button>
         ) : (
-          <Button onClick={lap} className="col-span-2 shadow-glow"><Flag className="w-4 h-4 mr-1" /> Lap</Button>
+          <Button size="lg" onClick={lap} className="col-span-2 shadow-glow h-14 text-base"><Flag className="w-5 h-5 mr-1" /> Lap</Button>
         )}
         {running ? (
-          <Button variant="outline" onClick={stop}><Square className="w-4 h-4 mr-1" /> Stop</Button>
+          <Button size="lg" variant="outline" onClick={stop} className="h-14"><Square className="w-5 h-5 mr-1" /> Stop</Button>
         ) : (
-          <Button variant="outline" onClick={reset} disabled={!startedAt}><RotateCcw className="w-4 h-4 mr-1" /> Reset</Button>
+          <Button size="lg" variant="outline" onClick={reset} disabled={!startedAt} className="h-14"><RotateCcw className="w-5 h-5 mr-1" /> Reset</Button>
         )}
       </div>
+      <Link
+        to="/pitlane"
+        className="mt-2 flex items-center justify-center gap-2 h-11 w-full rounded-md border border-primary/30 bg-primary/5 text-primary font-mono text-[11px] uppercase tracking-widest hover:bg-primary/10 active:scale-[0.98] transition"
+      >
+        Open Pit Lane timing <ArrowRight className="w-3.5 h-3.5" />
+      </Link>
       {captures.length > 0 && (
         <div className="mt-4 max-h-40 overflow-y-auto">
           <table className="w-full text-sm font-mono">
@@ -84,7 +96,7 @@ export function StandaloneStopwatch() {
             </tbody>
           </table>
           <p className="mt-2 text-[10px] uppercase tracking-widest text-muted-foreground">
-            Quick stopwatch · not saved. Open a session to log laps to history.
+            Open a session to log laps to history.
           </p>
         </div>
       )}
