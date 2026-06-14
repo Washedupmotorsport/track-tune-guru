@@ -302,6 +302,7 @@ const ALL_NAV_GROUPS = [
     label: "Pitwall",
     items: [
       { to: "/pitwall",         label: "Live board",       icon: Radio },
+      { to: "/pitlane",         label: "Pit Lane timing",  icon: Timer },
       { to: "/track-evolution", label: "Track evolution",  icon: CloudRain },
       { to: "/engineer",        label: "Engineer cockpit", icon: HardHat },
     ],
