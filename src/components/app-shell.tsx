@@ -164,11 +164,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span>© {new Date().getFullYear()} My Race Engineer</span>
           </div>
           <div className="flex items-center gap-4">
-            <FooterLink to="/weekends">Weekend</FooterLink>
-            <FooterLink to="/sessions">Sessions</FooterLink>
-            <FooterLink to="/tyre-setup">Tyres</FooterLink>
-            <FooterLink to="/setup-library">Setup</FooterLink>
-            <FooterLink to="/pitwall">Pitwall</FooterLink>
+            <FooterLink to="/weekends" pathname={pathname}>Weekend</FooterLink>
+            <FooterLink to="/sessions" pathname={pathname}>Sessions</FooterLink>
+            <FooterLink to="/tyre-setup" pathname={pathname}>Tyres</FooterLink>
+            <FooterLink to="/setup-library" pathname={pathname}>Setup</FooterLink>
+            <FooterLink to="/pitwall" pathname={pathname} matches={["/pitwall", "/pitlane", "/engineer", "/track-evolution", "/racemode"]}>Pitwall</FooterLink>
           </div>
           <div className="flex items-center gap-4">
             <FooterLink to="/terms">Terms of Service</FooterLink>
@@ -342,10 +342,16 @@ const ALL_NAV_GROUPS = [
   },
 ] as const;
 
-function FooterLink({ to, children }: { to: string; children: React.ReactNode }) {
+function FooterLink({ to, children, pathname, matches }: { to: string; children: React.ReactNode; pathname?: string; matches?: string[] }) {
+  const ms = matches ?? [to];
+  const active = !!pathname && ms.some((m) => pathname === m || pathname.startsWith(m + "/"));
   return (
-    <Link to={to} className="text-muted-foreground hover:text-primary transition-colors">
+    <Link
+      to={to}
+      className={`relative pb-0.5 transition-colors ${active ? "text-primary font-semibold" : "text-muted-foreground hover:text-primary"}`}
+    >
       {children}
+      {active && <span aria-hidden className="absolute -bottom-0.5 left-0 right-0 h-[2px] bg-primary rounded" />}
     </Link>
   );
 }
