@@ -641,3 +641,41 @@ function FootLink({ to, label }: { to: string; label: string }) {
 }
 
 // Suppress unused import warnings for icons reserved for future widgets
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2 px-1 pt-1">
+      <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{children}</span>
+      <div className="flex-1 h-px bg-border" />
+    </div>
+  );
+}
+
+function CollapsibleSection({
+  title, icon, hint, tone, defaultOpen, children,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  hint?: string;
+  tone?: "destructive";
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const wrapCls = tone === "destructive"
+    ? "border-[1.5px] border-destructive/40 bg-destructive/5 rounded-md"
+    : "border border-border bg-card/60 rounded-md";
+  const iconCls = tone === "destructive" ? "text-destructive" : "text-primary";
+  return (
+    <Collapsible defaultOpen={defaultOpen} className={wrapCls}>
+      <CollapsibleTrigger className="group flex w-full items-center gap-2 px-3 py-2 text-left">
+        <span className={iconCls}>{icon}</span>
+        <span className={`font-mono text-[10px] uppercase tracking-[0.2em] ${tone === "destructive" ? "text-destructive" : "text-foreground"}`}>{title}</span>
+        {hint ? <span className="ml-auto font-mono text-[10px] uppercase tracking-widest text-muted-foreground truncate max-w-[40%]">{hint}</span> : <span className="ml-auto" />}
+        <ChevronDown className="w-3.5 h-3.5 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="border-t border-border/60">
+        {children}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
