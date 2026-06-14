@@ -408,7 +408,7 @@ function BigBtn({
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center justify-center gap-2 ${compact ? "h-12 px-4 text-base" : "h-16 px-3 text-lg"} ${full ? "w-full" : ""} rounded-lg font-mono uppercase tracking-widest font-bold active:scale-95 transition ${toneCls}`}
+      className={`inline-flex items-center justify-center gap-2 ${compact ? "h-14 px-4 text-base" : "h-20 px-3 text-xl"} ${full ? "w-full" : ""} rounded-lg font-mono uppercase tracking-widest font-bold active:scale-95 transition ${toneCls}`}
     >
       {children}
     </button>
