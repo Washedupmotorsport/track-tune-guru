@@ -5,10 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import {
   Gauge, Thermometer, Droplets, Fuel, Timer, CloudSun, Activity,
-  Disc, TrendingDown, TrendingUp, Wind, Flame, ArrowRight, AlertTriangle,
+  Disc, TrendingDown, TrendingUp, Wind, Flame, ArrowRight, AlertTriangle, ChevronDown,
 } from "lucide-react";
 import { GuidedTour } from "@/components/guided-tour";
 import { StandaloneStopwatch } from "@/components/standalone-stopwatch";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 export const Route = createFileRoute("/_authenticated/pitwall")({ component: PitWallPage });
 
@@ -216,34 +217,10 @@ function PitWallPage() {
   return (
     <div className="space-y-3">
       <GuidedTour tourKey="race-mode" />
-      {/* Quick paddock stopwatch — first card, always visible */}
-      <StandaloneStopwatch />
 
-      {/* WATCH — active critical/testing priorities, race-weekend triage */}
-      {(prioritiesQ.data?.length ?? 0) > 0 && (
-        <div className="border-[1.5px] border-destructive/40 bg-destructive/5 rounded-md">
-          <div className="flex items-center gap-2 px-3 py-2 border-b border-destructive/30">
-            <AlertTriangle className="w-3.5 h-3.5 text-destructive" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-destructive">Watch · active priorities</span>
-            <Link to="/engineer" className="ml-auto font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary">
-              Cockpit →
-            </Link>
-          </div>
-          <ul className="divide-y divide-destructive/20">
-            {(prioritiesQ.data ?? []).map((p) => (
-              <li key={p.id} className="px-3 py-2 flex items-center gap-2">
-                <span className={`inline-flex items-center px-1.5 h-5 rounded text-[10px] font-mono uppercase tracking-widest ${
-                  p.priority === "critical"
-                    ? "bg-destructive text-destructive-foreground"
-                    : "bg-accent/80 text-accent-foreground"
-                }`}>{p.priority}</span>
-                <span className="text-[13px] font-semibold truncate flex-1 min-w-0">{p.title}</span>
-                <span className="hidden sm:inline text-[10px] font-mono text-muted-foreground uppercase">{p.category}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {/* ───────── 1. TIMING ───────── */}
+      <SectionLabel>Timing</SectionLabel>
+      <StandaloneStopwatch />
 
       {/* Pit-wall header strip */}
       <div className="border border-border bg-card/60 rounded-md">
@@ -277,24 +254,18 @@ function PitWallPage() {
           <Stat label="Last" value={fmtLap(lapStats?.last.lap_time_ms ?? null)} sub={lapStats ? fmtDelta(lapStats.delta) : ""} mono />
           <Stat label="Laps" value={String(lapStats?.count ?? 0)} sub="completed" mono />
         </div>
-        <div className="border-t border-border p-2">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <Link to="/sessions" className="flex items-center justify-center gap-2 h-12 w-full rounded-md bg-primary/10 border border-primary/30 text-primary font-mono text-xs uppercase tracking-widest hover:bg-primary/20 active:scale-[0.98] transition">
-              <Timer className="w-4 h-4" /> Log lap
-            </Link>
-            <Link to="/pitlane" className="flex items-center justify-center gap-2 h-12 w-full rounded-md border border-border bg-muted/30 text-foreground font-mono text-xs uppercase tracking-widest hover:border-primary/40 hover:text-primary active:scale-[0.98] transition">
-              <Timer className="w-4 h-4" /> Pit Lane timing
-            </Link>
-          </div>
+        <div className="border-t border-border p-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <Link to="/sessions" className="flex items-center justify-center gap-2 h-14 w-full rounded-md bg-primary text-primary-foreground font-mono text-sm uppercase tracking-widest shadow-glow hover:bg-primary/90 active:scale-[0.98] transition">
+            <Timer className="w-5 h-5" /> Log lap
+          </Link>
+          <Link to="/pitlane" className="flex items-center justify-center gap-2 h-14 w-full rounded-md border border-border bg-muted/30 text-foreground font-mono text-sm uppercase tracking-widest hover:border-primary/40 hover:text-primary active:scale-[0.98] transition">
+            <Timer className="w-5 h-5" /> Pit Lane timing
+          </Link>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 px-1">
-        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-muted-foreground">Now</span>
-        <div className="flex-1 h-px bg-border" />
-      </div>
-
-      {/* Main grid */}
+      {/* ───────── 2. LIVE DATA ───────── */}
+      <SectionLabel>Live data</SectionLabel>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {/* Lap delta widget */}
         <Panel title="Lap delta" icon={<Activity className="w-3.5 h-3.5" />} hint="vs personal best">
@@ -383,8 +354,40 @@ function PitWallPage() {
         </Panel>
       </div>
 
-      {/* Tyre panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+      {/* ───────── 3. SECONDARY TOOLS ───────── */}
+      <SectionLabel>Secondary tools</SectionLabel>
+
+      {(prioritiesQ.data?.length ?? 0) > 0 && (
+        <CollapsibleSection
+          title="Watch · active priorities"
+          icon={<AlertTriangle className="w-3.5 h-3.5" />}
+          tone="destructive"
+          defaultOpen
+          hint={`${prioritiesQ.data?.length ?? 0} open`}
+        >
+          <ul className="divide-y divide-destructive/20">
+            {(prioritiesQ.data ?? []).map((p) => (
+              <li key={p.id} className="px-3 py-2 flex items-center gap-2">
+                <span className={`inline-flex items-center px-1.5 h-5 rounded text-[10px] font-mono uppercase tracking-widest ${
+                  p.priority === "critical"
+                    ? "bg-destructive text-destructive-foreground"
+                    : "bg-accent/80 text-accent-foreground"
+                }`}>{p.priority}</span>
+                <span className="text-[13px] font-semibold truncate flex-1 min-w-0">{p.title}</span>
+                <span className="hidden sm:inline text-[10px] font-mono text-muted-foreground uppercase">{p.category}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="px-3 py-2 border-t border-destructive/20">
+            <Link to="/engineer" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary">
+              Open cockpit →
+            </Link>
+          </div>
+        </CollapsibleSection>
+      )}
+
+      <CollapsibleSection title="Tyre status" icon={<Droplets className="w-3.5 h-3.5" />} hint={latestTire?.tire_set ?? "no set"}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 p-3">
         <Panel title="Tyre pressures" icon={<Droplets className="w-3.5 h-3.5" />} hint={latestTire?.tire_set ?? "no set"}>
           {latestTire ? (
             <CornerGrid
@@ -421,10 +424,11 @@ function PitWallPage() {
             />
           ) : <Empty hint="Log hot temperatures to see heat map" />}
         </Panel>
-      </div>
+        </div>
+      </CollapsibleSection>
 
-      {/* Setup / brake balance */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+      <CollapsibleSection title="Setup balance" icon={<Gauge className="w-3.5 h-3.5" />} hint={latestSetup?.name ?? "no setup"}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 p-3">
         <Panel title="Brake balance" icon={<Disc className="w-3.5 h-3.5" />} hint={latestSetup?.name ?? "no setup"}>
           <div className="flex items-baseline gap-3 mb-3">
             <div className="font-mono text-4xl tabular-nums text-primary">{setupBalance.brakeBias.toFixed(1)}%</div>
@@ -453,16 +457,18 @@ function PitWallPage() {
             <Mini label="Wing R" value={setupBalance.rearWing != null ? String(setupBalance.rearWing) : "—"} />
           </div>
         </Panel>
-      </div>
+        </div>
+      </CollapsibleSection>
 
-      {/* Footer link strip */}
-      <div className="flex flex-wrap gap-2 pt-1">
-        <FootLink to="/sessions" label="Sessions" />
-        <FootLink to="/tires" label="Tyre logs" />
-        <FootLink to="/tyre-setup" label="Tyre setup" />
-        <FootLink to="/analysis" label="Analysis" />
-        <FootLink to="/weekends" label="Weekends" />
-      </div>
+      <CollapsibleSection title="Jump to" icon={<ArrowRight className="w-3.5 h-3.5" />}>
+        <div className="flex flex-wrap gap-2 p-3">
+          <FootLink to="/sessions" label="Sessions" />
+          <FootLink to="/tires" label="Tyre logs" />
+          <FootLink to="/tyre-setup" label="Tyre setup" />
+          <FootLink to="/analysis" label="Analysis" />
+          <FootLink to="/weekends" label="Weekends" />
+        </div>
+      </CollapsibleSection>
     </div>
   );
 }
@@ -635,3 +641,41 @@ function FootLink({ to, label }: { to: string; label: string }) {
 }
 
 // Suppress unused import warnings for icons reserved for future widgets
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2 px-1 pt-1">
+      <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{children}</span>
+      <div className="flex-1 h-px bg-border" />
+    </div>
+  );
+}
+
+function CollapsibleSection({
+  title, icon, hint, tone, defaultOpen, children,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  hint?: string;
+  tone?: "destructive";
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const wrapCls = tone === "destructive"
+    ? "border-[1.5px] border-destructive/40 bg-destructive/5 rounded-md"
+    : "border border-border bg-card/60 rounded-md";
+  const iconCls = tone === "destructive" ? "text-destructive" : "text-primary";
+  return (
+    <Collapsible defaultOpen={defaultOpen} className={wrapCls}>
+      <CollapsibleTrigger className="group flex w-full items-center gap-2 px-3 py-2 text-left">
+        <span className={iconCls}>{icon}</span>
+        <span className={`font-mono text-[10px] uppercase tracking-[0.2em] ${tone === "destructive" ? "text-destructive" : "text-foreground"}`}>{title}</span>
+        {hint ? <span className="ml-auto font-mono text-[10px] uppercase tracking-widest text-muted-foreground truncate max-w-[40%]">{hint}</span> : <span className="ml-auto" />}
+        <ChevronDown className="w-3.5 h-3.5 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="border-t border-border/60">
+        {children}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}

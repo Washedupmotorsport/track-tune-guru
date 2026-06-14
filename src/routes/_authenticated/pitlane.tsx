@@ -236,9 +236,9 @@ function PitLaneMode() {
       <header className="sticky top-12 z-20 bg-black border-b-4 border-yellow-400 px-3 py-2 flex items-center justify-between gap-2">
         <Link
           to="/pitwall"
-          className="inline-flex items-center gap-2 h-12 px-4 rounded-md bg-white/10 hover:bg-white/20 text-base font-mono uppercase tracking-widest active:scale-95"
+          className="inline-flex items-center gap-2 h-14 px-5 rounded-md bg-white/10 hover:bg-white/20 text-base font-mono uppercase tracking-widest active:scale-95"
         >
-          <ArrowLeft className="w-5 h-5" /> Exit
+          <ArrowLeft className="w-5 h-5" /> Pitwall
         </Link>
         <div className="flex items-center gap-2 font-mono uppercase tracking-widest text-yellow-400 text-sm">
           <Flag className="w-4 h-4" /> Pit Lane Mode
@@ -246,7 +246,7 @@ function PitLaneMode() {
         <select
           value={carId ?? ""}
           onChange={(e) => setCarId(e.target.value)}
-          className="h-12 rounded-md bg-white/10 text-white text-base font-mono uppercase px-3 border border-white/20"
+          className="h-14 rounded-md bg-white/10 text-white text-base font-mono uppercase px-3 border border-white/20"
         >
           {(carsQ.data ?? []).map((c) => (
             <option key={c.id} value={c.id} className="bg-black">{c.name}</option>
@@ -272,19 +272,19 @@ function PitLaneMode() {
         {/* Stopwatch */}
         <section className="rounded-xl bg-zinc-900 border-2 border-white/10 p-4">
           <SectionTitle icon={Timer}>Session timer</SectionTitle>
-          <div className="text-center font-mono tabular-nums text-6xl md:text-7xl font-black tracking-tight text-yellow-300 py-3">
+          <div className="text-center font-mono tabular-nums text-7xl md:text-8xl font-black tracking-tight text-yellow-300 py-4">
             {fmtLap(elapsed)}
           </div>
           <div className="grid grid-cols-3 gap-2">
             <BigBtn onClick={handleStartStop} tone={running ? "danger" : "primary"}>
-              {running ? <Pause className="w-7 h-7" /> : <Play className="w-7 h-7" />}
+              {running ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
               {running ? "Stop" : "Start"}
             </BigBtn>
             <BigBtn onClick={handleReset} tone="neutral">
-              <RotateCcw className="w-7 h-7" /> Reset
+              <RotateCcw className="w-8 h-8" /> Reset
             </BigBtn>
             <BigBtn onClick={handleLap} tone="neutral">
-              <Flag className="w-7 h-7" /> Lap
+              <Flag className="w-8 h-8" /> Lap
             </BigBtn>
           </div>
           {laps.length > 0 && (
@@ -408,7 +408,7 @@ function BigBtn({
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center justify-center gap-2 ${compact ? "h-12 px-4 text-base" : "h-16 px-3 text-lg"} ${full ? "w-full" : ""} rounded-lg font-mono uppercase tracking-widest font-bold active:scale-95 transition ${toneCls}`}
+      className={`inline-flex items-center justify-center gap-2 ${compact ? "h-14 px-4 text-base" : "h-20 px-3 text-xl"} ${full ? "w-full" : ""} rounded-lg font-mono uppercase tracking-widest font-bold active:scale-95 transition ${toneCls}`}
     >
       {children}
     </button>
