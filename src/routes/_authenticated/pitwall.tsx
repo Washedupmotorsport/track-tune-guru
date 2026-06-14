@@ -216,6 +216,9 @@ function PitWallPage() {
   return (
     <div className="space-y-3">
       <GuidedTour tourKey="race-mode" />
+      {/* Quick paddock stopwatch — first card, always visible */}
+      <StandaloneStopwatch />
+
       {/* WATCH — active critical/testing priorities, race-weekend triage */}
       {(prioritiesQ.data?.length ?? 0) > 0 && (
         <div className="border-[1.5px] border-destructive/40 bg-destructive/5 rounded-md">
@@ -275,9 +278,14 @@ function PitWallPage() {
           <Stat label="Laps" value={String(lapStats?.count ?? 0)} sub="completed" mono />
         </div>
         <div className="border-t border-border p-2">
-          <Link to="/sessions" className="flex items-center justify-center gap-2 h-12 w-full rounded-md bg-primary/10 border border-primary/30 text-primary font-mono text-xs uppercase tracking-widest hover:bg-primary/20 active:scale-[0.98] transition">
-            <Timer className="w-4 h-4" /> Log lap
-          </Link>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <Link to="/sessions" className="flex items-center justify-center gap-2 h-12 w-full rounded-md bg-primary/10 border border-primary/30 text-primary font-mono text-xs uppercase tracking-widest hover:bg-primary/20 active:scale-[0.98] transition">
+              <Timer className="w-4 h-4" /> Log lap
+            </Link>
+            <Link to="/pitlane" className="flex items-center justify-center gap-2 h-12 w-full rounded-md border border-border bg-muted/30 text-foreground font-mono text-xs uppercase tracking-widest hover:border-primary/40 hover:text-primary active:scale-[0.98] transition">
+              <Timer className="w-4 h-4" /> Pit Lane timing
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -288,10 +296,6 @@ function PitWallPage() {
 
       {/* Main grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-        {/* Quick stopwatch — paddock lap timing without opening a session */}
-        <div className="lg:col-span-3">
-          <StandaloneStopwatch />
-        </div>
         {/* Lap delta widget */}
         <Panel title="Lap delta" icon={<Activity className="w-3.5 h-3.5" />} hint="vs personal best">
           {lapStats ? (
