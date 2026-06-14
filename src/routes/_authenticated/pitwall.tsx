@@ -5,10 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import {
   Gauge, Thermometer, Droplets, Fuel, Timer, CloudSun, Activity,
-  Disc, TrendingDown, TrendingUp, Wind, Flame, ArrowRight, AlertTriangle,
+  Disc, TrendingDown, TrendingUp, Wind, Flame, ArrowRight, AlertTriangle, ChevronDown,
 } from "lucide-react";
 import { GuidedTour } from "@/components/guided-tour";
 import { StandaloneStopwatch } from "@/components/standalone-stopwatch";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 export const Route = createFileRoute("/_authenticated/pitwall")({ component: PitWallPage });
 
