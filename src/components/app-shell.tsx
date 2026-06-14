@@ -301,10 +301,10 @@ const ALL_NAV_GROUPS = [
   {
     label: "Pitwall",
     items: [
-      { to: "/pitwall",         label: "Live board",       icon: Radio },
-      { to: "/pitlane",         label: "Pit Lane timing",  icon: Timer },
+      { to: "/pitwall",         label: "Pitwall",          icon: Radio },
+      { to: "/pitlane",         label: "Pit Lane",         icon: Timer },
+      { to: "/engineer",        label: "Engineer",         icon: HardHat },
       { to: "/track-evolution", label: "Track evolution",  icon: CloudRain },
-      { to: "/engineer",        label: "Engineer cockpit", icon: HardHat },
     ],
   },
   {
