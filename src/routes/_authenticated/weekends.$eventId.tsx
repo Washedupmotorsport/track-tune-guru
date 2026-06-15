@@ -356,6 +356,12 @@ function WeekendHub() {
             <AddChecklistItem onAdd={(label) => updateEvent.mutate({ checklist: { ...checklist, [label]: false } })} />
           </div>
 
+          <LatestActivity
+            ai={(latestDebriefQ.data?.ai_summary as { summary?: string } | null)?.summary ?? null}
+            feedback={latestFeedbackQ.data}
+            debrief={latestDebriefQ.data}
+          />
+
           <div className="rounded-sm border border-border bg-card p-3">
             <div className="font-display text-xs font-bold uppercase tracking-[0.15em] mb-2">Quick actions</div>
             <div className="grid gap-2">
