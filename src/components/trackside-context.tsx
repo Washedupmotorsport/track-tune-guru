@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { getCurrentWeather } from "@/lib/weather";
 import { Flag, Timer, MapPin, CloudSun } from "lucide-react";
+import { useActiveWeekend } from "@/lib/active-weekend";
 
 type Event = { id: string; title: string; starts_at: string; ends_at: string | null; track: string | null; track_id: string | null };
 type Session = { id: string; name: string; session_type: string; started_at: string; track: string | null; track_id: string | null };
@@ -11,59 +12,7 @@ type Track = { id: string; name: string };
 
 export function TracksideContext() {
   const { user } = useAuth();
-
-  const eventQ = useQuery({
-    queryKey: ["trackside-event", user?.id],
-    queryFn: async () => {
-      const nowIso = new Date().toISOString();
-      // Prefer an event currently in progress
-      const cur = await supabase
-        .from("calendar_events")
-        .select("id, title, starts_at, ends_at, track, track_id")
-        .lte("starts_at", nowIso)
-        .or(`ends_at.gte.${nowIso},ends_at.is.null`)
-        .order("starts_at", { ascending: false })
-        .limit(1);
-      if (cur.data && cur.data.length) return cur.data[0] as Event;
-      // Else: next upcoming
-      const next = await supabase
-        .from("calendar_events")
-        .select("id, title, starts_at, ends_at, track, track_id")
-        .gte("starts_at", nowIso)
-        .order("starts_at", { ascending: true })
-        .limit(1);
-      return (next.data?.[0] as Event) ?? null;
-    },
-    enabled: !!user,
-    refetchInterval: 60_000,
-  });
-
-  const sessionQ = useQuery({
-    queryKey: ["trackside-session", user?.id],
-    queryFn: async () => {
-      const since = new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString();
-      const { data } = await supabase
-        .from("sessions")
-        .select("id, name, session_type, started_at, track, track_id")
-        .gte("started_at", since)
-        .order("started_at", { ascending: false })
-        .limit(1);
-      return (data?.[0] as Session) ?? null;
-    },
-    enabled: !!user,
-    refetchInterval: 30_000,
-  });
-
-  const trackId = sessionQ.data?.track_id ?? eventQ.data?.track_id ?? null;
-  const trackQ = useQuery({
-    queryKey: ["trackside-track", trackId],
-    queryFn: async () => {
-      if (!trackId) return null;
-      const { data } = await supabase.from("tracks").select("id, name").eq("id", trackId).maybeSingle();
-      return (data as Track) ?? null;
-    },
-    enabled: !!user && !!trackId,
-  });
+  const { activeWeekend, activeCar: _car, activeTrack, activeSession } = useActiveWeekend();
 
   const weatherQ = useQuery({
     queryKey: ["trackside-weather", user?.id],
@@ -74,10 +23,9 @@ export function TracksideContext() {
     retry: 1,
   });
 
-  const event = eventQ.data;
-  const session = sessionQ.data;
-  const trackName =
-    trackQ.data?.name ?? session?.track ?? event?.track ?? null;
+  const event = activeWeekend;
+  const session = activeSession;
+  const trackName = activeTrack?.name ?? event?.track ?? null;
 
   const weather = weatherQ.data;
   const weatherValue = weather
