@@ -97,14 +97,13 @@ function CalendarPage() {
           <h1 className="font-display text-4xl font-bold mt-1">Calendar</h1>
           <p className="text-sm text-muted-foreground mt-1">Race weekends, deadlines, workshop days.</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <div className="flex items-center gap-2">
-              <ReminderSettingsButton />
+        <div className="flex items-center gap-2">
+          <ReminderSettingsButton />
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
               <Button className="shadow-glow"><Plus className="w-4 h-4 mr-1" /> New event</Button>
-            </div>
-          </DialogTrigger>
-          <DialogContent>
+            </DialogTrigger>
+            <DialogContent>
             <DialogHeader><DialogTitle>New event</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <div><Label>Title *</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Brands Hatch round 3" /></div>
