@@ -361,3 +361,18 @@ function FooterLink({ to, children, pathname, matches }: { to: string; children:
     </Link>
   );
 }
+
+function SyncStatus() {
+  const fetching = useIsFetching();
+  const mutating = useIsMutating();
+  const busy = fetching > 0 || mutating > 0;
+  return (
+    <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.15em]">
+      <span
+        aria-hidden
+        className={`w-1.5 h-1.5 rounded-full ${busy ? "bg-primary animate-pulse" : "bg-accent"}`}
+      />
+      {busy ? "Syncing" : "Saved"}
+    </span>
+  );
+}
