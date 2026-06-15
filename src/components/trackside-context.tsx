@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { getCurrentWeather } from "@/lib/weather";
 import { Flag, Timer, MapPin, CloudSun } from "lucide-react";
 
 type Event = { id: string; title: string; starts_at: string; ends_at: string | null; track: string | null; track_id: string | null };
