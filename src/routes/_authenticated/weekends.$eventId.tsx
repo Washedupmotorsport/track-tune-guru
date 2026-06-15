@@ -121,6 +121,34 @@ function WeekendHub() {
     },
   });
 
+  const latestFeedbackQ = useQuery({
+    queryKey: ["weekend-latest-feedback", eventId, sessionIds.join(",")],
+    enabled: sessionIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("driver_feedback")
+        .select("id, description, category, severity, phase, corner, recorded_at")
+        .in("session_id", sessionIds)
+        .order("recorded_at", { ascending: false })
+        .limit(1);
+      if (error) throw error;
+      return data?.[0] ?? null;
+    },
+  });
+
+  const latestDebriefQ = useQuery({
+    queryKey: ["weekend-latest-debrief", eventId, sessionIds.join(",")],
+    enabled: sessionIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("session_debriefs")
+        .select("id, improved, worsened, needs_work, suggested_changes, ai_summary, created_at")
+        .in("session_id", sessionIds)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (error) throw error;
+      return data?.[0] ?? null;
+    },
+  });
+
   const updateEvent = useMutation({
     mutationFn: async (patch: Partial<Evt>) => {
       const { error } = await supabase.from("calendar_events").update(patch as never).eq("id", eventId);
