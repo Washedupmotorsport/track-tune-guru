@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { CalendarDays, Plus, ArrowLeft, Trash2, Clock, Flag } from "lucide-react";
 import { toast } from "sonner";
+import { ReminderSettingsButton } from "@/components/reminder-settings";
 
 export const Route = createFileRoute("/_authenticated/calendar")({ component: CalendarPage });
 
@@ -97,7 +98,12 @@ function CalendarPage() {
           <p className="text-sm text-muted-foreground mt-1">Race weekends, deadlines, workshop days.</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild><Button className="shadow-glow"><Plus className="w-4 h-4 mr-1" /> New event</Button></DialogTrigger>
+          <DialogTrigger asChild>
+            <div className="flex items-center gap-2">
+              <ReminderSettingsButton />
+              <Button className="shadow-glow"><Plus className="w-4 h-4 mr-1" /> New event</Button>
+            </div>
+          </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>New event</DialogTitle></DialogHeader>
             <div className="space-y-3">
