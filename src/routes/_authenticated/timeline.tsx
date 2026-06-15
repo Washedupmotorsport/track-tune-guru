@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatLapTime } from "@/lib/lap-time";
+import { TimelineFeed } from "@/components/timeline-feed";
 import {
   Flag, Timer, Wrench, Disc, CloudRain, Gauge, NotebookPen, TrendingDown, TrendingUp,
   Activity, ChevronRight, Thermometer, MapPin, ClipboardList, Sparkles,
