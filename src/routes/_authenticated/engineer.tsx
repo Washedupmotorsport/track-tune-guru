@@ -317,12 +317,12 @@ function EngineerCockpit() {
 
       {/* HEADER BAR ====================================================== */}
       <header className="rounded-xl border border-border bg-card">
-        <div className="flex items-stretch divide-x divide-border text-sm">
-          <div className="flex items-center gap-2 px-4 py-3">
+        <div className="flex flex-wrap items-stretch md:divide-x md:divide-border text-sm">
+          <div className="flex items-center gap-2 px-4 py-3 shrink-0">
             <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             <span className="font-semibold text-primary tracking-wide">Cockpit</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-3 min-w-0">
+          <div className="flex flex-1 min-w-0 items-center gap-2 px-4 py-3 border-t border-border md:border-t-0">
             <Radio className="w-4 h-4 text-muted-foreground shrink-0" />
             <span className="text-xs text-muted-foreground">Last run</span>
             {session ? (
@@ -341,7 +341,7 @@ function EngineerCockpit() {
             {session?.air_temp_c != null && <span>air {session.air_temp_c}°</span>}
             {session?.track_temp_c != null && <span>track {session.track_temp_c}°</span>}
           </div>
-          <div className="ml-auto flex items-center gap-2 px-4 py-3">
+          <div className="flex w-full md:w-auto md:ml-auto items-center gap-2 px-4 py-3 border-t border-border md:border-t-0">
             <Link to="/driver" className="text-xs font-medium text-muted-foreground hover:text-primary border border-border rounded-md px-3 py-1.5">
               Driver →
             </Link>
