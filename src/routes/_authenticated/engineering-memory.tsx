@@ -342,8 +342,18 @@ function EngineeringMemoryPage() {
           <EntryEditor
             entry={editing}
             cars={carsQ.data ?? []}
+            tracks={tracksQ.data ?? []}
             userId={user!.id}
             defaultCarId={carFilter !== "all" ? carFilter : undefined}
+            activeContext={{
+              eventId: activeWeekend?.id ?? null,
+              trackId: activeTrack?.id ?? activeWeekend?.track_id ?? null,
+              carId: activeCar?.id ?? activeWeekend?.car_id ?? null,
+              sessionId: activeSession?.id ?? null,
+              tyre: contextTyre,
+              weather: contextWeather,
+              symptoms: contextSymptoms,
+            }}
             onDone={() => { setCreating(false); setEditing(null); qc.invalidateQueries({ queryKey: ["engineering_memory"] }); }}
             onCancel={() => { setCreating(false); setEditing(null); }}
           />
