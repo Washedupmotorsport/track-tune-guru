@@ -65,10 +65,27 @@ export function TracksideContext() {
     enabled: !!user && !!trackId,
   });
 
+  const weatherQ = useQuery({
+    queryKey: ["trackside-weather", user?.id],
+    queryFn: getCurrentWeather,
+    enabled: !!user,
+    refetchInterval: 5 * 60_000,
+    staleTime: 2 * 60_000,
+    retry: 1,
+  });
+
   const event = eventQ.data;
   const session = sessionQ.data;
   const trackName =
     trackQ.data?.name ?? session?.track ?? event?.track ?? null;
+
+  const weather = weatherQ.data;
+  const weatherValue = weather
+    ? `${weather.air_temp_c}°C  ${weather.weather}`
+    : "—";
+  const weatherSub = weather
+    ? `${weather.wind_kph} kph wind`
+    : "Tap to log";
 
   return (
     <div className="hidden md:flex items-stretch gap-0 rounded-md border border-border bg-card/40 overflow-hidden">
@@ -102,10 +119,10 @@ export function TracksideContext() {
       <ContextCell
         icon={CloudSun}
         label="Weather"
-        value="—"
-        sub="Tap to log"
+        value={weatherValue}
+        sub={weatherSub}
         to="/track-evolution"
-        muted
+        muted={!weather}
       />
     </div>
   );
