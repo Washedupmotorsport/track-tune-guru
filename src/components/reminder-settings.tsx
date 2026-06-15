@@ -133,7 +133,7 @@ export function ReminderSettingsButton() {
           </div>
 
           <div className="text-[10px] text-muted-foreground leading-snug border-t border-border pt-2">
-            Reminders fire while the app is open in a tab. Keep this tab open during a race weekend, or install the app to your home screen for a persistent window.
+            On supported browsers (Chrome / Edge / Android) reminders also fire when the tab is closed. On iOS, install to Home Screen and keep the app installed.
           </div>
 
           {active && (
