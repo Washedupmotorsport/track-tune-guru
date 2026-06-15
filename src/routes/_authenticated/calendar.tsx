@@ -135,7 +135,8 @@ function CalendarPage() {
             </div>
             <DialogFooter><Button onClick={() => create.mutate()} disabled={create.isPending}>Add event</Button></DialogFooter>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <h2 className="mt-8 font-display text-xl font-bold uppercase tracking-wider">Upcoming</h2>
