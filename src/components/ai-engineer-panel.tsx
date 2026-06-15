@@ -58,7 +58,7 @@ export function AiEngineerPanel() {
       {/* Context strip — what was loaded */}
       <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border border-b border-border text-xs">
         <Ctx label="Weekend" value={activeWeekend?.title ?? "—"} />
-        <Ctx label="Car" value={activeCar ? (activeCar.name ?? `${activeCar.make ?? ""} ${activeCar.model ?? ""}`.trim() || "—") : "—"} />
+        <Ctx label="Car" value={activeCar ? (activeCar.name ?? (`${activeCar.make ?? ""} ${activeCar.model ?? ""}`.trim() || "—")) : "—"} />
         <Ctx label="Track" value={activeTrack?.name ?? activeWeekend?.track ?? "—"} />
         <Ctx label="Session" value={activeSession?.name ?? "—"} />
       </div>
