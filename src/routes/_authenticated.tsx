@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { AppShell } from "@/components/app-shell";
 import { WavingFlags } from "@/components/waving-flags";
+import { ActiveWeekendProvider } from "@/lib/active-weekend";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthGate,
@@ -25,5 +26,9 @@ function AuthGate() {
       </div>
     );
   }
-  return <AppShell><Outlet /></AppShell>;
+  return (
+    <ActiveWeekendProvider>
+      <AppShell><Outlet /></AppShell>
+    </ActiveWeekendProvider>
+  );
 }
