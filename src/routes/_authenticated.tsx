@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/auth-context";
 import { AppShell } from "@/components/app-shell";
 import { WavingFlags } from "@/components/waving-flags";
 import { ActiveWeekendProvider } from "@/lib/active-weekend";
+import { ReminderProvider } from "@/lib/reminders";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthGate,
@@ -28,7 +29,9 @@ function AuthGate() {
   }
   return (
     <ActiveWeekendProvider>
-      <AppShell><Outlet /></AppShell>
+      <ReminderProvider>
+        <AppShell><Outlet /></AppShell>
+      </ReminderProvider>
     </ActiveWeekendProvider>
   );
 }
