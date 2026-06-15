@@ -2,30 +2,10 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useIsFetching, useIsMutating } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { LogOut, Calculator, Wand as Wand2, NotebookPen, Timer, Disc, Wrench, Package, CalendarDays, Receipt, ChartBar as BarChart3, Menu, Search, Sun, Moon, Flag, TriangleAlert as AlertTriangle, HardHat, Radio, ClipboardList, FileText, MapPin, CloudRain, GitBranch, Brain, BookMarked, Sparkles, BookOpen } from "lucide-react";
+import {
+  LogOut, Calculator, Wand as Wand2, NotebookPen, Timer, Disc, Wrench, Package, CalendarDays, Receipt, ChartBar as BarChart3, Menu, Search, Sun, Moon, Flag, TriangleAlert as AlertTriangle, HardHat, Radio, ClipboardList, FileText, MapPin, CloudRain, GitBranch, Brain, BookMarked, Sparkles, BookOpen, Car, Warehouse,
+} from "lucide-react";
 import React, { type ReactNode } from "react";
-
-const GARAGE_ICON_URL = "https://uxwing.com/wp-content/themes/uxwing/download/buildings-architecture-real-estate/garage-door-icon.png";
-
-function Home({ className }: { className?: string }) {
-  return (
-    <span
-      role="img"
-      aria-hidden="true"
-      className={`inline-block bg-current ${className ?? ""}`}
-      style={{
-        WebkitMaskImage: `url(${GARAGE_ICON_URL})`,
-        maskImage: `url(${GARAGE_ICON_URL})`,
-        WebkitMaskRepeat: "no-repeat",
-        maskRepeat: "no-repeat",
-        WebkitMaskPosition: "center",
-        maskPosition: "center",
-        WebkitMaskSize: "contain",
-        maskSize: "contain",
-      }}
-    />
-  );
-}
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
   DropdownMenuSeparator, DropdownMenuLabel,
@@ -275,7 +255,8 @@ const ALL_NAV_GROUPS = [
     items: [
       { to: "/weekends", label: "Race weekends", icon: Flag },
       { to: "/calendar", label: "Calendar",      icon: CalendarDays },
-      { to: "/garage",   label: "Garage & cars", icon: Home },
+      { to: "/garage",   label: "Garage", icon: Warehouse },
+      { to: "/cars",     label: "Cars",   icon: Car },
       { to: "/tracks",   label: "Track database", icon: MapPin },
     ],
   },
