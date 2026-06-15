@@ -1,18 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { getCurrentWeather } from "@/lib/weather";
 import { Flag, Timer, MapPin, CloudSun } from "lucide-react";
 import { useActiveWeekend } from "@/lib/active-weekend";
 
-type Event = { id: string; title: string; starts_at: string; ends_at: string | null; track: string | null; track_id: string | null };
-type Session = { id: string; name: string; session_type: string; started_at: string; track: string | null; track_id: string | null };
-type Track = { id: string; name: string };
-
 export function TracksideContext() {
   const { user } = useAuth();
-  const { activeWeekend, activeCar: _car, activeTrack, activeSession } = useActiveWeekend();
+  const { activeWeekend, activeTrack, activeSession } = useActiveWeekend();
 
   const weatherQ = useQuery({
     queryKey: ["trackside-weather", user?.id],
