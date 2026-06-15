@@ -358,8 +358,8 @@ function WeekendHub() {
 
           <LatestActivity
             ai={(latestDebriefQ.data?.ai_summary as { summary?: string } | null)?.summary ?? null}
-            feedback={latestFeedbackQ.data}
-            debrief={latestDebriefQ.data}
+            feedback={latestFeedbackQ.data ?? null}
+            debrief={latestDebriefQ.data ?? null}
           />
 
           <div className="rounded-sm border border-border bg-card p-3">
