@@ -1,66 +1,61 @@
-# Tutorial system — A + B + C
+# Launch Readiness Plan
 
-A complete in-app learning system: a searchable manual, a first-run guided tour, and embedded video walkthroughs.
+This is a large, multi-area polish pass on an existing app. To keep it tractable and reviewable, I want to confirm scope and sequencing before editing ~20+ files. Nothing here rebuilds existing features — it connects, restyles, and adds glue.
 
-## A — In-app Manual (`/manual`)
+## Phase 1 — Foundation (routing + shell)
 
-New route under Cockpit with a sectioned, searchable handbook.
+**1.1 Make `/weekends` the post-login landing**
+- `_authenticated/route.tsx` (managed gate) already redirects unauth → `/auth`. Add a redirect from `/` → `/weekends` only for authenticated users (keep public landing for signed-out visitors).
+- Update `<Link to="/engineer">Open Cockpit</Link>` on `index.tsx` to point to `/weekends`.
 
-- **Layout:** left sidebar (sections), main content (markdown-style cards), top search bar (client-side filter over titles + body).
-- **Sections (one per workspace):** Getting Started, Cockpit, Race Mode (Pitwall / Race Mode / Pit Lane / Track Evolution), Setup, Sessions (incl. Debrief), Tyres, Driver Hub, Engineering Log, Garage & Operations, Tools (Calculators), Keyboard Shortcuts, FAQ.
-- **Per section:** what it's for, when to use it during a race weekend, key buttons, common pitfalls, "Open this screen" deep link, embed slot for a video.
-- **Content source:** static TS data file `src/lib/manual-content.ts` — easy to edit, no backend needed.
-- **`?` Help button in header:** opens the manual section relevant to the current route (path → section map).
-- **Nav entry:** added to `app-shell.tsx` All-routes menu under a new "Help" group, plus a small "First-time here? Read the manual" callout on `/engineer` (Cockpit) that dismisses to localStorage.
+**1.2 Active Weekend context**
+- New `src/lib/active-weekend.tsx` provider: persists `activeEventId`, `activeCarId`, `activeSessionId`, `activeSetupId`, `activeTireSetId` to localStorage + syncs from URL when on `/weekends/$eventId`.
+- Mount inside `_authenticated.tsx` so every authed page can read it.
 
-## B — Guided Tour overlay
+**1.3 Shared `AppHeader` + `AppFooter`**
+- Header (in `app-shell.tsx`): logo, active weekend name, active car, active track, sync/save indicator (driven by react-query `isFetching`), user menu (existing).
+- Footer: version (from `package.json` via vite define), Support / Privacy / Terms links, "Last saved Xs ago" from a shared `useLastSaved()` store.
+- Keep current 6-tab nav (Weekend / Sessions / Tyres / Setup / Pitwall / Debrief) — rename existing nav items to match exactly.
 
-Coachmark step-through for first-run onboarding on each workspace.
+## Phase 2 — Weekend Command Centre
 
-- **Library:** lightweight custom overlay (no extra dependency) — fixed-position spotlight + tooltip card, driven by an array of `{ selector, title, body, route }` steps.
-- **Trigger:** auto-runs once per workspace on first visit (tracked in `tutorial_progress` table, scoped to `user_id` + `tour_key`). Manually re-runnable from manual page or `?` menu ("Replay tour").
-- **Tours shipped:** `cockpit`, `race-mode`, `sessions`, `setup`, `tyres`, `driver`, `garage` — 4–6 steps each.
-- **Backend:** new `tutorial_progress` table — `user_id`, `tour_key`, `completed_at`. RLS scoped to `auth.uid()`. GRANTs to authenticated + service_role.
+Rewrite `weekends.$eventId.tsx` (and `weekends.tsx` index) into a dense MoTeC-style dashboard with these cards:
+- Active car · Active track · Current session · Fastest lap · Setup version · Tyre set · Weather
+- Latest AI recommendation (read from `session_debriefs.ai_summary` most recent)
+- Latest driver feedback (most recent `driver_feedback`)
+- Latest debrief note
+- `<WeekendTimeline />` (already exists — reuse, scoped to event's sessions)
 
-## C — Video walkthroughs (C1 embedded + C2 generated intros)
+All data fetched via existing supabase tables filtered by `event_id` / session IDs belonging to event.
 
-- **C1 — Embeds:** each manual section has an optional `videoUrl` field. Renders a `<video>` (or YouTube/Vimeo iframe if URL is a known host). You/the user uploads MP4 to Lovable Cloud Storage `tutorials` bucket (public read) or pastes a YouTube/Vimeo link. Empty by default — placeholders show "Video coming soon".
-- **C2 — AI-generated workspace intros (optional, ship 1 as proof):** generate a 5–10 s motion-graphics clip for the Cockpit section using the video skill, store under `public/tutorials/cockpit-intro.mp4`. User can request more later.
+## Phase 3 — Timeline auto-events
 
-## Technical details
+`WeekendTimeline` already derives events from existing tables (sessions, setup_changes, tire_logs, driver_feedback, debriefs, best lap). That covers all 7 requested triggers without new DB writes. Verify each insertion path (session create, setup change form, tyre log, feedback, debrief) writes to the correct table with `session_id` — patch any missing FKs.
 
-**Files added**
-- `src/routes/_authenticated/manual.tsx` — manual page with sidebar + search + section renderer.
-- `src/lib/manual-content.ts` — section data (id, title, route, body markdown-ish, bullets, videoUrl?).
-- `src/lib/route-to-manual.ts` — map current pathname → manual section id (for context `?` button).
-- `src/components/help-button.tsx` — `?` icon button in header; navigates to `/manual?section=<id>`.
-- `src/components/guided-tour.tsx` — overlay component; reads tour from `src/lib/tours.ts`, persists completion via server fn.
-- `src/lib/tours.ts` — tour definitions keyed by workspace.
-- `src/lib/tutorial-progress.functions.ts` — `getCompletedTours` + `markTourComplete` server functions (uses `requireSupabaseAuth`).
-- `src/components/first-time-callout.tsx` — Cockpit banner.
+No schema migration unless a gap is found.
 
-**Files edited**
-- `src/components/app-shell.tsx` — add Help button next to theme toggle; add "Help" group to All-routes menu with Manual + Replay tour.
-- `src/routes/_authenticated/engineer.tsx` — mount `<FirstTimeCallout />` at top.
-- Workspace front-door routes — mount `<GuidedTour tourKey="..." />` (no UI until triggered).
+## Phase 4 — Engineering Memory & AI Engineer
 
-**Bucket**
-- Create `tutorials` storage bucket (public read) for user-uploaded clips.
+- **Memory**: surface "Relevant past notes" panel on the Weekend Hub by querying `engineering_memory` filtered by current `track_id` / `car_id`. No new tables — uses existing columns.
+- **AI Engineer**: extend the existing `advisor.functions.ts` server function to accept `{ eventId }` and auto-load track, car, weather, latest tyre log, current setup, recent feedback. Add a "Data used" expandable block in the UI listing what context was injected.
 
-**Migration**
-- `tutorial_progress` table + RLS + GRANTs.
+## Phase 5 — Visual standardisation
 
-## Build order
+Update `src/styles.css` tokens for a darker engineering-notebook palette and update shared primitives (`Card`, `CardHeader`, table styles) for tighter MoTeC density. Sweep major routes for spacing/heading consistency — no per-page redesigns.
 
-1. Migration: `tutorial_progress` + storage bucket.
-2. Manual content + route + sidebar/search/section UI.
-3. Header `?` button + route→section mapping.
-4. Tutorial progress server fns + guided tour overlay + tours data.
-5. Mount tours on workspace front doors + first-time callout on Cockpit.
-6. Generate 1 sample intro video for Cockpit (proof of C2).
+## Phase 6 — Verify
 
-## Out of scope (for now)
+Run typecheck/build (auto), fix routing/TS errors, smoke-test `/`, `/weekends`, `/weekends/$eventId`, `/sessions`, `/pitwall`.
 
-- Per-user manual bookmarks / progress tracking.
-- Multi-language manual.
-- Recording user-narrated walkthroughs (you supply MP4s when ready).
+---
+
+## Scope confirmation before I start
+
+This will touch ~25–35 files. A few decisions I'd like to confirm rather than guess:
+
+1. **Landing redirect**: should signed-in users hitting `/` always bounce to `/weekends`, or keep the marketing landing reachable (e.g. via logo click)?
+2. **"Active weekend"** when none selected: auto-pick most-recent event, or show a picker on `/weekends`?
+3. **Visual overhaul depth**: light token tweaks + Card/Table density (safe, ~1 hr), or a deeper sweep of every route (higher risk of regressions on the routes you just dialled in like Pitwall/Pitlane)?
+4. **Schema changes**: I'd prefer to avoid any migrations and only wire existing tables. OK?
+
+If you want, I can also just proceed with sensible defaults (redirect always, auto-pick most recent, light visual sweep, no migrations) — say "go with defaults" and I'll execute the full plan end-to-end.
