@@ -295,7 +295,7 @@ function TrackEvolutionPage() {
               </Button>
               <Button variant="ghost" size="sm" asChild className="text-xs px-2">
                 <a href="http://www.bom.gov.au/" target="_blank" rel="noopener noreferrer" title="Bureau of Meteorology">
-                  <ExternalLink className="w-3.5 h-3.5" />
+                  <Globe className="w-3.5 h-3.5" />
                 </a>
               </Button>
             </div>
