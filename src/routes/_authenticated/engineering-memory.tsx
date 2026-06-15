@@ -463,6 +463,33 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
+function BackLinks({ entry }: { entry: Entry }) {
+  const links: { to: string; params?: Record<string, string>; label: string; icon: typeof Flag }[] = [];
+  if (entry.event_id) links.push({ to: "/weekends/$eventId", params: { eventId: entry.event_id }, label: "weekend", icon: Flag });
+  if (entry.session_id) links.push({ to: "/sessions/$sessionId", params: { sessionId: entry.session_id }, label: "session", icon: FileText });
+  if (entry.setup_id) links.push({ to: "/setups/$setupId", params: { setupId: entry.setup_id }, label: "setup", icon: Wrench });
+  if (entry.setup_change_id) links.push({ to: "/iteration", label: "setup change", icon: Wrench });
+  if (entry.debrief_id) links.push({ to: "/post-debrief", label: "debrief", icon: FileText });
+  if (!links.length) return null;
+  return (
+    <div className="mt-2 flex flex-wrap gap-1.5">
+      {links.map((l, i) => {
+        const Icon = l.icon;
+        return (
+          <Link
+            key={i}
+            to={l.to as never}
+            params={l.params as never}
+            className="inline-flex items-center gap-1 px-1.5 h-5 rounded border border-border bg-background/40 hover:border-primary/50 font-mono text-[9px] uppercase tracking-widest text-muted-foreground hover:text-primary"
+          >
+            <Icon className="w-2.5 h-2.5" /> {l.label} <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
 function EntryEditor({
   entry, cars, userId, defaultCarId, onDone, onCancel,
 }: {
