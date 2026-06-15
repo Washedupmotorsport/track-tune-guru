@@ -18,6 +18,7 @@ import {
 import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
 import { WeekendTimeline } from "@/components/weekend-timeline";
+import { TimelineFeed } from "@/components/timeline-feed";
 
 export const Route = createFileRoute("/_authenticated/weekends/$eventId")({ component: WeekendHub });
 
@@ -243,6 +244,13 @@ function WeekendHub() {
       <div className="mt-4 grid lg:grid-cols-[1fr_320px] gap-3">
         <div className="space-y-3">
           <WeekendTimeline sessions={sessions as Parameters<typeof WeekendTimeline>[0]["sessions"]} carId={e.car_id} />
+
+          <TimelineFeed
+            eventId={eventId}
+            title="Weekend activity"
+            limit={50}
+            emptyHint="Start a session, log a setup change or driver comment — activity from across the app will land here automatically."
+          />
 
           {SESSION_GROUPS.map((g) => {
             const rows = sessions.filter((s) => g.types.includes(s.session_type));

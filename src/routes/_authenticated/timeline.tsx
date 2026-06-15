@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatLapTime } from "@/lib/lap-time";
+import { TimelineFeed } from "@/components/timeline-feed";
 import {
   Flag, Timer, Wrench, Disc, CloudRain, Gauge, NotebookPen, TrendingDown, TrendingUp,
   Activity, ChevronRight, Thermometer, MapPin, ClipboardList, Sparkles,
@@ -309,6 +310,16 @@ function TimelinePage() {
             bestBySession={bestBySession}
             overallBest={overallBest === Infinity ? null : overallBest}
           />
+
+          {/* Auto activity feed */}
+          <div className="mt-4">
+            <TimelineFeed
+              eventId={activeId}
+              title="Live activity"
+              limit={100}
+              emptyHint="Activity logged across the app for this weekend will appear here automatically."
+            />
+          </div>
 
           {/* Weekend summary KPIs */}
           <SummaryKPIs

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useActiveWeekend } from "@/lib/active-weekend";
 import { useAuth } from "@/lib/auth-context";
 import { getCurrentWeather, type WeatherSnap } from "@/lib/weather";
+import { recordTimelineEvent } from "@/components/timeline-feed";
 import {
   getEngineerRecommendations,
   type EngineerResult,
@@ -30,7 +31,25 @@ export function AiEngineerPanel() {
         },
       });
     },
-    onSuccess: (r) => setResult(r),
+    onSuccess: async (r) => {
+      setResult(r);
+      if (user && activeWeekend) {
+        try {
+          await recordTimelineEvent({
+            user_id: user.id,
+            type: "ai_recommendation",
+            title: `AI Engineer · ${r.recommendations.length} recommendation${r.recommendations.length === 1 ? "" : "s"}`,
+            description: r.summary?.slice(0, 240) ?? null,
+            event_id: activeWeekend.id,
+            session_id: activeSession?.id ?? null,
+            metadata: {
+              recommendation_count: r.recommendations.length,
+              missing: r.missing,
+            },
+          });
+        } catch { /* non-blocking */ }
+      }
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "AI Engineer failed"),
   });
 
