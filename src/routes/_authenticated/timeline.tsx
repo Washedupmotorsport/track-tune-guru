@@ -311,6 +311,16 @@ function TimelinePage() {
             overallBest={overallBest === Infinity ? null : overallBest}
           />
 
+          {/* Auto activity feed */}
+          <div className="mt-4">
+            <TimelineFeed
+              eventId={activeId}
+              title="Live activity"
+              limit={100}
+              emptyHint="Activity logged across the app for this weekend will appear here automatically."
+            />
+          </div>
+
           {/* Weekend summary KPIs */}
           <SummaryKPIs
             sessions={orderedSessions}
