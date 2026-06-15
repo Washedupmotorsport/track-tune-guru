@@ -449,7 +449,7 @@ function AddChecklistItem({ onAdd }: { onAdd: (label: string) => void }) {
 }
 
 type LatestFb = {
-  description: string | null; category: string | null; severity: string | null;
+  description: string; category: string; severity: string;
   phase: string | null; corner: string | null; recorded_at: string;
 } | null;
 type LatestDeb = {
