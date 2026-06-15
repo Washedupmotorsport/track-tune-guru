@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Gauge, Wrench, ChartLine as LineChart, Flag } from "lucide-react";
 import { DISCIPLINES } from "@/lib/disciplines";
@@ -32,6 +33,10 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (user) navigate({ to: "/weekends", replace: true });
+  }, [user, navigate]);
   return (
     <div className="min-h-screen text-foreground">
       <header className="fixed top-0 inset-x-0 z-30 backdrop-blur-md bg-background/70 border-b border-border">
@@ -41,7 +46,7 @@ function Landing() {
           </Link>
           <nav className="flex items-center gap-2">
             {user ? (
-              <Link to="/engineer"><Button variant="default" size="sm">Open Cockpit</Button></Link>
+              <Link to="/weekends"><Button variant="default" size="sm">Open Command Centre</Button></Link>
             ) : (
               <>
                 <Link to="/auth"><Button variant="ghost" size="sm">Sign in</Button></Link>
@@ -80,9 +85,9 @@ function Landing() {
             Save baselines, log changes, never lose a winning setup again.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to={user ? "/engineer" : "/auth"}>
+            <Link to={user ? "/weekends" : "/auth"}>
               <Button size="lg" className="shadow-glow">
-                {user ? "Enter Cockpit" : "Start free"}
+                {user ? "Enter Command Centre" : "Start free"}
               </Button>
             </Link>
             <a href="#disciplines">
