@@ -1,4 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useIsFetching, useIsMutating } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { LogOut, Calculator, Wand as Wand2, NotebookPen, Timer, Disc, Wrench, Package, CalendarDays, Receipt, ChartBar as BarChart3, Menu, Search, Sun, Moon, Flag, TriangleAlert as AlertTriangle, HardHat, Radio, ClipboardList, FileText, MapPin, CloudRain, GitBranch, Brain, BookMarked, Sparkles, BookOpen } from "lucide-react";
@@ -162,6 +163,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               <img src={logoMre} alt="My Race Engineer" className="h-4 w-auto opacity-70 hover:opacity-100 transition-opacity" />
             </Link>
             <span>© {new Date().getFullYear()} My Race Engineer</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.15em] opacity-70">v1.0</span>
+            <SyncStatus />
           </div>
           <div className="flex items-center gap-4">
             <FooterLink to="/weekends" pathname={pathname}>Weekend</FooterLink>
@@ -171,6 +174,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             <FooterLink to="/pitwall" pathname={pathname} matches={["/pitwall", "/pitlane", "/engineer", "/track-evolution", "/racemode"]}>Pitwall</FooterLink>
           </div>
           <div className="flex items-center gap-4">
+            <a href="mailto:support@my-race-engineer.app" className="hover:text-primary transition-colors">Support</a>
+            <FooterLink to="/terms">Privacy</FooterLink>
             <FooterLink to="/terms">Terms of Service</FooterLink>
             <a
               href="https://www.facebook.com/people/My-Motorsport-engineer/61590792381151/"
@@ -354,5 +359,20 @@ function FooterLink({ to, children, pathname, matches }: { to: string; children:
       {children}
       {active && <span aria-hidden className="absolute -bottom-0.5 left-0 right-0 h-[2px] bg-primary rounded" />}
     </Link>
+  );
+}
+
+function SyncStatus() {
+  const fetching = useIsFetching();
+  const mutating = useIsMutating();
+  const busy = fetching > 0 || mutating > 0;
+  return (
+    <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.15em]">
+      <span
+        aria-hidden
+        className={`w-1.5 h-1.5 rounded-full ${busy ? "bg-primary animate-pulse" : "bg-accent"}`}
+      />
+      {busy ? "Syncing" : "Saved"}
+    </span>
   );
 }

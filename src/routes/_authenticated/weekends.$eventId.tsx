@@ -121,6 +121,34 @@ function WeekendHub() {
     },
   });
 
+  const latestFeedbackQ = useQuery({
+    queryKey: ["weekend-latest-feedback", eventId, sessionIds.join(",")],
+    enabled: sessionIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("driver_feedback")
+        .select("id, description, category, severity, phase, corner, recorded_at")
+        .in("session_id", sessionIds)
+        .order("recorded_at", { ascending: false })
+        .limit(1);
+      if (error) throw error;
+      return data?.[0] ?? null;
+    },
+  });
+
+  const latestDebriefQ = useQuery({
+    queryKey: ["weekend-latest-debrief", eventId, sessionIds.join(",")],
+    enabled: sessionIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("session_debriefs")
+        .select("id, improved, worsened, needs_work, suggested_changes, ai_summary, created_at")
+        .in("session_id", sessionIds)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (error) throw error;
+      return data?.[0] ?? null;
+    },
+  });
+
   const updateEvent = useMutation({
     mutationFn: async (patch: Partial<Evt>) => {
       const { error } = await supabase.from("calendar_events").update(patch as never).eq("id", eventId);
@@ -328,6 +356,12 @@ function WeekendHub() {
             <AddChecklistItem onAdd={(label) => updateEvent.mutate({ checklist: { ...checklist, [label]: false } })} />
           </div>
 
+          <LatestActivity
+            ai={(latestDebriefQ.data?.ai_summary as { summary?: string } | null)?.summary ?? null}
+            feedback={latestFeedbackQ.data ?? null}
+            debrief={latestDebriefQ.data ?? null}
+          />
+
           <div className="rounded-sm border border-border bg-card p-3">
             <div className="font-display text-xs font-bold uppercase tracking-[0.15em] mb-2">Quick actions</div>
             <div className="grid gap-2">
@@ -411,6 +445,60 @@ function AddChecklistItem({ onAdd }: { onAdd: (label: string) => void }) {
       <Input value={v} onChange={(e) => setV(e.target.value)} placeholder="Add task" className="h-9 text-sm" />
       <Button type="submit" size="sm" disabled={!v.trim()}><Plus className="w-4 h-4" /></Button>
     </form>
+  );
+}
+
+type LatestFb = {
+  description: string; category: string; severity: string;
+  phase: string | null; corner: string | null; recorded_at: string;
+} | null;
+type LatestDeb = {
+  improved: string | null; worsened: string | null; needs_work: string | null;
+  suggested_changes: string | null; created_at: string;
+} | null;
+
+function LatestActivity({ ai, feedback, debrief }: { ai: string | null; feedback: LatestFb; debrief: LatestDeb }) {
+  const empty = !ai && !feedback && !debrief;
+  return (
+    <div className="rounded-sm border border-border bg-card">
+      <div className="px-3 py-2 border-b border-border/60 bg-muted/20 flex items-center gap-2">
+        <Sparkles className="w-4 h-4 text-primary" />
+        <span className="font-display text-xs font-bold uppercase tracking-[0.15em]">Latest activity</span>
+      </div>
+      {empty ? (
+        <div className="px-3 py-3 text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground">
+          No AI, feedback or debrief notes yet.
+        </div>
+      ) : (
+        <div className="divide-y divide-border/60">
+          {ai && (
+            <div className="px-3 py-2">
+              <div className="font-mono text-[9px] uppercase tracking-[0.15em] text-primary mb-1">AI recommendation</div>
+              <div className="text-xs text-foreground line-clamp-3">{ai}</div>
+            </div>
+          )}
+          {feedback && (
+            <div className="px-3 py-2">
+              <div className="font-mono text-[9px] uppercase tracking-[0.15em] text-primary mb-1 flex items-center gap-2">
+                Driver feedback
+                <span className="text-muted-foreground">
+                  {[feedback.category, feedback.phase, feedback.corner, feedback.severity].filter(Boolean).join(" · ")}
+                </span>
+              </div>
+              <div className="text-xs text-foreground line-clamp-3">{feedback.description ?? "—"}</div>
+            </div>
+          )}
+          {debrief && (
+            <div className="px-3 py-2">
+              <div className="font-mono text-[9px] uppercase tracking-[0.15em] text-primary mb-1">Latest debrief</div>
+              <div className="text-xs text-foreground line-clamp-3">
+                {debrief.improved || debrief.needs_work || debrief.worsened || debrief.suggested_changes || "Debrief recorded"}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
