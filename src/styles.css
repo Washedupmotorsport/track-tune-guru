@@ -228,6 +228,140 @@
   @media (min-width: 768px) { .pb-safe-nav { padding-bottom: 0; } }
 }
 
+/* ===== MoTeC / race-engineer notebook utilities ===== */
+@layer utilities {
+  /* Technical panel: hairline border, near-black surface, faint top inset highlight */
+  .tech-panel {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.025);
+    position: relative;
+  }
+  /* Section header strip inside a tech-panel — like a MoTeC channel header */
+  .tech-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, oklch(1 0 0 / 0.02), transparent);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted-foreground);
+  }
+  .tech-panel-header > .accent-bar {
+    width: 2px;
+    height: 12px;
+    background: var(--primary);
+    border-radius: 1px;
+  }
+
+  /* Subtle telemetry grid backdrop for hero strips and data canvases */
+  .grid-backdrop {
+    background-image:
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: -1px -1px;
+  }
+
+  /* Compact data table — engineering log feel */
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--card-foreground);
+  }
+  .data-table thead th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--muted-foreground);
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+    background-color: color-mix(in oklab, var(--card) 92%, white 4%);
+    position: sticky;
+    top: 0;
+  }
+  .data-table tbody td {
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+    white-space: nowrap;
+  }
+  .data-table tbody tr:hover td {
+    background-color: color-mix(in oklab, var(--primary) 6%, transparent);
+  }
+  .data-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .data-table tbody tr:last-child td { border-bottom: 0; }
+
+  /* KPI stat block — MoTeC channel value */
+  .kpi-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) - 2px);
+    background-color: color-mix(in oklab, var(--card) 92%, black 6%);
+  }
+  .kpi-stat .kpi-label {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted-foreground);
+  }
+  .kpi-stat .kpi-value {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+  }
+  .kpi-stat.kpi-accent .kpi-value { color: var(--primary); }
+
+  /* Section eyebrow + title combo */
+  .section-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* Status dot — for live indicators */
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--primary);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 30%, transparent);
+    display: inline-block;
+  }
+  .status-dot.live {
+    animation: live-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes live-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+}
+
 /* ===== Print / engineering document export ===== */
 @media print {
   @page { size: A4; margin: 12mm 12mm 14mm 12mm; }
