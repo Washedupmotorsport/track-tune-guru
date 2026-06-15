@@ -1233,6 +1233,140 @@ export type Database = {
           },
         ]
       }
+      timeline_events: {
+        Row: {
+          created_at: string
+          debrief_id: string | null
+          description: string | null
+          event_id: string | null
+          feedback_id: string | null
+          id: string
+          lap_id: string | null
+          memory_id: string | null
+          metadata: Json
+          occurred_at: string
+          session_id: string | null
+          setup_change_id: string | null
+          setup_id: string | null
+          tire_log_id: string | null
+          tire_stint_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          debrief_id?: string | null
+          description?: string | null
+          event_id?: string | null
+          feedback_id?: string | null
+          id?: string
+          lap_id?: string | null
+          memory_id?: string | null
+          metadata?: Json
+          occurred_at?: string
+          session_id?: string | null
+          setup_change_id?: string | null
+          setup_id?: string | null
+          tire_log_id?: string | null
+          tire_stint_id?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          debrief_id?: string | null
+          description?: string | null
+          event_id?: string | null
+          feedback_id?: string | null
+          id?: string
+          lap_id?: string | null
+          memory_id?: string | null
+          metadata?: Json
+          occurred_at?: string
+          session_id?: string | null
+          setup_change_id?: string | null
+          setup_id?: string | null
+          tire_log_id?: string | null
+          tire_stint_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "timeline_events_debrief_id_fkey"
+            columns: ["debrief_id"]
+            isOneToOne: false
+            referencedRelation: "session_debriefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timeline_events_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "calendar_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timeline_events_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "driver_feedback"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timeline_events_lap_id_fkey"
+            columns: ["lap_id"]
+            isOneToOne: false
+            referencedRelation: "laps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timeline_events_memory_id_fkey"
+            columns: ["memory_id"]
+            isOneToOne: false
+            referencedRelation: "engineering_memory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timeline_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timeline_events_setup_change_id_fkey"
+            columns: ["setup_change_id"]
+            isOneToOne: false
+            referencedRelation: "setup_changes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timeline_events_setup_id_fkey"
+            columns: ["setup_id"]
+            isOneToOne: false
+            referencedRelation: "setups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timeline_events_tire_log_id_fkey"
+            columns: ["tire_log_id"]
+            isOneToOne: false
+            referencedRelation: "tire_logs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timeline_events_tire_stint_id_fkey"
+            columns: ["tire_stint_id"]
+            isOneToOne: false
+            referencedRelation: "tire_stints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tire_logs: {
         Row: {
           ambient_c: number | null
