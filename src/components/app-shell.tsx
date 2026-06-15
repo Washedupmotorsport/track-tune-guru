@@ -257,7 +257,6 @@ const ALL_NAV_GROUPS = [
       { to: "/weekends", label: "Race weekends", icon: Flag },
       { to: "/calendar", label: "Calendar",      icon: CalendarDays },
       { to: "/garage",   label: "Garage", icon: Warehouse },
-      { to: "/cars",     label: "Cars",   icon: Car },
       { to: "/tracks",   label: "Track database", icon: MapPin },
     ],
   },
