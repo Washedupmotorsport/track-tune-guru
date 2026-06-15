@@ -66,7 +66,7 @@
 
 :root {
   /* MRE brand — racing red on near-black. Light variant. */
-  --radius: 0.5rem;
+  --radius: 0.375rem;
   --background: oklch(0.97 0.003 250);
   --foreground: oklch(0.08 0.018 255); /* sunlight-legible: high contrast on light bg */
   --card: oklch(1 0 0);
@@ -107,34 +107,34 @@
 }
 
 .dark {
-  /* MRE brand — pure black with racing red, matches key art. */
-  --background: oklch(0.10 0.004 250);   /* deeper graphite for sunlight contrast */
+  /* MRE brand — MoTeC-style technical dark. */
+  --background: oklch(0.075 0.004 250);   /* near-black paddock */
   --foreground: oklch(1.00 0.000 0);       /* pure white for max sunlight readability */
-  --card: oklch(0.17 0.005 250);         /* panel */
+  --card: oklch(0.135 0.005 250);          /* darker technical panel */
   --card-foreground: oklch(0.97 0.004 250);
-  --popover: oklch(0.17 0.005 250);
+  --popover: oklch(0.14 0.005 250);
   --popover-foreground: oklch(0.96 0.005 250);
   --primary: oklch(0.66 0.248 26);          /* MRE racing red — brighter for outdoor */
   --primary-foreground: oklch(0.99 0.005 250);
-  --secondary: oklch(0.19 0.006 250);
+  --secondary: oklch(0.16 0.006 250);
   --secondary-foreground: oklch(0.96 0.005 250);
-  --muted: oklch(0.18 0.006 250);
+  --muted: oklch(0.155 0.006 250);
   --muted-foreground: oklch(0.92 0.008 250); /* sunlight: brighter secondary text */
   --accent: oklch(0.62 0.14 244);
   --accent-foreground: oklch(0.99 0.005 250);
   --destructive: oklch(0.62 0.22 27);
   --destructive-foreground: oklch(0.99 0.005 250);
-  --border: oklch(0.48 0.012 250 / 0.70);  /* sunlight: higher alpha for dark borders */
-  --input: oklch(0.30 0.008 250);
+  --border: oklch(0.42 0.010 250 / 0.55);  /* fainter, more technical hairline */
+  --input: oklch(0.24 0.008 250);
   --ring: oklch(0.62 0.248 26);
-  --grid: oklch(0.30 0.008 250 / 0.18);  /* faint telemetry grid */
-  --sidebar: oklch(0.11 0.004 250);
+  --grid: oklch(0.55 0.010 250 / 0.10);   /* fainter telemetry grid */
+  --sidebar: oklch(0.085 0.004 250);
   --sidebar-foreground: oklch(0.96 0.005 250);
   --sidebar-primary: oklch(0.62 0.248 26);
   --sidebar-primary-foreground: oklch(0.14 0.01 250);
-  --sidebar-accent: oklch(0.18 0.006 250);
+  --sidebar-accent: oklch(0.155 0.006 250);
   --sidebar-accent-foreground: oklch(0.96 0.005 250);
-  --sidebar-border: oklch(0.26 0.01 250);
+  --sidebar-border: oklch(0.22 0.01 250);
   --sidebar-ring: oklch(0.62 0.248 26);
   --chart-1: oklch(0.68 0.245 26);
   --chart-2: oklch(0.68 0.14 244);
@@ -142,8 +142,8 @@
   --chart-4: oklch(0.75 0.16 85);
   --chart-5: oklch(0.68 0.16 305);
   --gradient-hero: linear-gradient(180deg, oklch(0.20 0.01 250) 0%, oklch(0.13 0.004 250) 100%);
-  --shadow-glow: 0 0 48px -8px oklch(0.62 0.248 26 / 0.55);
-  --shadow-card: 0 1px 0 oklch(1 0 0 / 0.04) inset, 0 8px 24px -12px oklch(0 0 0 / 0.6);
+  --shadow-glow: 0 0 48px -8px oklch(0.62 0.248 26 / 0.45);
+  --shadow-card: 0 1px 0 oklch(1 0 0 / 0.03) inset, 0 1px 0 oklch(0 0 0 / 0.6);
 }
 
 @layer base {
@@ -156,8 +156,8 @@
     color: var(--color-foreground);
     font-family: "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
     font-feature-settings: "ss01" 1;
-    font-size: 15px;
-    line-height: 1.6;
+    font-size: 14px;
+    line-height: 1.5;
   }
 
   h1, h2, h3, h4, .font-display {
@@ -168,6 +168,9 @@
   }
 
   .font-mono { font-family: var(--font-mono); }
+
+  /* Tabular numerics by default in any monospace context — race engineering reflex */
+  code, kbd, samp, pre, .font-mono { font-variant-numeric: tabular-nums; }
 }
 
 @layer utilities {
