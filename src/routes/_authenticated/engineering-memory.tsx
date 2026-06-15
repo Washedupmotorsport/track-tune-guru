@@ -520,17 +520,27 @@ function BackLinks({ entry }: { entry: Entry }) {
 }
 
 function EntryEditor({
-  entry, cars, userId, defaultCarId, onDone, onCancel,
+  entry, cars, tracks, userId, defaultCarId, activeContext, onDone, onCancel,
 }: {
   entry: Entry | null;
   cars: Car[];
+  tracks: TrackLite[];
   userId: string;
   defaultCarId?: string;
+  activeContext?: {
+    eventId: string | null;
+    trackId: string | null;
+    carId: string | null;
+    sessionId: string | null;
+    tyre: string;
+    weather: string;
+    symptoms: string;
+  };
   onDone: () => void;
   onCancel: () => void;
 }) {
   const [category, setCategory] = useState<Category>(entry?.category ?? "handling");
-  const [carId, setCarId] = useState<string>(entry?.car_id ?? defaultCarId ?? cars[0]?.id ?? "");
+  const [carId, setCarId] = useState<string>(entry?.car_id ?? activeContext?.carId ?? defaultCarId ?? cars[0]?.id ?? "");
   const [title, setTitle] = useState(entry?.title ?? "");
   const [detail, setDetail] = useState(entry?.detail ?? "");
   const [conditions, setConditions] = useState(entry?.conditions ?? "");
@@ -538,6 +548,15 @@ function EntryEditor({
   const [tagsInput, setTagsInput] = useState((entry?.tags ?? []).join(", "));
   const [pinned, setPinned] = useState<boolean>(entry?.pinned ?? false);
   const [priority, setPriority] = useState<Priority>(entry?.priority ?? "monitor");
+  const [trackId, setTrackId] = useState<string>(entry?.track_id ?? activeContext?.trackId ?? "");
+  const [eventId, setEventId] = useState<string | null>(entry?.event_id ?? activeContext?.eventId ?? null);
+  const [sessionId, setSessionId] = useState<string | null>(entry?.session_id ?? activeContext?.sessionId ?? null);
+  const [tyreCompound, setTyreCompound] = useState<string>(entry?.tyre_compound ?? activeContext?.tyre ?? "");
+  const [weather, setWeather] = useState<string>(entry?.weather ?? activeContext?.weather ?? "");
+  const [symptomsInput, setSymptomsInput] = useState<string>(
+    (entry?.symptoms ?? []).join(", ") || (activeContext?.symptoms ?? "")
+  );
+  const [outcome, setOutcome] = useState<"worked" | "failed" | "mixed" | "">(entry?.outcome ?? "");
   const [saving, setSaving] = useState(false);
 
   const meta = CAT_META[category];
@@ -547,6 +566,7 @@ function EntryEditor({
     if (!title.trim()) { toast.error("Title required"); return; }
     setSaving(true);
     const tags = tagsInput.split(",").map((t) => t.trim()).filter(Boolean);
+    const symptoms = symptomsInput.split(",").map((t) => t.trim()).filter(Boolean);
     const payload = {
       car_id: carId,
       category,
@@ -557,6 +577,13 @@ function EntryEditor({
       tags,
       pinned,
       priority,
+      track_id: trackId || null,
+      event_id: eventId,
+      session_id: sessionId,
+      tyre_compound: tyreCompound.trim() || null,
+      weather: weather.trim() || null,
+      symptoms,
+      outcome: outcome || null,
     };
     try {
       if (entry) {
