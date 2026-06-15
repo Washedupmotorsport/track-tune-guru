@@ -18,6 +18,7 @@ import {
 import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
 import { WeekendTimeline } from "@/components/weekend-timeline";
+import { TimelineFeed } from "@/components/timeline-feed";
 
 export const Route = createFileRoute("/_authenticated/weekends/$eventId")({ component: WeekendHub });
 
