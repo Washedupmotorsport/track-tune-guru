@@ -698,6 +698,57 @@ function EntryEditor({
           </span>
         </label>
 
+        <div className="grid sm:grid-cols-3 gap-4">
+          <div>
+            <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Track</Label>
+            <Select value={trackId || "none"} onValueChange={(v) => setTrackId(v === "none" ? "" : v)}>
+              <SelectTrigger className="mt-1"><SelectValue placeholder="No track" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No track</SelectItem>
+                {tracks.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Tyre compound</Label>
+            <Input className="mt-1" value={tyreCompound} onChange={(e) => setTyreCompound(e.target.value)} placeholder="soft / medium / hard / wet" />
+          </div>
+          <div>
+            <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Weather</Label>
+            <Input className="mt-1" value={weather} onChange={(e) => setWeather(e.target.value)} placeholder="hot, cool, wet, drying…" />
+          </div>
+        </div>
+
+        <div>
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+            Setup symptoms <span className="text-primary">(comma separated)</span>
+          </Label>
+          <Input value={symptomsInput} onChange={(e) => setSymptomsInput(e.target.value)} className="mt-1 font-mono"
+            placeholder="understeer mid-corner, snap oversteer on exit, locking front-left" />
+        </div>
+
+        <div>
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Outcome of change</Label>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {(["worked", "failed", "mixed"] as const).map((o) => (
+              <button
+                key={o}
+                type="button"
+                onClick={() => setOutcome(outcome === o ? "" : o)}
+                className={`inline-flex items-center px-2 h-7 rounded border font-mono text-[10px] uppercase tracking-widest transition ${
+                  outcome === o
+                    ? o === "worked" ? "border-primary/60 bg-primary/10 text-primary"
+                      : o === "failed" ? "border-destructive/60 bg-destructive/10 text-destructive"
+                      : "border-accent/60 bg-accent/10 text-accent"
+                    : "border-border bg-background/40 text-muted-foreground hover:border-primary/50"
+                }`}
+              >
+                {o}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div>
           <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
             Priority
