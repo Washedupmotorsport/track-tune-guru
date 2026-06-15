@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { useActiveWeekend } from "@/lib/active-weekend";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +14,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ArrowLeft, BookOpen, Plus, Trash2, Pencil, X, Save, Pin, PinOff,
   Disc, Sliders, User, AlertTriangle, CloudRain, Gauge, Archive, ArchiveRestore, Repeat,
+  Sparkles, MapPin, Flag, FileText, Wrench, ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,6 +23,7 @@ export const Route = createFileRoute("/_authenticated/engineering-memory")({
 });
 
 type Car = { id: string; name: string };
+type TrackLite = { id: string; name: string };
 type Entry = {
   id: string;
   user_id: string;
@@ -38,6 +41,14 @@ type Entry = {
   priority: Priority;
   session_id: string | null;
   setup_id: string | null;
+  event_id: string | null;
+  track_id: string | null;
+  setup_change_id: string | null;
+  debrief_id: string | null;
+  tyre_compound: string | null;
+  weather: string | null;
+  symptoms: string[] | null;
+  outcome: "worked" | "failed" | "mixed" | null;
   created_at: string;
   updated_at: string;
 };
