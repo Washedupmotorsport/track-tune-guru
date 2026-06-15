@@ -439,6 +439,23 @@ function EngineeringMemoryPage() {
                 <Stat label="Conditions" value={e.conditions || "—"} />
               </div>
 
+              {(e.track_id || e.tyre_compound || e.weather || e.outcome || (e.symptoms?.length ?? 0) > 0) && (
+                <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-3 text-[11px] font-mono uppercase tracking-widest">
+                  <Stat label="Track" value={trackName(e.track_id)} />
+                  <Stat label="Tyre" value={e.tyre_compound || "—"} />
+                  <Stat label="Weather" value={e.weather || "—"} />
+                  <Stat label="Outcome" value={e.outcome || "—"} />
+                </div>
+              )}
+
+              {e.symptoms && e.symptoms.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {e.symptoms.map((s) => (
+                    <Badge key={s} variant="outline" className="font-mono text-[10px] border-accent/40">{s}</Badge>
+                  ))}
+                </div>
+              )}
+
               {e.tags && e.tags.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1">
                   {e.tags.map((t) => (
@@ -446,6 +463,8 @@ function EngineeringMemoryPage() {
                   ))}
                 </div>
               )}
+
+              <BackLinks entry={e} />
             </article>
           );
         })}
