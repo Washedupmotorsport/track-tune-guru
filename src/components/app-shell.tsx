@@ -163,6 +163,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               <img src={logoMre} alt="My Race Engineer" className="h-4 w-auto opacity-70 hover:opacity-100 transition-opacity" />
             </Link>
             <span>© {new Date().getFullYear()} My Race Engineer</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.15em] opacity-70">v1.0</span>
+            <SyncStatus />
           </div>
           <div className="flex items-center gap-4">
             <FooterLink to="/weekends" pathname={pathname}>Weekend</FooterLink>
@@ -172,6 +174,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             <FooterLink to="/pitwall" pathname={pathname} matches={["/pitwall", "/pitlane", "/engineer", "/track-evolution", "/racemode"]}>Pitwall</FooterLink>
           </div>
           <div className="flex items-center gap-4">
+            <a href="mailto:support@my-race-engineer.app" className="hover:text-primary transition-colors">Support</a>
+            <FooterLink to="/terms">Privacy</FooterLink>
             <FooterLink to="/terms">Terms of Service</FooterLink>
             <a
               href="https://www.facebook.com/people/My-Motorsport-engineer/61590792381151/"
