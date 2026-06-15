@@ -245,6 +245,13 @@ function WeekendHub() {
         <div className="space-y-3">
           <WeekendTimeline sessions={sessions as Parameters<typeof WeekendTimeline>[0]["sessions"]} carId={e.car_id} />
 
+          <TimelineFeed
+            eventId={eventId}
+            title="Weekend activity"
+            limit={50}
+            emptyHint="Start a session, log a setup change or driver comment — activity from across the app will land here automatically."
+          />
+
           {SESSION_GROUPS.map((g) => {
             const rows = sessions.filter((s) => g.types.includes(s.session_type));
             const groupLaps = laps.filter((l) => rows.some((r) => r.id === l.session_id));
