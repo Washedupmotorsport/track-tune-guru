@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType }
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FirstTimeCallout } from "@/components/first-time-callout";
 import { GuidedTour } from "@/components/guided-tour";
+import { AiEngineerPanel } from "@/components/ai-engineer-panel";
 
 export const Route = createFileRoute("/_authenticated/engineer")({
   head: () => ({
@@ -286,6 +287,7 @@ function EngineerCockpit() {
     <div className="space-y-4 pb-16">
       <FirstTimeCallout />
       <GuidedTour tourKey="cockpit" />
+      <AiEngineerPanel />
       {/* ENGINEERING PRIORITIES — top of screen, race-weekend triage ===== */}
       <section className="rounded-xl border border-border bg-card overflow-hidden">
         <div className={`flex items-center gap-2 px-4 py-2.5 border-b ${criticalIssues > 0 ? "bg-destructive/10 border-destructive/40" : testingIssues > 0 ? "bg-accent/10 border-accent/40" : "bg-muted/30 border-border"}`}>
