@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CloudRain, Thermometer, Wind, Activity, Gauge, Disc, AlertTriangle, Sparkles, Plus, Trash2, CloudSun, Droplets, Flame, Snowflake } from "lucide-react";
+import { CloudRain, Thermometer, Wind, Activity, Gauge, Disc, AlertTriangle, Sparkles, Plus, Trash2, CloudSun, Droplets, Flame, Snowflake, ExternalLink } from "lucide-react";
 import { getCurrentWeather } from "@/lib/weather";
 import { toast } from "sonner";
 
@@ -289,9 +289,16 @@ function TrackEvolutionPage() {
             <h2 className="font-display text-lg font-bold uppercase tracking-wider flex items-center gap-2">
               <Plus className="w-4 h-4 text-primary" /> Log snapshot
             </h2>
-            <Button variant="ghost" size="sm" onClick={pullWeather} className="text-xs">
-              <CloudSun className="w-4 h-4 mr-1" /> Auto
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="sm" onClick={pullWeather} className="text-xs">
+                <CloudSun className="w-4 h-4 mr-1" /> Auto
+              </Button>
+              <Button variant="ghost" size="sm" asChild className="text-xs px-2">
+                <a href="http://www.bom.gov.au/" target="_blank" rel="noopener noreferrer" title="Bureau of Meteorology">
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2">
