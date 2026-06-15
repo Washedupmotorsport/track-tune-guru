@@ -79,6 +79,29 @@ function notify(title: string, body: string, tag: string) {
   } catch { /* ignore */ }
 }
 
+async function getSwRegistration(): Promise<ServiceWorkerRegistration | null> {
+  if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return null;
+  try {
+    const reg = await navigator.serviceWorker.getRegistration("/sw.js");
+    return reg ?? null;
+  } catch { return null; }
+}
+
+type ScheduleItem = { key: string; when: number; title: string; body: string; url?: string };
+
+async function postSchedule(items: ScheduleItem[]) {
+  const reg = await getSwRegistration();
+  if (!reg || !reg.active) return false;
+  reg.active.postMessage({ type: "schedule-reminders", prefix: "mre:", items });
+  return true;
+}
+
+async function postClear() {
+  const reg = await getSwRegistration();
+  if (!reg || !reg.active) return;
+  reg.active.postMessage({ type: "clear-reminders", prefix: "mre:" });
+}
+
 export function ReminderProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [settings, setSettingsState] = useState<ReminderSettings>(() => loadSettings());
@@ -167,11 +190,13 @@ export function ReminderProvider({ children }: { children: ReactNode }) {
 
     if (!settings.enabled || permission !== "granted") {
       setScheduledCount(0);
+      void postClear();
       return;
     }
 
     const now = Date.now();
     let count = 0;
+    const swItems: ScheduleItem[] = [];
 
     const schedule = (key: string, when: number, title: string, body: string) => {
       const delay = when - now;
@@ -184,6 +209,7 @@ export function ReminderProvider({ children }: { children: ReactNode }) {
       }, delay);
       timeoutsRef.current.push(id);
       count++;
+      swItems.push({ key: `mre:${key}`, when, title, body });
     };
 
     for (const ev of eventsQ.data ?? []) {
@@ -215,6 +241,9 @@ export function ReminderProvider({ children }: { children: ReactNode }) {
     }
 
     setScheduledCount(count);
+    // Hand off to the service worker so notifications can still fire
+    // when the tab is closed (where the browser supports it).
+    void postSchedule(swItems);
 
     return () => {
       timeoutsRef.current.forEach((id) => window.clearTimeout(id));
