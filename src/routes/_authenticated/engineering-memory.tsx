@@ -238,6 +238,66 @@ function EngineeringMemoryPage() {
         </Button>
       </div>
 
+      {/* Relevant now — uses active weekend context */}
+      {activeWeekend && (
+        <div className="mt-6 rounded-lg border border-primary/40 bg-primary/5 p-4">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="font-mono text-[11px] uppercase tracking-widest text-primary flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5" /> Relevant to this weekend
+            </div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2 flex-wrap">
+              {activeWeekend.title && <span className="flex items-center gap-1"><Flag className="w-3 h-3" />{activeWeekend.title}</span>}
+              {activeTrack?.name && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{activeTrack.name}</span>}
+              {activeCar?.name && <span>· {activeCar.name}</span>}
+              {activeSession?.name && <span>· {activeSession.name}</span>}
+            </div>
+          </div>
+          <div className="mt-3 grid gap-2 md:grid-cols-3">
+            <Input value={contextTyre} onChange={e => setContextTyre(e.target.value)} placeholder="Tyre compound (e.g. soft)" />
+            <Input value={contextWeather} onChange={e => setContextWeather(e.target.value)} placeholder="Weather (e.g. wet, hot, cool)" />
+            <Input value={contextSymptoms} onChange={e => setContextSymptoms(e.target.value)} placeholder="Symptoms (e.g. understeer, oversteer on exit)" />
+          </div>
+          <div className="mt-3 space-y-2">
+            {relevant.length === 0 && (
+              <div className="text-xs text-muted-foreground">
+                No matching notebook entries yet. Add weather, tyre or symptom hints above, or log entries with track/tyre context to see them surface here.
+              </div>
+            )}
+            {relevant.map(({ e, reasons }) => {
+              const meta = CAT_META[e.category] ?? CAT_META.handling;
+              const Icon = meta.icon;
+              return (
+                <div key={e.id} className="rounded border border-border/70 bg-card p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest ${meta.tone}`}>
+                          <Icon className="w-3 h-3" /> {meta.label}
+                        </span>
+                        {reasons.map(r => (
+                          <Badge key={r} variant="outline" className="font-mono text-[9px] border-primary/40 text-primary">match: {r}</Badge>
+                        ))}
+                        {e.outcome && (
+                          <Badge variant="outline" className={`font-mono text-[9px] ${e.outcome === "worked" ? "border-primary/50 text-primary" : e.outcome === "failed" ? "border-destructive/50 text-destructive" : "border-border text-muted-foreground"}`}>
+                            {e.outcome}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="font-semibold mt-1 text-sm leading-tight">{e.title}</div>
+                      {e.detail && <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{e.detail}</div>}
+                      <BackLinks entry={e} />
+                    </div>
+                    <Button size="sm" variant="ghost" onClick={() => { setCreating(false); setEditing(e); }}>
+                      <Pencil className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Filters */}
       <div className="mt-6 rounded-lg border border-border bg-card p-4 grid gap-3 md:grid-cols-[1fr_auto_auto_auto]">
         <Input placeholder="Search title, detail, tags…" value={search} onChange={(e) => setSearch(e.target.value)} />
