@@ -19,6 +19,7 @@ import { ConnectionStatus } from "@/lib/offline";
 import { QuickLogFab } from "@/components/quick-log-fab";
 import { HelpButton } from "@/components/help-button";
 import { TracksideContext } from "@/components/trackside-context";
+import { ActiveWeekendSelector } from "@/components/active-weekend-selector";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
@@ -31,9 +32,14 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="h-[2px] w-full bg-primary" aria-hidden />
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
         <div className="mx-auto max-w-[1400px] px-3 md:px-4 h-12 md:h-14 grid grid-cols-[auto_1fr_auto] items-center gap-3">
-          <Link to="/" aria-label="My Race Engineer — home" className="flex items-center shrink-0">
-            <img src={logoMre} alt="My Race Engineer" className="h-7 md:h-8 w-auto" />
-          </Link>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link to="/" aria-label="My Race Engineer — home" className="flex items-center">
+              <img src={logoMre} alt="My Race Engineer" className="h-7 md:h-8 w-auto" />
+            </Link>
+            <div className="hidden md:block">
+              <ActiveWeekendSelector />
+            </div>
+          </div>
 
           {/* Trackside context strip — desktop */}
           <div className="min-w-0 flex justify-center">
