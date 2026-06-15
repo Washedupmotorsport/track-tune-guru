@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { CalendarDays, Plus, ArrowLeft, Trash2, Clock, Flag } from "lucide-react";
 import { toast } from "sonner";
+import { ReminderSettingsButton } from "@/components/reminder-settings";
 
 export const Route = createFileRoute("/_authenticated/calendar")({ component: CalendarPage });
 
@@ -96,9 +97,13 @@ function CalendarPage() {
           <h1 className="font-display text-4xl font-bold mt-1">Calendar</h1>
           <p className="text-sm text-muted-foreground mt-1">Race weekends, deadlines, workshop days.</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild><Button className="shadow-glow"><Plus className="w-4 h-4 mr-1" /> New event</Button></DialogTrigger>
-          <DialogContent>
+        <div className="flex items-center gap-2">
+          <ReminderSettingsButton />
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="shadow-glow"><Plus className="w-4 h-4 mr-1" /> New event</Button>
+            </DialogTrigger>
+            <DialogContent>
             <DialogHeader><DialogTitle>New event</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <div><Label>Title *</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Brands Hatch round 3" /></div>
@@ -130,7 +135,8 @@ function CalendarPage() {
             </div>
             <DialogFooter><Button onClick={() => create.mutate()} disabled={create.isPending}>Add event</Button></DialogFooter>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <h2 className="mt-8 font-display text-xl font-bold uppercase tracking-wider">Upcoming</h2>
