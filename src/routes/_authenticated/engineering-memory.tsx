@@ -84,6 +84,7 @@ const CAT_META = Object.fromEntries(CATEGORIES.map((c) => [c.key, c])) as Record
 function EngineeringMemoryPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { activeWeekend, activeCar, activeTrack, activeSession } = useActiveWeekend();
 
   const [carFilter, setCarFilter] = useState<string>("all");
   const [catFilter, setCatFilter] = useState<Category | "all">("all");
@@ -91,6 +92,9 @@ function EngineeringMemoryPage() {
   const [showArchived, setShowArchived] = useState(false);
   const [editing, setEditing] = useState<Entry | null>(null);
   const [creating, setCreating] = useState(false);
+  const [contextWeather, setContextWeather] = useState<string>("");
+  const [contextTyre, setContextTyre] = useState<string>("");
+  const [contextSymptoms, setContextSymptoms] = useState<string>("");
 
   const carsQ = useQuery({
     queryKey: ["cars", user?.id],
@@ -101,6 +105,17 @@ function EngineeringMemoryPage() {
     },
     enabled: !!user,
   });
+
+  const tracksQ = useQuery({
+    queryKey: ["tracks-lite", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("tracks").select("id, name").order("name");
+      if (error) throw error;
+      return (data ?? []) as TrackLite[];
+    },
+    enabled: !!user,
+  });
+  const trackName = (id: string | null) => id ? (tracksQ.data?.find(t => t.id === id)?.name ?? "—") : "—";
 
   const entriesQ = useQuery({
     queryKey: ["engineering_memory", user?.id],
@@ -117,6 +132,42 @@ function EngineeringMemoryPage() {
   });
 
   const carName = (id: string) => carsQ.data?.find((c) => c.id === id)?.name ?? "—";
+
+  // Build relevance context from active weekend + user-provided hints
+  const ctx = useMemo(() => {
+    const symptomList = contextSymptoms.split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
+    return {
+      carId: activeCar?.id ?? activeWeekend?.car_id ?? null,
+      trackId: activeTrack?.id ?? activeWeekend?.track_id ?? null,
+      tyre: contextTyre.trim().toLowerCase(),
+      weather: contextWeather.trim().toLowerCase(),
+      symptoms: symptomList,
+    };
+  }, [activeCar, activeWeekend, activeTrack, contextTyre, contextWeather, contextSymptoms]);
+
+  const relevant = useMemo(() => {
+    if (!activeWeekend) return [];
+    const list = (entriesQ.data ?? []).filter(e => e.status === "active");
+    const scored = list.map((e) => {
+      let score = 0;
+      const reasons: string[] = [];
+      if (ctx.carId && e.car_id === ctx.carId) { score += 3; reasons.push("car"); }
+      if (ctx.trackId && e.track_id === ctx.trackId) { score += 4; reasons.push("track"); }
+      if (ctx.tyre && e.tyre_compound && e.tyre_compound.toLowerCase().includes(ctx.tyre)) { score += 2; reasons.push("tyre"); }
+      if (ctx.weather && e.weather && e.weather.toLowerCase().includes(ctx.weather)) { score += 2; reasons.push("weather"); }
+      if (ctx.symptoms.length && e.symptoms?.length) {
+        const overlap = e.symptoms.filter(s => ctx.symptoms.some(q => s.toLowerCase().includes(q) || q.includes(s.toLowerCase())));
+        if (overlap.length) { score += overlap.length * 2; reasons.push(`symptom: ${overlap.join(", ")}`); }
+      }
+      // light boosts
+      if (e.pinned) score += 1;
+      if (e.priority === "critical") score += 1;
+      return { e, score, reasons };
+    }).filter(x => x.score > 0)
+      .sort((a,b) => b.score - a.score)
+      .slice(0, 8);
+    return scored;
+  }, [entriesQ.data, activeWeekend, ctx]);
 
   const filtered = useMemo(() => {
     const list = entriesQ.data ?? [];
