@@ -200,6 +200,7 @@ function MobileTabBar() {
     { to: "/tyre-setup",    label: "Tyres",    icon: Disc,  matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
     { to: "/setup-library", label: "Setup",    icon: Wand2, matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
     { to: "/pitwall",       label: "Pitwall",  icon: Radio, matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution", "/engineer"] },
+    { to: "/debrief",       label: "Debrief",  icon: ClipboardList, matches: ["/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/confidence"] },
   ] as const;
   return (
     <nav
@@ -208,7 +209,7 @@ function MobileTabBar() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="h-[2px] w-full bg-primary/70" aria-hidden />
-      <ul className="grid grid-cols-5">
+      <ul className="grid grid-cols-6">
         {items.map((it) => {
           const Icon = it.icon;
           const active = it.matches.some((m) => pathname === m || pathname.startsWith(m + "/"));
@@ -218,13 +219,13 @@ function MobileTabBar() {
                 to={it.to}
                 title={"tooltip" in it ? (it as { tooltip: string }).tooltip : undefined}
                 aria-current={active ? "page" : undefined}
-                className={`relative flex flex-col items-center justify-center gap-0.5 h-14 text-[11px] font-medium active:bg-primary/10 transition-colors ${
+                className={`relative flex flex-col items-center justify-center gap-0.5 h-14 text-[10px] font-medium active:bg-primary/10 transition-colors ${
                   active ? "text-primary font-semibold bg-primary/10" : "text-muted-foreground hover:text-primary"
                 }`}
               >
                 {active && <span aria-hidden className="absolute top-0 left-2 right-2 h-[3px] bg-primary rounded-b" />}
-                <Icon className={`w-[20px] h-[20px] ${active ? "drop-shadow-[0_0_6px_hsl(var(--primary)/0.6)]" : ""}`} />
-                <span className="font-mono uppercase tracking-[0.1em] text-[10px]">{it.label}</span>
+                <Icon className={`w-[18px] h-[18px] ${active ? "drop-shadow-[0_0_6px_hsl(var(--primary)/0.6)]" : ""}`} />
+                <span className="font-mono uppercase tracking-[0.05em] text-[9px]">{it.label}</span>
               </Link>
             </li>
           );
