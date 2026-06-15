@@ -247,7 +247,7 @@ const WORKSPACES = [
   { key: "tyres",    label: "Tyres",    icon: Disc,          to: "/tyre-setup",     matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
   { key: "setup",    label: "Setup",    icon: Wand2,         to: "/setup-library",  matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
   { key: "pitwall",  label: "Pitwall",  icon: Radio,         to: "/pitwall",        matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution", "/engineer"], tooltip: "Trackside live ops" },
-  { key: "debrief",  label: "Debrief",  icon: ClipboardList, to: "/debrief",        matches: ["/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/confidence", "/sympathy", "/philosophies", "/flags", "/corners", "/known-behaviours"], tooltip: "Driver feedback & notes" },
+  { key: "debrief",  label: "Debrief",  icon: ClipboardList, to: "/debrief",        matches: ["/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/confidence", "/sympathy", "/philosophies", "/corners", "/known-behaviours"], tooltip: "Driver feedback & notes" },
 ] as const;
 
 const ALL_NAV_GROUPS = [
@@ -304,7 +304,6 @@ const ALL_NAV_GROUPS = [
       { to: "/confidence",         label: "Driver confidence",  icon: Brain },
       { to: "/known-behaviours",   label: "Known behaviours",   icon: Sparkles },
       { to: "/philosophies",       label: "Setup notes",        icon: NotebookPen },
-      { to: "/flags",              label: "Track flags",        icon: Flag },
       { to: "/corners",            label: "Corner notes",       icon: MapPin },
     ],
   },
