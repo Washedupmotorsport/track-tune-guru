@@ -146,7 +146,7 @@ export type EngineerContext = {
   session: { id: string; name: string; session_type: string; started_at: string; weather: string | null; air_temp_c: number | null; track_temp_c: number | null; setup_id: string | null } | null;
   weather: { air_temp_c?: number; weather?: string; wind_kph?: number } | null;
   tyre: { id: string; tire_set: string; compound: string | null; hot_fl: number | null; hot_fr: number | null; hot_rl: number | null; hot_rr: number | null; recorded_at: string } | null;
-  setup: { id: string; name: string; is_baseline: boolean; setup_data: Record<string, unknown> | null; notes: string | null } | null;
+  setup: { id: string; name: string; is_baseline: boolean; setup_data: string | null; notes: string | null } | null;
   recentChanges: { id: string; summary: string; area: string; reason: string | null; expected_effect: string | null; outcome_status: string; created_at: string }[];
   driverFeedback: { id: string; description: string; severity: string; corner: string | null; category: string; recorded_at: string }[];
   debriefs: { id: string; notes: string | null; balance_issue: string | null; tyre_issue: string | null; confidence_issue: string | null; suggested_changes: string | null; needs_work: string | null; created_at: string }[];
@@ -238,7 +238,7 @@ export const getEngineerRecommendations = createServerFn({ method: "POST" })
         .select("id, name, is_baseline, setup_data, notes")
         .eq("id", session.setup_id)
         .maybeSingle();
-      if (s) setup = s as unknown as EngineerContext["setup"];
+      if (s) setup = { id: s.id, name: s.name, is_baseline: s.is_baseline, notes: s.notes, setup_data: s.setup_data ? JSON.stringify(s.setup_data) : null };
     }
     if (!setup && carId) {
       const { data: s } = await supabase
@@ -247,7 +247,10 @@ export const getEngineerRecommendations = createServerFn({ method: "POST" })
         .eq("car_id", carId)
         .order("updated_at", { ascending: false })
         .limit(1);
-      if (s && s[0]) setup = s[0] as unknown as EngineerContext["setup"];
+      if (s && s[0]) {
+        const row = s[0];
+        setup = { id: row.id, name: row.name, is_baseline: row.is_baseline, notes: row.notes, setup_data: row.setup_data ? JSON.stringify(row.setup_data) : null };
+      }
     }
 
     // ---------- Tyre log (most recent for these sessions, else latest overall for car) ----------
