@@ -469,19 +469,27 @@ export type Database = {
           conditions: string | null
           confidence: number
           created_at: string
+          debrief_id: string | null
           detail: string | null
+          event_id: string | null
           id: string
           last_observed_at: string
           occurrences: number
+          outcome: string | null
           pinned: boolean
           priority: string
           session_id: string | null
+          setup_change_id: string | null
           setup_id: string | null
           status: string
+          symptoms: string[]
           tags: string[]
           title: string
+          track_id: string | null
+          tyre_compound: string | null
           updated_at: string
           user_id: string
+          weather: string | null
         }
         Insert: {
           car_id: string
@@ -489,19 +497,27 @@ export type Database = {
           conditions?: string | null
           confidence?: number
           created_at?: string
+          debrief_id?: string | null
           detail?: string | null
+          event_id?: string | null
           id?: string
           last_observed_at?: string
           occurrences?: number
+          outcome?: string | null
           pinned?: boolean
           priority?: string
           session_id?: string | null
+          setup_change_id?: string | null
           setup_id?: string | null
           status?: string
+          symptoms?: string[]
           tags?: string[]
           title: string
+          track_id?: string | null
+          tyre_compound?: string | null
           updated_at?: string
           user_id: string
+          weather?: string | null
         }
         Update: {
           car_id?: string
@@ -509,21 +525,58 @@ export type Database = {
           conditions?: string | null
           confidence?: number
           created_at?: string
+          debrief_id?: string | null
           detail?: string | null
+          event_id?: string | null
           id?: string
           last_observed_at?: string
           occurrences?: number
+          outcome?: string | null
           pinned?: boolean
           priority?: string
           session_id?: string | null
+          setup_change_id?: string | null
           setup_id?: string | null
           status?: string
+          symptoms?: string[]
           tags?: string[]
           title?: string
+          track_id?: string | null
+          tyre_compound?: string | null
           updated_at?: string
           user_id?: string
+          weather?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "engineering_memory_debrief_id_fkey"
+            columns: ["debrief_id"]
+            isOneToOne: false
+            referencedRelation: "session_debriefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engineering_memory_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "calendar_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engineering_memory_setup_change_id_fkey"
+            columns: ["setup_change_id"]
+            isOneToOne: false
+            referencedRelation: "setup_changes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engineering_memory_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       expenses: {
         Row: {

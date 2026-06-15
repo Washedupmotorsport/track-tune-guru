@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { useActiveWeekend } from "@/lib/active-weekend";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +14,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ArrowLeft, BookOpen, Plus, Trash2, Pencil, X, Save, Pin, PinOff,
   Disc, Sliders, User, AlertTriangle, CloudRain, Gauge, Archive, ArchiveRestore, Repeat,
+  Sparkles, MapPin, Flag, FileText, Wrench, ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,6 +23,7 @@ export const Route = createFileRoute("/_authenticated/engineering-memory")({
 });
 
 type Car = { id: string; name: string };
+type TrackLite = { id: string; name: string };
 type Entry = {
   id: string;
   user_id: string;
@@ -38,6 +41,14 @@ type Entry = {
   priority: Priority;
   session_id: string | null;
   setup_id: string | null;
+  event_id: string | null;
+  track_id: string | null;
+  setup_change_id: string | null;
+  debrief_id: string | null;
+  tyre_compound: string | null;
+  weather: string | null;
+  symptoms: string[] | null;
+  outcome: "worked" | "failed" | "mixed" | null;
   created_at: string;
   updated_at: string;
 };
@@ -73,6 +84,7 @@ const CAT_META = Object.fromEntries(CATEGORIES.map((c) => [c.key, c])) as Record
 function EngineeringMemoryPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { activeWeekend, activeCar, activeTrack, activeSession } = useActiveWeekend();
 
   const [carFilter, setCarFilter] = useState<string>("all");
   const [catFilter, setCatFilter] = useState<Category | "all">("all");
@@ -80,6 +92,9 @@ function EngineeringMemoryPage() {
   const [showArchived, setShowArchived] = useState(false);
   const [editing, setEditing] = useState<Entry | null>(null);
   const [creating, setCreating] = useState(false);
+  const [contextWeather, setContextWeather] = useState<string>("");
+  const [contextTyre, setContextTyre] = useState<string>("");
+  const [contextSymptoms, setContextSymptoms] = useState<string>("");
 
   const carsQ = useQuery({
     queryKey: ["cars", user?.id],
@@ -90,6 +105,17 @@ function EngineeringMemoryPage() {
     },
     enabled: !!user,
   });
+
+  const tracksQ = useQuery({
+    queryKey: ["tracks-lite", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("tracks").select("id, name").order("name");
+      if (error) throw error;
+      return (data ?? []) as TrackLite[];
+    },
+    enabled: !!user,
+  });
+  const trackName = (id: string | null) => id ? (tracksQ.data?.find(t => t.id === id)?.name ?? "—") : "—";
 
   const entriesQ = useQuery({
     queryKey: ["engineering_memory", user?.id],
@@ -106,6 +132,42 @@ function EngineeringMemoryPage() {
   });
 
   const carName = (id: string) => carsQ.data?.find((c) => c.id === id)?.name ?? "—";
+
+  // Build relevance context from active weekend + user-provided hints
+  const ctx = useMemo(() => {
+    const symptomList = contextSymptoms.split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
+    return {
+      carId: activeCar?.id ?? activeWeekend?.car_id ?? null,
+      trackId: activeTrack?.id ?? activeWeekend?.track_id ?? null,
+      tyre: contextTyre.trim().toLowerCase(),
+      weather: contextWeather.trim().toLowerCase(),
+      symptoms: symptomList,
+    };
+  }, [activeCar, activeWeekend, activeTrack, contextTyre, contextWeather, contextSymptoms]);
+
+  const relevant = useMemo(() => {
+    if (!activeWeekend) return [];
+    const list = (entriesQ.data ?? []).filter(e => e.status === "active");
+    const scored = list.map((e) => {
+      let score = 0;
+      const reasons: string[] = [];
+      if (ctx.carId && e.car_id === ctx.carId) { score += 3; reasons.push("car"); }
+      if (ctx.trackId && e.track_id === ctx.trackId) { score += 4; reasons.push("track"); }
+      if (ctx.tyre && e.tyre_compound && e.tyre_compound.toLowerCase().includes(ctx.tyre)) { score += 2; reasons.push("tyre"); }
+      if (ctx.weather && e.weather && e.weather.toLowerCase().includes(ctx.weather)) { score += 2; reasons.push("weather"); }
+      if (ctx.symptoms.length && e.symptoms?.length) {
+        const overlap = e.symptoms.filter(s => ctx.symptoms.some(q => s.toLowerCase().includes(q) || q.includes(s.toLowerCase())));
+        if (overlap.length) { score += overlap.length * 2; reasons.push(`symptom: ${overlap.join(", ")}`); }
+      }
+      // light boosts
+      if (e.pinned) score += 1;
+      if (e.priority === "critical") score += 1;
+      return { e, score, reasons };
+    }).filter(x => x.score > 0)
+      .sort((a,b) => b.score - a.score)
+      .slice(0, 8);
+    return scored;
+  }, [entriesQ.data, activeWeekend, ctx]);
 
   const filtered = useMemo(() => {
     const list = entriesQ.data ?? [];
@@ -176,6 +238,66 @@ function EngineeringMemoryPage() {
         </Button>
       </div>
 
+      {/* Relevant now — uses active weekend context */}
+      {activeWeekend && (
+        <div className="mt-6 rounded-lg border border-primary/40 bg-primary/5 p-4">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="font-mono text-[11px] uppercase tracking-widest text-primary flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5" /> Relevant to this weekend
+            </div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2 flex-wrap">
+              {activeWeekend.title && <span className="flex items-center gap-1"><Flag className="w-3 h-3" />{activeWeekend.title}</span>}
+              {activeTrack?.name && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{activeTrack.name}</span>}
+              {activeCar?.name && <span>· {activeCar.name}</span>}
+              {activeSession?.name && <span>· {activeSession.name}</span>}
+            </div>
+          </div>
+          <div className="mt-3 grid gap-2 md:grid-cols-3">
+            <Input value={contextTyre} onChange={e => setContextTyre(e.target.value)} placeholder="Tyre compound (e.g. soft)" />
+            <Input value={contextWeather} onChange={e => setContextWeather(e.target.value)} placeholder="Weather (e.g. wet, hot, cool)" />
+            <Input value={contextSymptoms} onChange={e => setContextSymptoms(e.target.value)} placeholder="Symptoms (e.g. understeer, oversteer on exit)" />
+          </div>
+          <div className="mt-3 space-y-2">
+            {relevant.length === 0 && (
+              <div className="text-xs text-muted-foreground">
+                No matching notebook entries yet. Add weather, tyre or symptom hints above, or log entries with track/tyre context to see them surface here.
+              </div>
+            )}
+            {relevant.map(({ e, reasons }) => {
+              const meta = CAT_META[e.category] ?? CAT_META.handling;
+              const Icon = meta.icon;
+              return (
+                <div key={e.id} className="rounded border border-border/70 bg-card p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest ${meta.tone}`}>
+                          <Icon className="w-3 h-3" /> {meta.label}
+                        </span>
+                        {reasons.map(r => (
+                          <Badge key={r} variant="outline" className="font-mono text-[9px] border-primary/40 text-primary">match: {r}</Badge>
+                        ))}
+                        {e.outcome && (
+                          <Badge variant="outline" className={`font-mono text-[9px] ${e.outcome === "worked" ? "border-primary/50 text-primary" : e.outcome === "failed" ? "border-destructive/50 text-destructive" : "border-border text-muted-foreground"}`}>
+                            {e.outcome}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="font-semibold mt-1 text-sm leading-tight">{e.title}</div>
+                      {e.detail && <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{e.detail}</div>}
+                      <BackLinks entry={e} />
+                    </div>
+                    <Button size="sm" variant="ghost" onClick={() => { setCreating(false); setEditing(e); }}>
+                      <Pencil className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Filters */}
       <div className="mt-6 rounded-lg border border-border bg-card p-4 grid gap-3 md:grid-cols-[1fr_auto_auto_auto]">
         <Input placeholder="Search title, detail, tags…" value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -220,8 +342,18 @@ function EngineeringMemoryPage() {
           <EntryEditor
             entry={editing}
             cars={carsQ.data ?? []}
+            tracks={tracksQ.data ?? []}
             userId={user!.id}
             defaultCarId={carFilter !== "all" ? carFilter : undefined}
+            activeContext={{
+              eventId: activeWeekend?.id ?? null,
+              trackId: activeTrack?.id ?? activeWeekend?.track_id ?? null,
+              carId: activeCar?.id ?? activeWeekend?.car_id ?? null,
+              sessionId: activeSession?.id ?? null,
+              tyre: contextTyre,
+              weather: contextWeather,
+              symptoms: contextSymptoms,
+            }}
             onDone={() => { setCreating(false); setEditing(null); qc.invalidateQueries({ queryKey: ["engineering_memory"] }); }}
             onCancel={() => { setCreating(false); setEditing(null); }}
           />
@@ -317,6 +449,23 @@ function EngineeringMemoryPage() {
                 <Stat label="Conditions" value={e.conditions || "—"} />
               </div>
 
+              {(e.track_id || e.tyre_compound || e.weather || e.outcome || (e.symptoms?.length ?? 0) > 0) && (
+                <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-3 text-[11px] font-mono uppercase tracking-widest">
+                  <Stat label="Track" value={trackName(e.track_id)} />
+                  <Stat label="Tyre" value={e.tyre_compound || "—"} />
+                  <Stat label="Weather" value={e.weather || "—"} />
+                  <Stat label="Outcome" value={e.outcome || "—"} />
+                </div>
+              )}
+
+              {e.symptoms && e.symptoms.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {e.symptoms.map((s) => (
+                    <Badge key={s} variant="outline" className="font-mono text-[10px] border-accent/40">{s}</Badge>
+                  ))}
+                </div>
+              )}
+
               {e.tags && e.tags.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1">
                   {e.tags.map((t) => (
@@ -324,6 +473,8 @@ function EngineeringMemoryPage() {
                   ))}
                 </div>
               )}
+
+              <BackLinks entry={e} />
             </article>
           );
         })}
@@ -341,18 +492,55 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
+function BackLinks({ entry }: { entry: Entry }) {
+  const links: { to: string; params?: Record<string, string>; label: string; icon: typeof Flag }[] = [];
+  if (entry.event_id) links.push({ to: "/weekends/$eventId", params: { eventId: entry.event_id }, label: "weekend", icon: Flag });
+  if (entry.session_id) links.push({ to: "/sessions/$sessionId", params: { sessionId: entry.session_id }, label: "session", icon: FileText });
+  if (entry.setup_id) links.push({ to: "/setups/$setupId", params: { setupId: entry.setup_id }, label: "setup", icon: Wrench });
+  if (entry.setup_change_id) links.push({ to: "/iteration", label: "setup change", icon: Wrench });
+  if (entry.debrief_id) links.push({ to: "/post-debrief", label: "debrief", icon: FileText });
+  if (!links.length) return null;
+  return (
+    <div className="mt-2 flex flex-wrap gap-1.5">
+      {links.map((l, i) => {
+        const Icon = l.icon;
+        return (
+          <Link
+            key={i}
+            to={l.to as never}
+            params={l.params as never}
+            className="inline-flex items-center gap-1 px-1.5 h-5 rounded border border-border bg-background/40 hover:border-primary/50 font-mono text-[9px] uppercase tracking-widest text-muted-foreground hover:text-primary"
+          >
+            <Icon className="w-2.5 h-2.5" /> {l.label} <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
 function EntryEditor({
-  entry, cars, userId, defaultCarId, onDone, onCancel,
+  entry, cars, tracks, userId, defaultCarId, activeContext, onDone, onCancel,
 }: {
   entry: Entry | null;
   cars: Car[];
+  tracks: TrackLite[];
   userId: string;
   defaultCarId?: string;
+  activeContext?: {
+    eventId: string | null;
+    trackId: string | null;
+    carId: string | null;
+    sessionId: string | null;
+    tyre: string;
+    weather: string;
+    symptoms: string;
+  };
   onDone: () => void;
   onCancel: () => void;
 }) {
   const [category, setCategory] = useState<Category>(entry?.category ?? "handling");
-  const [carId, setCarId] = useState<string>(entry?.car_id ?? defaultCarId ?? cars[0]?.id ?? "");
+  const [carId, setCarId] = useState<string>(entry?.car_id ?? activeContext?.carId ?? defaultCarId ?? cars[0]?.id ?? "");
   const [title, setTitle] = useState(entry?.title ?? "");
   const [detail, setDetail] = useState(entry?.detail ?? "");
   const [conditions, setConditions] = useState(entry?.conditions ?? "");
@@ -360,6 +548,15 @@ function EntryEditor({
   const [tagsInput, setTagsInput] = useState((entry?.tags ?? []).join(", "));
   const [pinned, setPinned] = useState<boolean>(entry?.pinned ?? false);
   const [priority, setPriority] = useState<Priority>(entry?.priority ?? "monitor");
+  const [trackId, setTrackId] = useState<string>(entry?.track_id ?? activeContext?.trackId ?? "");
+  const [eventId, setEventId] = useState<string | null>(entry?.event_id ?? activeContext?.eventId ?? null);
+  const [sessionId, setSessionId] = useState<string | null>(entry?.session_id ?? activeContext?.sessionId ?? null);
+  const [tyreCompound, setTyreCompound] = useState<string>(entry?.tyre_compound ?? activeContext?.tyre ?? "");
+  const [weather, setWeather] = useState<string>(entry?.weather ?? activeContext?.weather ?? "");
+  const [symptomsInput, setSymptomsInput] = useState<string>(
+    (entry?.symptoms ?? []).join(", ") || (activeContext?.symptoms ?? "")
+  );
+  const [outcome, setOutcome] = useState<"worked" | "failed" | "mixed" | "">(entry?.outcome ?? "");
   const [saving, setSaving] = useState(false);
 
   const meta = CAT_META[category];
@@ -369,6 +566,7 @@ function EntryEditor({
     if (!title.trim()) { toast.error("Title required"); return; }
     setSaving(true);
     const tags = tagsInput.split(",").map((t) => t.trim()).filter(Boolean);
+    const symptoms = symptomsInput.split(",").map((t) => t.trim()).filter(Boolean);
     const payload = {
       car_id: carId,
       category,
@@ -379,6 +577,13 @@ function EntryEditor({
       tags,
       pinned,
       priority,
+      track_id: trackId || null,
+      event_id: eventId,
+      session_id: sessionId,
+      tyre_compound: tyreCompound.trim() || null,
+      weather: weather.trim() || null,
+      symptoms,
+      outcome: outcome || null,
     };
     try {
       if (entry) {
@@ -492,6 +697,57 @@ function EntryEditor({
             Pin to top of notebook
           </span>
         </label>
+
+        <div className="grid sm:grid-cols-3 gap-4">
+          <div>
+            <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Track</Label>
+            <Select value={trackId || "none"} onValueChange={(v) => setTrackId(v === "none" ? "" : v)}>
+              <SelectTrigger className="mt-1"><SelectValue placeholder="No track" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No track</SelectItem>
+                {tracks.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Tyre compound</Label>
+            <Input className="mt-1" value={tyreCompound} onChange={(e) => setTyreCompound(e.target.value)} placeholder="soft / medium / hard / wet" />
+          </div>
+          <div>
+            <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Weather</Label>
+            <Input className="mt-1" value={weather} onChange={(e) => setWeather(e.target.value)} placeholder="hot, cool, wet, drying…" />
+          </div>
+        </div>
+
+        <div>
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+            Setup symptoms <span className="text-primary">(comma separated)</span>
+          </Label>
+          <Input value={symptomsInput} onChange={(e) => setSymptomsInput(e.target.value)} className="mt-1 font-mono"
+            placeholder="understeer mid-corner, snap oversteer on exit, locking front-left" />
+        </div>
+
+        <div>
+          <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Outcome of change</Label>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {(["worked", "failed", "mixed"] as const).map((o) => (
+              <button
+                key={o}
+                type="button"
+                onClick={() => setOutcome(outcome === o ? "" : o)}
+                className={`inline-flex items-center px-2 h-7 rounded border font-mono text-[10px] uppercase tracking-widest transition ${
+                  outcome === o
+                    ? o === "worked" ? "border-primary/60 bg-primary/10 text-primary"
+                      : o === "failed" ? "border-destructive/60 bg-destructive/10 text-destructive"
+                      : "border-accent/60 bg-accent/10 text-accent"
+                    : "border-border bg-background/40 text-muted-foreground hover:border-primary/50"
+                }`}
+              >
+                {o}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div>
           <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
