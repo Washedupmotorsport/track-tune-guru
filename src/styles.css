@@ -66,7 +66,7 @@
 
 :root {
   /* MRE brand — racing red on near-black. Light variant. */
-  --radius: 0.5rem;
+  --radius: 0.375rem;
   --background: oklch(0.97 0.003 250);
   --foreground: oklch(0.08 0.018 255); /* sunlight-legible: high contrast on light bg */
   --card: oklch(1 0 0);
@@ -107,34 +107,34 @@
 }
 
 .dark {
-  /* MRE brand — pure black with racing red, matches key art. */
-  --background: oklch(0.10 0.004 250);   /* deeper graphite for sunlight contrast */
+  /* MRE brand — MoTeC-style technical dark. */
+  --background: oklch(0.075 0.004 250);   /* near-black paddock */
   --foreground: oklch(1.00 0.000 0);       /* pure white for max sunlight readability */
-  --card: oklch(0.17 0.005 250);         /* panel */
+  --card: oklch(0.135 0.005 250);          /* darker technical panel */
   --card-foreground: oklch(0.97 0.004 250);
-  --popover: oklch(0.17 0.005 250);
+  --popover: oklch(0.14 0.005 250);
   --popover-foreground: oklch(0.96 0.005 250);
   --primary: oklch(0.66 0.248 26);          /* MRE racing red — brighter for outdoor */
   --primary-foreground: oklch(0.99 0.005 250);
-  --secondary: oklch(0.19 0.006 250);
+  --secondary: oklch(0.16 0.006 250);
   --secondary-foreground: oklch(0.96 0.005 250);
-  --muted: oklch(0.18 0.006 250);
+  --muted: oklch(0.155 0.006 250);
   --muted-foreground: oklch(0.92 0.008 250); /* sunlight: brighter secondary text */
   --accent: oklch(0.62 0.14 244);
   --accent-foreground: oklch(0.99 0.005 250);
   --destructive: oklch(0.62 0.22 27);
   --destructive-foreground: oklch(0.99 0.005 250);
-  --border: oklch(0.48 0.012 250 / 0.70);  /* sunlight: higher alpha for dark borders */
-  --input: oklch(0.30 0.008 250);
+  --border: oklch(0.42 0.010 250 / 0.55);  /* fainter, more technical hairline */
+  --input: oklch(0.24 0.008 250);
   --ring: oklch(0.62 0.248 26);
-  --grid: oklch(0.30 0.008 250 / 0.18);  /* faint telemetry grid */
-  --sidebar: oklch(0.11 0.004 250);
+  --grid: oklch(0.55 0.010 250 / 0.10);   /* fainter telemetry grid */
+  --sidebar: oklch(0.085 0.004 250);
   --sidebar-foreground: oklch(0.96 0.005 250);
   --sidebar-primary: oklch(0.62 0.248 26);
   --sidebar-primary-foreground: oklch(0.14 0.01 250);
-  --sidebar-accent: oklch(0.18 0.006 250);
+  --sidebar-accent: oklch(0.155 0.006 250);
   --sidebar-accent-foreground: oklch(0.96 0.005 250);
-  --sidebar-border: oklch(0.26 0.01 250);
+  --sidebar-border: oklch(0.22 0.01 250);
   --sidebar-ring: oklch(0.62 0.248 26);
   --chart-1: oklch(0.68 0.245 26);
   --chart-2: oklch(0.68 0.14 244);
@@ -142,8 +142,8 @@
   --chart-4: oklch(0.75 0.16 85);
   --chart-5: oklch(0.68 0.16 305);
   --gradient-hero: linear-gradient(180deg, oklch(0.20 0.01 250) 0%, oklch(0.13 0.004 250) 100%);
-  --shadow-glow: 0 0 48px -8px oklch(0.62 0.248 26 / 0.55);
-  --shadow-card: 0 1px 0 oklch(1 0 0 / 0.04) inset, 0 8px 24px -12px oklch(0 0 0 / 0.6);
+  --shadow-glow: 0 0 48px -8px oklch(0.62 0.248 26 / 0.45);
+  --shadow-card: 0 1px 0 oklch(1 0 0 / 0.03) inset, 0 1px 0 oklch(0 0 0 / 0.6);
 }
 
 @layer base {
@@ -156,8 +156,8 @@
     color: var(--color-foreground);
     font-family: "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
     font-feature-settings: "ss01" 1;
-    font-size: 15px;
-    line-height: 1.6;
+    font-size: 14px;
+    line-height: 1.5;
   }
 
   h1, h2, h3, h4, .font-display {
@@ -168,6 +168,9 @@
   }
 
   .font-mono { font-family: var(--font-mono); }
+
+  /* Tabular numerics by default in any monospace context — race engineering reflex */
+  code, kbd, samp, pre, .font-mono { font-variant-numeric: tabular-nums; }
 }
 
 @layer utilities {
@@ -223,6 +226,140 @@
   /* Bottom-nav safe area for mobile pit-lane use */
   .pb-safe-nav { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4.25rem); }
   @media (min-width: 768px) { .pb-safe-nav { padding-bottom: 0; } }
+}
+
+/* ===== MoTeC / race-engineer notebook utilities ===== */
+@layer utilities {
+  /* Technical panel: hairline border, near-black surface, faint top inset highlight */
+  .tech-panel {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.025);
+    position: relative;
+  }
+  /* Section header strip inside a tech-panel — like a MoTeC channel header */
+  .tech-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, oklch(1 0 0 / 0.02), transparent);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted-foreground);
+  }
+  .tech-panel-header > .accent-bar {
+    width: 2px;
+    height: 12px;
+    background: var(--primary);
+    border-radius: 1px;
+  }
+
+  /* Subtle telemetry grid backdrop for hero strips and data canvases */
+  .grid-backdrop {
+    background-image:
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: -1px -1px;
+  }
+
+  /* Compact data table — engineering log feel */
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--card-foreground);
+  }
+  .data-table thead th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--muted-foreground);
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+    background-color: color-mix(in oklab, var(--card) 92%, white 4%);
+    position: sticky;
+    top: 0;
+  }
+  .data-table tbody td {
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+    white-space: nowrap;
+  }
+  .data-table tbody tr:hover td {
+    background-color: color-mix(in oklab, var(--primary) 6%, transparent);
+  }
+  .data-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .data-table tbody tr:last-child td { border-bottom: 0; }
+
+  /* KPI stat block — MoTeC channel value */
+  .kpi-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) - 2px);
+    background-color: color-mix(in oklab, var(--card) 92%, black 6%);
+  }
+  .kpi-stat .kpi-label {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted-foreground);
+  }
+  .kpi-stat .kpi-value {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+  }
+  .kpi-stat.kpi-accent .kpi-value { color: var(--primary); }
+
+  /* Section eyebrow + title combo */
+  .section-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* Status dot — for live indicators */
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--primary);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 30%, transparent);
+    display: inline-block;
+  }
+  .status-dot.live {
+    animation: live-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes live-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
 }
 
 /* ===== Print / engineering document export ===== */
