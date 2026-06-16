@@ -15,9 +15,13 @@ function AuthGate() {
   const navigate = useNavigate();
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
+    if (!loading && user && !user.email_confirmed_at && !user.confirmed_at) {
+      navigate({ to: "/auth", search: { pending: 1 } as never });
+    }
   }, [loading, user, navigate]);
 
-  if (loading || !user) {
+  const pendingConfirm = !!user && !user.email_confirmed_at && !user.confirmed_at;
+  if (loading || !user || pendingConfirm) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <WavingFlags className="w-16 h-16" />
