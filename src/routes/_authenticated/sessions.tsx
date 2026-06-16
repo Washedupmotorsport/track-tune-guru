@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { useActiveWeekend } from "@/lib/active-weekend";
+import { NoActiveWeekendEmpty } from "@/components/no-active-weekend-empty";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,12 +33,24 @@ const TYPES = ["practice", "qualifying", "race", "testing"];
 function SessionsPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { activeWeekend, activeCar, activeTrack } = useActiveWeekend();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     name: "", session_type: "practice", car_id: "", setup_id: "none",
     track: "", track_id: "none", driver: "", weather: "", air_temp_c: "", track_temp_c: "",
     fuel_start_l: "", notes: "",
   });
+
+  // Whenever the dialog opens, prefill from the active weekend context.
+  useEffect(() => {
+    if (!open) return;
+    setForm((f) => ({
+      ...f,
+      car_id: f.car_id || activeCar?.id || activeWeekend?.car_id || "",
+      track_id: f.track_id !== "none" ? f.track_id : (activeTrack?.id || activeWeekend?.track_id || "none"),
+      track: f.track || activeTrack?.name || activeWeekend?.track || "",
+    }));
+  }, [open, activeCar, activeWeekend, activeTrack]);
 
   const carsQ = useQuery({
     queryKey: ["cars-min", user?.id],
@@ -112,6 +126,7 @@ function SessionsPage() {
         track_temp_c: form.track_temp_c ? Number(form.track_temp_c) : null,
         fuel_start_l: form.fuel_start_l ? Number(form.fuel_start_l) : null,
         notes: form.notes || null,
+        event_id: activeWeekend?.id ?? null,
       });
       if (error) throw error;
     },
@@ -138,11 +153,14 @@ function SessionsPage() {
             <Timer className="w-3 h-3" /> Trackside
           </div>
           <h1 className="font-display text-4xl font-bold mt-1">Sessions</h1>
-          <p className="text-sm text-muted-foreground mt-1">Group laps, weather, fuel and driver feedback by track session.</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Group laps, weather, fuel and driver feedback by track session.
+            {activeWeekend && <> Sessions you create are attached to <span className="text-primary">{activeWeekend.title}</span>.</>}
+          </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="shadow-glow"><Plus className="w-4 h-4 mr-1" /> New session</Button>
+            <Button className="shadow-glow" disabled={!activeWeekend}><Plus className="w-4 h-4 mr-1" /> New session</Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader><DialogTitle>New session</DialogTitle></DialogHeader>
