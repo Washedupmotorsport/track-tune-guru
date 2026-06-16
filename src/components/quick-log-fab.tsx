@@ -15,7 +15,6 @@ export function QuickLogFab() {
   if (pathname === "/" || pathname.startsWith("/auth") || pathname.startsWith("/share") || pathname.startsWith("/terms")) return null;
 
   const actions = [
-    { to: "/engineering-memory", label: "Flag CRITICAL", icon: AlertTriangle, tone: "warn" },
     { to: "/tyre-setup",  label: "Tyre pressures", icon: Gauge,         tone: "primary" },
     { to: "/sessions",    label: "New lap",        icon: Timer,         tone: "primary" },
     { to: "/tires",       label: "Tyre log",       icon: Disc,          tone: "default" },
@@ -46,17 +45,45 @@ export function QuickLogFab() {
               Tap to jump · single-handed
             </p>
           </DrawerHeader>
-          <div className="grid grid-cols-2 gap-2 p-4 pt-0 pb-6">
-            <button
-              type="button"
-              onClick={flagCritical}
-              className="flex flex-col items-center justify-center gap-2 h-24 rounded-md border-[1.5px] active:scale-[0.98] transition border-destructive/50 bg-destructive/10 text-destructive"
-            >
-              <ShieldAlert className="w-7 h-7" />
-              <span className="font-mono text-[11px] uppercase tracking-widest text-center leading-tight px-1">
-                Flag issue → Critical
-              </span>
-            </button>
+          {flagMode ? (
+            <div className="flex flex-col gap-3 p-4">
+              <p className="font-mono text-xs uppercase tracking-widest text-destructive">Flag critical issue</p>
+              <input
+                autoFocus
+                value={flagTitle}
+                onChange={e => setFlagTitle(e.target.value)}
+                placeholder="Describe the issue…"
+                className="w-full h-12 rounded-md border-2 border-destructive/50 bg-background px-3 text-base font-mono focus:outline-none focus:border-destructive"
+              />
+              <button
+                onClick={async () => {
+                  if (!flagTitle.trim() || !user?.id) return;
+                  const { error } = await supabase.from("engineering_memory" as never).insert({
+                    user_id: user.id, title: flagTitle.trim(), priority: "critical",
+                    status: "active", category: "handling", confidence: 5, pinned: true, occurrences: 1,
+                  } as never);
+                  if (error) { toast.error(error.message); return; }
+                  toast.success("Critical issue flagged");
+                  setFlagTitle(""); setFlagMode(false); setOpen(false);
+                }}
+                className="h-14 w-full rounded-md bg-destructive text-destructive-foreground font-mono text-sm uppercase tracking-widest"
+              >
+                Log critical
+              </button>
+              <button onClick={() => setFlagMode(false)} className="text-xs text-muted-foreground text-center">Cancel</button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2 p-4 pt-0 pb-6">
+              <button
+                type="button"
+                onClick={() => setFlagMode(true)}
+                className="flex flex-col items-center justify-center gap-2 h-24 rounded-md border-[1.5px] active:scale-[0.98] transition border-destructive/50 bg-destructive/10 text-destructive"
+              >
+                <ShieldAlert className="w-7 h-7" />
+                <span className="font-mono text-[11px] uppercase tracking-widest text-center leading-tight px-1">
+                  Flag issue → Critical
+                </span>
+              </button>
             {actions.map((a) => {
               const Icon = a.icon;
               const tone =
