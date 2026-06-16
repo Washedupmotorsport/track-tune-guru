@@ -66,16 +66,6 @@ export const MANUAL_SECTIONS: ManualSection[] = [
     pitfalls: ["Don't forget to start the timer when the car crosses the line."],
   },
   {
-    id: "pit-lane",
-    title: "Pit Lane mode",
-    group: "Race Weekend",
-    route: "/race-mode",
-    summary:
-      "Pit-lane-friendly big-button view with stopwatch, last three laps and quick incident buttons.",
-    whenToUse: "When you're standing in the pit with a phone, not a laptop.",
-    keyActions: ["LAP button captures the current lap.", "Hold-to-stop avoids accidental taps."],
-  },
-  {
     id: "track-evolution",
     title: "Track Evolution",
     group: "Race Weekend",
