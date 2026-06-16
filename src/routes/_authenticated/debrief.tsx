@@ -390,9 +390,8 @@ function EntryDialog({ onClose, cars, sessions, setups, userId, onSaved }: {
   defaultCarId?: string | null;
   defaultSessionId?: string | null;
 }) {
-  // see signature; defaults pulled from props
-}
-function _EntryDialogImpl() {}
+  const defaultCar = (arguments[0] as { defaultCarId?: string | null }).defaultCarId ?? cars[0]?.id ?? "";
+  const defaultSession = (arguments[0] as { defaultSessionId?: string | null }).defaultSessionId ?? "";
   const [form, setForm] = useState({
     car_id: defaultCar,
     session_id: "" as string,
