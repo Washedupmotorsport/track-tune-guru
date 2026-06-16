@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { useActiveWeekend } from "@/lib/active-weekend";
@@ -45,12 +45,14 @@ function SetupLibrary() {
   const { user } = useAuth();
   const { activeCar, activeTrack, activeWeekend } = useActiveWeekend();
   const [carId, setCarId] = useState<string>("all");
-  // Bias the car filter to the active car on first load.
-  const initedRef = useState<{ done: boolean }>({ done: false })[0];
-  if (!initedRef.done && activeCar?.id) {
-    initedRef.done = true;
-    setCarId(activeCar.id);
-  }
+  const initedRef = useRef(false);
+  useEffect(() => {
+    if (initedRef.current) return;
+    if (activeCar?.id) {
+      initedRef.current = true;
+      setCarId(activeCar.id);
+    }
+  }, [activeCar]);
   const [preset, setPreset] = useState<string>("all");
   const [search, setSearch] = useState("");
 
