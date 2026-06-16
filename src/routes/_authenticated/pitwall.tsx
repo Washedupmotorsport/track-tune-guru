@@ -240,10 +240,10 @@ function PitWallPage() {
         <NoActiveWeekendEmpty hint="Pit wall locks onto your active race weekend. Pick or create one to see live data." />
       )}
       {activeWeekend && (
-        <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
-          <span className="text-primary">Active:</span>
-          <span className="text-foreground truncate">{activeWeekend.title}</span>
-          {activeSession && <><span className="opacity-50">·</span><span>{activeSession.name}</span></>}
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground min-w-0">
+          <span className="text-primary shrink-0">Active:</span>
+          <span className="text-foreground truncate max-w-full">{activeWeekend.title}</span>
+          {activeSession && <><span className="opacity-50">·</span><span className="truncate max-w-full">{activeSession.name}</span></>}
         </div>
       )}
 
@@ -253,8 +253,8 @@ function PitWallPage() {
 
       {/* Pit-wall header strip */}
       <div className="border border-border bg-card/60 rounded-md">
-        <div className="flex items-center justify-between px-3 py-2 border-b border-border">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-2 flex-wrap px-3 py-2 border-b border-border">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="flex items-center gap-2">
               <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
               <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">Pit wall · Live</span>
@@ -263,7 +263,7 @@ function PitWallPage() {
               {new Date(now).toISOString().slice(11, 19)} UTC
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Car</span>
             <select
               value={carId}

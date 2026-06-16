@@ -159,32 +159,32 @@ function DebriefPage() {
 
   return (
     <div className="space-y-4">
-      <header className="flex items-center justify-between gap-3 flex-wrap">
-        <div>
+      <header className="flex items-start justify-between gap-3 flex-wrap">
+        <div className="min-w-0 flex-1">
           <h1 className="font-mono uppercase tracking-[0.2em] text-primary text-xs">Driver debrief</h1>
           <p className="text-foreground text-xl font-semibold">Structured feedback</p>
           <p className="text-muted-foreground text-xs font-mono mt-1">
             Capture corner-by-corner notes. Convert observations into setup actions.
           </p>
           {activeWeekend ? (
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
-              <span className="text-primary">Active:</span>
-              <span className="text-foreground truncate">{activeWeekend.title}</span>
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground min-w-0">
+              <span className="text-primary shrink-0">Active:</span>
+              <span className="text-foreground truncate max-w-full">{activeWeekend.title}</span>
               {activeSession?.name && (
                 <>
                   <span className="opacity-50">·</span>
-                  <span>{activeSession.name}</span>
+                  <span className="truncate max-w-full">{activeSession.name}</span>
                 </>
               )}
               {!activeSession && (
-                <span className="text-accent">no active session — entries will attach to weekend only</span>
+                <span className="text-accent normal-case tracking-normal">no active session — entries attach to weekend only</span>
               )}
             </div>
           ) : null}
         </div>
         <button
           onClick={() => setOpen(true)}
-          className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-3 py-2 rounded-md text-xs font-mono uppercase tracking-widest hover:opacity-90"
+          className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-3 py-2 rounded-md text-xs font-mono uppercase tracking-widest hover:opacity-90 shrink-0"
         >
           <Plus className="w-4 h-4" /> New entry
         </button>

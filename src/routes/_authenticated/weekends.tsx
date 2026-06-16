@@ -56,11 +56,11 @@ function WeekendsPage() {
   return (
     <div>
       <div className="flex items-end justify-between flex-wrap gap-4">
-        <div>
+        <div className="min-w-0">
           <div className="font-mono text-xs uppercase tracking-[0.15em] text-primary flex items-center gap-1">
             <Flag className="w-3 h-3" /> Race control
           </div>
-          <h1 className="font-display text-4xl font-bold mt-1 uppercase tracking-tight">Race Weekends</h1>
+          <h1 className="font-display text-3xl sm:text-4xl font-bold mt-1 uppercase tracking-tight">Race Weekends</h1>
           <p className="text-sm text-muted-foreground mt-1">Practice, qualifying, sprint and endurance — managed end to end.</p>
         </div>
         <Link to="/calendar" className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground hover:text-primary inline-flex items-center gap-1">

@@ -226,7 +226,7 @@ function TyreSetupPage() {
 
       {/* STICKY CHIP ROW */}
       <div className="sticky top-0 z-20 -mx-4 px-4 py-2 bg-background/95 backdrop-blur-md border-b border-border mb-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             type="button"
             onClick={cycleCompound}
@@ -248,7 +248,7 @@ function TyreSetupPage() {
           >
             Set {setNumber}
           </button>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2 flex-wrap">
             <Button onClick={downloadReport} disabled={!recommendation} size="sm" variant="outline" className="h-9">
               <Download className="w-3.5 h-3.5 mr-1.5" /> PDF
             </Button>
@@ -256,7 +256,7 @@ function TyreSetupPage() {
               onClick={() => saveLog.mutate()}
               disabled={saveLog.isPending || !activeCar?.id}
               size="sm"
-              className="h-9 ml-2"
+              className="h-9"
               title={!activeCar?.id ? "Pick an active weekend with a car to log tyres" : "Save tyre log to active session"}
             >
               {saveLog.isPending ? "Saving…" : "Save log"}
@@ -266,11 +266,11 @@ function TyreSetupPage() {
       </div>
 
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
+        <div className="min-w-0">
           <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
             <Disc className="w-3 h-3" /> Baseline
           </div>
-          <h1 className="font-display text-4xl font-bold mt-1">Tyre Setup</h1>
+          <h1 className="font-display text-3xl sm:text-4xl font-bold mt-1">Tyre Setup</h1>
           <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
             Pick compound, enter car load and track temp, optionally log your current cold pressures.
             You get a recommended cold-set baseline plus the hot window to aim for.
