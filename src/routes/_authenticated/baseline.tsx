@@ -15,17 +15,33 @@ import type { DisciplineId } from "@/lib/disciplines";
 import { DISCIPLINES } from "@/lib/disciplines";
 import { useUnits } from "@/lib/units";
 import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
+import { useActiveWeekend } from "@/lib/active-weekend";
 
 export const Route = createFileRoute("/_authenticated/baseline")({
   component: BaselinePage,
 });
 
 type Car = { id: string; name: string; discipline: string };
+type Track = {
+  id: string;
+  name: string;
+  country: string | null;
+  length_m: number | null;
+  corner_count: number | null;
+  layout_notes: string | null;
+  gearing_notes: string | null;
+  brake_bias_start: string | null;
+  tyre_pressure_notes: string | null;
+  camber_toe_notes: string | null;
+  setup_tips: string | null;
+  weather_sensitivity: string | null;
+};
 
 function BaselinePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const units = useUnits();
+  const { activeTrack } = useActiveWeekend();
 
   const carsQ = useQuery({
     queryKey: ["cars", user?.id],
@@ -37,7 +53,21 @@ function BaselinePage() {
     enabled: !!user,
   });
 
+  const tracksQ = useQuery({
+    queryKey: ["tracks-baseline"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tracks")
+        .select("id,name,country,length_m,corner_count,layout_notes,gearing_notes,brake_bias_start,tyre_pressure_notes,camber_toe_notes,setup_tips,weather_sensitivity")
+        .order("name");
+      if (error) throw error;
+      return data as Track[];
+    },
+    enabled: !!user,
+  });
+
   const [carId, setCarId] = useState<string>("");
+  const [trackId, setTrackId] = useState<string>("");
   const [discipline, setDiscipline] = useState<DisciplineId>("circuit");
   const [drivetrain, setDrivetrain] = useState<Drivetrain>("RWD");
   const [weightKg, setWeightKg] = useState("1300");
@@ -74,8 +104,14 @@ function BaselinePage() {
     if (c) setDiscipline(c.discipline as DisciplineId);
   }, [carId, carsQ.data]);
 
+  // Default to active track when available
+  useEffect(() => {
+    if (!trackId && activeTrack?.id) setTrackId(activeTrack.id);
+  }, [activeTrack?.id, trackId]);
+
   const car = carsQ.data?.find((c) => c.id === carId) ?? null;
   const isOwner = car && user && car.user_id === user.id;
+  const track = tracksQ.data?.find((t) => t.id === trackId) ?? null;
 
   const input: BaselineInput = useMemo(() => ({
     discipline,
@@ -89,7 +125,26 @@ function BaselinePage() {
     aero,
   }), [discipline, drivetrain, weightKg, frontBiasPct, tire, surface, grip, ambientC, aero]);
 
-  const { rows, setupData } = useMemo(() => generateBaseline(input), [input]);
+  const generated = useMemo(() => generateBaseline(input), [input]);
+
+  // Apply track-specific overrides where we can parse a usable number.
+  const { rows, setupData } = useMemo(() => {
+    if (!track) return generated;
+    const rows = generated.rows.map((r) => ({ ...r }));
+    const setupData = { ...generated.setupData };
+    if (track.brake_bias_start) {
+      const m = track.brake_bias_start.match(/(\d{2}(?:\.\d+)?)/);
+      if (m) {
+        const v = Math.min(80, Math.max(40, parseFloat(m[1])));
+        const i = rows.findIndex((r) => r.key === "brake_bias");
+        if (i >= 0) {
+          rows[i] = { ...rows[i], value: String(Math.round(v)), rationale: `Track suggestion (${track.name})` };
+          setupData.brake_bias = String(Math.round(v));
+        }
+      }
+    }
+    return { rows, setupData };
+  }, [generated, track]);
 
   const save = useMutation({
     mutationFn: async () => {
@@ -100,10 +155,10 @@ function BaselinePage() {
         car_id: carId,
         name,
         discipline,
-        track: null,
+        track: track?.name ?? null,
         conditions: `${ambientC}°C · ${surface} · ${grip} grip · ${tire}`,
         setup_data: setupData,
-        notes: `Generated baseline for ${drivetrain} ${weightKg}kg, ${frontBiasPct}% F bias.`,
+        notes: `Generated baseline for ${drivetrain} ${weightKg}kg, ${frontBiasPct}% F bias${track ? ` at ${track.name}` : ""}.`,
       }).select().single();
       if (error) throw error;
       return data;
@@ -141,6 +196,23 @@ function BaselinePage() {
                 <SelectContent>
                   {(carsQ.data ?? []).map((c) => (
                     <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="col-span-2">
+              <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+                Track <span className="text-muted-foreground/60 normal-case">(optional — applies track-specific tips)</span>
+              </Label>
+              <Select value={trackId || "__none"} onValueChange={(v) => setTrackId(v === "__none" ? "" : v)}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="No track" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none">No track</SelectItem>
+                  {(tracksQ.data ?? []).map((t) => (
+                    <SelectItem key={t.id} value={t.id}>
+                      {t.name}{t.country ? ` · ${t.country}` : ""}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -185,6 +257,27 @@ function BaselinePage() {
               <Switch checked={aero} onCheckedChange={setAero} />
             </div>
           </div>
+
+          {track && (
+            <div className="mt-5 rounded-md border border-border/70 bg-muted/30 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="font-display text-sm font-bold uppercase tracking-wider">{track.name}</div>
+                <div className="text-[11px] font-mono text-muted-foreground">
+                  {track.length_m ? `${(track.length_m / 1000).toFixed(2)} km` : ""}
+                  {track.corner_count ? ` · ${track.corner_count} corners` : ""}
+                </div>
+              </div>
+              <div className="mt-3 space-y-2 text-xs">
+                <TrackNote label="Layout" value={track.layout_notes} />
+                <TrackNote label="Gearing" value={track.gearing_notes} />
+                <TrackNote label="Brake bias" value={track.brake_bias_start} />
+                <TrackNote label="Tyre pressures" value={track.tyre_pressure_notes} />
+                <TrackNote label="Camber / toe" value={track.camber_toe_notes} />
+                <TrackNote label="Setup tips" value={track.setup_tips} />
+                <TrackNote label="Weather sensitivity" value={track.weather_sensitivity} />
+              </div>
+            </div>
+          )}
         </Section>
 
         <Section title="Generated baseline">
