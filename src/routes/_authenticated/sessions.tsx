@@ -232,6 +232,9 @@ function SessionsPage() {
       </div>
 
       <div className="mt-6 space-y-2">
+        {!activeWeekend && (
+          <NoActiveWeekendEmpty hint="No active weekend. Create or pick one to attach new sessions to it." />
+        )}
         {sessionsQ.isLoading && <div className="text-sm text-muted-foreground">Loading...</div>}
         {!sessionsQ.isLoading && (sessionsQ.data ?? []).length === 0 && (
           <div className="rounded-lg border border-dashed border-border p-6 text-center">
