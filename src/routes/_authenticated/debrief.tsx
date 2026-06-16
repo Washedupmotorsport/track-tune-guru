@@ -5,7 +5,6 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { useActiveWeekend } from "@/lib/active-weekend";
-import { NoActiveWeekendEmpty } from "@/components/no-active-weekend-empty";
 import { toast } from "sonner";
 import {
   ClipboardList, Plus, Filter, MessageSquare, Wand2, TrendingUp,
@@ -102,10 +101,17 @@ function DebriefPage() {
   });
 
   // Bias filters toward active context on first load.
-  useState(() => {
-    if (activeCar?.id) setFilter((f) => ({ ...f, car: activeCar.id }));
-    if (activeSession?.id) setFilter((f) => ({ ...f, session: activeSession.id }));
-  });
+  const biasedRef = useState(false);
+  if (!biasedRef[0] && (activeCar?.id || activeSession?.id)) {
+    biasedRef[1](true);
+    if (activeCar?.id || activeSession?.id) {
+      setFilter((f) => ({
+        ...f,
+        car: activeCar?.id ?? f.car,
+        session: activeSession?.id ?? f.session,
+      }));
+    }
+  }
 
   const feedbackQ = useQuery({
     queryKey: ["driver-feedback", user?.id, filter],
