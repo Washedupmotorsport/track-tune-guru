@@ -29,6 +29,7 @@ import { Route as AuthenticatedSympathyRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSetupLibraryRouteImport } from './routes/_authenticated/setup-library'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedRacemodeRouteImport } from './routes/_authenticated/racemode'
 import { Route as AuthenticatedRaceModeRouteImport } from './routes/_authenticated/race-mode'
 import { Route as AuthenticatedPostDebriefRouteImport } from './routes/_authenticated/post-debrief'
 import { Route as AuthenticatedPhilosophiesRouteImport } from './routes/_authenticated/philosophies'
@@ -160,6 +161,11 @@ const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedRacemodeRoute = AuthenticatedRacemodeRouteImport.update({
+  id: '/racemode',
+  path: '/racemode',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedRaceModeRoute = AuthenticatedRaceModeRouteImport.update({
@@ -354,6 +360,7 @@ export interface FileRoutesByFullPath {
   '/philosophies': typeof AuthenticatedPhilosophiesRoute
   '/post-debrief': typeof AuthenticatedPostDebriefRoute
   '/race-mode': typeof AuthenticatedRaceModeRoute
+  '/racemode': typeof AuthenticatedRacemodeRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/setup-library': typeof AuthenticatedSetupLibraryRoute
@@ -405,6 +412,7 @@ export interface FileRoutesByTo {
   '/philosophies': typeof AuthenticatedPhilosophiesRoute
   '/post-debrief': typeof AuthenticatedPostDebriefRoute
   '/race-mode': typeof AuthenticatedRaceModeRoute
+  '/racemode': typeof AuthenticatedRacemodeRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/setup-library': typeof AuthenticatedSetupLibraryRoute
@@ -458,6 +466,7 @@ export interface FileRoutesById {
   '/_authenticated/philosophies': typeof AuthenticatedPhilosophiesRoute
   '/_authenticated/post-debrief': typeof AuthenticatedPostDebriefRoute
   '/_authenticated/race-mode': typeof AuthenticatedRaceModeRoute
+  '/_authenticated/racemode': typeof AuthenticatedRacemodeRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/_authenticated/setup-library': typeof AuthenticatedSetupLibraryRoute
@@ -511,6 +520,7 @@ export interface FileRouteTypes {
     | '/philosophies'
     | '/post-debrief'
     | '/race-mode'
+    | '/racemode'
     | '/reports'
     | '/sessions'
     | '/setup-library'
@@ -562,6 +572,7 @@ export interface FileRouteTypes {
     | '/philosophies'
     | '/post-debrief'
     | '/race-mode'
+    | '/racemode'
     | '/reports'
     | '/sessions'
     | '/setup-library'
@@ -614,6 +625,7 @@ export interface FileRouteTypes {
     | '/_authenticated/philosophies'
     | '/_authenticated/post-debrief'
     | '/_authenticated/race-mode'
+    | '/_authenticated/racemode'
     | '/_authenticated/reports'
     | '/_authenticated/sessions'
     | '/_authenticated/setup-library'
@@ -787,6 +799,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/racemode': {
+      id: '/_authenticated/racemode'
+      path: '/racemode'
+      fullPath: '/racemode'
+      preLoaderRoute: typeof AuthenticatedRacemodeRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/race-mode': {
@@ -1068,6 +1087,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedPhilosophiesRoute: typeof AuthenticatedPhilosophiesRoute
   AuthenticatedPostDebriefRoute: typeof AuthenticatedPostDebriefRoute
   AuthenticatedRaceModeRoute: typeof AuthenticatedRaceModeRoute
+  AuthenticatedRacemodeRoute: typeof AuthenticatedRacemodeRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRouteWithChildren
   AuthenticatedSetupLibraryRoute: typeof AuthenticatedSetupLibraryRoute
@@ -1110,6 +1130,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedPhilosophiesRoute: AuthenticatedPhilosophiesRoute,
   AuthenticatedPostDebriefRoute: AuthenticatedPostDebriefRoute,
   AuthenticatedRaceModeRoute: AuthenticatedRaceModeRoute,
+  AuthenticatedRacemodeRoute: AuthenticatedRacemodeRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRouteWithChildren,
   AuthenticatedSetupLibraryRoute: AuthenticatedSetupLibraryRoute,
