@@ -110,31 +110,86 @@ function AuthPage() {
             </>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-3">
-            {mode === "signup" && (
-              <div>
-                <Label htmlFor="name">Driver name</Label>
-                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="A. Senna" />
+          {mode === "reset" ? (
+            resetSent ? (
+              <div className="mt-6 space-y-4">
+                <p className="text-sm text-muted-foreground">Check your email for a reset link.</p>
+                <button
+                  type="button"
+                  onClick={() => { setMode("signin"); setResetSent(false); }}
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Back to sign in
+                </button>
               </div>
-            )}
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
-            </div>
-            <Button type="submit" className="w-full" disabled={busy}>
-              {busy && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              {mode === "signin" ? "Sign in" : "Create account"}
-            </Button>
-          </form>
+            ) : (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!email.trim()) return;
+                  setBusy(true);
+                  const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+                    redirectTo: window.location.origin + "/auth",
+                  });
+                  setBusy(false);
+                  if (error) { toast.error(error.message); return; }
+                  setResetSent(true);
+                }}
+                className="space-y-3"
+              >
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                </div>
+                <Button type="submit" className="w-full" disabled={busy}>
+                  {busy && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  Send reset link
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => setMode("signin")}
+                  className="block w-full text-center text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Back to sign in
+                </button>
+              </form>
+            )
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-3">
+              {mode === "signup" && (
+                <div>
+                  <Label htmlFor="name">Driver name</Label>
+                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="A. Senna" />
+                </div>
+              )}
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              </div>
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+              </div>
+              <Button type="submit" className="w-full" disabled={busy}>
+                {busy && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {mode === "signin" ? "Sign in" : "Create account"}
+              </Button>
+            </form>
+          )}
 
-          <button type="button" onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-            className="mt-4 text-sm text-muted-foreground hover:text-primary transition-colors">
-            {mode === "signin" ? "Need an account? Sign up" : "Already have an account? Sign in"}
-          </button>
+          {mode === "signin" && (
+            <button type="button" onClick={() => setMode("reset")}
+              className="mt-4 block text-sm text-muted-foreground hover:text-primary transition-colors">
+              Forgot password?
+            </button>
+          )}
+
+          {mode !== "reset" && (
+            <button type="button" onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+              className="mt-4 text-sm text-muted-foreground hover:text-primary transition-colors">
+              {mode === "signin" ? "Need an account? Sign up" : "Already have an account? Sign in"}
+            </button>
+          )}
 
           <div className="mt-6 pt-4 border-t border-border text-xs text-muted-foreground flex items-center gap-3">
             <Link to="/terms" className="hover:text-primary transition-colors">Terms</Link>
