@@ -300,6 +300,9 @@ function EngineerCockpit() {
     <div className="space-y-4 pb-16">
       <FirstTimeCallout />
       <GuidedTour tourKey="cockpit" />
+      {!activeWeekend && (
+        <NoActiveWeekendEmpty hint="Cockpit follows your active race weekend. Pick or create one to populate the panels." />
+      )}
       <AiEngineerPanel />
       {/* ENGINEERING PRIORITIES — top of screen, race-weekend triage ===== */}
       <section className="rounded-xl border border-border bg-card overflow-hidden">
