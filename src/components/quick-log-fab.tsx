@@ -107,6 +107,7 @@ export function QuickLogFab() {
               );
             })}
           </div>
+        )}
         </DrawerContent>
       </Drawer>
     </>
