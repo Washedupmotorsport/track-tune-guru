@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { useActiveWeekend } from "@/lib/active-weekend";
+import { NoActiveWeekendEmpty } from "@/components/no-active-weekend-empty";
 import { toast } from "sonner";
 import {
   ClipboardList, Plus, Filter, MessageSquare, Wand2, TrendingUp,
@@ -63,6 +65,7 @@ const formSchema = z.object({
 function DebriefPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { activeWeekend, activeCar, activeSession } = useActiveWeekend();
 
   const carsQ = useQuery({
     queryKey: ["debrief-cars", user?.id],
@@ -96,6 +99,12 @@ function DebriefPage() {
 
   const [filter, setFilter] = useState<{ car: string; session: string; category: string }>({
     car: "all", session: "all", category: "all",
+  });
+
+  // Bias filters toward active context on first load.
+  useState(() => {
+    if (activeCar?.id) setFilter((f) => ({ ...f, car: activeCar.id }));
+    if (activeSession?.id) setFilter((f) => ({ ...f, session: activeSession.id }));
   });
 
   const feedbackQ = useQuery({
@@ -251,6 +260,8 @@ function DebriefPage() {
           sessions={sessions}
           setups={setupsQ.data ?? []}
           userId={user!.id}
+          defaultCarId={activeCar?.id ?? activeWeekend?.car_id ?? null}
+          defaultSessionId={activeSession?.id ?? null}
           onSaved={() => qc.invalidateQueries({ queryKey: ["driver-feedback"] })}
         />
       )}
