@@ -89,8 +89,6 @@ export function QuickLogFab() {
               const tone =
                 a.tone === "primary"
                   ? "border-primary/60 bg-primary/10 text-primary"
-                  : a.tone === "warn"
-                  ? "border-destructive/50 bg-destructive/10 text-destructive"
                   : "border-border bg-card text-foreground";
               return (
                 <Link
