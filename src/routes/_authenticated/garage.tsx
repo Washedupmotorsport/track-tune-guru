@@ -442,7 +442,7 @@ function TracksideRail({ userId }: { userId: string }) {
 
         {/* Next actions — glove-friendly tap targets */}
         <div className="grid grid-cols-2 gap-2">
-          <RailAction to="/race-mode"  tone="primary" icon={Radio} label="Pit wall" sub="Live board" />
+          <RailAction to="/race-mode"  tone="primary" icon={Radio} label="Race Mode" sub="Live ops" />
           <RailAction
             to="/sessions/$sessionId" params={{ sessionId: session.id }}
             tone="default" icon={Timer} label="Open run" sub="Last session"

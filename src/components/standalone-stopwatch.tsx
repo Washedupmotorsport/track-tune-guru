@@ -78,7 +78,7 @@ export function StandaloneStopwatch() {
         to="/race-mode"
         className="mt-2 flex items-center justify-center gap-2 h-11 w-full rounded-md border border-primary/30 bg-primary/5 text-primary font-mono text-[11px] uppercase tracking-widest hover:bg-primary/10 active:scale-[0.98] transition"
       >
-        Open Pit Lane <ArrowRight className="w-3.5 h-3.5" />
+        Open Race Mode <ArrowRight className="w-3.5 h-3.5" />
       </Link>
       {captures.length > 0 && (
         <div className="mt-4 max-h-40 overflow-y-auto">
