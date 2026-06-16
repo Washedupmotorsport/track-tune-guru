@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/racemode")({
 // ---------------- types ----------------
 
 type Sess = {
-  id: string; name: string; started_at: string; session_type: string;
+  id: string; name: string; started_at: string; ended_at: string | null; session_type: string;
   track: string | null; driver: string | null;
   fuel_start_l: number | null; fuel_end_l: number | null;
   air_temp_c: number | null; track_temp_c: number | null;
@@ -105,7 +105,7 @@ function RaceModePage() {
     enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase.from("sessions")
-        .select("id, name, started_at, session_type, track, driver, fuel_start_l, fuel_end_l, air_temp_c, track_temp_c, car_id")
+        .select("id, name, started_at, ended_at, session_type, track, driver, fuel_start_l, fuel_end_l, air_temp_c, track_temp_c, car_id")
         .order("started_at", { ascending: false }).limit(25);
       if (error) throw error;
       return data as Sess[];
@@ -181,6 +181,10 @@ function RaceModePage() {
   const sessionStartMs = session ? new Date(session.started_at).getTime() : 0;
   const sessionEndMs = sessionStartMs + targets.sessionLen * 60_000;
   const remainingMs = Math.max(0, sessionEndMs - Date.now());
+  const elapsedRawMs = session
+    ? (session.ended_at ? new Date(session.ended_at).getTime() - sessionStartMs : Date.now() - sessionStartMs)
+    : 0;
+  const elapsedMs = Math.max(0, elapsedRawMs);
   // tick reference (forces refresh)
   void tick;
 
@@ -300,7 +304,10 @@ function RaceModePage() {
                 <div className="h-full bg-[#ffe600]"
                      style={{ width: `${100 - Math.min(100, (remainingMs / (targets.sessionLen * 60_000)) * 100)}%` }} />
               </div>
-              <div className="mt-2 text-[11px] font-mono uppercase tracking-[0.2em] text-white/60">
+              <div className="mt-2 text-[11px] font-mono uppercase tracking-[0.15em] text-white/60">
+                Elapsed {fmtElapsed(elapsedMs)}
+              </div>
+              <div className="mt-1 text-[11px] font-mono uppercase tracking-[0.2em] text-white/60">
                 {session.driver ?? "Driver"} · {session.track ?? "Track"} · {targets.sessionLen} min
               </div>
             </div>
@@ -508,4 +515,13 @@ function fmtStopwatch(ms: number) {
   const s = sTotal % 60;
   const m = Math.floor(sTotal / 60);
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}.${String(cs).padStart(2, "0")}`;
+}
+function fmtElapsed(ms: number) {
+  const hours = ms / 3600_000;
+  if (hours >= 24) return "24:00:00+";
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
