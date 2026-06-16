@@ -1,0 +1,1 @@
+ALTER TABLE public.cars ADD COLUMN IF NOT EXISTS fuel_tank_l numeric DEFAULT 60;

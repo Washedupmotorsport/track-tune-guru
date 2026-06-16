@@ -13,6 +13,7 @@ import { getDiscipline } from "@/lib/disciplines";
 import { ShareDialog } from "@/components/share-dialog";
 import { useCarAccess, canEdit } from "@/lib/use-car-access";
 import { formatLapTime } from "@/lib/lap-time";
+import { Stepper } from "@/components/stepper";
 
 export const Route = createFileRoute("/_authenticated/cars/$carId")({
   component: CarDetail,
@@ -115,6 +116,17 @@ function CarDetail() {
     onSuccess: () => { toast.success("Setup removed"); qc.invalidateQueries({ queryKey: ["setups", carId] }); },
   });
 
+  const updateCar = useMutation({
+    mutationFn: async (patch: { fuel_tank_l?: number | null }) => {
+      const { error } = await supabase.from("cars").update(patch).eq("id", carId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["car", carId] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to save"),
+  });
+
   if (carQ.isLoading) return <div className="text-muted-foreground">Loading…</div>;
   if (!carQ.data) return <div>Not found</div>;
 
@@ -160,6 +172,25 @@ function CarDetail() {
           )}
         </div>
       </div>
+
+      {writable && (
+        <div className="mt-4 rounded-sm border border-border bg-card p-3 max-w-xs">
+          <Stepper
+            label="Fuel tank capacity"
+            unit="L"
+            value={carQ.data.fuel_tank_l ?? 60}
+            onChange={(next) => {
+              const n = parseFloat(next);
+              if (!Number.isFinite(n)) return;
+              updateCar.mutate({ fuel_tank_l: n });
+            }}
+            step={1}
+            min={5}
+            max={150}
+            precision={0}
+          />
+        </div>
+      )}
 
       <div className="mt-4 grid grid-cols-2 sm:grid-cols-5 gap-2">
         <StatTile icon={<FileText className="w-3 h-3" />} label="Setups" value={String(setupsQ.data?.length ?? 0)} />
