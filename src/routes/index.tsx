@@ -131,7 +131,10 @@ function Landing() {
       <footer className="border-t border-border mt-16">
         <div className="mx-auto max-w-6xl px-4 py-5 text-sm text-muted-foreground flex items-center justify-between">
           <div>© {new Date().getFullYear()} My Race Engineer</div>
-          <div className="font-medium text-sm text-muted-foreground">Built for the paddock</div>
+          <div className="flex items-center gap-4">
+            <Link to="/terms" className="hover:text-primary transition-colors">Terms</Link>
+            <Link to="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
+          </div>
         </div>
       </footer>
     </div>

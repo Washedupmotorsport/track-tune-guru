@@ -124,6 +124,12 @@ function AuthPage() {
             className="mt-4 text-sm text-muted-foreground hover:text-primary transition-colors">
             {mode === "signin" ? "Need an account? Sign up" : "Already have an account? Sign in"}
           </button>
+
+          <div className="mt-6 pt-4 border-t border-border text-xs text-muted-foreground flex items-center gap-3">
+            <Link to="/terms" className="hover:text-primary transition-colors">Terms</Link>
+            <span className="text-border">·</span>
+            <Link to="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
+          </div>
         </div>
       </div>
     </div>
