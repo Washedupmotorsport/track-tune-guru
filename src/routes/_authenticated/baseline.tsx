@@ -353,6 +353,16 @@ function SelField({ label, value, onChange, options }: {
   );
 }
 
+function TrackNote({ label, value }: { label: string; value: string | null }) {
+  if (!value) return null;
+  return (
+    <div>
+      <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">{label}</div>
+      <div className="text-foreground/90 whitespace-pre-wrap">{value}</div>
+    </div>
+  );
+}
+
 function displayRow(value: string, unit: string | undefined, units: ReturnType<typeof useUnits>) {
   if (!unit) return <>{value}</>;
   const n = parseFloat(value);
