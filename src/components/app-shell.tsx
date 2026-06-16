@@ -160,7 +160,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <FooterLink to="/pitwall" pathname={pathname} matches={["/pitwall", "/pitlane", "/engineer", "/track-evolution", "/racemode"]}>Pitwall</FooterLink>
           </div>
           <div className="flex items-center gap-4">
-            <a href="mailto:support@my-race-engineer.app" className="hover:text-primary transition-colors">Support</a>
+            <FooterLink to="/support">Support</FooterLink>
             <FooterLink to="/terms">Privacy</FooterLink>
             <FooterLink to="/terms">Terms of Service</FooterLink>
             <a
