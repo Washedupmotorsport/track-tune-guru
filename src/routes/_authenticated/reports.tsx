@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Printer, FileText, Disc, ClipboardList, GitCompare, Timer, Download } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/reports")({ component: ReportsPage });
 
@@ -130,6 +131,43 @@ function ReportsPage() {
 
   const handlePrint = () => window.print();
 
+  const exportLapsCsv = async () => {
+    if (!session) {
+      toast.error("Pick a session first");
+      return;
+    }
+    const { data, error } = await supabase
+      .from("laps")
+      .select("lap_number, lap_time_ms, sector_1_ms, sector_2_ms, sector_3_ms, notes")
+      .eq("session_id", session.id)
+      .order("recorded_at");
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    if (!data || data.length === 0) {
+      toast.error("No laps in this session");
+      return;
+    }
+    const cols = ["lap_number", "lap_time_ms", "sector_1_ms", "sector_2_ms", "sector_3_ms", "notes"] as const;
+    const esc = (v: unknown) => {
+      if (v == null) return "";
+      const s = String(v);
+      return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const csv =
+      cols.join(",") + "\n" +
+      data.map((row) => cols.map((c) => esc((row as Record<string, unknown>)[c])).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const safeName = session.name.replace(/[^a-z0-9-_]+/gi, "-").replace(/^-+|-+$/g, "") || "session";
+    a.href = url;
+    a.download = `${safeName}-laps.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-4">
       {/* ===== Toolbar (hidden in print) ===== */}
@@ -139,12 +177,21 @@ function ReportsPage() {
             <h1 className="text-xl font-mono uppercase tracking-widest">Engineering Reports</h1>
             <p className="text-xs text-muted-foreground font-mono">Printable documents for the pit garage binder. Export via Print → Save as PDF.</p>
           </div>
-          <button
-            onClick={handlePrint}
-            className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-3 py-2 text-xs font-mono uppercase tracking-widest hover:opacity-90"
-          >
-            <Printer className="w-4 h-4" /> Print / PDF
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={exportLapsCsv}
+              disabled={!session}
+              className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-xs font-mono uppercase tracking-widest hover:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Download className="w-4 h-4" /> Export laps CSV
+            </button>
+            <button
+              onClick={handlePrint}
+              className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-3 py-2 text-xs font-mono uppercase tracking-widest hover:opacity-90"
+            >
+              <Printer className="w-4 h-4" /> Print / PDF
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
