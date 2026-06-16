@@ -5,6 +5,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { useActiveWeekend } from "@/lib/active-weekend";
+import { NoActiveWeekendEmpty } from "@/components/no-active-weekend-empty";
 import { toast } from "sonner";
 import {
   ClipboardList, Plus, Filter, MessageSquare, Wand2, TrendingUp,
@@ -165,6 +166,21 @@ function DebriefPage() {
           <p className="text-muted-foreground text-xs font-mono mt-1">
             Capture corner-by-corner notes. Convert observations into setup actions.
           </p>
+          {activeWeekend ? (
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
+              <span className="text-primary">Active:</span>
+              <span className="text-foreground truncate">{activeWeekend.title}</span>
+              {activeSession?.name && (
+                <>
+                  <span className="opacity-50">·</span>
+                  <span>{activeSession.name}</span>
+                </>
+              )}
+              {!activeSession && (
+                <span className="text-accent">no active session — entries will attach to weekend only</span>
+              )}
+            </div>
+          ) : null}
         </div>
         <button
           onClick={() => setOpen(true)}
@@ -173,6 +189,10 @@ function DebriefPage() {
           <Plus className="w-4 h-4" /> New entry
         </button>
       </header>
+
+      {!activeWeekend && (
+        <NoActiveWeekendEmpty hint="Debriefs default to your active weekend's latest session. Pick or create a weekend to wire feedback in." />
+      )}
 
       <section className="grid grid-cols-2 md:grid-cols-4 gap-2">
         <Stat label="Entries" value={String(trends.total)} icon={<ClipboardList className="w-3.5 h-3.5" />} />
