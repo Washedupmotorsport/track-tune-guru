@@ -363,8 +363,8 @@ function EngineerCockpit() {
             <Link to="/driver" className="text-xs font-medium text-muted-foreground hover:text-primary border border-border rounded-md px-3 py-1.5">
               Driver →
             </Link>
-            <Link to="/pitwall" className="text-xs font-medium text-primary hover:underline border border-primary/40 bg-primary/10 rounded-md px-3 py-1.5">
-              Pit wall
+            <Link to="/race-mode" className="text-xs font-medium text-primary hover:underline border border-primary/40 bg-primary/10 rounded-md px-3 py-1.5">
+              Race Mode
             </Link>
           </div>
         </div>
@@ -619,10 +619,10 @@ function EngineerCockpit() {
             <Plus className="w-4 h-4" /> Priority
           </Link>
           <Link
-            to="/pitwall"
+            to="/race-mode"
             className="flex-1 h-12 inline-flex items-center justify-center gap-2 rounded-md border border-border bg-card text-foreground text-sm font-semibold hover:bg-muted/30 active:scale-[0.98] transition"
           >
-            <Radio className="w-4 h-4" /> Open Pitwall
+            <Radio className="w-4 h-4" /> Open Race Mode
           </Link>
         </div>
       </div>

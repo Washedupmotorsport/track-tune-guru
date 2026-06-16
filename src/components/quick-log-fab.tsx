@@ -21,7 +21,7 @@ export function QuickLogFab() {
     { to: "/debrief",     label: "Driver debrief", icon: ClipboardList, tone: "default" },
     { to: "/notes",       label: "Quick note",     icon: NotebookPen,   tone: "default" },
     { to: "/engineering-memory", label: "Notebook entry", icon: Brain, tone: "default" },
-    { to: "/pitwall",     label: "Pit wall",       icon: Radio,         tone: "default" },
+    { to: "/race-mode",     label: "Race Mode",      icon: Radio,         tone: "default" },
   ] as const;
 
   return (

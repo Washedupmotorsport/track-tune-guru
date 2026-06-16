@@ -157,7 +157,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <FooterLink to="/sessions" pathname={pathname}>Sessions</FooterLink>
             <FooterLink to="/tyre-setup" pathname={pathname}>Tyres</FooterLink>
             <FooterLink to="/setup-library" pathname={pathname}>Setup</FooterLink>
-            <FooterLink to="/pitwall" pathname={pathname} matches={["/pitwall", "/pitlane", "/engineer", "/track-evolution", "/racemode"]}>Pitwall</FooterLink>
+            <FooterLink to="/race-mode" pathname={pathname} matches={["/race-mode", "/engineer", "/track-evolution"]}>Race Mode</FooterLink>
           </div>
           <div className="flex items-center gap-4">
             <FooterLink to="/support">Support</FooterLink>
@@ -205,7 +205,7 @@ function MobileTabBar() {
     { to: "/sessions",      label: "Sessions", icon: Timer, matches: ["/sessions", "/timeline", "/analysis", "/debrief", "/post-debrief"] },
     { to: "/tyre-setup",    label: "Tyres",    icon: Disc,  matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
     { to: "/setup-library", label: "Setup",    icon: Wand2, matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-    { to: "/pitwall",       label: "Pitwall",  icon: Radio, matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution", "/engineer"] },
+    { to: "/race-mode",     label: "Race",     icon: Radio, matches: ["/race-mode", "/track-evolution", "/engineer"] },
     { to: "/debrief",       label: "Debrief",  icon: ClipboardList, matches: ["/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/confidence"] },
   ] as const;
   return (
@@ -252,7 +252,7 @@ const WORKSPACES = [
   { key: "sessions", label: "Sessions", icon: Timer,         to: "/sessions",       matches: ["/sessions", "/timeline", "/analysis"] },
   { key: "tyres",    label: "Tyres",    icon: Disc,          to: "/tyre-setup",     matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
   { key: "setup",    label: "Setup",    icon: Wand2,         to: "/setup-library",  matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-  { key: "pitwall",  label: "Pitwall",  icon: Radio,         to: "/pitwall",        matches: ["/pitwall", "/racemode", "/pitlane", "/track-evolution", "/engineer"], tooltip: "Trackside live ops" },
+  { key: "race",     label: "Race Mode", icon: Radio,        to: "/race-mode",      matches: ["/race-mode", "/track-evolution", "/engineer"], tooltip: "One race-day operating screen" },
   { key: "debrief",  label: "Debrief",  icon: ClipboardList, to: "/debrief",        matches: ["/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/confidence", "/sympathy", "/philosophies", "/corners", "/known-behaviours"], tooltip: "Driver feedback & notes" },
 ] as const;
 
@@ -292,10 +292,9 @@ const ALL_NAV_GROUPS = [
     ],
   },
   {
-    label: "Pitwall",
+    label: "Race Mode",
     items: [
-      { to: "/pitwall",         label: "Pitwall",          icon: Radio },
-      { to: "/pitlane",         label: "Pit Lane",         icon: Timer },
+      { to: "/race-mode",       label: "Race Mode",        icon: Radio },
       { to: "/engineer",        label: "Engineer",         icon: HardHat },
       { to: "/track-evolution", label: "Track evolution",  icon: CloudRain },
     ],

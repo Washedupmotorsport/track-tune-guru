@@ -151,11 +151,9 @@ function DriverHub() {
         {lens === "live" && (
           <LensPanel
             title="Live session"
-            blurb="Pit wall channel and pit-lane mode if a run is happening. Otherwise the next session ahead."
-            primary={{ to: "/pitwall", label: "Open pit wall" }}
+            blurb="Race Mode is your single race-day screen — live timing, tyres, fuel, feedback and priorities."
+            primary={{ to: "/race-mode", label: "Open Race Mode" }}
             secondary={[
-              { to: "/pitlane",  label: "Pit lane mode" },
-              { to: "/racemode", label: "Race mode" },
               { to: "/flags",    label: "Flag an issue" },
             ]}
           />
@@ -176,7 +174,7 @@ function DriverHub() {
         <ActionCard to="/sympathy" icon={MessageSquare} title="Driver feedback" desc="Tag complaints by corner, phase, and severity. Engineers see them instantly." />
         <ActionCard to="/flags" icon={AlertTriangle} title="Handling issues" desc="Log incidents, near-misses, snap oversteer, brake locks." />
         <ActionCard to="/notes" icon={NotebookPen} title="Notes" desc="Personal notebook — lines, references, what worked." />
-        <ActionCard to="/pitwall" icon={Radio} title="Pit wall" desc="Live channel to the engineer between runs." />
+        <ActionCard to="/race-mode" icon={Radio} title="Race Mode" desc="One race-day screen: live timing, tyres, fuel, feedback, priorities." />
       </div>
 
       <h2 className="font-display text-lg font-bold uppercase tracking-wider mt-8 mb-3">Recent feedback</h2>
