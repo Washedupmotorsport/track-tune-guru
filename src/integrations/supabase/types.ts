@@ -166,6 +166,7 @@ export type Database = {
         Row: {
           created_at: string
           discipline: string
+          fuel_tank_l: number | null
           id: string
           make: string | null
           model: string | null
@@ -179,6 +180,7 @@ export type Database = {
         Insert: {
           created_at?: string
           discipline?: string
+          fuel_tank_l?: number | null
           id?: string
           make?: string | null
           model?: string | null
@@ -192,6 +194,7 @@ export type Database = {
         Update: {
           created_at?: string
           discipline?: string
+          fuel_tank_l?: number | null
           id?: string
           make?: string | null
           model?: string | null
