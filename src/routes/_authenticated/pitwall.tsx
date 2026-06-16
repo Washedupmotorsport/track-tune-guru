@@ -235,6 +235,16 @@ function PitWallPage() {
   return (
     <div className="space-y-3">
       <GuidedTour tourKey="race-mode" />
+      {!activeWeekend && (
+        <NoActiveWeekendEmpty hint="Pit wall locks onto your active race weekend. Pick or create one to see live data." />
+      )}
+      {activeWeekend && (
+        <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
+          <span className="text-primary">Active:</span>
+          <span className="text-foreground truncate">{activeWeekend.title}</span>
+          {activeSession && <><span className="opacity-50">·</span><span>{activeSession.name}</span></>}
+        </div>
+      )}
 
       {/* ───────── 1. TIMING ───────── */}
       <SectionLabel>Timing</SectionLabel>
