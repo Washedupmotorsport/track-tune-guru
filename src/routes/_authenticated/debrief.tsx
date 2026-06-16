@@ -383,18 +383,18 @@ function Chip({ children }: { children: React.ReactNode }) {
   );
 }
 
-function EntryDialog({ onClose, cars, sessions, setups, userId, onSaved }: {
+function EntryDialog({ onClose, cars, sessions, setups, userId, onSaved, defaultCarId, defaultSessionId }: {
   onClose: () => void;
   cars: Car[]; sessions: Session[]; setups: Setup[];
   userId: string; onSaved: () => void;
   defaultCarId?: string | null;
   defaultSessionId?: string | null;
 }) {
-  const defaultCar = (arguments[0] as { defaultCarId?: string | null }).defaultCarId ?? cars[0]?.id ?? "";
-  const defaultSession = (arguments[0] as { defaultSessionId?: string | null }).defaultSessionId ?? "";
+  const defaultCar = defaultCarId ?? cars[0]?.id ?? "";
+  const defaultSession = defaultSessionId ?? "";
   const [form, setForm] = useState({
     car_id: defaultCar,
-    session_id: "" as string,
+    session_id: defaultSession as string,
     setup_id: "" as string,
     corner: "",
     category: "balance" as (typeof CATEGORIES)[number]["id"],
