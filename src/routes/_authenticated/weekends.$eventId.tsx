@@ -211,8 +211,8 @@ function WeekendHub() {
           </span>
         </div>
         <div className="p-3 flex items-end justify-between gap-4 flex-wrap">
-          <div className="min-w-0">
-            <h1 className="font-display text-3xl font-bold uppercase tracking-tight leading-tight">{e.title}</h1>
+          <div className="min-w-0 flex-1">
+            <h1 className="font-display text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-tight break-words">{e.title}</h1>
             <div className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mt-1 flex items-center gap-3 flex-wrap">
               {e.track && (
                 <Link to="/tracks" className="inline-flex items-center gap-1 hover:text-primary transition-colors">
