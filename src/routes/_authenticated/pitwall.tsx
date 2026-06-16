@@ -15,7 +15,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 
 export const Route = createFileRoute("/_authenticated/pitwall")({ component: PitWallPage });
 
-type Car = { id: string; name: string };
+type Car = { id: string; name: string; fuel_tank_l: number | null };
 type Session = {
   id: string; car_id: string; name: string; session_type: string;
   track: string | null; driver: string | null; weather: string | null;
@@ -80,7 +80,7 @@ function PitWallPage() {
   const carsQ = useQuery({
     queryKey: ["pw-cars", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("cars").select("id,name").order("created_at");
+      const { data, error } = await supabase.from("cars").select("id,name,fuel_tank_l").order("created_at");
       if (error) throw error;
       return data as Car[];
     },
@@ -205,11 +205,12 @@ function PitWallPage() {
     const latestUsed = (latestSession?.fuel_start_l ?? 0) - (latestSession?.fuel_end_l ?? 0);
     const lapCount = (lapsQ.data?.length ?? 0) || 0;
     const perLap = lapCount > 0 && latestUsed > 0 ? latestUsed / lapCount : avgPerSession / 20;
-    const tankAssumed = 60; // default assumption
+    const selectedCar = (carsQ.data ?? []).find((c) => c.id === (latestSession?.car_id ?? carId));
+    const tankAssumed = selectedCar?.fuel_tank_l ?? 60;
     const remaining = latestSession?.fuel_end_l ?? null;
     const lapsRemaining = remaining != null && perLap > 0 ? Math.floor(remaining / perLap) : null;
     return { perLap, avgPerSession, remaining, lapsRemaining, tank: tankAssumed };
-  }, [sessionsQ.data, lapsQ.data, latestSession]);
+  }, [sessionsQ.data, lapsQ.data, latestSession, carsQ.data, carId]);
 
   const setupBalance = useMemo(() => {
     const sd = (latestSetup?.setup_data ?? {}) as Record<string, unknown>;
