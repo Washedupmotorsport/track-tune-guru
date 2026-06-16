@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -101,17 +101,17 @@ function DebriefPage() {
   });
 
   // Bias filters toward active context on first load.
-  const biasedRef = useState(false);
-  if (!biasedRef[0] && (activeCar?.id || activeSession?.id)) {
-    biasedRef[1](true);
-    if (activeCar?.id || activeSession?.id) {
-      setFilter((f) => ({
-        ...f,
-        car: activeCar?.id ?? f.car,
-        session: activeSession?.id ?? f.session,
-      }));
-    }
-  }
+  const biased = useRef(false);
+  useEffect(() => {
+    if (biased.current) return;
+    if (!activeCar?.id && !activeSession?.id) return;
+    biased.current = true;
+    setFilter((f) => ({
+      ...f,
+      car: activeCar?.id ?? f.car,
+      session: activeSession?.id ?? f.session,
+    }));
+  }, [activeCar, activeSession]);
 
   const feedbackQ = useQuery({
     queryKey: ["driver-feedback", user?.id, filter],
@@ -387,8 +387,12 @@ function EntryDialog({ onClose, cars, sessions, setups, userId, onSaved }: {
   onClose: () => void;
   cars: Car[]; sessions: Session[]; setups: Setup[];
   userId: string; onSaved: () => void;
+  defaultCarId?: string | null;
+  defaultSessionId?: string | null;
 }) {
-  const defaultCar = cars[0]?.id ?? "";
+  // see signature; defaults pulled from props
+}
+function _EntryDialogImpl() {}
   const [form, setForm] = useState({
     car_id: defaultCar,
     session_id: "" as string,
