@@ -26,7 +26,8 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "reset">("signin");
+  const [resetSent, setResetSent] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -85,45 +86,110 @@ function AuthPage() {
 
       <div className="flex items-center justify-center p-4">
         <div className="w-full max-w-sm">
-          <h1 className="font-display text-3xl font-bold">{mode === "signin" ? "Sign in" : "Create account"}</h1>
+          <h1 className="font-display text-3xl font-bold">
+            {mode === "signin" ? "Sign in" : mode === "signup" ? "Create account" : "Reset password"}
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {mode === "signin" ? "Welcome back, driver." : "Start logging your setups in minutes."}
+            {mode === "signin"
+              ? "Welcome back, driver."
+              : mode === "signup"
+              ? "Start logging your setups in minutes."
+              : "Enter your email and we’ll send you a link."}
           </p>
 
-          <Button type="button" variant="outline" className="w-full mt-6" onClick={handleGoogle} disabled={busy}>
-            <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 11v3.4h5.4a4.7 4.7 0 0 1-2 3l3.3 2.5c1.9-1.8 3-4.4 3-7.5 0-.7-.1-1.4-.2-2H12z"/><path fill="#34A853" d="M5.5 14.3l-1 .8L1.7 17a11 11 0 0 0 9.8 6c2.7 0 5-1 6.6-2.4l-3.3-2.5c-.9.6-2 1-3.3 1a5.5 5.5 0 0 1-5.2-3.7z"/><path fill="#FBBC05" d="M1.7 7A11 11 0 0 0 1 12c0 1.8.4 3.5 1.2 5l3.7-2.8a5.5 5.5 0 0 1 0-3.4z"/><path fill="#4285F4" d="M12 5.5c1.5 0 2.8.5 3.8 1.4L18.7 4A10.7 10.7 0 0 0 11.5 1 11 11 0 0 0 1.7 7l3.7 2.8A5.5 5.5 0 0 1 12 5.5z"/></svg>
-            Continue with Google
-          </Button>
+          {mode !== "reset" && (
+            <>
+              <Button type="button" variant="outline" className="w-full mt-6" onClick={handleGoogle} disabled={busy}>
+                <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 11v3.4h5.4a4.7 4.7 0 0 1-2 3l3.3 2.5c1.9-1.8 3-4.4 3-7.5 0-.7-.1-1.4-.2-2H12z"/><path fill="#34A853" d="M5.5 14.3l-1 .8L1.7 17a11 11 0 0 0 9.8 6c2.7 0 5-1 6.6-2.4l-3.3-2.5c-.9.6-2 1-3.3 1a5.5 5.5 0 0 1-5.2-3.7z"/><path fill="#FBBC05" d="M1.7 7A11 11 0 0 0 1 12c0 1.8.4 3.5 1.2 5l3.7-2.8a5.5 5.5 0 0 1 0-3.4z"/><path fill="#4285F4" d="M12 5.5c1.5 0 2.8.5 3.8 1.4L18.7 4A10.7 10.7 0 0 0 11.5 1 11 11 0 0 0 1.7 7l3.7 2.8A5.5 5.5 0 0 1 12 5.5z"/></svg>
+                Continue with Google
+              </Button>
 
-          <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground font-mono uppercase tracking-widest">
-            <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-3">
-            {mode === "signup" && (
-              <div>
-                <Label htmlFor="name">Driver name</Label>
-                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="A. Senna" />
+              <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground font-mono uppercase tracking-widest">
+                <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
               </div>
-            )}
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
-            </div>
-            <Button type="submit" className="w-full" disabled={busy}>
-              {busy && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              {mode === "signin" ? "Sign in" : "Create account"}
-            </Button>
-          </form>
+            </>
+          )}
 
-          <button type="button" onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-            className="mt-4 text-sm text-muted-foreground hover:text-primary transition-colors">
-            {mode === "signin" ? "Need an account? Sign up" : "Already have an account? Sign in"}
-          </button>
+          {mode === "reset" ? (
+            resetSent ? (
+              <div className="mt-6 space-y-4">
+                <p className="text-sm text-muted-foreground">Check your email for a reset link.</p>
+                <button
+                  type="button"
+                  onClick={() => { setMode("signin"); setResetSent(false); }}
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Back to sign in
+                </button>
+              </div>
+            ) : (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!email.trim()) return;
+                  setBusy(true);
+                  const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+                    redirectTo: window.location.origin + "/auth",
+                  });
+                  setBusy(false);
+                  if (error) { toast.error(error.message); return; }
+                  setResetSent(true);
+                }}
+                className="space-y-3"
+              >
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                </div>
+                <Button type="submit" className="w-full" disabled={busy}>
+                  {busy && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  Send reset link
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => setMode("signin")}
+                  className="block w-full text-center text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Back to sign in
+                </button>
+              </form>
+            )
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-3">
+              {mode === "signup" && (
+                <div>
+                  <Label htmlFor="name">Driver name</Label>
+                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="A. Senna" />
+                </div>
+              )}
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              </div>
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+              </div>
+              <Button type="submit" className="w-full" disabled={busy}>
+                {busy && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {mode === "signin" ? "Sign in" : "Create account"}
+              </Button>
+            </form>
+          )}
+
+          {mode === "signin" && (
+            <button type="button" onClick={() => setMode("reset")}
+              className="mt-4 block text-sm text-muted-foreground hover:text-primary transition-colors">
+              Forgot password?
+            </button>
+          )}
+
+          {mode !== "reset" && (
+            <button type="button" onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+              className="mt-4 text-sm text-muted-foreground hover:text-primary transition-colors">
+              {mode === "signin" ? "Need an account? Sign up" : "Already have an account? Sign in"}
+            </button>
+          )}
 
           <div className="mt-6 pt-4 border-t border-border text-xs text-muted-foreground flex items-center gap-3">
             <Link to="/terms" className="hover:text-primary transition-colors">Terms</Link>
