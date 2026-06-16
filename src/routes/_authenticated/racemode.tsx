@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/racemode")({
 // ---------------- types ----------------
 
 type Sess = {
-  id: string; name: string; started_at: string; session_type: string;
+  id: string; name: string; started_at: string; ended_at: string | null; session_type: string;
   track: string | null; driver: string | null;
   fuel_start_l: number | null; fuel_end_l: number | null;
   air_temp_c: number | null; track_temp_c: number | null;
