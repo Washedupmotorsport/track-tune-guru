@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { useActiveWeekend } from "@/lib/active-weekend";
+import { NoActiveWeekendEmpty } from "@/components/no-active-weekend-empty";
 import { GitBranch, Disc, ArrowRight, Brain, MessageSquare, TriangleAlert as AlertTriangle, HardHat, CircleCheck as CheckCircle2, CircleDot, Circle as XCircle, Pin, Radio, Cloud, Fuel, Timer, Wrench, Wand as Wand2, CalendarDays, TrendingUp, TrendingDown, Minus, Activity, Flag, Plus, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
@@ -54,6 +56,7 @@ type DamageRow = { id: string; component: string; severity: string; status: stri
 function EngineerCockpit() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { activeWeekend, activeSession } = useActiveWeekend();
 
   // live clock for countdown
   const [now, setNow] = useState(() => new Date());
@@ -63,12 +66,22 @@ function EngineerCockpit() {
   }, []);
 
   const sessionQ = useQuery({
-    queryKey: ["cockpit-session", user?.id], enabled: !!user,
+    queryKey: ["cockpit-session", user?.id, activeWeekend?.id ?? null, activeSession?.id ?? null],
+    enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("sessions")
-        .select("id, name, track, weather, air_temp_c, track_temp_c, started_at, session_type, setup_id, fuel_start_l, fuel_end_l")
+      // Prefer the active session; otherwise the most recent session
+      // belonging to the active weekend; otherwise the user's last session.
+      const select = "id, name, track, weather, air_temp_c, track_temp_c, started_at, session_type, setup_id, fuel_start_l, fuel_end_l";
+      if (activeSession?.id) {
+        const { data, error } = await supabase
+          .from("sessions").select(select).eq("id", activeSession.id).maybeSingle();
+        if (error) throw error;
+        if (data) return data as SessionRow;
+      }
+      let q = supabase.from("sessions").select(select)
         .order("started_at", { ascending: false }).limit(1);
+      if (activeWeekend?.id) q = q.eq("event_id", activeWeekend.id);
+      const { data, error } = await q;
       if (error) throw error;
       return (data?.[0] ?? null) as SessionRow | null;
     },
