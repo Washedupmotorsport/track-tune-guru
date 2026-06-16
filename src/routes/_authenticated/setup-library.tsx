@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { useActiveWeekend } from "@/lib/active-weekend";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -42,7 +43,14 @@ type Car = { id: string; name: string };
 
 function SetupLibrary() {
   const { user } = useAuth();
+  const { activeCar, activeTrack, activeWeekend } = useActiveWeekend();
   const [carId, setCarId] = useState<string>("all");
+  // Bias the car filter to the active car on first load.
+  const initedRef = useState<{ done: boolean }>({ done: false })[0];
+  if (!initedRef.done && activeCar?.id) {
+    initedRef.done = true;
+    setCarId(activeCar.id);
+  }
   const [preset, setPreset] = useState<string>("all");
   const [search, setSearch] = useState("");
 
@@ -143,9 +151,18 @@ function SetupLibrary() {
       }
       return true;
     });
-    // baselines pinned first
-    return list.sort((a, b) => Number(b.is_baseline) - Number(a.is_baseline));
-  }, [setupsQ.data, carId, preset, search]);
+    // Sort: active-track matches first, then baselines, then most recently updated.
+    const trackName = activeTrack?.name?.toLowerCase() ?? activeWeekend?.track?.toLowerCase() ?? null;
+    const trackMatch = (s: SetupRow) =>
+      trackName && s.track && s.track.toLowerCase().includes(trackName) ? 1 : 0;
+    return list.sort((a, b) => {
+      const t = trackMatch(b) - trackMatch(a);
+      if (t !== 0) return t;
+      const bl = Number(b.is_baseline) - Number(a.is_baseline);
+      if (bl !== 0) return bl;
+      return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+    });
+  }, [setupsQ.data, carId, preset, search, activeTrack, activeWeekend]);
 
   // Grouped by preset for the overview
   const grouped = useMemo(() => {
