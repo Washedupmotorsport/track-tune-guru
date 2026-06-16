@@ -1037,6 +1037,7 @@ export type Database = {
           car_id: string
           created_at: string
           driver: string | null
+          ended_at: string | null
           event_id: string | null
           fuel_end_l: number | null
           fuel_start_l: number | null
@@ -1058,6 +1059,7 @@ export type Database = {
           car_id: string
           created_at?: string
           driver?: string | null
+          ended_at?: string | null
           event_id?: string | null
           fuel_end_l?: number | null
           fuel_start_l?: number | null
@@ -1079,6 +1081,7 @@ export type Database = {
           car_id?: string
           created_at?: string
           driver?: string | null
+          ended_at?: string | null
           event_id?: string | null
           fuel_end_l?: number | null
           fuel_start_l?: number | null
