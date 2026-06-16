@@ -148,11 +148,11 @@ function SessionsPage() {
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
       <div className="mt-4 flex items-end justify-between flex-wrap gap-4">
-        <div>
+        <div className="min-w-0">
           <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
             <Timer className="w-3 h-3" /> Trackside
           </div>
-          <h1 className="font-display text-4xl font-bold mt-1">Sessions</h1>
+          <h1 className="font-display text-3xl sm:text-4xl font-bold mt-1">Sessions</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Group laps, weather, fuel and driver feedback by track session.
             {activeWeekend && <> Sessions you create are attached to <span className="text-primary">{activeWeekend.title}</span>.</>}
