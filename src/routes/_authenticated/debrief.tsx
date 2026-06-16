@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { useActiveWeekend } from "@/lib/active-weekend";
 import { toast } from "sonner";
 import {
   ClipboardList, Plus, Filter, MessageSquare, Wand2, TrendingUp,
@@ -63,6 +64,7 @@ const formSchema = z.object({
 function DebriefPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { activeWeekend, activeCar, activeSession } = useActiveWeekend();
 
   const carsQ = useQuery({
     queryKey: ["debrief-cars", user?.id],
@@ -97,6 +99,19 @@ function DebriefPage() {
   const [filter, setFilter] = useState<{ car: string; session: string; category: string }>({
     car: "all", session: "all", category: "all",
   });
+
+  // Bias filters toward active context on first load.
+  const biased = useRef(false);
+  useEffect(() => {
+    if (biased.current) return;
+    if (!activeCar?.id && !activeSession?.id) return;
+    biased.current = true;
+    setFilter((f) => ({
+      ...f,
+      car: activeCar?.id ?? f.car,
+      session: activeSession?.id ?? f.session,
+    }));
+  }, [activeCar, activeSession]);
 
   const feedbackQ = useQuery({
     queryKey: ["driver-feedback", user?.id, filter],
@@ -251,6 +266,8 @@ function DebriefPage() {
           sessions={sessions}
           setups={setupsQ.data ?? []}
           userId={user!.id}
+          defaultCarId={activeCar?.id ?? activeWeekend?.car_id ?? null}
+          defaultSessionId={activeSession?.id ?? null}
           onSaved={() => qc.invalidateQueries({ queryKey: ["driver-feedback"] })}
         />
       )}
@@ -366,15 +383,18 @@ function Chip({ children }: { children: React.ReactNode }) {
   );
 }
 
-function EntryDialog({ onClose, cars, sessions, setups, userId, onSaved }: {
+function EntryDialog({ onClose, cars, sessions, setups, userId, onSaved, defaultCarId, defaultSessionId }: {
   onClose: () => void;
   cars: Car[]; sessions: Session[]; setups: Setup[];
   userId: string; onSaved: () => void;
+  defaultCarId?: string | null;
+  defaultSessionId?: string | null;
 }) {
-  const defaultCar = cars[0]?.id ?? "";
+  const defaultCar = defaultCarId ?? cars[0]?.id ?? "";
+  const defaultSession = defaultSessionId ?? "";
   const [form, setForm] = useState({
     car_id: defaultCar,
-    session_id: "" as string,
+    session_id: defaultSession as string,
     setup_id: "" as string,
     corner: "",
     category: "balance" as (typeof CATEGORIES)[number]["id"],

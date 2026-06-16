@@ -3,6 +3,8 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { useActiveWeekend } from "@/lib/active-weekend";
+import { NoActiveWeekendEmpty } from "@/components/no-active-weekend-empty";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatLapTime } from "@/lib/lap-time";
 import { TimelineFeed } from "@/components/timeline-feed";
@@ -87,6 +89,7 @@ function classify(s: Sess, eventStart: number): Stage {
 
 function TimelinePage() {
   const { user } = useAuth();
+  const { activeWeekend } = useActiveWeekend();
   const [eventId, setEventId] = useState<string>("");
 
   const eventsQ = useQuery({
@@ -103,7 +106,7 @@ function TimelinePage() {
   });
 
   const events = eventsQ.data ?? [];
-  const activeId = eventId || events[0]?.id || "";
+  const activeId = eventId || activeWeekend?.id || events[0]?.id || "";
   const activeEvent = events.find((e) => e.id === activeId) ?? null;
 
   const sessQ = useQuery({
@@ -287,7 +290,7 @@ function TimelinePage() {
       </div>
 
       {!activeEvent ? (
-        <EmptyState />
+        events.length === 0 ? <NoActiveWeekendEmpty /> : <EmptyState />
       ) : (
         <>
           {/* Title strip */}

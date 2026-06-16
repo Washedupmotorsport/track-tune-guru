@@ -10,6 +10,8 @@ import { TyreTabs } from "@/components/tyre-tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import jsPDF from "jspdf";
 import { GuidedTour } from "@/components/guided-tour";
+import { useActiveWeekend } from "@/lib/active-weekend";
+import { NoActiveWeekendEmpty } from "@/components/no-active-weekend-empty";
 
 export const Route = createFileRoute("/_authenticated/tyre-setup")({
   component: TyreSetupPage,
@@ -39,6 +41,7 @@ const SET_OPTIONS = ["A", "B", "C", "D", "E"];
 function TyreSetupPage() {
   const { pressureUnit, tempUnit, system, toDisplayPressure } = useUnits();
   const isMobile = useIsMobile();
+  const { activeWeekend, activeCar, activeTrack, activeSession } = useActiveWeekend();
   const [compound, setCompound] = useState("medium");
   const [heatCycles, setHeatCycles] = useState(0);
   const [setNumber, setSetNumber] = useState("A");
@@ -174,6 +177,21 @@ function TyreSetupPage() {
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
       <TyreTabs />
+
+      {!activeWeekend && (
+        <div className="mt-4">
+          <NoActiveWeekendEmpty hint="Tyre setup recommendations are still available, but logged tyre data attaches to your active race weekend. Pick or create one." />
+        </div>
+      )}
+      {activeWeekend && (
+        <div className="mt-4 flex flex-wrap items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
+          <span className="text-primary">Active:</span>
+          <span className="text-foreground truncate">{activeWeekend.title}</span>
+          {activeTrack?.name && <><span className="opacity-50">·</span><span>{activeTrack.name}</span></>}
+          {activeCar?.name && <><span className="opacity-50">·</span><span>{activeCar.name}</span></>}
+          {activeSession?.name && <><span className="opacity-50">·</span><span>{activeSession.name}</span></>}
+        </div>
+      )}
 
       {/* STICKY CHIP ROW */}
       <div className="sticky top-0 z-20 -mx-4 px-4 py-2 bg-background/95 backdrop-blur-md border-b border-border mb-4">

@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { useActiveWeekend } from "@/lib/active-weekend";
+import { NoActiveWeekendEmpty } from "@/components/no-active-weekend-empty";
 import {
   Gauge, Thermometer, Droplets, Fuel, Timer, CloudSun, Activity,
   Disc, TrendingDown, TrendingUp, Wind, Flame, ArrowRight, AlertTriangle, ChevronDown,
@@ -62,7 +64,13 @@ function getNum(rec: Record<string, unknown>, key: string): number | null {
 
 function PitWallPage() {
   const { user } = useAuth();
+  const { activeWeekend, activeCar, activeSession } = useActiveWeekend();
   const [carId, setCarId] = useState<string | "all">("all");
+  const carInited = useRef(false);
+  useEffect(() => {
+    if (carInited.current) return;
+    if (activeCar?.id) { carInited.current = true; setCarId(activeCar.id); }
+  }, [activeCar]);
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
@@ -80,12 +88,13 @@ function PitWallPage() {
   });
 
   const sessionsQ = useQuery({
-    queryKey: ["pw-sessions", user?.id, carId],
+    queryKey: ["pw-sessions", user?.id, carId, activeWeekend?.id ?? null],
     queryFn: async () => {
       let q = supabase.from("sessions")
         .select("id,car_id,name,session_type,track,driver,weather,air_temp_c,track_temp_c,fuel_start_l,fuel_end_l,started_at")
         .order("started_at", { ascending: false }).limit(25);
       if (carId !== "all") q = q.eq("car_id", carId);
+      if (activeWeekend?.id) q = q.eq("event_id", activeWeekend.id);
       const { data, error } = await q;
       if (error) throw error;
       return data as Session[];
@@ -93,7 +102,16 @@ function PitWallPage() {
     enabled: !!user,
   });
 
-  const latestSession = sessionsQ.data?.[0];
+  // Prefer the active session from context, fall back to most recent session
+  // for the active weekend.
+  const latestSession = useMemo(() => {
+    const list = sessionsQ.data ?? [];
+    if (activeSession?.id) {
+      const m = list.find((s) => s.id === activeSession.id);
+      if (m) return m;
+    }
+    return list[0];
+  }, [sessionsQ.data, activeSession]);
 
   const lapsQ = useQuery({
     queryKey: ["pw-laps", user?.id, latestSession?.id],
@@ -217,6 +235,16 @@ function PitWallPage() {
   return (
     <div className="space-y-3">
       <GuidedTour tourKey="race-mode" />
+      {!activeWeekend && (
+        <NoActiveWeekendEmpty hint="Pit wall locks onto your active race weekend. Pick or create one to see live data." />
+      )}
+      {activeWeekend && (
+        <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
+          <span className="text-primary">Active:</span>
+          <span className="text-foreground truncate">{activeWeekend.title}</span>
+          {activeSession && <><span className="opacity-50">·</span><span>{activeSession.name}</span></>}
+        </div>
+      )}
 
       {/* ───────── 1. TIMING ───────── */}
       <SectionLabel>Timing</SectionLabel>
