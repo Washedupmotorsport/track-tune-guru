@@ -39,7 +39,7 @@ export const TOURS: Tour[] = [
   {
     key: "race-mode",
     label: "Race Mode",
-    route: "/pitwall",
+    route: "/race-mode",
     steps: [
       { title: "Pit Wall live board", body: "Lap times, fuel, weather and incidents in one trackside view." },
       { title: "Capture laps", body: "Tap the LAP button each time the car crosses the line." },

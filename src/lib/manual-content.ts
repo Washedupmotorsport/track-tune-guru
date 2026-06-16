@@ -54,7 +54,7 @@ export const MANUAL_SECTIONS: ManualSection[] = [
     id: "race-mode",
     title: "Race Mode (Pit Wall)",
     group: "Race Weekend",
-    route: "/pitwall",
+    route: "/race-mode",
     summary:
       "Live trackside board: lap stopwatch, last/best/avg, fuel countdown, weather, incidents and pit-stop call.",
     whenToUse: "During the race itself — keep this open on the pit wall device.",
@@ -69,7 +69,7 @@ export const MANUAL_SECTIONS: ManualSection[] = [
     id: "pit-lane",
     title: "Pit Lane mode",
     group: "Race Weekend",
-    route: "/pitlane",
+    route: "/race-mode",
     summary:
       "Pit-lane-friendly big-button view with stopwatch, last three laps and quick incident buttons.",
     whenToUse: "When you're standing in the pit with a phone, not a laptop.",
