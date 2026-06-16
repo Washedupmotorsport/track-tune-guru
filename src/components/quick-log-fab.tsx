@@ -8,28 +8,11 @@ import { toast } from "sonner";
 
 export function QuickLogFab() {
   const [open, setOpen] = useState(false);
+  const [flagMode, setFlagMode] = useState(false);
+  const [flagTitle, setFlagTitle] = useState("");
   const { user } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   if (pathname === "/" || pathname.startsWith("/auth") || pathname.startsWith("/share") || pathname.startsWith("/terms")) return null;
-
-  const flagCritical = async () => {
-    const title = prompt("Describe the critical issue:");
-    if (!title?.trim()) return;
-    if (!user?.id) { toast.error("Not signed in"); return; }
-    const { error } = await supabase.from("engineering_memory" as never).insert({
-      user_id: user.id,
-      title: title.trim(),
-      priority: "critical",
-      status: "active",
-      category: "handling",
-      confidence: 5,
-      pinned: true,
-      occurrences: 1,
-    } as never);
-    if (error) { toast.error(error.message); return; }
-    toast.success("Critical issue flagged");
-    setOpen(false);
-  };
 
   const actions = [
     { to: "/engineering-memory", label: "Flag CRITICAL", icon: AlertTriangle, tone: "warn" },
