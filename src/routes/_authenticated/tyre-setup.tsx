@@ -12,6 +12,10 @@ import jsPDF from "jspdf";
 import { GuidedTour } from "@/components/guided-tour";
 import { useActiveWeekend } from "@/lib/active-weekend";
 import { NoActiveWeekendEmpty } from "@/components/no-active-weekend-empty";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth-context";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/tyre-setup")({
   component: TyreSetupPage,
@@ -41,6 +45,7 @@ const SET_OPTIONS = ["A", "B", "C", "D", "E"];
 function TyreSetupPage() {
   const { pressureUnit, tempUnit, system, toDisplayPressure } = useUnits();
   const isMobile = useIsMobile();
+  const { user } = useAuth();
   const { activeWeekend, activeCar, activeTrack, activeSession } = useActiveWeekend();
   const [compound, setCompound] = useState("medium");
   const [heatCycles, setHeatCycles] = useState(0);
@@ -80,6 +85,32 @@ function TyreSetupPage() {
   const cycleHeatCycles = () => {
     setHeatCycles((v) => (v >= 10 ? 0 : v + 1));
   };
+
+  const saveLog = useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error("Sign in required");
+      if (!activeCar?.id) throw new Error("Active weekend has no car selected");
+      const trackN = parseFloat(trackTemp);
+      const payload = {
+        user_id: user.id,
+        car_id: activeCar.id,
+        session_id: activeSession?.id ?? null,
+        tire_set: `Set ${setNumber}`,
+        compound,
+        heat_cycles: heatCycles,
+        track_c: isNaN(trackN) ? null : trackN,
+        cold_fl: currentCold.fl ? Number(currentCold.fl) : null,
+        cold_fr: currentCold.fr ? Number(currentCold.fr) : null,
+        cold_rl: currentCold.rl ? Number(currentCold.rl) : null,
+        cold_rr: currentCold.rr ? Number(currentCold.rr) : null,
+        notes: activeWeekend ? `Tyre Setup log · ${activeWeekend.title}` : "Tyre Setup log",
+      };
+      const { error } = await supabase.from("tire_logs").insert(payload);
+      if (error) throw error;
+    },
+    onSuccess: () => toast.success("Tyre log saved to active session"),
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const getPressureTone = (value: string): "cold" | "optimal" | "hot" | undefined => {
     if (!recommendation) return undefined;
@@ -220,6 +251,15 @@ function TyreSetupPage() {
           <div className="ml-auto">
             <Button onClick={downloadReport} disabled={!recommendation} size="sm" variant="outline" className="h-9">
               <Download className="w-3.5 h-3.5 mr-1.5" /> PDF
+            </Button>
+            <Button
+              onClick={() => saveLog.mutate()}
+              disabled={saveLog.isPending || !activeCar?.id}
+              size="sm"
+              className="h-9 ml-2"
+              title={!activeCar?.id ? "Pick an active weekend with a car to log tyres" : "Save tyre log to active session"}
+            >
+              {saveLog.isPending ? "Saving…" : "Save log"}
             </Button>
           </div>
         </div>
