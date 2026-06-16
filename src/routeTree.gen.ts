@@ -29,11 +29,8 @@ import { Route as AuthenticatedSympathyRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSetupLibraryRouteImport } from './routes/_authenticated/setup-library'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
-import { Route as AuthenticatedRacemodeRouteImport } from './routes/_authenticated/racemode'
 import { Route as AuthenticatedRaceModeRouteImport } from './routes/_authenticated/race-mode'
 import { Route as AuthenticatedPostDebriefRouteImport } from './routes/_authenticated/post-debrief'
-import { Route as AuthenticatedPitwallRouteImport } from './routes/_authenticated/pitwall'
-import { Route as AuthenticatedPitlaneRouteImport } from './routes/_authenticated/pitlane'
 import { Route as AuthenticatedPhilosophiesRouteImport } from './routes/_authenticated/philosophies'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
 import { Route as AuthenticatedManualRouteImport } from './routes/_authenticated/manual'
@@ -165,11 +162,6 @@ const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedRacemodeRoute = AuthenticatedRacemodeRouteImport.update({
-  id: '/racemode',
-  path: '/racemode',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedRaceModeRoute = AuthenticatedRaceModeRouteImport.update({
   id: '/race-mode',
   path: '/race-mode',
@@ -181,16 +173,6 @@ const AuthenticatedPostDebriefRoute =
     path: '/post-debrief',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedPitwallRoute = AuthenticatedPitwallRouteImport.update({
-  id: '/pitwall',
-  path: '/pitwall',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedPitlaneRoute = AuthenticatedPitlaneRouteImport.update({
-  id: '/pitlane',
-  path: '/pitlane',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedPhilosophiesRoute =
   AuthenticatedPhilosophiesRouteImport.update({
     id: '/philosophies',
@@ -370,11 +352,8 @@ export interface FileRoutesByFullPath {
   '/manual': typeof AuthenticatedManualRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/philosophies': typeof AuthenticatedPhilosophiesRoute
-  '/pitlane': typeof AuthenticatedPitlaneRoute
-  '/pitwall': typeof AuthenticatedPitwallRoute
   '/post-debrief': typeof AuthenticatedPostDebriefRoute
   '/race-mode': typeof AuthenticatedRaceModeRoute
-  '/racemode': typeof AuthenticatedRacemodeRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/setup-library': typeof AuthenticatedSetupLibraryRoute
@@ -424,11 +403,8 @@ export interface FileRoutesByTo {
   '/manual': typeof AuthenticatedManualRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/philosophies': typeof AuthenticatedPhilosophiesRoute
-  '/pitlane': typeof AuthenticatedPitlaneRoute
-  '/pitwall': typeof AuthenticatedPitwallRoute
   '/post-debrief': typeof AuthenticatedPostDebriefRoute
   '/race-mode': typeof AuthenticatedRaceModeRoute
-  '/racemode': typeof AuthenticatedRacemodeRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/setup-library': typeof AuthenticatedSetupLibraryRoute
@@ -480,11 +456,8 @@ export interface FileRoutesById {
   '/_authenticated/manual': typeof AuthenticatedManualRoute
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
   '/_authenticated/philosophies': typeof AuthenticatedPhilosophiesRoute
-  '/_authenticated/pitlane': typeof AuthenticatedPitlaneRoute
-  '/_authenticated/pitwall': typeof AuthenticatedPitwallRoute
   '/_authenticated/post-debrief': typeof AuthenticatedPostDebriefRoute
   '/_authenticated/race-mode': typeof AuthenticatedRaceModeRoute
-  '/_authenticated/racemode': typeof AuthenticatedRacemodeRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/_authenticated/setup-library': typeof AuthenticatedSetupLibraryRoute
@@ -536,11 +509,8 @@ export interface FileRouteTypes {
     | '/manual'
     | '/notes'
     | '/philosophies'
-    | '/pitlane'
-    | '/pitwall'
     | '/post-debrief'
     | '/race-mode'
-    | '/racemode'
     | '/reports'
     | '/sessions'
     | '/setup-library'
@@ -590,11 +560,8 @@ export interface FileRouteTypes {
     | '/manual'
     | '/notes'
     | '/philosophies'
-    | '/pitlane'
-    | '/pitwall'
     | '/post-debrief'
     | '/race-mode'
-    | '/racemode'
     | '/reports'
     | '/sessions'
     | '/setup-library'
@@ -645,11 +612,8 @@ export interface FileRouteTypes {
     | '/_authenticated/manual'
     | '/_authenticated/notes'
     | '/_authenticated/philosophies'
-    | '/_authenticated/pitlane'
-    | '/_authenticated/pitwall'
     | '/_authenticated/post-debrief'
     | '/_authenticated/race-mode'
-    | '/_authenticated/racemode'
     | '/_authenticated/reports'
     | '/_authenticated/sessions'
     | '/_authenticated/setup-library'
@@ -825,13 +789,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/racemode': {
-      id: '/_authenticated/racemode'
-      path: '/racemode'
-      fullPath: '/racemode'
-      preLoaderRoute: typeof AuthenticatedRacemodeRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/race-mode': {
       id: '/_authenticated/race-mode'
       path: '/race-mode'
@@ -844,20 +801,6 @@ declare module '@tanstack/react-router' {
       path: '/post-debrief'
       fullPath: '/post-debrief'
       preLoaderRoute: typeof AuthenticatedPostDebriefRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/pitwall': {
-      id: '/_authenticated/pitwall'
-      path: '/pitwall'
-      fullPath: '/pitwall'
-      preLoaderRoute: typeof AuthenticatedPitwallRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/pitlane': {
-      id: '/_authenticated/pitlane'
-      path: '/pitlane'
-      fullPath: '/pitlane'
-      preLoaderRoute: typeof AuthenticatedPitlaneRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/philosophies': {
@@ -1123,11 +1066,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedManualRoute: typeof AuthenticatedManualRoute
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
   AuthenticatedPhilosophiesRoute: typeof AuthenticatedPhilosophiesRoute
-  AuthenticatedPitlaneRoute: typeof AuthenticatedPitlaneRoute
-  AuthenticatedPitwallRoute: typeof AuthenticatedPitwallRoute
   AuthenticatedPostDebriefRoute: typeof AuthenticatedPostDebriefRoute
   AuthenticatedRaceModeRoute: typeof AuthenticatedRaceModeRoute
-  AuthenticatedRacemodeRoute: typeof AuthenticatedRacemodeRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRouteWithChildren
   AuthenticatedSetupLibraryRoute: typeof AuthenticatedSetupLibraryRoute
@@ -1168,11 +1108,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedManualRoute: AuthenticatedManualRoute,
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
   AuthenticatedPhilosophiesRoute: AuthenticatedPhilosophiesRoute,
-  AuthenticatedPitlaneRoute: AuthenticatedPitlaneRoute,
-  AuthenticatedPitwallRoute: AuthenticatedPitwallRoute,
   AuthenticatedPostDebriefRoute: AuthenticatedPostDebriefRoute,
   AuthenticatedRaceModeRoute: AuthenticatedRaceModeRoute,
-  AuthenticatedRacemodeRoute: AuthenticatedRacemodeRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRouteWithChildren,
   AuthenticatedSetupLibraryRoute: AuthenticatedSetupLibraryRoute,
