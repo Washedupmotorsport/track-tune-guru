@@ -28,13 +28,23 @@ function AuthPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"signin" | "signup" | "reset">("signin");
   const [resetSent, setResetSent] = useState(false);
+  const [confirmPending, setConfirmPending] = useState(false);
+  const [resending, setResending] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) navigate({ to: "/engineer" });
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("pending") === "1") {
+      setConfirmPending(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!loading && user && (user.email_confirmed_at || (user as { confirmed_at?: string }).confirmed_at)) {
+      navigate({ to: "/engineer" });
+    }
   }, [loading, user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,7 +52,7 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email, password,
           options: {
             emailRedirectTo: window.location.origin,
@@ -50,7 +60,11 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Welcome to the paddock");
+        if (!data.session) {
+          setConfirmPending(true);
+        } else {
+          toast.success("Welcome to the paddock");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -60,6 +74,18 @@ function AuthPage() {
     } finally {
       setBusy(false);
     }
+  };
+
+  const handleResend = async () => {
+    if (!email.trim()) {
+      toast.error("Enter your email above first");
+      return;
+    }
+    setResending(true);
+    const { error } = await supabase.auth.resend({ type: "signup", email: email.trim() });
+    setResending(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Confirmation email sent");
   };
 
   const handleGoogle = async () => {
@@ -86,6 +112,36 @@ function AuthPage() {
 
       <div className="flex items-center justify-center p-4">
         <div className="w-full max-w-sm">
+          {confirmPending ? (
+            <div className="space-y-4">
+              <h1 className="font-display text-3xl font-bold">Confirm your email</h1>
+              <p className="text-sm text-muted-foreground">
+                Check your email to confirm your account before signing in.
+              </p>
+              {email && (
+                <p className="text-sm font-mono text-foreground break-all">{email}</p>
+              )}
+              <Button type="button" className="w-full" onClick={handleResend} disabled={resending}>
+                {resending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Resend confirmation email
+              </Button>
+              <button
+                type="button"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  setConfirmPending(false);
+                  setMode("signin");
+                  if (typeof window !== "undefined" && window.location.search.includes("pending")) {
+                    window.history.replaceState({}, "", "/auth");
+                  }
+                }}
+                className="block w-full text-center text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                Back to sign in
+              </button>
+            </div>
+          ) : (
+          <>
           <h1 className="font-display text-3xl font-bold">
             {mode === "signin" ? "Sign in" : mode === "signup" ? "Create account" : "Reset password"}
           </h1>
@@ -196,6 +252,8 @@ function AuthPage() {
             <span className="text-border">·</span>
             <Link to="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
           </div>
+          </>
+          )}
         </div>
       </div>
     </div>
