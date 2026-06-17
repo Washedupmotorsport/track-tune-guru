@@ -259,7 +259,8 @@ export function PhilosophiesPage() {
           </p>
         </div>
         <Link
-          to="/baseline"
+          to="/setup-library"
+          search={{ tab: "baselines" }}
           className="inline-flex items-center text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary"
         >
           Build from baseline <ChevronRight className="w-3 h-3 ml-0.5" />
