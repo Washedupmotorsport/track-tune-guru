@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, GitCompare, Grid2x2, Download, Thermometer, Activity, Info } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -7,17 +7,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
-import { TyreTabs } from "@/components/tyre-tabs";
 import jsPDF from "jspdf";
 
 export const Route = createFileRoute("/_authenticated/tyre-compare")({
-  component: TyreComparePage,
-  head: () => ({
-    meta: [
-      { title: "Tyre Compare — My Race Engineer" },
-      { name: "description", content: "Compare expected grip, warm-up, peak temperature window, and stint longevity across compounds." },
-    ],
-  }),
+  component: () => {
+    const nav = useNavigate();
+    useEffect(() => { nav({ to: "/tyres", search: { tab: "compare" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    return null;
+  },
 });
 
 type Compound = {
@@ -71,7 +68,7 @@ function bestCompoundAt(trackTempC: number, condition: "dry" | "wet", gw: number
   return { winner, score: bestScore };
 }
 
-function TyreComparePage() {
+export function TyreComparePage() {
   const [trackC, setTrackC] = useState("28");
   const [stintLaps, setStintLaps] = useState("20");
   const [condition, setCondition] = useState<"dry" | "wet">("dry");
@@ -227,7 +224,6 @@ function TyreComparePage() {
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
-      <TyreTabs />
       <div className="mt-4">
         <div className="flex items-start justify-between gap-4">
           <div>

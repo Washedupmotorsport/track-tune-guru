@@ -1,12 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, ChevronDown, Disc, Download, Gauge, Thermometer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUnits } from "@/lib/units";
 import { Stepper } from "@/components/stepper";
-import { TyreTabs } from "@/components/tyre-tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import jsPDF from "jspdf";
 import { GuidedTour } from "@/components/guided-tour";
@@ -18,13 +17,11 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/tyre-setup")({
-  component: TyreSetupPage,
-  head: () => ({
-    meta: [
-      { title: "Tyre Setup — My Race Engineer" },
-      { name: "description", content: "Enter compound, load, current pressures, and track temperature to get a recommended cold-pressure baseline." },
-    ],
-  }),
+  component: () => {
+    const nav = useNavigate();
+    useEffect(() => { nav({ to: "/tyres", search: { tab: "pressures" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    return null;
+  },
 });
 
 // Baseline cold pressure (psi) per compound at a 25°C track reference and ~1000 kg load.
@@ -42,7 +39,7 @@ const PSI_PER_KG = 0.005;
 
 const SET_OPTIONS = ["A", "B", "C", "D", "E"];
 
-function TyreSetupPage() {
+export function TyreSetupPage() {
   const { pressureUnit, tempUnit, system, toDisplayPressure } = useUnits();
   const isMobile = useIsMobile();
   const { user } = useAuth();
@@ -207,7 +204,6 @@ function TyreSetupPage() {
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
-      <TyreTabs />
 
       {!activeWeekend && (
         <div className="mt-4">
