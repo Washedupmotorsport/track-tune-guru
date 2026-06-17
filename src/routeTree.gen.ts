@@ -46,6 +46,7 @@ import { Route as AuthenticatedFlagsRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated/expenses'
 import { Route as AuthenticatedEngineeringMemoryRouteImport } from './routes/_authenticated/engineering-memory'
 import { Route as AuthenticatedEngineerRouteImport } from './routes/_authenticated/engineer'
+import { Route as AuthenticatedDriverHubRouteImport } from './routes/_authenticated/driver-hub'
 import { Route as AuthenticatedDriverRouteImport } from './routes/_authenticated/driver'
 import { Route as AuthenticatedDebriefRouteImport } from './routes/_authenticated/debrief'
 import { Route as AuthenticatedDamageRouteImport } from './routes/_authenticated/damage'
@@ -255,6 +256,11 @@ const AuthenticatedEngineerRoute = AuthenticatedEngineerRouteImport.update({
   path: '/engineer',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedDriverHubRoute = AuthenticatedDriverHubRouteImport.update({
+  id: '/driver-hub',
+  path: '/driver-hub',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDriverRoute = AuthenticatedDriverRouteImport.update({
   id: '/driver',
   path: '/driver',
@@ -358,6 +364,7 @@ export interface FileRoutesByFullPath {
   '/damage': typeof AuthenticatedDamageRoute
   '/debrief': typeof AuthenticatedDebriefRoute
   '/driver': typeof AuthenticatedDriverRoute
+  '/driver-hub': typeof AuthenticatedDriverHubRoute
   '/engineer': typeof AuthenticatedEngineerRoute
   '/engineering-memory': typeof AuthenticatedEngineeringMemoryRoute
   '/expenses': typeof AuthenticatedExpensesRoute
@@ -412,6 +419,7 @@ export interface FileRoutesByTo {
   '/damage': typeof AuthenticatedDamageRoute
   '/debrief': typeof AuthenticatedDebriefRoute
   '/driver': typeof AuthenticatedDriverRoute
+  '/driver-hub': typeof AuthenticatedDriverHubRoute
   '/engineer': typeof AuthenticatedEngineerRoute
   '/engineering-memory': typeof AuthenticatedEngineeringMemoryRoute
   '/expenses': typeof AuthenticatedExpensesRoute
@@ -468,6 +476,7 @@ export interface FileRoutesById {
   '/_authenticated/damage': typeof AuthenticatedDamageRoute
   '/_authenticated/debrief': typeof AuthenticatedDebriefRoute
   '/_authenticated/driver': typeof AuthenticatedDriverRoute
+  '/_authenticated/driver-hub': typeof AuthenticatedDriverHubRoute
   '/_authenticated/engineer': typeof AuthenticatedEngineerRoute
   '/_authenticated/engineering-memory': typeof AuthenticatedEngineeringMemoryRoute
   '/_authenticated/expenses': typeof AuthenticatedExpensesRoute
@@ -524,6 +533,7 @@ export interface FileRouteTypes {
     | '/damage'
     | '/debrief'
     | '/driver'
+    | '/driver-hub'
     | '/engineer'
     | '/engineering-memory'
     | '/expenses'
@@ -578,6 +588,7 @@ export interface FileRouteTypes {
     | '/damage'
     | '/debrief'
     | '/driver'
+    | '/driver-hub'
     | '/engineer'
     | '/engineering-memory'
     | '/expenses'
@@ -633,6 +644,7 @@ export interface FileRouteTypes {
     | '/_authenticated/damage'
     | '/_authenticated/debrief'
     | '/_authenticated/driver'
+    | '/_authenticated/driver-hub'
     | '/_authenticated/engineer'
     | '/_authenticated/engineering-memory'
     | '/_authenticated/expenses'
@@ -944,6 +956,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEngineerRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/driver-hub': {
+      id: '/_authenticated/driver-hub'
+      path: '/driver-hub'
+      fullPath: '/driver-hub'
+      preLoaderRoute: typeof AuthenticatedDriverHubRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/driver': {
       id: '/_authenticated/driver'
       path: '/driver'
@@ -1111,6 +1130,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDamageRoute: typeof AuthenticatedDamageRoute
   AuthenticatedDebriefRoute: typeof AuthenticatedDebriefRoute
   AuthenticatedDriverRoute: typeof AuthenticatedDriverRoute
+  AuthenticatedDriverHubRoute: typeof AuthenticatedDriverHubRoute
   AuthenticatedEngineerRoute: typeof AuthenticatedEngineerRoute
   AuthenticatedEngineeringMemoryRoute: typeof AuthenticatedEngineeringMemoryRoute
   AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRoute
@@ -1156,6 +1176,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDamageRoute: AuthenticatedDamageRoute,
   AuthenticatedDebriefRoute: AuthenticatedDebriefRoute,
   AuthenticatedDriverRoute: AuthenticatedDriverRoute,
+  AuthenticatedDriverHubRoute: AuthenticatedDriverHubRoute,
   AuthenticatedEngineerRoute: AuthenticatedEngineerRoute,
   AuthenticatedEngineeringMemoryRoute: AuthenticatedEngineeringMemoryRoute,
   AuthenticatedExpensesRoute: AuthenticatedExpensesRoute,
@@ -1208,13 +1229,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

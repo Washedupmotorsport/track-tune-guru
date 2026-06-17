@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -15,13 +15,11 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/sympathy")({
-  component: SympathyPage,
-  head: () => ({
-    meta: [
-      { title: "Mechanical Sympathy — My Race Engineer" },
-      { name: "description", content: "Detect tyre abuse, overheating, unstable braking, kerb strikes, and rear overworking — and generate engineering warnings to protect the car." },
-    ],
-  }),
+  component: () => {
+    const nav = useNavigate();
+    useEffect(() => { nav({ to: "/driver-hub", search: { tab: "sympathy" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    return null;
+  },
 });
 
 // ------------------------------------------------------------
@@ -194,7 +192,7 @@ function warningsFor(p: Pattern, sev: 1 | 2 | 3): Warning[] {
 
 // ------------------------------------------------------------
 
-function SympathyPage() {
+export function SympathyPage() {
   const { user } = useAuth();
 
   const fbQ = useQuery({
