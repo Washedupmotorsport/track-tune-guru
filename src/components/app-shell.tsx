@@ -155,7 +155,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-4">
             <FooterLink to="/weekends" pathname={pathname}>Weekend</FooterLink>
             <FooterLink to="/sessions" pathname={pathname}>Sessions</FooterLink>
-            <FooterLink to="/tyre-setup" pathname={pathname}>Tyres</FooterLink>
+            <FooterLink to="/tyres" pathname={pathname}>Tyres</FooterLink>
             <FooterLink to="/setup-library" pathname={pathname}>Setup</FooterLink>
             <FooterLink to="/race-mode" pathname={pathname} matches={["/race-mode", "/engineer", "/track-evolution"]}>Race Mode</FooterLink>
           </div>
