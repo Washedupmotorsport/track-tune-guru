@@ -16,6 +16,7 @@ type Hit =
   | { kind: "note"; id: string; label: string };
 
 const PAGES: { label: string; to: string; icon: React.ReactNode }[] = [
+  { label: "Settings", to: "/settings", icon: <Settings2 className="w-4 h-4" /> },
   { label: "Garage", to: "/garage", icon: <Car className="w-4 h-4" /> },
   { label: "Sessions", to: "/sessions", icon: <Timer className="w-4 h-4" /> },
   { label: "Analysis", to: "/analysis", icon: <BarChart3 className="w-4 h-4" /> },
