@@ -286,8 +286,6 @@ const ALL_NAV_GROUPS = [
     items: [
       { to: "/analysis",        label: "Stint analysis",     icon: BarChart3 },
       { to: "/timeline",        label: "Weekend timeline",   icon: ClipboardList },
-      { to: "/baseline",        label: "Baseline generator", icon: Wand2 },
-      { to: "/iteration",       label: "Setup iteration",    icon: GitBranch },
       { to: "/track-evolution", label: "Track evolution",    icon: CloudRain },
       { to: "/session-debrief", label: "Session debrief",    icon: ClipboardList },
       { to: "/notes",           label: "Engineer notes",     icon: NotebookPen },
