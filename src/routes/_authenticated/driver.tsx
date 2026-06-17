@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -10,13 +10,11 @@ import { GuidedTour } from "@/components/guided-tour";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/driver")({
-  head: () => ({
-    meta: [
-      { title: "Driver — My Race Engineer" },
-      { name: "description", content: "Driver workspace: in-car feedback, confidence scoring, debrief notes, and handling complaints." },
-    ],
-  }),
-  component: DriverHub,
+  component: () => {
+    const nav = useNavigate();
+    useEffect(() => { nav({ to: "/driver-hub", search: { tab: "confidence" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    return null;
+  },
 });
 
 type Confidence = { overall: number | null; recorded_at: string };
