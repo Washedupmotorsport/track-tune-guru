@@ -361,7 +361,6 @@ function SetupLibraryList({ mode, hideHeader }: { mode: "baselines" | "presets" 
       )}
 
       {mode !== "comparisons" && (
-      {/* Groups */}
       <div className="mt-6 space-y-6">
         {[...grouped.entries()].map(([key, items]) => {
           const meta = presetMeta(key);
