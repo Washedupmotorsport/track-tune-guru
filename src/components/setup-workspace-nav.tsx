@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookMarked, Wand2, GitBranch, NotebookPen } from "lucide-react";
+import { BookMarked, NotebookPen } from "lucide-react";
 
 const TABS = [
   { to: "/setup-library", label: "Library", icon: BookMarked, blurb: "Setup library hub — baselines, iterations, presets, history, comparisons" },

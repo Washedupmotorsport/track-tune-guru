@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/command";
 import {
   Timer, Disc, Wrench, Package, CalendarDays, Receipt, BarChart3,
-  Calculator, Wand2, NotebookPen, Car, Settings2, Flag, Brain, BookMarked,
+  Calculator, NotebookPen, Car, Settings2, Flag, Brain, BookMarked,
 } from "lucide-react";
 
 type Hit =
