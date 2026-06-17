@@ -413,7 +413,7 @@ function WeekendHub() {
                 <span className="flex-1">Track database</span>
                 <ChevronRight className="w-3 h-3 text-muted-foreground" />
               </Link>
-              <Link to="/confidence" className="flex items-center gap-2 px-2 py-2 rounded-sm hover:bg-muted/30 text-sm">
+              <Link to="/driver-hub" search={{ tab: "confidence" }} className="flex items-center gap-2 px-2 py-2 rounded-sm hover:bg-muted/30 text-sm">
                 <Trophy className="w-4 h-4 text-primary" />
                 <span className="flex-1">Driver feedback trends</span>
                 <ChevronRight className="w-3 h-3 text-muted-foreground" />
