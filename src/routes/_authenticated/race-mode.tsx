@@ -264,18 +264,8 @@ function RaceModePage() {
     },
     onSuccess: (lapId, { ms, lapNumber }) => {
       qc.invalidateQueries({ queryKey: ["rm-laps", sessionId] });
-      toast.success(`Lap #${lapNumber} saved — ${formatLapTime(ms)}`, {
-        duration: 6000,
-        action: {
-          label: "Undo",
-          onClick: async () => {
-            const { error } = await supabase.from("laps").delete().eq("id", lapId);
-            if (error) { toast.error("Could not undo lap"); return; }
-            qc.invalidateQueries({ queryKey: ["rm-laps", sessionId] });
-            toast("Lap removed");
-          },
-        },
-      });
+      recentLapsRef.current.push({ id: lapId, lapNumber, ms, savedAt: Date.now() });
+      showUndoToast();
     },
     onError: (e: Error) => toast.error(e.message),
   });
