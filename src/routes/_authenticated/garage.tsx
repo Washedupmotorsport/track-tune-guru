@@ -12,6 +12,7 @@ import { DISCIPLINES } from "@/lib/disciplines";
 import {
   Plus, Car, Trash2, Users, Share2, Timer, FileText, Trophy,
   Radio, Flag, ClipboardList, ChevronRight, Disc, Wand2, Camera, Loader2,
+  HardHat, Wrench, Package, Receipt,
 } from "lucide-react";
 import { GuidedTour } from "@/components/guided-tour";
 import { useState, useRef, useEffect } from "react";
@@ -190,6 +191,8 @@ function Garage() {
           <p className="text-sm text-muted-foreground">Add your first car to start tracking setups.</p>
         </div>
       )}
+
+      <OperationsStrip />
     </div>
   );
 }
@@ -201,6 +204,46 @@ function EmptyState() {
       <h3 className="mt-4 font-display text-xl font-semibold">No cars yet</h3>
       <p className="text-sm text-muted-foreground">Add your first car to start tracking setups.</p>
     </div>
+  );
+}
+
+function OperationsStrip() {
+  const items = [
+    { to: "/workshop",    label: "Workshop",    icon: HardHat,        sub: "Build sheet" },
+    { to: "/maintenance", label: "Maintenance", icon: Wrench,         sub: "Service log" },
+    { to: "/inventory",   label: "Inventory",   icon: Package,        sub: "Parts & stock" },
+    { to: "/expenses",    label: "Expenses",    icon: Receipt,        sub: "Spend tracking" },
+    { to: "/reports",     label: "Reports",     icon: FileText,       sub: "Season totals" },
+  ] as const;
+  return (
+    <section className="mt-10">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Garage</div>
+          <h2 className="font-display text-lg font-bold uppercase tracking-wider">Operations</h2>
+        </div>
+        <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground">Admin & off-track</span>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+        {items.map((it) => {
+          const Icon = it.icon;
+          return (
+            <Link
+              key={it.to}
+              to={it.to}
+              className="group min-h-[64px] rounded-md border border-border bg-card/60 hover:border-primary/40 hover:text-primary px-3 py-2 flex items-center gap-3 transition-colors"
+            >
+              <Icon className="w-5 h-5 shrink-0" />
+              <div className="min-w-0">
+                <div className="text-xs font-mono uppercase tracking-[0.18em] truncate">{it.label}</div>
+                <div className="text-[10px] text-muted-foreground truncate">{it.sub}</div>
+              </div>
+              <ChevronRight className="w-4 h-4 ml-auto opacity-50 group-hover:opacity-100" />
+            </Link>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
