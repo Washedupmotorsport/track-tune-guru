@@ -28,6 +28,7 @@ import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSympathyRouteImport } from './routes/_authenticated/sympathy'
 import { Route as AuthenticatedSetupLibraryRouteImport } from './routes/_authenticated/setup-library'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
+import { Route as AuthenticatedSessionDebriefRouteImport } from './routes/_authenticated/session-debrief'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedRacemodeRouteImport } from './routes/_authenticated/racemode'
 import { Route as AuthenticatedRaceModeRouteImport } from './routes/_authenticated/race-mode'
@@ -161,6 +162,12 @@ const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
   path: '/sessions',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSessionDebriefRoute =
+  AuthenticatedSessionDebriefRouteImport.update({
+    id: '/session-debrief',
+    path: '/session-debrief',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -383,6 +390,7 @@ export interface FileRoutesByFullPath {
   '/race-mode': typeof AuthenticatedRaceModeRoute
   '/racemode': typeof AuthenticatedRacemodeRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/session-debrief': typeof AuthenticatedSessionDebriefRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/setup-library': typeof AuthenticatedSetupLibraryRoute
   '/sympathy': typeof AuthenticatedSympathyRoute
@@ -438,6 +446,7 @@ export interface FileRoutesByTo {
   '/race-mode': typeof AuthenticatedRaceModeRoute
   '/racemode': typeof AuthenticatedRacemodeRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/session-debrief': typeof AuthenticatedSessionDebriefRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/setup-library': typeof AuthenticatedSetupLibraryRoute
   '/sympathy': typeof AuthenticatedSympathyRoute
@@ -495,6 +504,7 @@ export interface FileRoutesById {
   '/_authenticated/race-mode': typeof AuthenticatedRaceModeRoute
   '/_authenticated/racemode': typeof AuthenticatedRacemodeRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
+  '/_authenticated/session-debrief': typeof AuthenticatedSessionDebriefRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRouteWithChildren
   '/_authenticated/setup-library': typeof AuthenticatedSetupLibraryRoute
   '/_authenticated/sympathy': typeof AuthenticatedSympathyRoute
@@ -552,6 +562,7 @@ export interface FileRouteTypes {
     | '/race-mode'
     | '/racemode'
     | '/reports'
+    | '/session-debrief'
     | '/sessions'
     | '/setup-library'
     | '/sympathy'
@@ -607,6 +618,7 @@ export interface FileRouteTypes {
     | '/race-mode'
     | '/racemode'
     | '/reports'
+    | '/session-debrief'
     | '/sessions'
     | '/setup-library'
     | '/sympathy'
@@ -663,6 +675,7 @@ export interface FileRouteTypes {
     | '/_authenticated/race-mode'
     | '/_authenticated/racemode'
     | '/_authenticated/reports'
+    | '/_authenticated/session-debrief'
     | '/_authenticated/sessions'
     | '/_authenticated/setup-library'
     | '/_authenticated/sympathy'
@@ -828,6 +841,13 @@ declare module '@tanstack/react-router' {
       path: '/sessions'
       fullPath: '/sessions'
       preLoaderRoute: typeof AuthenticatedSessionsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/session-debrief': {
+      id: '/_authenticated/session-debrief'
+      path: '/session-debrief'
+      fullPath: '/session-debrief'
+      preLoaderRoute: typeof AuthenticatedSessionDebriefRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/reports': {
@@ -1149,6 +1169,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedRaceModeRoute: typeof AuthenticatedRaceModeRoute
   AuthenticatedRacemodeRoute: typeof AuthenticatedRacemodeRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
+  AuthenticatedSessionDebriefRoute: typeof AuthenticatedSessionDebriefRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRouteWithChildren
   AuthenticatedSetupLibraryRoute: typeof AuthenticatedSetupLibraryRoute
   AuthenticatedSympathyRoute: typeof AuthenticatedSympathyRoute
@@ -1195,6 +1216,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedRaceModeRoute: AuthenticatedRaceModeRoute,
   AuthenticatedRacemodeRoute: AuthenticatedRacemodeRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
+  AuthenticatedSessionDebriefRoute: AuthenticatedSessionDebriefRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRouteWithChildren,
   AuthenticatedSetupLibraryRoute: AuthenticatedSetupLibraryRoute,
   AuthenticatedSympathyRoute: AuthenticatedSympathyRoute,

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
@@ -12,7 +12,13 @@ import {
   Wind, Disc, Gauge, Mountain, ShieldCheck, AlertTriangle, X,
 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/debrief")({ component: DebriefPage });
+export const Route = createFileRoute("/_authenticated/debrief")({
+  component: () => {
+    const nav = useNavigate();
+    useEffect(() => { nav({ to: "/session-debrief", search: { tab: "feedback" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    return null;
+  },
+});
 
 type Car = { id: string; name: string };
 type Session = { id: string; name: string; car_id: string; started_at: string; track: string | null };
@@ -62,7 +68,7 @@ const formSchema = z.object({
   tags: z.array(z.string().trim().min(1).max(30)).max(8),
 });
 
-function DebriefPage() {
+export function DebriefPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const { activeWeekend, activeCar, activeSession } = useActiveWeekend();

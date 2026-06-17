@@ -585,7 +585,7 @@ function EngineerCockpit() {
                 {confDelta != null && confDelta <= -2 && <li>Confidence down {Math.abs(confDelta)} pt vs prior</li>}
               </ul>
               <div className="mt-3 flex flex-wrap gap-2">
-                <Link to="/post-debrief" className="border border-border rounded-md px-3 py-1.5 inline-flex items-center text-xs font-medium hover:border-primary hover:text-primary">Open debrief</Link>
+                <Link to="/session-debrief" className="border border-border rounded-md px-3 py-1.5 inline-flex items-center text-xs font-medium hover:border-primary hover:text-primary">Open debrief</Link>
                 <Link to="/iteration"   className="border border-border rounded-md px-3 py-1.5 inline-flex items-center text-xs font-medium hover:border-primary hover:text-primary">Plan change</Link>
               </div>
             </div>

@@ -170,7 +170,7 @@ function DriverHub() {
       <h2 className="font-display text-lg font-bold uppercase tracking-wider mt-8 mb-3">Between sessions</h2>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <ActionCard to="/driver-hub" icon={Gauge} title="Driver Hub" desc="Confidence, feedback, corner notes, known behaviours and mechanical sympathy — one place." />
-        <ActionCard to="/debrief" icon={ClipboardList} title="Debrief" desc="Drop a structured debrief while the lap is fresh. Audio + notes." />
+        <ActionCard to="/session-debrief" icon={ClipboardList} title="Session Debrief" desc="One workflow: driver feedback, engineering review, action items, lessons learned." />
         <ActionCard to="/sympathy" icon={MessageSquare} title="Driver feedback" desc="Tag complaints by corner, phase, and severity. Engineers see them instantly." />
         <ActionCard to="/notes" icon={NotebookPen} title="Notes" desc="Personal notebook — lines, references, what worked." />
         <ActionCard to="/race-mode" icon={Radio} title="Race Mode" desc="One race-day screen: live timing, tyres, fuel, feedback, priorities." />

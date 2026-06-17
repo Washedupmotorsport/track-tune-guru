@@ -199,13 +199,13 @@ function RecCard({ rec }: { rec: EngineerRecommendation }) {
                 <RelatedLink to="/tyre-setup" label="Tyre log" />
               )}
               {related.debrief_id && (
-                <RelatedLink to="/post-debrief" label="Debrief" />
+                <RelatedLink to="/session-debrief" label="Debrief" />
               )}
               {related.memory_id && (
                 <RelatedLink to="/engineering-memory" label="Memory" />
               )}
               {related.feedback_id && (
-                <RelatedLink to="/debrief" label="Driver feedback" />
+                <RelatedLink to="/session-debrief" label="Driver feedback" />
               )}
             </div>
           )}

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
@@ -18,12 +18,24 @@ import { toast } from "sonner";
 import { summarizeSessionDebrief, type SessionDebriefAI } from "@/lib/session-debrief.functions";
 
 export const Route = createFileRoute("/_authenticated/post-debrief")({
-  component: PostDebriefPage,
   validateSearch: (s: Record<string, unknown>) => ({
     sessionId: typeof s.sessionId === "string" ? s.sessionId : undefined,
     carId: typeof s.carId === "string" ? s.carId : undefined,
     new: s.new === "1" || s.new === true ? true : undefined,
   }),
+  component: () => {
+    const nav = useNavigate();
+    const s = Route.useSearch();
+    useEffect(() => {
+      nav({
+        to: "/session-debrief",
+        search: { tab: "review", sessionId: s.sessionId, carId: s.carId, new: s.new },
+        replace: true,
+      });
+      /* eslint-disable-next-line react-hooks/exhaustive-deps */
+    }, []);
+    return null;
+  },
 });
 
 type Car = { id: string; name: string };
@@ -37,7 +49,7 @@ type Debrief = {
   created_at: string; updated_at: string;
 };
 
-function PostDebriefPage() {
+export function PostDebriefPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const search = Route.useSearch();
