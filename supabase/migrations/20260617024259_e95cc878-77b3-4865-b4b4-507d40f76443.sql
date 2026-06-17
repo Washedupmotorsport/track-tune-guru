@@ -1,0 +1,1 @@
+ALTER TABLE public.laps ALTER COLUMN setup_id DROP NOT NULL;
