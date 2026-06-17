@@ -1,11 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookMarked, Wand2, GitBranch, NotebookPen } from "lucide-react";
+import { BookMarked, NotebookPen } from "lucide-react";
 
 const TABS = [
-  { to: "/setup-library", label: "Library",      icon: BookMarked, blurb: "Saved philosophies, best laps, tyre + confidence" },
-  { to: "/baseline",      label: "Baseline",     icon: Wand2,      blurb: "Generate a starting point" },
-  { to: "/iteration",     label: "Iteration",    icon: GitBranch,  blurb: "Track every change and its effect" },
-  { to: "/notes",         label: "Notes",        icon: NotebookPen, blurb: "Engineering notebook" },
+  { to: "/setup-library", label: "Library", icon: BookMarked, blurb: "Setup library hub — baselines, iterations, presets, history, comparisons" },
+  { to: "/notes",         label: "Notes",   icon: NotebookPen, blurb: "Engineering notebook" },
 ] as const;
 
 /**

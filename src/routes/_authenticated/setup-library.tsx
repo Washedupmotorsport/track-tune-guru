@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,15 +7,105 @@ import { useActiveWeekend } from "@/lib/active-weekend";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { BookMarked, Pin, Trophy, Gauge, Cloud, Flame, Shield, Zap, Wand2, Search, Star } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { BookMarked, Pin, Trophy, Gauge, Cloud, Flame, Shield, Zap, Wand2, Search, Star, GitBranch, Sparkles, History, GitCompare } from "lucide-react";
 import { formatLapTime } from "@/lib/lap-time";
 import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
 import { GuidedTour } from "@/components/guided-tour";
+import { BaselinePage } from "./baseline";
+import { IterationPage } from "./iteration";
+
+type TabId = "baselines" | "iterations" | "presets" | "history" | "comparisons";
+const VALID_TABS: TabId[] = ["baselines", "iterations", "presets", "history", "comparisons"];
 
 export const Route = createFileRoute("/_authenticated/setup-library")({
-  component: SetupLibrary,
+  validateSearch: (s: Record<string, unknown>) => ({
+    tab: typeof s.tab === "string" && (VALID_TABS as string[]).includes(s.tab) ? (s.tab as TabId) : undefined,
+  }),
+  head: () => ({
+    meta: [
+      { title: "Setup Library — My Race Engineer" },
+      { name: "description", content: "Single source of truth for setup engineering — baselines, iterations, presets, history and comparisons." },
+    ],
+  }),
+  component: SetupHub,
 });
+
+const TAB_DEFS: { id: TabId; label: string; icon: typeof Wand2; blurb: string }[] = [
+  { id: "baselines",   label: "Baselines",     icon: Wand2,      blurb: "Generated starting points & pinned baselines" },
+  { id: "iterations",  label: "Iterations",    icon: GitBranch,  blurb: "Every change, its expected effect and outcome" },
+  { id: "presets",     label: "Presets",       icon: Sparkles,   blurb: "Tagged philosophies: qualifying, wet, endurance…" },
+  { id: "history",     label: "Setup History", icon: History,    blurb: "All setups by recency" },
+  { id: "comparisons", label: "Comparisons",   icon: GitCompare, blurb: "Best laps & confidence side-by-side" },
+];
+
+function SetupHub() {
+  const search = Route.useSearch();
+  const nav = useNavigate();
+  const [tab, setTab] = useState<TabId>(search.tab ?? "baselines");
+  useEffect(() => { if (search.tab && search.tab !== tab) setTab(search.tab); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [search.tab]);
+  return (
+    <div>
+      <GuidedTour tourKey="setup" />
+      <SetupWorkspaceNav />
+      <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
+        <BookMarked className="w-3 h-3" /> Setup library
+      </div>
+      <h1 className="font-display text-4xl font-bold mt-1">Setup Library</h1>
+      <p className="text-muted-foreground text-sm mt-1 max-w-2xl">
+        The single source of truth for setup engineering — generate baselines, log iterations,
+        browse presets, review history and compare setups in one place.
+      </p>
+
+      <Tabs
+        value={tab}
+        onValueChange={(v) => { const next = v as TabId; setTab(next); nav({ to: "/setup-library", search: { tab: next }, replace: true }); }}
+        className="mt-6"
+      >
+        <TabsList className="flex flex-wrap h-auto gap-1 bg-muted/40 p-1 justify-start">
+          {TAB_DEFS.map((t) => {
+            const Icon = t.icon;
+            return (
+              <TabsTrigger key={t.id} value={t.id} title={t.blurb} className="gap-1.5">
+                <Icon className="w-3.5 h-3.5" /> {t.label}
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
+
+        <TabsContent value="baselines"   className="mt-6"><BaselinesTab /></TabsContent>
+        <TabsContent value="iterations"  className="mt-6"><IterationPage /></TabsContent>
+        <TabsContent value="presets"     className="mt-6"><SetupLibraryList mode="presets" /></TabsContent>
+        <TabsContent value="history"     className="mt-6"><SetupLibraryList mode="history" /></TabsContent>
+        <TabsContent value="comparisons" className="mt-6"><ComparisonsTab /></TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function BaselinesTab() {
+  return (
+    <div className="space-y-6">
+      <div className="rounded-lg border border-border bg-card p-4 flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <div className="font-display text-lg font-bold">Generate a new baseline</div>
+          <p className="text-xs text-muted-foreground mt-0.5 max-w-xl">
+            Build a discipline-aware starting point for any car/track combo, then iterate from it.
+          </p>
+        </div>
+      </div>
+      <BaselinePage />
+      <div>
+        <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-3">Saved baselines</h2>
+        <SetupLibraryList mode="baselines" hideHeader />
+      </div>
+    </div>
+  );
+}
+
+function ComparisonsTab() {
+  return <SetupLibraryList mode="comparisons" />;
+}
 
 type PresetType =
   | "none" | "baseline" | "qualifying" | "endurance" | "wet"
@@ -41,7 +131,7 @@ type SetupRow = {
 };
 type Car = { id: string; name: string };
 
-function SetupLibrary() {
+function SetupLibraryList({ mode, hideHeader }: { mode: "baselines" | "presets" | "history" | "comparisons"; hideHeader?: boolean }) {
   const { user } = useAuth();
   const { activeCar, activeTrack, activeWeekend } = useActiveWeekend();
   const [carId, setCarId] = useState<string>("all");
@@ -53,7 +143,7 @@ function SetupLibrary() {
       setCarId(activeCar.id);
     }
   }, [activeCar]);
-  const [preset, setPreset] = useState<string>("all");
+  const [preset, setPreset] = useState<string>(mode === "presets" ? "presets" : "all");
   const [search, setSearch] = useState("");
 
   const carsQ = useQuery({
@@ -145,6 +235,8 @@ function SetupLibrary() {
   const filtered = useMemo(() => {
     const list = (setupsQ.data ?? []).filter((s) => {
       if (carId !== "all" && s.car_id !== carId) return false;
+      if (mode === "baselines" && !s.is_baseline) return false;
+      if (mode === "presets" && s.preset_type === "none" && !s.is_baseline) return false;
       if (preset === "presets" && (s.preset_type === "none" && !s.is_baseline)) return false;
       if (preset !== "all" && preset !== "presets" && s.preset_type !== preset) return false;
       if (search) {
@@ -153,6 +245,13 @@ function SetupLibrary() {
       }
       return true;
     });
+    if (mode === "history") {
+      return list.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+    }
+    if (mode === "comparisons") {
+      const best = (id: string) => stats.get(id)?.bestMs ?? Number.POSITIVE_INFINITY;
+      return list.sort((a, b) => best(a.id) - best(b.id));
+    }
     // Sort: active-track matches first, then baselines, then most recently updated.
     const trackName = activeTrack?.name?.toLowerCase() ?? activeWeekend?.track?.toLowerCase() ?? null;
     const trackMatch = (s: SetupRow) =>
@@ -164,7 +263,7 @@ function SetupLibrary() {
       if (bl !== 0) return bl;
       return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
     });
-  }, [setupsQ.data, carId, preset, search, activeTrack, activeWeekend]);
+  }, [setupsQ.data, carId, preset, search, activeTrack, activeWeekend, mode, stats]);
 
   // Grouped by preset for the overview
   const grouped = useMemo(() => {
@@ -179,20 +278,14 @@ function SetupLibrary() {
 
   const carName = (id: string) => carsQ.data?.find((c) => c.id === id)?.name ?? "—";
 
+  const leaderBest = mode === "comparisons"
+    ? filtered.map((s) => stats.get(s.id)?.bestMs).find((v): v is number => v != null) ?? null
+    : null;
+
   return (
     <div>
-      <GuidedTour tourKey="setup" />
-      <SetupWorkspaceNav />
-      <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">
-        <BookMarked className="w-3 h-3" /> Setup library
-      </div>
-      <h1 className="font-display text-4xl font-bold mt-1">Engineering setup library</h1>
-      <p className="text-muted-foreground text-sm mt-1">
-        Your saved setup philosophies — qualifying, endurance, wet, hot, conservative, aggressive rotation — with best laps, tyre behaviour and driver confidence pulled from every session that used them.
-      </p>
-
       {/* Filters */}
-      <div className="mt-6 flex flex-wrap items-end gap-3 rounded-lg border border-border bg-card p-4">
+      <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border bg-card p-4">
         <div className="flex-1 min-w-[180px]">
           <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1">Search</div>
           <div className="relative">
@@ -212,6 +305,7 @@ function SetupLibrary() {
             </SelectContent>
           </Select>
         </div>
+        {mode !== "baselines" && (
         <div className="min-w-[180px]">
           <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1">Type</div>
           <Select value={preset} onValueChange={setPreset}>
@@ -225,17 +319,47 @@ function SetupLibrary() {
             </SelectContent>
           </Select>
         </div>
+        )}
       </div>
 
       {/* Empty */}
       {filtered.length === 0 && (
         <div className="mt-8 rounded-lg border border-dashed border-border p-10 text-center text-muted-foreground">
           <BookMarked className="w-8 h-8 mx-auto mb-3 opacity-60" />
-          No setups match. Tag your existing setups (Qualifying, Wet, Endurance…) from the setup detail page to build your library.
+          No setups match this view yet.
         </div>
       )}
 
-      {/* Groups */}
+      {mode === "comparisons" && filtered.length > 0 && (
+        <div className="mt-6 rounded-lg border border-border bg-card overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/40 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              <tr><th className="text-left px-3 py-2">Setup</th><th className="text-left px-3 py-2">Car · Track</th><th className="text-right px-3 py-2">Best lap</th><th className="text-right px-3 py-2">Δ</th><th className="text-right px-3 py-2">Confidence</th></tr>
+            </thead>
+            <tbody>
+              {filtered.map((s) => {
+                const st = stats.get(s.id);
+                const delta = st?.bestMs != null && leaderBest != null ? st.bestMs - leaderBest : null;
+                return (
+                  <tr key={s.id} className="border-t border-border hover:bg-muted/20">
+                    <td className="px-3 py-2">
+                      <Link to="/setups/$setupId" params={{ setupId: s.id }} className="font-display font-bold hover:text-primary inline-flex items-center gap-1">
+                        {s.is_baseline && <Pin className="w-3 h-3 text-primary" />}{s.name}
+                      </Link>
+                    </td>
+                    <td className="px-3 py-2 text-xs text-muted-foreground">{carName(s.car_id)} · {s.track || "—"}</td>
+                    <td className="px-3 py-2 text-right font-mono">{st?.bestMs ? formatLapTime(st.bestMs) : "—"}</td>
+                    <td className="px-3 py-2 text-right font-mono text-xs text-muted-foreground">{delta == null ? "—" : delta === 0 ? "leader" : `+${(delta/1000).toFixed(3)}s`}</td>
+                    <td className="px-3 py-2 text-right font-mono">{st?.avgConf != null ? `${st.avgConf.toFixed(1)}/10` : "—"}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {mode !== "comparisons" && (
       <div className="mt-6 space-y-6">
         {[...grouped.entries()].map(([key, items]) => {
           const meta = presetMeta(key);
@@ -311,15 +435,13 @@ function SetupLibrary() {
           );
         })}
       </div>
+      )}
 
-      <div className="mt-8 text-xs text-muted-foreground">
-        Tip: tag any setup from its detail page using the <strong>Library</strong> panel to make it appear here.
-      </div>
-      <div className="mt-2">
-        <Button asChild variant="outline" size="sm">
-          <Link to="/baseline"><Wand2 className="w-4 h-4 mr-1" /> Generate new baseline</Link>
-        </Button>
-      </div>
+      {!hideHeader && (
+        <div className="mt-8 text-xs text-muted-foreground">
+          Tip: tag any setup from its detail page using the <strong>Library</strong> panel to make it appear here.
+        </div>
+      )}
     </div>
   );
 }

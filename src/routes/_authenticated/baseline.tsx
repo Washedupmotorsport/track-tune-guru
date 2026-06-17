@@ -18,7 +18,11 @@ import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
 import { useActiveWeekend } from "@/lib/active-weekend";
 
 export const Route = createFileRoute("/_authenticated/baseline")({
-  component: BaselinePage,
+  component: () => {
+    const nav = useNavigate();
+    useEffect(() => { nav({ to: "/setup-library", search: { tab: "baselines" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    return null;
+  },
 });
 
 type Car = { id: string; name: string; discipline: string };
@@ -37,7 +41,7 @@ type Track = {
   weather_sensitivity: string | null;
 };
 
-function BaselinePage() {
+export function BaselinePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const units = useUnits();

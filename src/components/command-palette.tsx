@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/command";
 import {
   Timer, Disc, Wrench, Package, CalendarDays, Receipt, BarChart3,
-  Calculator, Wand2, NotebookPen, Car, Settings2, Flag, Brain, BookMarked,
+  Calculator, NotebookPen, Car, Settings2, Flag, Brain, BookMarked,
 } from "lucide-react";
 
 type Hit =
@@ -25,7 +25,6 @@ const PAGES: { label: string; to: string; icon: React.ReactNode }[] = [
   { label: "Calendar", to: "/calendar", icon: <CalendarDays className="w-4 h-4" /> },
   { label: "Expenses", to: "/expenses", icon: <Receipt className="w-4 h-4" /> },
   { label: "Calculators", to: "/calculators", icon: <Calculator className="w-4 h-4" /> },
-  { label: "Baseline", to: "/baseline", icon: <Wand2 className="w-4 h-4" /> },
   { label: "Notes", to: "/notes", icon: <NotebookPen className="w-4 h-4" /> },
   { label: "Engineering memory", to: "/engineering-memory", icon: <Brain className="w-4 h-4" /> },
   { label: "Setup library", to: "/setup-library", icon: <BookMarked className="w-4 h-4" /> },
