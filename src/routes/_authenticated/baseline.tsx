@@ -1,5 +1,4 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect as useEffectRedirect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -21,7 +20,7 @@ import { useActiveWeekend } from "@/lib/active-weekend";
 export const Route = createFileRoute("/_authenticated/baseline")({
   component: () => {
     const nav = useNavigate();
-    useEffectRedirect(() => { nav({ to: "/setup-library", search: { tab: "baselines" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    useEffect(() => { nav({ to: "/setup-library", search: { tab: "baselines" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
     return null;
   },
 });
