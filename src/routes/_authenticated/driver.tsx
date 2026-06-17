@@ -169,7 +169,7 @@ function DriverHub() {
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <ActionCard to="/driver-hub" icon={Gauge} title="Driver Hub" desc="Confidence, feedback, corner notes, known behaviours and mechanical sympathy — one place." />
         <ActionCard to="/session-debrief" icon={ClipboardList} title="Session Debrief" desc="One workflow: driver feedback, engineering review, action items, lessons learned." />
-        <ActionCard to="/sympathy" icon={MessageSquare} title="Driver feedback" desc="Tag complaints by corner, phase, and severity. Engineers see them instantly." />
+        <ActionCard to="/driver-hub" search={{ tab: "sympathy" }} icon={MessageSquare} title="Driver feedback" desc="Tag complaints by corner, phase, and severity. Engineers see them instantly." />
         <ActionCard to="/notes" icon={NotebookPen} title="Notes" desc="Personal notebook — lines, references, what worked." />
         <ActionCard to="/race-mode" icon={Radio} title="Race Mode" desc="One race-day screen: live timing, tyres, fuel, feedback, priorities." />
       </div>
@@ -181,7 +181,7 @@ function DriverHub() {
           <div className="p-6 text-center">
             <Zap className="w-6 h-6 mx-auto text-muted-foreground/60" />
             <div className="text-sm text-muted-foreground mt-2">No feedback yet — log the first one after the next run.</div>
-            <Link to="/sympathy" className="inline-flex items-center text-xs text-primary mt-2 hover:underline">
+            <Link to="/driver-hub" search={{ tab: "sympathy" }} className="inline-flex items-center text-xs text-primary mt-2 hover:underline">
               Log feedback <ArrowRight className="w-3 h-3 ml-1" />
             </Link>
           </div>
@@ -275,9 +275,10 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
 }
 
 function ActionCard({
-  to, icon: Icon, title, desc,
+  to, search, icon: Icon, title, desc,
 }: {
   to: string;
+  search?: Record<string, string>;
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   desc: string;
@@ -285,6 +286,7 @@ function ActionCard({
   return (
     <Link
       to={to}
+      search={search as never}
       className="group rounded-lg border border-border bg-card p-4 shadow-card hover:border-primary/50 hover:bg-card/80 transition-colors"
     >
       <div className="flex items-center gap-2">

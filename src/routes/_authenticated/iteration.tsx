@@ -448,9 +448,9 @@ function HistoryColumn({
           Propose a change on the left. Every adjustment carries a reason, an expected effect, and ends with a verdict — that's how the weekend builds memory.
         </p>
         <div className="mt-4 inline-flex items-center gap-2 text-xs text-muted-foreground">
-          <Link to="/baseline" className="text-primary hover:underline">Generate a baseline</Link>
+          <Link to="/setup-library" search={{ tab: "baselines" }} className="text-primary hover:underline">Generate a baseline</Link>
           <ArrowRight className="w-3 h-3" />
-          <Link to="/setups" className="text-primary hover:underline">Open a setup</Link>
+          <Link to="/setup-library" search={{ tab: "history" }} className="text-primary hover:underline">Open a setup</Link>
           <ArrowRight className="w-3 h-3" />
           <span>Propose first change</span>
         </div>

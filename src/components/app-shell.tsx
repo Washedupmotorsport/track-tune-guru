@@ -207,7 +207,7 @@ function MobileTabBar() {
     { to: "/sessions",      label: "Sessions", icon: Timer,      matches: ["/sessions", "/timeline", "/analysis", "/session-debrief", "/debrief", "/post-debrief"] },
     { to: "/tyres",         label: "Tyres",    icon: Disc,       matches: ["/tyres", "/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
     { to: "/setup-library", label: "Setup",    icon: BookMarked, matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-    { to: "/driver-hub",    label: "Driver",   icon: Brain,      matches: ["/driver-hub", "/driver", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy", "/engineering-memory", "/notes"] },
+    { to: "/driver-hub",    label: "Driver",   icon: Brain,      matches: ["/driver-hub", "/driver", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy", "/flags"] },
   ] as const;
   return (
     <nav
@@ -257,7 +257,7 @@ const PRIMARY_NAV: { to: string; label: string; icon: typeof Radio; matches?: st
   { to: "/setup-library",      label: "Setup Library",      icon: BookMarked,   matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
   { to: "/tyres",              label: "Tyres",              icon: Disc,         matches: ["/tyres", "/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
   { to: "/driver-hub",         label: "Driver Hub",         icon: Brain,        matches: ["/driver-hub", "/driver", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy", "/flags"] },
-  { to: "/engineering-memory", label: "Engineering Memory", icon: Brain,        matches: ["/engineering-memory", "/notes"] },
+  { to: "/engineering-memory", label: "Engineering Memory", icon: Brain,        matches: ["/engineering-memory"] },
   { to: "/tracks",             label: "Tracks",             icon: MapPin },
   { to: "/garage",             label: "Garage",             icon: Warehouse,    matches: ["/garage", "/cars"] },
   { to: "/workshop",           label: "Operations",         icon: Wrench,       matches: ["/workshop", "/maintenance", "/inventory", "/expenses", "/reports", "/damage", "/calculators"] },

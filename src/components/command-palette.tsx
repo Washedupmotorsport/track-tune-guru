@@ -5,8 +5,8 @@ import {
   CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator,
 } from "@/components/ui/command";
 import {
-  Timer, Disc, Wrench, Package, CalendarDays, Receipt, BarChart3,
-  Calculator, NotebookPen, Car, Settings2, Flag, Brain, BookMarked,
+  Timer, Disc, Wrench, CalendarDays, BarChart3,
+  Calculator, NotebookPen, Car, Settings2, Flag, Brain, BookMarked, HardHat, MapPin,
 } from "lucide-react";
 
 type Hit =
@@ -17,21 +17,21 @@ type Hit =
 
 const PAGES: { label: string; to: string; icon: React.ReactNode }[] = [
   { label: "Settings", to: "/settings", icon: <Settings2 className="w-4 h-4" /> },
-  { label: "Garage", to: "/garage", icon: <Car className="w-4 h-4" /> },
-  { label: "Sessions", to: "/sessions", icon: <Timer className="w-4 h-4" /> },
-  { label: "Analysis", to: "/analysis", icon: <BarChart3 className="w-4 h-4" /> },
-  { label: "Tyres", to: "/tyres", icon: <Disc className="w-4 h-4" /> },
-  { label: "Maintenance", to: "/maintenance", icon: <Wrench className="w-4 h-4" /> },
-  { label: "Inventory", to: "/inventory", icon: <Package className="w-4 h-4" /> },
-  { label: "Calendar", to: "/calendar", icon: <CalendarDays className="w-4 h-4" /> },
-  { label: "Expenses", to: "/expenses", icon: <Receipt className="w-4 h-4" /> },
-  { label: "Calculators", to: "/calculators", icon: <Calculator className="w-4 h-4" /> },
-  { label: "Notes", to: "/notes", icon: <NotebookPen className="w-4 h-4" /> },
-  { label: "Engineering memory", to: "/engineering-memory", icon: <Brain className="w-4 h-4" /> },
-  { label: "Setup library", to: "/setup-library", icon: <BookMarked className="w-4 h-4" /> },
-  { label: "Session debrief", to: "/session-debrief", icon: <NotebookPen className="w-4 h-4" /> },
-  { label: "Driver Hub", to: "/driver-hub", icon: <Brain className="w-4 h-4" /> },
+  { label: "Engineer Cockpit", to: "/engineer", icon: <HardHat className="w-4 h-4" /> },
   { label: "Race Mode", to: "/race-mode", icon: <Flag className="w-4 h-4" /> },
+  { label: "Sessions", to: "/sessions", icon: <Timer className="w-4 h-4" /> },
+  { label: "Tyres", to: "/tyres", icon: <Disc className="w-4 h-4" /> },
+  { label: "Setup library", to: "/setup-library", icon: <BookMarked className="w-4 h-4" /> },
+  { label: "Driver Hub", to: "/driver-hub", icon: <Brain className="w-4 h-4" /> },
+  { label: "Engineering memory", to: "/engineering-memory", icon: <Brain className="w-4 h-4" /> },
+  { label: "Garage", to: "/garage", icon: <Car className="w-4 h-4" /> },
+  { label: "Operations", to: "/workshop", icon: <Wrench className="w-4 h-4" /> },
+  { label: "Tracks", to: "/tracks", icon: <MapPin className="w-4 h-4" /> },
+  { label: "Analysis", to: "/analysis", icon: <BarChart3 className="w-4 h-4" /> },
+  { label: "Calendar", to: "/calendar", icon: <CalendarDays className="w-4 h-4" /> },
+  { label: "Calculators", to: "/calculators", icon: <Calculator className="w-4 h-4" /> },
+  { label: "Session debrief", to: "/session-debrief", icon: <NotebookPen className="w-4 h-4" /> },
+  { label: "Notes", to: "/notes", icon: <NotebookPen className="w-4 h-4" /> },
 ];
 
 export function CommandPalette() {

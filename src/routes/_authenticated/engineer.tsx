@@ -586,7 +586,7 @@ function EngineerCockpit() {
               </ul>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Link to="/session-debrief" className="border border-border rounded-md px-3 py-1.5 inline-flex items-center text-xs font-medium hover:border-primary hover:text-primary">Open debrief</Link>
-                <Link to="/iteration"   className="border border-border rounded-md px-3 py-1.5 inline-flex items-center text-xs font-medium hover:border-primary hover:text-primary">Plan change</Link>
+                <Link to="/setup-library" search={{ tab: "iterations" }} className="border border-border rounded-md px-3 py-1.5 inline-flex items-center text-xs font-medium hover:border-primary hover:text-primary">Plan change</Link>
               </div>
             </div>
           )}
@@ -598,7 +598,7 @@ function EngineerCockpit() {
       <div className="pt-4 border-t border-border flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
         <span className="text-foreground/70 inline-flex items-center gap-1.5 font-medium"><HardHat className="w-3.5 h-3.5" /> Tools</span>
         <Link to="/setup-library" className="hover:text-primary">Setup library</Link>
-        <Link to="/iteration"     className="hover:text-primary">Iteration log</Link>
+        <Link to="/setup-library" search={{ tab: "iterations" }} className="hover:text-primary">Iteration log</Link>
         <Link to="/driver-hub" search={{ tab: "corners" }} className="hover:text-primary">Corner balance</Link>
         <Link to="/analysis"      className="hover:text-primary">Session compare</Link>
         <Link to="/tyres" search={{ tab: "compare" }} className="hover:text-primary">Tyre compare</Link>
