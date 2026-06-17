@@ -7,7 +7,6 @@ import { useActiveWeekend } from "@/lib/active-weekend";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BookMarked, Pin, Trophy, Gauge, Cloud, Flame, Shield, Zap, Wand2, Search, Star, GitBranch, Sparkles, History, GitCompare } from "lucide-react";
 import { formatLapTime } from "@/lib/lap-time";
