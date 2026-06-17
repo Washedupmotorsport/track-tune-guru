@@ -758,7 +758,7 @@ export type Database = {
           sector_2_ms: number | null
           sector_3_ms: number | null
           session_id: string | null
-          setup_id: string
+          setup_id: string | null
           tire_set: string | null
           updated_at: string
           user_id: string
@@ -777,7 +777,7 @@ export type Database = {
           sector_2_ms?: number | null
           sector_3_ms?: number | null
           session_id?: string | null
-          setup_id: string
+          setup_id?: string | null
           tire_set?: string | null
           updated_at?: string
           user_id: string
@@ -796,7 +796,7 @@ export type Database = {
           sector_2_ms?: number | null
           sector_3_ms?: number | null
           session_id?: string | null
-          setup_id?: string
+          setup_id?: string | null
           tire_set?: string | null
           updated_at?: string
           user_id?: string
