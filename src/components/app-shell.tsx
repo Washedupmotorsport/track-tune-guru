@@ -204,12 +204,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 function MobileTabBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = [
-    { to: "/weekends",      label: "Weekend",  icon: Flag,  matches: ["/weekends", "/calendar", "/garage", "/cars", "/tracks"] },
-    { to: "/sessions",      label: "Sessions", icon: Timer, matches: ["/sessions", "/timeline", "/analysis", "/debrief", "/post-debrief", "/session-debrief"] },
-    { to: "/tyres",         label: "Tyres",    icon: Disc,  matches: ["/tyres", "/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
-    { to: "/setup-library", label: "Setup",    icon: Wand2, matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-    { to: "/race-mode",     label: "Race",     icon: Radio, matches: ["/race-mode", "/track-evolution", "/engineer"] },
-    { to: "/session-debrief", label: "Debrief", icon: ClipboardList, matches: ["/session-debrief", "/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/driver-hub", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy"] },
+    { to: "/garage",      label: "Garage",  icon: Warehouse, matches: ["/garage", "/cars", "/weekends", "/calendar", "/tracks"] },
+    { to: "/race-mode",   label: "Race",    icon: Radio,     matches: ["/race-mode", "/track-evolution", "/engineer"] },
+    { to: "/sessions",    label: "Sessions",icon: Timer,     matches: ["/sessions", "/timeline", "/analysis", "/session-debrief", "/debrief", "/post-debrief"] },
+    { to: "/tyres",       label: "Tyres",   icon: Disc,      matches: ["/tyres", "/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
+    { to: "/setup-library", label: "Setup", icon: Wand2,     matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
+    { to: "/driver-hub",  label: "Driver",  icon: Brain,     matches: ["/driver-hub", "/driver", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy", "/engineering-memory", "/notes"] },
   ] as const;
   return (
     <nav
