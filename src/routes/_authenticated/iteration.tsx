@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,7 +17,11 @@ import { formatLapTime } from "@/lib/lap-time";
 import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
 
 export const Route = createFileRoute("/_authenticated/iteration")({
-  component: IterationPage,
+  component: () => {
+    const nav = useNavigate();
+    useEffect(() => { nav({ to: "/setup-library", search: { tab: "iterations" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    return null;
+  },
 });
 
 type Car = { id: string; name: string };

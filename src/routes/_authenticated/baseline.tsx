@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect as useEffectRedirect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -18,7 +19,11 @@ import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
 import { useActiveWeekend } from "@/lib/active-weekend";
 
 export const Route = createFileRoute("/_authenticated/baseline")({
-  component: BaselinePage,
+  component: () => {
+    const nav = useNavigate();
+    useEffectRedirect(() => { nav({ to: "/setup-library", search: { tab: "baselines" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    return null;
+  },
 });
 
 type Car = { id: string; name: string; discipline: string };
