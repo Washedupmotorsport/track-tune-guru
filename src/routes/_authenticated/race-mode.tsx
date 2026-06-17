@@ -110,6 +110,41 @@ function RaceModePage() {
   // Slow tick for countdown / general re-render
   useEffect(() => { const id = setInterval(() => setTick((t) => t + 1), 1000); return () => clearInterval(id); }, []);
 
+  const pruneRecentLaps = () => {
+    const cutoff = Date.now() - 6000;
+    recentLapsRef.current = recentLapsRef.current.filter((l) => l.savedAt > cutoff);
+  };
+  const showUndoToast = () => {
+    pruneRecentLaps();
+    const queue = recentLapsRef.current;
+    if (queue.length === 0) {
+      if (undoToastIdRef.current) { toast.dismiss(undoToastIdRef.current); undoToastIdRef.current = null; }
+      return;
+    }
+    const latest = queue[queue.length - 1];
+    const nextId = undoToastIdRef.current ?? undefined;
+    undoToastIdRef.current = toast.success(
+      queue.length === 1
+        ? `Lap #${latest.lapNumber} saved — ${formatLapTime(latest.ms)}`
+        : `${queue.length} laps saved · Lap #${latest.lapNumber} — ${formatLapTime(latest.ms)}`,
+      {
+        id: nextId,
+        duration: 6000,
+        action: {
+          label: "Undo",
+          onClick: async () => {
+            const { error } = await supabase.from("laps").delete().eq("id", latest.id);
+            if (error) { toast.error("Could not undo lap"); return; }
+            recentLapsRef.current = recentLapsRef.current.filter((l) => l.id !== latest.id);
+            qc.invalidateQueries({ queryKey: ["rm-laps", sessionId] });
+            toast("Lap removed");
+            showUndoToast();
+          },
+        },
+      },
+    );
+  };
+
   // Sessions for the active weekend (fallback: latest 15 if no weekend)
   const sessionsQ = useQuery({
     queryKey: ["rm-sessions", user?.id, activeWeekend?.id ?? null, activeCar?.id ?? null],
