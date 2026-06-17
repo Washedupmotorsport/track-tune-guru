@@ -504,7 +504,7 @@ function EngineerCockpit() {
           </Panel>
 
           <Panel icon={Activity} title="Confidence trend" count={confValues.length}
-                 action={{ to: "/driver-hub", label: "Open", search: { tab: "confidence" } }}
+                 action={{ to: "/driver-hub", label: "Open" }}
                  tone={confDelta != null && confDelta < 0 ? "warn" : undefined}>
             {confValues.length === 0 && <PanelEmpty>Score confidence after the next run.</PanelEmpty>}
             {confValues.length > 0 && (
