@@ -200,6 +200,16 @@ function RaceModePage() {
   const [swFrozen, setSwFrozen] = useState(0);
   const swMs = swStart != null ? Date.now() - swStart : swFrozen;
 
+  // Smooth re-render while the stopwatch is running so the tenths/hundredths
+  // don't jump in 1s steps from the slow page tick.
+  useEffect(() => {
+    if (swStart == null) return;
+    let raf = 0;
+    const loop = () => { setTick((t) => t + 1); raf = requestAnimationFrame(loop); };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [swStart]);
+
   const logLap = useMutation({
     mutationFn: async (ms: number) => {
       if (!session || !user) throw new Error("No active session");
