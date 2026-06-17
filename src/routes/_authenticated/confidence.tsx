@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -10,7 +10,13 @@ import {
   ShieldCheck, Disc, Wind, CloudSun, Thermometer, Sparkles,
 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/confidence")({ component: ConfidencePage });
+export const Route = createFileRoute("/_authenticated/confidence")({
+  component: () => {
+    const nav = useNavigate();
+    useEffect(() => { nav({ to: "/driver-hub", search: { tab: "confidence" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    return null;
+  },
+});
 
 type Car = { id: string; name: string };
 type Session = {
@@ -72,7 +78,7 @@ function scoreClass(v: number | null | undefined): string {
   return "text-destructive";
 }
 
-function ConfidencePage() {
+export function ConfidencePage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [carId, setCarId] = useState<string>("");

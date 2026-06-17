@@ -504,7 +504,7 @@ function EngineerCockpit() {
           </Panel>
 
           <Panel icon={Activity} title="Confidence trend" count={confValues.length}
-                 action={{ to: "/confidence", label: "Open" }}
+                 action={{ to: "/driver-hub", label: "Open" }}
                  tone={confDelta != null && confDelta < 0 ? "warn" : undefined}>
             {confValues.length === 0 && <PanelEmpty>Score confidence after the next run.</PanelEmpty>}
             {confValues.length > 0 && (
@@ -599,13 +599,13 @@ function EngineerCockpit() {
         <span className="text-foreground/70 inline-flex items-center gap-1.5 font-medium"><HardHat className="w-3.5 h-3.5" /> Tools</span>
         <Link to="/setup-library" className="hover:text-primary">Setup library</Link>
         <Link to="/iteration"     className="hover:text-primary">Iteration log</Link>
-        <Link to="/corners"       className="hover:text-primary">Corner balance</Link>
+        <Link to="/driver-hub" search={{ tab: "corners" }} className="hover:text-primary">Corner balance</Link>
         <Link to="/analysis"      className="hover:text-primary">Session compare</Link>
         <Link to="/tyre-compare"  className="hover:text-primary">Tyre compare</Link>
         <Link to="/tyre-wear"     className="hover:text-primary">Tyre wear</Link>
         <Link to="/sessions"      className="hover:text-primary">Sessions</Link>
         <Link to="/weekends"      className="hover:text-primary">Weekends</Link>
-        <Link to="/flags"         className="hover:text-primary"><Flag className="w-3.5 h-3.5 inline -mt-0.5 mr-0.5" />Incidents</Link>
+        <Link to="/driver-hub" search={{ tab: "sympathy" }} className="hover:text-primary"><Flag className="w-3.5 h-3.5 inline -mt-0.5 mr-0.5" />Incidents</Link>
         <span className="ml-auto inline-flex items-center gap-1.5"><Timer className="w-3.5 h-3.5" />{now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
       </div>
 

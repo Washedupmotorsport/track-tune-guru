@@ -1,19 +1,15 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   BookOpen, Wind, ShieldCheck, CloudRain, Zap, Mountain,
   Activity, Disc, Gauge, Sparkles, ThumbsUp, ThumbsDown, ChevronRight,
 } from "lucide-react";
-import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
-
 export const Route = createFileRoute("/_authenticated/philosophies")({
-  component: PhilosophiesPage,
-  head: () => ({
-    meta: [
-      { title: "Setup Philosophies — My Race Engineer" },
-      { name: "description", content: "Engineering setup philosophies for different driving styles and race conditions — aggressive rotation, stable endurance, wet compliance, high-speed stability, kerb-friendly." },
-    ],
-  }),
+  component: () => {
+    const nav = useNavigate();
+    useEffect(() => { nav({ to: "/driver-hub", search: { tab: "feedback" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    return null;
+  },
 });
 
 type Trait = { label: string; level: 1 | 2 | 3 | 4 | 5 };
@@ -244,14 +240,13 @@ const PHILOSOPHIES: Philosophy[] = [
   },
 ];
 
-function PhilosophiesPage() {
+export function PhilosophiesPage() {
   const [selectedId, setSelectedId] = useState<string>(PHILOSOPHIES[0].id);
   const selected = PHILOSOPHIES.find((p) => p.id === selectedId) ?? PHILOSOPHIES[0];
   const Icon = selected.icon;
 
   return (
     <div>
-      <SetupWorkspaceNav />
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">

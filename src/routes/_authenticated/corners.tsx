@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -11,7 +11,13 @@ import {
   Minus, Sparkles, Repeat, SlidersHorizontal,
 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/corners")({ component: CornersPage });
+export const Route = createFileRoute("/_authenticated/corners")({
+  component: () => {
+    const nav = useNavigate();
+    useEffect(() => { nav({ to: "/driver-hub", search: { tab: "corners" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    return null;
+  },
+});
 
 type Car = { id: string; name: string };
 type Session = { id: string; name: string; car_id: string; started_at: string; track: string | null; setup_id: string | null };
@@ -69,7 +75,7 @@ const formSchema = z.object({
   description: z.string().trim().min(3, "Add detail").max(2000),
 });
 
-function CornersPage() {
+export function CornersPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
 

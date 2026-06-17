@@ -5,7 +5,7 @@ export const Route = createFileRoute("/_authenticated/flags")({
   component: () => {
     const nav = useNavigate();
     useEffect(() => {
-      nav({ to: "/sympathy", replace: true });
+      nav({ to: "/driver-hub", search: { tab: "sympathy" }, replace: true });
     }, []);
     return null;
   },

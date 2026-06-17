@@ -142,7 +142,7 @@ function DriverHub() {
             blurb="What improved, what got worse, what still needs work. Close the loop before the next run."
             primary={{ to: "/post-debrief", label: "Open post-session debrief" }}
             secondary={[
-              { to: "/confidence", label: "Score confidence" },
+              { to: "/driver-hub", label: "Driver Hub" },
               { to: "/sympathy",   label: "Log driver feedback" },
               { to: "/iteration",  label: "Suggest setup change" },
             ]}
@@ -154,7 +154,7 @@ function DriverHub() {
             blurb="Race Mode is your single race-day screen — live timing, tyres, fuel, feedback and priorities."
             primary={{ to: "/race-mode", label: "Open Race Mode" }}
             secondary={[
-              { to: "/flags",    label: "Flag an issue" },
+              { to: "/driver-hub",    label: "Driver Hub" },
             ]}
           />
         )}
@@ -169,10 +169,9 @@ function DriverHub() {
 
       <h2 className="font-display text-lg font-bold uppercase tracking-wider mt-8 mb-3">Between sessions</h2>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        <ActionCard to="/confidence" icon={Gauge} title="Confidence scoring" desc="Rate front, rear, brakes, traction. Track how the car feels session over session." />
+        <ActionCard to="/driver-hub" icon={Gauge} title="Driver Hub" desc="Confidence, feedback, corner notes, known behaviours and mechanical sympathy — one place." />
         <ActionCard to="/debrief" icon={ClipboardList} title="Debrief" desc="Drop a structured debrief while the lap is fresh. Audio + notes." />
         <ActionCard to="/sympathy" icon={MessageSquare} title="Driver feedback" desc="Tag complaints by corner, phase, and severity. Engineers see them instantly." />
-        <ActionCard to="/flags" icon={AlertTriangle} title="Handling issues" desc="Log incidents, near-misses, snap oversteer, brake locks." />
         <ActionCard to="/notes" icon={NotebookPen} title="Notes" desc="Personal notebook — lines, references, what worked." />
         <ActionCard to="/race-mode" icon={Radio} title="Race Mode" desc="One race-day screen: live timing, tyres, fuel, feedback, priorities." />
       </div>

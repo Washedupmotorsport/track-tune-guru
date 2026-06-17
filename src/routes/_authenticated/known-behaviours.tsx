@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,11 @@ import {
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/known-behaviours")({
-  component: KnownBehavioursPage,
+  component: () => {
+    const nav = useNavigate();
+    useEffect(() => { nav({ to: "/driver-hub", search: { tab: "behaviours" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    return null;
+  },
 });
 
 type Car = { id: string; name: string };
@@ -83,7 +87,7 @@ const COMPOUNDS = ["Soft", "Medium", "Hard", "Inter", "Wet"];
 const WEATHERS = ["Dry", "Damp", "Light rain", "Heavy rain", "Hot", "Cold"];
 const FUEL_STATES = ["Low fuel", "Mid fuel", "Heavy fuel"];
 
-function KnownBehavioursPage() {
+export function KnownBehavioursPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
 
