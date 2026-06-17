@@ -181,7 +181,7 @@ function DriverHub() {
           <div className="p-6 text-center">
             <Zap className="w-6 h-6 mx-auto text-muted-foreground/60" />
             <div className="text-sm text-muted-foreground mt-2">No feedback yet — log the first one after the next run.</div>
-            <Link to="/sympathy" className="inline-flex items-center text-xs text-primary mt-2 hover:underline">
+            <Link to="/driver-hub" search={{ tab: "sympathy" }} className="inline-flex items-center text-xs text-primary mt-2 hover:underline">
               Log feedback <ArrowRight className="w-3 h-3 ml-1" />
             </Link>
           </div>
