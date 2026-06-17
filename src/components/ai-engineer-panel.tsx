@@ -196,7 +196,7 @@ function RecCard({ rec }: { rec: EngineerRecommendation }) {
                 <RelatedLink to="/setups/$setupId" params={{ setupId: related.setup_id }} label="Setup" />
               )}
               {related.tire_log_id && (
-                <RelatedLink to="/tyre-setup" label="Tyre log" />
+                <RelatedLink to="/tyres" label="Tyre log" />
               )}
               {related.debrief_id && (
                 <RelatedLink to="/session-debrief" label="Debrief" />

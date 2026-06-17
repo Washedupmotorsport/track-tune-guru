@@ -382,7 +382,7 @@ function WeekendHub() {
                 </Button>
               )}
               <Button variant="outline" size="sm" asChild>
-                <Link to="/tires">Tyre logs</Link>
+                <Link to="/tyres">Tyre logs</Link>
               </Button>
             </div>
           </div>

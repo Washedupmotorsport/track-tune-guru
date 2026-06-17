@@ -15,9 +15,9 @@ export function QuickLogFab() {
   if (pathname === "/" || pathname.startsWith("/auth") || pathname.startsWith("/share") || pathname.startsWith("/terms")) return null;
 
   const actions = [
-    { to: "/tyre-setup",  label: "Tyre pressures", icon: Gauge,         tone: "primary" },
+    { to: "/tyres",       label: "Tyre pressures", icon: Gauge,         tone: "primary" },
     { to: "/sessions",    label: "New lap",        icon: Timer,         tone: "primary" },
-    { to: "/tires",       label: "Tyre log",       icon: Disc,          tone: "default" },
+    { to: "/tyres",       label: "Tyre log",       icon: Disc,          tone: "default" },
     { to: "/session-debrief", label: "Session debrief", icon: ClipboardList, tone: "default" },
     { to: "/notes",       label: "Quick note",     icon: NotebookPen,   tone: "default" },
     { to: "/engineering-memory", label: "Notebook entry", icon: Brain, tone: "default" },

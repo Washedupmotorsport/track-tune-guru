@@ -277,11 +277,7 @@ const ALL_NAV_GROUPS = [
   {
     label: "Tyres",
     items: [
-      { to: "/tyres",                                label: "Tyres",     icon: Disc },
-      { to: "/tyres", search: { tab: "pressures" }, label: "Pressures", icon: Disc },
-      { to: "/tyres", search: { tab: "wear" },      label: "Wear",      icon: Disc },
-      { to: "/tyres", search: { tab: "compare" },   label: "Compare",   icon: Disc },
-      { to: "/tyres", search: { tab: "setup" },     label: "Sets",      icon: Disc },
+      { to: "/tyres", label: "Tyres module", icon: Disc },
     ],
   },
   {
