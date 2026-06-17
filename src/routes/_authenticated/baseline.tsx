@@ -41,7 +41,7 @@ type Track = {
   weather_sensitivity: string | null;
 };
 
-function BaselinePage() {
+export function BaselinePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const units = useUnits();

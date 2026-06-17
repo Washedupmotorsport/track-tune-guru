@@ -75,7 +75,7 @@ const STATUS_META: Record<LifecycleStatus, { label: string; tone: string; Icon: 
 
 const LIFECYCLE_ORDER: LifecycleStatus[] = ["proposed", "testing", "successful", "rejected", "archived"];
 
-function IterationPage() {
+export function IterationPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
 
