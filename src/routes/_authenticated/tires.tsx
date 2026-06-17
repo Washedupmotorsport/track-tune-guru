@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -11,9 +11,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Disc, Plus, ArrowLeft, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { PressureCalculator } from "@/components/pressure-calculator";
-import { TyreTabs } from "@/components/tyre-tabs";
-
-export const Route = createFileRoute("/_authenticated/tires")({ component: TiresPage });
+export const Route = createFileRoute("/_authenticated/tires")({
+  component: () => {
+    const nav = useNavigate();
+    useEffect(() => { nav({ to: "/tyres", search: { tab: "setup" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    return null;
+  },
+});
 
 type Car = { id: string; name: string };
 type TireLog = {
@@ -26,7 +30,7 @@ type TireLog = {
 
 const empty4 = { fl: "", fr: "", rl: "", rr: "" };
 
-function TiresPage() {
+export function TiresPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -97,7 +101,6 @@ function TiresPage() {
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
-      <TyreTabs />
       <div className="mt-4 flex items-end justify-between flex-wrap gap-4">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">

@@ -131,7 +131,7 @@ function DriverHub() {
             primary={{ to: "/weekends", label: "Open weekends" }}
             secondary={[
               { to: "/setup-library", label: "Setup library" },
-              { to: "/tyre-setup",    label: "Tyre pressures" },
+              { to: "/tyres",         label: "Tyre pressures" },
               { to: "/notes",         label: "Engineering notes" },
             ]}
           />
@@ -207,7 +207,7 @@ function DriverHub() {
         <div className="flex items-center gap-2">
           <Disc className="w-4 h-4" /> Tyres feel off?
         </div>
-        <Link to="/tyre-wear" className="text-xs text-primary hover:underline inline-flex items-center">
+        <Link to="/tyres" search={{ tab: "wear" }} className="text-xs text-primary hover:underline inline-flex items-center">
           Send a tyre note to the engineer <ArrowRight className="w-3 h-3 ml-1" />
         </Link>
       </div>

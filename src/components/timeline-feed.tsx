@@ -47,7 +47,7 @@ function backLinks(e: TimelineEvt) {
   if (e.setup_change_id) links.push({ to: "/iteration", label: "setup change" });
   if (e.debrief_id) links.push({ to: "/post-debrief", label: "debrief" });
   if (e.memory_id) links.push({ to: "/engineering-memory", label: "notebook" });
-  if (e.tire_stint_id || e.tire_log_id) links.push({ to: "/tires", label: "tyres" });
+  if (e.tire_stint_id || e.tire_log_id) links.push({ to: "/tyres", label: "tyres" });
   return links;
 }
 

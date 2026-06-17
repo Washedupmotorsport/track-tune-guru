@@ -124,7 +124,7 @@ export function WeekendTimeline({
         t.track_c != null ? `${t.track_c}°C track` : null,
       ].filter(Boolean).join(" · "),
       sessionId: t.session_id ?? undefined,
-      href: { to: "/tires" },
+      href: { to: "/tyres" },
     });
   }
 

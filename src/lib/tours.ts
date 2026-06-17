@@ -69,7 +69,7 @@ export const TOURS: Tour[] = [
   {
     key: "tyres",
     label: "Tyres",
-    route: "/tyre-setup",
+    route: "/tyres",
     steps: [
       { title: "Pressures matter most", body: "Log cold targets and capture hot pressures within a minute of pit-in." },
       { title: "Track wear", body: "Tread + heat-cycles per set tells you what's race-fit." },

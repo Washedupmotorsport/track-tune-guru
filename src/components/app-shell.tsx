@@ -155,7 +155,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-4">
             <FooterLink to="/weekends" pathname={pathname}>Weekend</FooterLink>
             <FooterLink to="/sessions" pathname={pathname}>Sessions</FooterLink>
-            <FooterLink to="/tyre-setup" pathname={pathname}>Tyres</FooterLink>
+            <FooterLink to="/tyres" pathname={pathname}>Tyres</FooterLink>
             <FooterLink to="/setup-library" pathname={pathname}>Setup</FooterLink>
             <FooterLink to="/race-mode" pathname={pathname} matches={["/race-mode", "/engineer", "/track-evolution"]}>Race Mode</FooterLink>
           </div>
@@ -203,7 +203,7 @@ function MobileTabBar() {
   const items = [
     { to: "/weekends",      label: "Weekend",  icon: Flag,  matches: ["/weekends", "/calendar", "/garage", "/cars", "/tracks"] },
     { to: "/sessions",      label: "Sessions", icon: Timer, matches: ["/sessions", "/timeline", "/analysis", "/debrief", "/post-debrief", "/session-debrief"] },
-    { to: "/tyre-setup",    label: "Tyres",    icon: Disc,  matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
+    { to: "/tyres",         label: "Tyres",    icon: Disc,  matches: ["/tyres", "/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
     { to: "/setup-library", label: "Setup",    icon: Wand2, matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
     { to: "/race-mode",     label: "Race",     icon: Radio, matches: ["/race-mode", "/track-evolution", "/engineer"] },
     { to: "/session-debrief", label: "Debrief", icon: ClipboardList, matches: ["/session-debrief", "/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/driver-hub", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy"] },
@@ -250,7 +250,7 @@ const WORKSPACES = [
   // 6-stop primary nav — race weekend workflow.
   { key: "weekend",  label: "Weekend",  icon: Flag,          to: "/weekends",       matches: ["/weekends", "/calendar", "/garage", "/cars"], tooltip: "Plan the race weekend" },
   { key: "sessions", label: "Sessions", icon: Timer,         to: "/sessions",       matches: ["/sessions", "/timeline", "/analysis"] },
-  { key: "tyres",    label: "Tyres",    icon: Disc,          to: "/tyre-setup",     matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
+  { key: "tyres",    label: "Tyres",    icon: Disc,          to: "/tyres",          matches: ["/tyres", "/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
   { key: "setup",    label: "Setup",    icon: Wand2,         to: "/setup-library",  matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
   { key: "race",     label: "Race Mode", icon: Radio,        to: "/race-mode",      matches: ["/race-mode", "/track-evolution", "/engineer"], tooltip: "One race-day operating screen" },
   { key: "debrief",  label: "Debrief",  icon: ClipboardList, to: "/session-debrief", matches: ["/session-debrief", "/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/driver-hub", "/confidence", "/sympathy", "/philosophies", "/corners", "/known-behaviours"], tooltip: "Driver feedback & notes" },
@@ -277,10 +277,7 @@ const ALL_NAV_GROUPS = [
   {
     label: "Tyres",
     items: [
-      { to: "/tyre-setup",   label: "Pressures",  icon: Disc },
-      { to: "/tyre-wear",    label: "Wear",       icon: Disc },
-      { to: "/tyre-compare", label: "Compare",    icon: Disc },
-      { to: "/tires",        label: "Sets",       icon: Disc },
+      { to: "/tyres", label: "Tyres module", icon: Disc },
     ],
   },
   {

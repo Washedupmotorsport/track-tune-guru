@@ -472,7 +472,7 @@ function EngineerCockpit() {
         {/* COL B — tyres + confidence trend */}
         <section className="space-y-4">
           <Panel icon={Disc} title="Tyre status" count={tyreFlags.length}
-                 action={{ to: "/tyre-setup", label: "Pressures" }}
+                 action={{ to: "/tyres", label: "Pressures" }}
                  tone={tyreFlags.length > 0 ? "warn" : undefined}>
             {!tyresQ.data && <PanelEmpty>No tyre log yet.</PanelEmpty>}
             {tyresQ.data && (
@@ -601,8 +601,8 @@ function EngineerCockpit() {
         <Link to="/iteration"     className="hover:text-primary">Iteration log</Link>
         <Link to="/driver-hub" search={{ tab: "corners" }} className="hover:text-primary">Corner balance</Link>
         <Link to="/analysis"      className="hover:text-primary">Session compare</Link>
-        <Link to="/tyre-compare"  className="hover:text-primary">Tyre compare</Link>
-        <Link to="/tyre-wear"     className="hover:text-primary">Tyre wear</Link>
+        <Link to="/tyres" search={{ tab: "compare" }} className="hover:text-primary">Tyre compare</Link>
+        <Link to="/tyres" search={{ tab: "wear" }}    className="hover:text-primary">Tyre wear</Link>
         <Link to="/sessions"      className="hover:text-primary">Sessions</Link>
         <Link to="/weekends"      className="hover:text-primary">Weekends</Link>
         <Link to="/driver-hub" search={{ tab: "sympathy" }} className="hover:text-primary"><Flag className="w-3.5 h-3.5 inline -mt-0.5 mr-0.5" />Incidents</Link>

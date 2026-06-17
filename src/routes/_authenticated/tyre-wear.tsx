@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -10,16 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { ArrowLeft, Disc, Plus, Trash2, TrendingDown, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
-import { TyreTabs } from "@/components/tyre-tabs";
-
 export const Route = createFileRoute("/_authenticated/tyre-wear")({
-  component: TyreWearPage,
-  head: () => ({
-    meta: [
-      { title: "Tyre Wear — My Race Engineer" },
-      { name: "description", content: "Log tyre stints and see predicted wear, remaining life, and when to change tyres." },
-    ],
-  }),
+  component: () => {
+    const nav = useNavigate();
+    useEffect(() => { nav({ to: "/tyres", search: { tab: "wear" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    return null;
+  },
 });
 
 const MIN_TREAD_MM = 2; // change threshold
@@ -35,7 +31,7 @@ type Stint = {
 
 const empty4 = { fl: "", fr: "", rl: "", rr: "" };
 
-function TyreWearPage() {
+export function TyreWearPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -142,7 +138,6 @@ function TyreWearPage() {
       <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
-      <TyreTabs />
       <div className="mt-4 flex items-end justify-between flex-wrap gap-4">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-1">

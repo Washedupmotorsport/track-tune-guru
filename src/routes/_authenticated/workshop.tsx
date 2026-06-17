@@ -112,7 +112,7 @@ function WorkshopPage() {
         <Tile to="/maintenance" icon={<Wrench className="w-4 h-4" />} label="Service" value={`${dueSoon.length}`} sub="due / overdue" highlight={dueSoon.some((r) => r.overdue)} />
         <Tile to="/damage" icon={<AlertTriangle className="w-4 h-4" />} label="Damage" value={`${openDamage.length}`} sub={`${criticalDamage.length} critical`} highlight={criticalDamage.length > 0} />
         <Tile to="/inventory" icon={<Package className="w-4 h-4" />} label="Inventory" value={`${lowStock.length}`} sub="below min" highlight={lowStock.length > 0} />
-        <Tile to="/tires" icon={<Disc className="w-4 h-4" />} label="Tyre sets" value={`${tyreSets.size}`} sub="tracked" />
+        <Tile to="/tyres" icon={<Disc className="w-4 h-4" />} label="Tyre sets" value={`${tyreSets.size}`} sub="tracked" />
       </div>
 
       <div className="mt-6 grid lg:grid-cols-2 gap-4">
@@ -183,7 +183,7 @@ function WorkshopPage() {
         </Panel>
 
         {/* Tyre sets */}
-        <Panel title="Tyre inventory" icon={<Disc className="w-3 h-3" />} to="/tires" linkLabel="All sets">
+        <Panel title="Tyre inventory" icon={<Disc className="w-3 h-3" />} to="/tyres" linkLabel="All sets">
           {tyreSetList.length === 0 && <Empty text="No tyre logs yet." icon={<Gauge className="w-5 h-5 text-muted-foreground" />} />}
           <ul className="divide-y divide-border">
             {tyreSetList.map(([name, info]) => (
