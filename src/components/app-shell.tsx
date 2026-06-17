@@ -152,12 +152,15 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="font-mono text-[10px] uppercase tracking-[0.15em] opacity-70">v1.0</span>
             <SyncStatus />
           </div>
-          <div className="flex items-center gap-4">
-            <FooterLink to="/weekends" pathname={pathname}>Weekend</FooterLink>
-            <FooterLink to="/sessions" pathname={pathname}>Sessions</FooterLink>
+          <div className="flex items-center gap-3 flex-wrap">
+            <FooterLink to="/garage" pathname={pathname} matches={["/garage", "/cars"]}>Garage</FooterLink>
+            <FooterLink to="/engineer" pathname={pathname}>Cockpit</FooterLink>
+            <FooterLink to="/race-mode" pathname={pathname} matches={["/race-mode", "/track-evolution"]}>Race Mode</FooterLink>
+            <FooterLink to="/sessions" pathname={pathname} matches={["/sessions", "/timeline", "/analysis"]}>Sessions</FooterLink>
+            <FooterLink to="/setup-library" pathname={pathname} matches={["/setup-library", "/setups", "/baseline", "/iteration"]}>Setup</FooterLink>
             <FooterLink to="/tyres" pathname={pathname}>Tyres</FooterLink>
-            <FooterLink to="/setup-library" pathname={pathname}>Setup</FooterLink>
-            <FooterLink to="/race-mode" pathname={pathname} matches={["/race-mode", "/engineer", "/track-evolution"]}>Race Mode</FooterLink>
+            <FooterLink to="/driver-hub" pathname={pathname} matches={["/driver-hub", "/driver", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy"]}>Driver Hub</FooterLink>
+            <FooterLink to="/engineering-memory" pathname={pathname} matches={["/engineering-memory", "/notes"]}>Eng. Log</FooterLink>
           </div>
           <div className="flex items-center gap-4">
             <FooterLink to="/support">Support</FooterLink>
@@ -201,12 +204,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 function MobileTabBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = [
-    { to: "/weekends",      label: "Weekend",  icon: Flag,  matches: ["/weekends", "/calendar", "/garage", "/cars", "/tracks"] },
-    { to: "/sessions",      label: "Sessions", icon: Timer, matches: ["/sessions", "/timeline", "/analysis", "/debrief", "/post-debrief", "/session-debrief"] },
-    { to: "/tyres",         label: "Tyres",    icon: Disc,  matches: ["/tyres", "/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
-    { to: "/setup-library", label: "Setup",    icon: Wand2, matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-    { to: "/race-mode",     label: "Race",     icon: Radio, matches: ["/race-mode", "/track-evolution", "/engineer"] },
-    { to: "/session-debrief", label: "Debrief", icon: ClipboardList, matches: ["/session-debrief", "/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/driver-hub", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy"] },
+    { to: "/garage",      label: "Garage",  icon: Warehouse, matches: ["/garage", "/cars", "/weekends", "/calendar", "/tracks"] },
+    { to: "/race-mode",   label: "Race",    icon: Radio,     matches: ["/race-mode", "/track-evolution", "/engineer"] },
+    { to: "/sessions",    label: "Sessions",icon: Timer,     matches: ["/sessions", "/timeline", "/analysis", "/session-debrief", "/debrief", "/post-debrief"] },
+    { to: "/tyres",       label: "Tyres",   icon: Disc,      matches: ["/tyres", "/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
+    { to: "/setup-library", label: "Setup", icon: Wand2,     matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
+    { to: "/driver-hub",  label: "Driver",  icon: Brain,     matches: ["/driver-hub", "/driver", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy", "/engineering-memory", "/notes"] },
   ] as const;
   return (
     <nav
@@ -258,58 +261,38 @@ const WORKSPACES = [
 
 const ALL_NAV_GROUPS = [
   {
-    label: "Weekend",
+    label: "Race Day",
     items: [
-      { to: "/weekends", label: "Race weekends", icon: Flag },
-      { to: "/calendar", label: "Calendar",      icon: CalendarDays },
-      { to: "/garage",   label: "Garage", icon: Warehouse },
+      { to: "/garage",             label: "Garage",             icon: Warehouse },
+      { to: "/engineer",           label: "Engineer Cockpit",   icon: HardHat },
+      { to: "/race-mode",          label: "Race Mode",          icon: Radio },
+      { to: "/sessions",           label: "Sessions",           icon: Timer },
+      { to: "/setup-library",      label: "Setup Library",      icon: BookMarked },
+      { to: "/tyres",              label: "Tyres",              icon: Disc },
+      { to: "/driver-hub",         label: "Driver Hub",         icon: Brain },
+      { to: "/engineering-memory", label: "Engineering Log",    icon: Brain },
+    ],
+  },
+  {
+    label: "Planning",
+    items: [
+      { to: "/weekends", label: "Race weekends",  icon: Flag },
+      { to: "/calendar", label: "Calendar",       icon: CalendarDays },
       { to: "/tracks",   label: "Track database", icon: MapPin },
     ],
   },
   {
-    label: "Sessions",
+    label: "Tools",
     items: [
-      { to: "/sessions",        label: "Sessions",         icon: Timer },
-      { to: "/timeline",        label: "Weekend timeline", icon: ClipboardList },
-      { to: "/analysis",        label: "Stint analysis",   icon: BarChart3 },
-    ],
-  },
-  {
-    label: "Tyres",
-    items: [
-      { to: "/tyres", label: "Tyres module", icon: Disc },
-    ],
-  },
-  {
-    label: "Setup",
-    items: [
-      { to: "/setup-library", label: "Setup library",       icon: BookMarked },
-      { to: "/baseline",      label: "Baseline generator",  icon: Wand2 },
-      { to: "/iteration",     label: "Setup iteration",     icon: GitBranch },
-    ],
-  },
-  {
-    label: "Race Mode",
-    items: [
-      { to: "/race-mode",       label: "Race Mode",        icon: Radio },
-      { to: "/engineer",        label: "Engineer",         icon: HardHat },
-      { to: "/track-evolution", label: "Track evolution",  icon: CloudRain },
-    ],
-  },
-  {
-    label: "Debrief",
-    items: [
-      { to: "/driver-hub",         label: "Driver Hub",         icon: Brain },
-      { to: "/session-debrief",    label: "Session debrief",    icon: ClipboardList },
-      { to: "/engineering-memory", label: "Engineering memory", icon: Brain },
-      { to: "/notes",              label: "Engineer notes",     icon: NotebookPen },
-    ],
-  },
-  {
-    label: "More",
-    items: [
-      { to: "/calculators", label: "Calculators", icon: Calculator },
-      { to: "/damage",      label: "Damage log",  icon: AlertTriangle },
+      { to: "/analysis",        label: "Stint analysis",     icon: BarChart3 },
+      { to: "/timeline",        label: "Weekend timeline",   icon: ClipboardList },
+      { to: "/baseline",        label: "Baseline generator", icon: Wand2 },
+      { to: "/iteration",       label: "Setup iteration",    icon: GitBranch },
+      { to: "/track-evolution", label: "Track evolution",    icon: CloudRain },
+      { to: "/session-debrief", label: "Session debrief",    icon: ClipboardList },
+      { to: "/notes",           label: "Engineer notes",     icon: NotebookPen },
+      { to: "/calculators",     label: "Calculators",        icon: Calculator },
+      { to: "/damage",          label: "Damage log",         icon: AlertTriangle },
     ],
   },
   {
