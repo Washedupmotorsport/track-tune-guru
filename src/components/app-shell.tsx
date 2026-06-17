@@ -261,58 +261,38 @@ const WORKSPACES = [
 
 const ALL_NAV_GROUPS = [
   {
-    label: "Weekend",
+    label: "Race Day",
     items: [
-      { to: "/weekends", label: "Race weekends", icon: Flag },
-      { to: "/calendar", label: "Calendar",      icon: CalendarDays },
-      { to: "/garage",   label: "Garage", icon: Warehouse },
+      { to: "/garage",             label: "Garage",             icon: Warehouse },
+      { to: "/engineer",           label: "Engineer Cockpit",   icon: HardHat },
+      { to: "/race-mode",          label: "Race Mode",          icon: Radio },
+      { to: "/sessions",           label: "Sessions",           icon: Timer },
+      { to: "/setup-library",      label: "Setup Library",      icon: BookMarked },
+      { to: "/tyres",              label: "Tyres",              icon: Disc },
+      { to: "/driver-hub",         label: "Driver Hub",         icon: Brain },
+      { to: "/engineering-memory", label: "Engineering Log",    icon: Brain },
+    ],
+  },
+  {
+    label: "Planning",
+    items: [
+      { to: "/weekends", label: "Race weekends",  icon: Flag },
+      { to: "/calendar", label: "Calendar",       icon: CalendarDays },
       { to: "/tracks",   label: "Track database", icon: MapPin },
     ],
   },
   {
-    label: "Sessions",
+    label: "Tools",
     items: [
-      { to: "/sessions",        label: "Sessions",         icon: Timer },
-      { to: "/timeline",        label: "Weekend timeline", icon: ClipboardList },
-      { to: "/analysis",        label: "Stint analysis",   icon: BarChart3 },
-    ],
-  },
-  {
-    label: "Tyres",
-    items: [
-      { to: "/tyres", label: "Tyres module", icon: Disc },
-    ],
-  },
-  {
-    label: "Setup",
-    items: [
-      { to: "/setup-library", label: "Setup library",       icon: BookMarked },
-      { to: "/baseline",      label: "Baseline generator",  icon: Wand2 },
-      { to: "/iteration",     label: "Setup iteration",     icon: GitBranch },
-    ],
-  },
-  {
-    label: "Race Mode",
-    items: [
-      { to: "/race-mode",       label: "Race Mode",        icon: Radio },
-      { to: "/engineer",        label: "Engineer",         icon: HardHat },
-      { to: "/track-evolution", label: "Track evolution",  icon: CloudRain },
-    ],
-  },
-  {
-    label: "Debrief",
-    items: [
-      { to: "/driver-hub",         label: "Driver Hub",         icon: Brain },
-      { to: "/session-debrief",    label: "Session debrief",    icon: ClipboardList },
-      { to: "/engineering-memory", label: "Engineering memory", icon: Brain },
-      { to: "/notes",              label: "Engineer notes",     icon: NotebookPen },
-    ],
-  },
-  {
-    label: "More",
-    items: [
-      { to: "/calculators", label: "Calculators", icon: Calculator },
-      { to: "/damage",      label: "Damage log",  icon: AlertTriangle },
+      { to: "/analysis",        label: "Stint analysis",     icon: BarChart3 },
+      { to: "/timeline",        label: "Weekend timeline",   icon: ClipboardList },
+      { to: "/baseline",        label: "Baseline generator", icon: Wand2 },
+      { to: "/iteration",       label: "Setup iteration",    icon: GitBranch },
+      { to: "/track-evolution", label: "Track evolution",    icon: CloudRain },
+      { to: "/session-debrief", label: "Session debrief",    icon: ClipboardList },
+      { to: "/notes",           label: "Engineer notes",     icon: NotebookPen },
+      { to: "/calculators",     label: "Calculators",        icon: Calculator },
+      { to: "/damage",          label: "Damage log",         icon: AlertTriangle },
     ],
   },
   {
