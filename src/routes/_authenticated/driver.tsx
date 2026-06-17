@@ -275,9 +275,10 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
 }
 
 function ActionCard({
-  to, icon: Icon, title, desc,
+  to, search, icon: Icon, title, desc,
 }: {
   to: string;
+  search?: Record<string, string>;
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   desc: string;
@@ -285,6 +286,7 @@ function ActionCard({
   return (
     <Link
       to={to}
+      search={search as never}
       className="group rounded-lg border border-border bg-card p-4 shadow-card hover:border-primary/50 hover:bg-card/80 transition-colors"
     >
       <div className="flex items-center gap-2">
