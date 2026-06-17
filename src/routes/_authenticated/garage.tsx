@@ -447,7 +447,7 @@ function TracksideRail({ userId }: { userId: string }) {
             to="/sessions/$sessionId" params={{ sessionId: session.id }}
             tone="default" icon={Timer} label="Open run" sub="Last session"
           />
-          <RailAction to="/debrief" tone="default" icon={ClipboardList} label="Debrief" sub="Log feedback" />
+          <RailAction to="/session-debrief" tone="default" icon={ClipboardList} label="Debrief" sub="Log feedback" />
         </div>
       </div>
     </section>

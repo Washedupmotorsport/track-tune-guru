@@ -202,8 +202,8 @@ function SessionDetail() {
             <Button variant="outline" size="sm"><Monitor className="w-4 h-4 mr-1" /> Pit board</Button>
           </Link>
           <Link
-            to="/post-debrief"
-            search={{ sessionId, carId: sessionQ.data.car_id, new: true }}
+            to="/session-debrief"
+            search={{ tab: "review", sessionId, carId: sessionQ.data.car_id, new: true }}
           >
             <Button variant="outline" size="sm">
               <ClipboardCheck className="w-4 h-4 mr-1" /> Debrief
