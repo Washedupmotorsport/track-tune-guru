@@ -115,7 +115,7 @@ export const MANUAL_SECTIONS: ManualSection[] = [
     id: "baseline",
     title: "Baseline generator",
     group: "Setup & Tyres",
-    route: "/baseline",
+    route: "/setup-library?tab=baselines",
     summary: "Generates a sensible starting setup from discipline, track type and tyre.",
     whenToUse: "First time at a new track or with a new car.",
     keyActions: ["Pick discipline + track character.", "Save the output to your library."],
@@ -124,7 +124,7 @@ export const MANUAL_SECTIONS: ManualSection[] = [
     id: "iteration",
     title: "Setup iteration",
     group: "Setup & Tyres",
-    route: "/iteration",
+    route: "/setup-library?tab=iterations",
     summary:
       "Step-by-step iteration log: propose a change, predict the effect, then record the actual outcome.",
     whenToUse: "Between every run when you're chasing a balance issue.",
@@ -174,7 +174,7 @@ export const MANUAL_SECTIONS: ManualSection[] = [
     id: "driver",
     title: "Driver hub",
     group: "Driver",
-    route: "/driver",
+    route: "/driver-hub",
     summary: "Driver-first workspace: feedback, confidence, behaviours and philosophies.",
     whenToUse: "When the driver is doing the talking.",
     keyActions: [
