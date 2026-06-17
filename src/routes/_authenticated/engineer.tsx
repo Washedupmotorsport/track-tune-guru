@@ -360,8 +360,8 @@ function EngineerCockpit() {
             {session?.track_temp_c != null && <span>track {session.track_temp_c}°</span>}
           </div>
           <div className="flex w-full md:w-auto md:ml-auto items-center gap-2 px-4 py-3 border-t border-border md:border-t-0">
-            <Link to="/driver" className="text-xs font-medium text-muted-foreground hover:text-primary border border-border rounded-md px-3 py-1.5">
-              Driver →
+            <Link to="/driver-hub" className="text-xs font-medium text-muted-foreground hover:text-primary border border-border rounded-md px-3 py-1.5">
+              Driver Hub →
             </Link>
             <Link to="/race-mode" className="text-xs font-medium text-primary hover:underline border border-primary/40 bg-primary/10 rounded-md px-3 py-1.5">
               Race Mode
