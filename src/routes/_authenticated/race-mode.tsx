@@ -219,12 +219,24 @@ function RaceModePage() {
         lap_time_ms: Math.max(1, Math.round(ms)),
         lap_number: lapNumber,
       };
-      const { error } = await supabase.from("laps").insert(payload as never);
+      const { data, error } = await supabase.from("laps").insert(payload as never).select("id").single();
       if (error) throw error;
+      return data.id;
     },
-    onSuccess: (_, { ms, lapNumber }) => {
+    onSuccess: (lapId, { ms, lapNumber }) => {
       qc.invalidateQueries({ queryKey: ["rm-laps", sessionId] });
-      toast.success(`Lap #${lapNumber} saved — ${formatLapTime(ms)}`);
+      toast.success(`Lap #${lapNumber} saved — ${formatLapTime(ms)}`, {
+        duration: 6000,
+        action: {
+          label: "Undo",
+          onClick: async () => {
+            const { error } = await supabase.from("laps").delete().eq("id", lapId);
+            if (error) { toast.error("Could not undo lap"); return; }
+            qc.invalidateQueries({ queryKey: ["rm-laps", sessionId] });
+            toast("Lap removed");
+          },
+        },
+      });
     },
     onError: (e: Error) => toast.error(e.message),
   });
