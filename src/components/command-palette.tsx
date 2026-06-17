@@ -5,8 +5,8 @@ import {
   CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator,
 } from "@/components/ui/command";
 import {
-  Timer, Disc, Wrench, Package, CalendarDays, Receipt, BarChart3,
-  Calculator, NotebookPen, Car, Settings2, Flag, Brain, BookMarked,
+  Timer, Disc, Wrench, CalendarDays, BarChart3,
+  Calculator, NotebookPen, Car, Settings2, Flag, Brain, BookMarked, HardHat, MapPin,
 } from "lucide-react";
 
 type Hit =
