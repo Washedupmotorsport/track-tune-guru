@@ -101,6 +101,10 @@ function RaceModePage() {
   const [showSettings, setShowSettings] = useState(false);
   const [manualSessionId, setManualSessionId] = useState<string | "">("");
   const [, setTick] = useState(0);
+  // Undo queue: recently saved laps that can still be undone while the toast is alive
+  type RecentLap = { id: string; lapNumber: number; ms: number; savedAt: number };
+  const recentLapsRef = useRef<RecentLap[]>([]);
+  const undoToastIdRef = useRef<string | number | null>(null);
 
   useWakeLock(true);
   // Slow tick for countdown / general re-render
