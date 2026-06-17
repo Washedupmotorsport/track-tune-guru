@@ -241,66 +241,50 @@ function MobileTabBar() {
 // every existing page remains accessible from the All-routes menu and
 // (where it makes sense) from the workspace front-door page.
 
-const WORKSPACES = [
-  // 6-stop primary nav — race weekend workflow.
-  { key: "weekend",  label: "Weekend",  icon: Flag,          to: "/weekends",       matches: ["/weekends", "/calendar", "/garage", "/cars"], tooltip: "Plan the race weekend" },
-  { key: "sessions", label: "Sessions", icon: Timer,         to: "/sessions",       matches: ["/sessions", "/timeline", "/analysis"] },
-  { key: "tyres",    label: "Tyres",    icon: Disc,          to: "/tyres",          matches: ["/tyres", "/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
-  { key: "setup",    label: "Setup",    icon: Wand2,         to: "/setup-library",  matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-  { key: "race",     label: "Race Mode", icon: Radio,        to: "/race-mode",      matches: ["/race-mode", "/track-evolution", "/engineer"], tooltip: "One race-day operating screen" },
-  { key: "debrief",  label: "Debrief",  icon: ClipboardList, to: "/session-debrief", matches: ["/session-debrief", "/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/driver-hub", "/confidence", "/sympathy", "/philosophies", "/corners", "/known-behaviours"], tooltip: "Driver feedback & notes" },
-] as const;
+// Single source of truth for the 11 primary race-weekend screens.
+// Anything not in this list lives under Operations (workshop hub) or
+// inside a parent screen — keeping the surface ruthlessly small.
+const PRIMARY_NAV: { to: string; label: string; icon: typeof Radio; matches?: string[] }[] = [
+  { to: "/engineer",           label: "Cockpit",            icon: HardHat },
+  { to: "/race-mode",          label: "Race Mode",          icon: Radio,        matches: ["/race-mode", "/track-evolution"] },
+  { to: "/sessions",           label: "Sessions",           icon: Timer,        matches: ["/sessions", "/timeline", "/analysis", "/session-debrief", "/debrief", "/post-debrief"] },
+  { to: "/setup-library",      label: "Setup Library",      icon: BookMarked,   matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
+  { to: "/tyres",              label: "Tyres",              icon: Disc,         matches: ["/tyres", "/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
+  { to: "/driver-hub",         label: "Driver Hub",         icon: Brain,        matches: ["/driver-hub", "/driver", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy", "/flags"] },
+  { to: "/engineering-memory", label: "Engineering Memory", icon: Brain,        matches: ["/engineering-memory", "/notes"] },
+  { to: "/tracks",             label: "Tracks",             icon: MapPin },
+  { to: "/garage",             label: "Garage",             icon: Warehouse,    matches: ["/garage", "/cars"] },
+  { to: "/workshop",           label: "Operations",         icon: Wrench,       matches: ["/workshop", "/maintenance", "/inventory", "/expenses", "/reports", "/damage", "/calculators"] },
+  { to: "/settings",           label: "Settings",           icon: SettingsIcon, matches: ["/settings"] },
+];
 
+// Sub-pages reachable from inside a primary screen but kept in the All-routes
+// menu for quick keyboard access. These are NOT in the primary nav.
 const ALL_NAV_GROUPS = [
-  {
-    label: "Race Day",
+  { label: "Primary",
+    items: PRIMARY_NAV.map(({ to, label, icon }) => ({ to, label, icon })) },
+  { label: "Operations",
     items: [
-      { to: "/garage",             label: "Garage",             icon: Warehouse },
-      { to: "/engineer",           label: "Engineer Cockpit",   icon: HardHat },
-      { to: "/race-mode",          label: "Race Mode",          icon: Radio },
-      { to: "/sessions",           label: "Sessions",           icon: Timer },
-      { to: "/setup-library",      label: "Setup Library",      icon: BookMarked },
-      { to: "/tyres",              label: "Tyres",              icon: Disc },
-      { to: "/driver-hub",         label: "Driver Hub",         icon: Brain },
-      { to: "/engineering-memory", label: "Engineering Log",    icon: Brain },
-    ],
-  },
-  {
-    label: "Planning",
-    items: [
-      { to: "/weekends", label: "Race weekends",  icon: Flag },
-      { to: "/calendar", label: "Calendar",       icon: CalendarDays },
-      { to: "/tracks",   label: "Track database", icon: MapPin },
-    ],
-  },
-  {
-    label: "Tools",
-    items: [
-      { to: "/analysis",        label: "Stint analysis",     icon: BarChart3 },
+      { to: "/workshop",        label: "Workshop hub",       icon: HardHat },
+      { to: "/maintenance",     label: "Maintenance",        icon: Wrench },
+      { to: "/inventory",       label: "Inventory",          icon: Package },
+      { to: "/damage",          label: "Damage log",         icon: AlertTriangle },
+      { to: "/expenses",        label: "Expenses",           icon: Receipt },
+      { to: "/reports",         label: "Reports",            icon: FileText },
+      { to: "/calculators",     label: "Calculators",        icon: Calculator },
+      { to: "/calendar",        label: "Calendar",           icon: CalendarDays },
+      { to: "/weekends",        label: "Race weekends",      icon: Flag },
       { to: "/timeline",        label: "Weekend timeline",   icon: ClipboardList },
       { to: "/track-evolution", label: "Track evolution",    icon: CloudRain },
+      { to: "/analysis",        label: "Stint analysis",     icon: BarChart3 },
       { to: "/session-debrief", label: "Session debrief",    icon: ClipboardList },
       { to: "/notes",           label: "Engineer notes",     icon: NotebookPen },
-      { to: "/calculators",     label: "Calculators",        icon: Calculator },
-      { to: "/damage",          label: "Damage log",         icon: AlertTriangle },
-    ],
-  },
-  {
-    label: "Operations",
+    ] },
+  { label: "Help",
     items: [
-      { to: "/workshop",    label: "Workshop",    icon: HardHat },
-      { to: "/maintenance", label: "Maintenance", icon: Wrench },
-      { to: "/inventory",   label: "Inventory",   icon: Package },
-      { to: "/expenses",    label: "Expenses",    icon: Receipt },
-      { to: "/reports",     label: "Reports",     icon: FileText },
-    ],
-  },
-  {
-    label: "Help",
-    items: [
-      { to: "/manual", label: "User manual", icon: BookOpen },
-    ],
-  },
+      { to: "/manual",  label: "User manual",     icon: BookOpen },
+      { to: "/support", label: "Support",         icon: BookOpen },
+    ] },
 ] as const;
 
 function FooterLink({ to, children, pathname, matches }: { to: string; children: React.ReactNode; pathname?: string; matches?: string[] }) {
