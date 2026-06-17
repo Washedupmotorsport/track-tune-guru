@@ -207,7 +207,7 @@ function MobileTabBar() {
     { to: "/sessions",      label: "Sessions", icon: Timer,      matches: ["/sessions", "/timeline", "/analysis", "/session-debrief", "/debrief", "/post-debrief"] },
     { to: "/tyres",         label: "Tyres",    icon: Disc,       matches: ["/tyres", "/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
     { to: "/setup-library", label: "Setup",    icon: BookMarked, matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-    { to: "/driver-hub",    label: "Driver",   icon: Brain,      matches: ["/driver-hub", "/driver", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy", "/engineering-memory", "/notes"] },
+    { to: "/driver-hub",    label: "Driver",   icon: Brain,      matches: ["/driver-hub", "/driver", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy", "/flags"] },
   ] as const;
   return (
     <nav
