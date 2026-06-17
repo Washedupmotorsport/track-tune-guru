@@ -18,6 +18,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedWorkshopRouteImport } from './routes/_authenticated/workshop'
 import { Route as AuthenticatedWeekendsRouteImport } from './routes/_authenticated/weekends'
+import { Route as AuthenticatedTyresRouteImport } from './routes/_authenticated/tyres'
 import { Route as AuthenticatedTyreWearRouteImport } from './routes/_authenticated/tyre-wear'
 import { Route as AuthenticatedTyreSetupRouteImport } from './routes/_authenticated/tyre-setup'
 import { Route as AuthenticatedTyreCompareRouteImport } from './routes/_authenticated/tyre-compare'
@@ -107,6 +108,11 @@ const AuthenticatedWorkshopRoute = AuthenticatedWorkshopRouteImport.update({
 const AuthenticatedWeekendsRoute = AuthenticatedWeekendsRouteImport.update({
   id: '/weekends',
   path: '/weekends',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTyresRoute = AuthenticatedTyresRouteImport.update({
+  id: '/tyres',
+  path: '/tyres',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedTyreWearRoute = AuthenticatedTyreWearRouteImport.update({
@@ -401,6 +407,7 @@ export interface FileRoutesByFullPath {
   '/tyre-compare': typeof AuthenticatedTyreCompareRoute
   '/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/tyre-wear': typeof AuthenticatedTyreWearRoute
+  '/tyres': typeof AuthenticatedTyresRoute
   '/weekends': typeof AuthenticatedWeekendsRouteWithChildren
   '/workshop': typeof AuthenticatedWorkshopRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
@@ -457,6 +464,7 @@ export interface FileRoutesByTo {
   '/tyre-compare': typeof AuthenticatedTyreCompareRoute
   '/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/tyre-wear': typeof AuthenticatedTyreWearRoute
+  '/tyres': typeof AuthenticatedTyresRoute
   '/weekends': typeof AuthenticatedWeekendsRouteWithChildren
   '/workshop': typeof AuthenticatedWorkshopRoute
   '/cars/$carId': typeof AuthenticatedCarsCarIdRoute
@@ -515,6 +523,7 @@ export interface FileRoutesById {
   '/_authenticated/tyre-compare': typeof AuthenticatedTyreCompareRoute
   '/_authenticated/tyre-setup': typeof AuthenticatedTyreSetupRoute
   '/_authenticated/tyre-wear': typeof AuthenticatedTyreWearRoute
+  '/_authenticated/tyres': typeof AuthenticatedTyresRoute
   '/_authenticated/weekends': typeof AuthenticatedWeekendsRouteWithChildren
   '/_authenticated/workshop': typeof AuthenticatedWorkshopRoute
   '/_authenticated/cars/$carId': typeof AuthenticatedCarsCarIdRoute
@@ -573,6 +582,7 @@ export interface FileRouteTypes {
     | '/tyre-compare'
     | '/tyre-setup'
     | '/tyre-wear'
+    | '/tyres'
     | '/weekends'
     | '/workshop'
     | '/cars/$carId'
@@ -629,6 +639,7 @@ export interface FileRouteTypes {
     | '/tyre-compare'
     | '/tyre-setup'
     | '/tyre-wear'
+    | '/tyres'
     | '/weekends'
     | '/workshop'
     | '/cars/$carId'
@@ -686,6 +697,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tyre-compare'
     | '/_authenticated/tyre-setup'
     | '/_authenticated/tyre-wear'
+    | '/_authenticated/tyres'
     | '/_authenticated/weekends'
     | '/_authenticated/workshop'
     | '/_authenticated/cars/$carId'
@@ -771,6 +783,13 @@ declare module '@tanstack/react-router' {
       path: '/weekends'
       fullPath: '/weekends'
       preLoaderRoute: typeof AuthenticatedWeekendsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/tyres': {
+      id: '/_authenticated/tyres'
+      path: '/tyres'
+      fullPath: '/tyres'
+      preLoaderRoute: typeof AuthenticatedTyresRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/tyre-wear': {
@@ -1180,6 +1199,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTyreCompareRoute: typeof AuthenticatedTyreCompareRoute
   AuthenticatedTyreSetupRoute: typeof AuthenticatedTyreSetupRoute
   AuthenticatedTyreWearRoute: typeof AuthenticatedTyreWearRoute
+  AuthenticatedTyresRoute: typeof AuthenticatedTyresRoute
   AuthenticatedWeekendsRoute: typeof AuthenticatedWeekendsRouteWithChildren
   AuthenticatedWorkshopRoute: typeof AuthenticatedWorkshopRoute
   AuthenticatedCarsCarIdRoute: typeof AuthenticatedCarsCarIdRoute
@@ -1227,6 +1247,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedTyreCompareRoute: AuthenticatedTyreCompareRoute,
   AuthenticatedTyreSetupRoute: AuthenticatedTyreSetupRoute,
   AuthenticatedTyreWearRoute: AuthenticatedTyreWearRoute,
+  AuthenticatedTyresRoute: AuthenticatedTyresRoute,
   AuthenticatedWeekendsRoute: AuthenticatedWeekendsRouteWithChildren,
   AuthenticatedWorkshopRoute: AuthenticatedWorkshopRoute,
   AuthenticatedCarsCarIdRoute: AuthenticatedCarsCarIdRoute,
