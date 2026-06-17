@@ -152,12 +152,15 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="font-mono text-[10px] uppercase tracking-[0.15em] opacity-70">v1.0</span>
             <SyncStatus />
           </div>
-          <div className="flex items-center gap-4">
-            <FooterLink to="/weekends" pathname={pathname}>Weekend</FooterLink>
-            <FooterLink to="/sessions" pathname={pathname}>Sessions</FooterLink>
+          <div className="flex items-center gap-3 flex-wrap">
+            <FooterLink to="/garage" pathname={pathname} matches={["/garage", "/cars"]}>Garage</FooterLink>
+            <FooterLink to="/engineer" pathname={pathname}>Cockpit</FooterLink>
+            <FooterLink to="/race-mode" pathname={pathname} matches={["/race-mode", "/track-evolution"]}>Race Mode</FooterLink>
+            <FooterLink to="/sessions" pathname={pathname} matches={["/sessions", "/timeline", "/analysis"]}>Sessions</FooterLink>
+            <FooterLink to="/setup-library" pathname={pathname} matches={["/setup-library", "/setups", "/baseline", "/iteration"]}>Setup</FooterLink>
             <FooterLink to="/tyres" pathname={pathname}>Tyres</FooterLink>
-            <FooterLink to="/setup-library" pathname={pathname}>Setup</FooterLink>
-            <FooterLink to="/race-mode" pathname={pathname} matches={["/race-mode", "/engineer", "/track-evolution"]}>Race Mode</FooterLink>
+            <FooterLink to="/driver-hub" pathname={pathname} matches={["/driver-hub", "/driver", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy"]}>Driver Hub</FooterLink>
+            <FooterLink to="/engineering-memory" pathname={pathname} matches={["/engineering-memory", "/notes"]}>Eng. Log</FooterLink>
           </div>
           <div className="flex items-center gap-4">
             <FooterLink to="/support">Support</FooterLink>
