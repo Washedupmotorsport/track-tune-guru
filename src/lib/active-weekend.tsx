@@ -81,6 +81,9 @@ export function ActiveWeekendProvider({ children }: { children: ReactNode }) {
     if (manualId) {
       const m = weekends.find((w) => w.id === manualId);
       if (m) return m;
+      // Stored id no longer maps to a visible weekend (deleted or access revoked).
+      // Clear it so we don't keep attaching new sessions to a phantom event id.
+      try { window.localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
     }
     const now = Date.now();
     // Running: started, not ended
