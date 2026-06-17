@@ -103,6 +103,7 @@ function RaceModePage() {
   const [, setTick] = useState(0);
 
   useWakeLock(true);
+  // Slow tick for countdown / general re-render
   useEffect(() => { const id = setInterval(() => setTick((t) => t + 1), 1000); return () => clearInterval(id); }, []);
 
   // Sessions for the active weekend (fallback: latest 15 if no weekend)
@@ -198,6 +199,16 @@ function RaceModePage() {
   const [swStart, setSwStart] = useState<number | null>(null);
   const [swFrozen, setSwFrozen] = useState(0);
   const swMs = swStart != null ? Date.now() - swStart : swFrozen;
+
+  // Smooth re-render while the stopwatch is running so the tenths/hundredths
+  // don't jump in 1s steps from the slow page tick.
+  useEffect(() => {
+    if (swStart == null) return;
+    let raf = 0;
+    const loop = () => { setTick((t) => t + 1); raf = requestAnimationFrame(loop); };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [swStart]);
 
   const logLap = useMutation({
     mutationFn: async (ms: number) => {
