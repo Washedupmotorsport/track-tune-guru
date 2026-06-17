@@ -101,10 +101,49 @@ function RaceModePage() {
   const [showSettings, setShowSettings] = useState(false);
   const [manualSessionId, setManualSessionId] = useState<string | "">("");
   const [, setTick] = useState(0);
+  // Undo queue: recently saved laps that can still be undone while the toast is alive
+  type RecentLap = { id: string; lapNumber: number; ms: number; savedAt: number };
+  const recentLapsRef = useRef<RecentLap[]>([]);
+  const undoToastIdRef = useRef<string | number | null>(null);
 
   useWakeLock(true);
   // Slow tick for countdown / general re-render
   useEffect(() => { const id = setInterval(() => setTick((t) => t + 1), 1000); return () => clearInterval(id); }, []);
+
+  const pruneRecentLaps = () => {
+    const cutoff = Date.now() - 6000;
+    recentLapsRef.current = recentLapsRef.current.filter((l) => l.savedAt > cutoff);
+  };
+  const showUndoToast = () => {
+    pruneRecentLaps();
+    const queue = recentLapsRef.current;
+    if (queue.length === 0) {
+      if (undoToastIdRef.current) { toast.dismiss(undoToastIdRef.current); undoToastIdRef.current = null; }
+      return;
+    }
+    const latest = queue[queue.length - 1];
+    const nextId = undoToastIdRef.current ?? undefined;
+    undoToastIdRef.current = toast.success(
+      queue.length === 1
+        ? `Lap #${latest.lapNumber} saved — ${formatLapTime(latest.ms)}`
+        : `${queue.length} laps saved · Lap #${latest.lapNumber} — ${formatLapTime(latest.ms)}`,
+      {
+        id: nextId,
+        duration: 6000,
+        action: {
+          label: "Undo",
+          onClick: async () => {
+            const { error } = await supabase.from("laps").delete().eq("id", latest.id);
+            if (error) { toast.error("Could not undo lap"); return; }
+            recentLapsRef.current = recentLapsRef.current.filter((l) => l.id !== latest.id);
+            qc.invalidateQueries({ queryKey: ["rm-laps", sessionId] });
+            toast("Lap removed");
+            showUndoToast();
+          },
+        },
+      },
+    );
+  };
 
   // Sessions for the active weekend (fallback: latest 15 if no weekend)
   const sessionsQ = useQuery({
@@ -225,18 +264,8 @@ function RaceModePage() {
     },
     onSuccess: (lapId, { ms, lapNumber }) => {
       qc.invalidateQueries({ queryKey: ["rm-laps", sessionId] });
-      toast.success(`Lap #${lapNumber} saved — ${formatLapTime(ms)}`, {
-        duration: 6000,
-        action: {
-          label: "Undo",
-          onClick: async () => {
-            const { error } = await supabase.from("laps").delete().eq("id", lapId);
-            if (error) { toast.error("Could not undo lap"); return; }
-            qc.invalidateQueries({ queryKey: ["rm-laps", sessionId] });
-            toast("Lap removed");
-          },
-        },
-      });
+      recentLapsRef.current.push({ id: lapId, lapNumber, ms, savedAt: Date.now() });
+      showUndoToast();
     },
     onError: (e: Error) => toast.error(e.message),
   });
