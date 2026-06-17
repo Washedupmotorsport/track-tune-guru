@@ -103,6 +103,7 @@ function RaceModePage() {
   const [, setTick] = useState(0);
 
   useWakeLock(true);
+  // Slow tick for countdown / general re-render
   useEffect(() => { const id = setInterval(() => setTick((t) => t + 1), 1000); return () => clearInterval(id); }, []);
 
   // Sessions for the active weekend (fallback: latest 15 if no weekend)
