@@ -2,13 +2,13 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
-  ClipboardCheck, MessageSquare, ClipboardList, Brain, CheckCircle2, Flag,
+  ClipboardCheck, MessageSquare, ClipboardList, Brain, CheckCircle2, Flag, Wrench,
 } from "lucide-react";
 import { DebriefPage } from "./debrief";
 import { PostDebriefPage } from "./post-debrief";
 
-type TabId = "feedback" | "review";
-const VALID: TabId[] = ["feedback", "review"];
+type TabId = "feedback" | "review" | "actions" | "lessons" | "setup";
+const VALID: TabId[] = ["feedback", "review", "actions", "lessons", "setup"];
 
 type Search = {
   tab?: TabId;
@@ -34,11 +34,11 @@ export const Route = createFileRoute("/_authenticated/session-debrief")({
 });
 
 const STEPS = [
-  { n: 1, label: "Session completed",       icon: Flag },
-  { n: 2, label: "Driver feedback",         icon: MessageSquare },
-  { n: 3, label: "Engineering review",      icon: ClipboardList },
-  { n: 4, label: "Action items",            icon: CheckCircle2 },
-  { n: 5, label: "Lessons → memory",        icon: Brain },
+  { n: 1, tab: "feedback" as TabId, label: "Driver feedback",       icon: MessageSquare },
+  { n: 2, tab: "review"   as TabId, label: "Engineering review",    icon: ClipboardList },
+  { n: 3, tab: "actions"  as TabId, label: "Action items",          icon: CheckCircle2 },
+  { n: 4, tab: "lessons"  as TabId, label: "Lessons learned",       icon: Brain },
+  { n: 5, tab: "setup"    as TabId, label: "Setup recommendations", icon: Wrench },
 ] as const;
 
 const QUESTIONS = [
@@ -74,9 +74,7 @@ function SessionDebriefPage() {
       <ol className="mt-6 grid grid-cols-2 sm:grid-cols-5 gap-2">
         {STEPS.map((s) => {
           const Icon = s.icon;
-          const active =
-            (s.n === 2 && tab === "feedback") ||
-            (s.n === 3 && tab === "review");
+          const active = s.tab === tab;
           return (
             <li
               key={s.n}
@@ -124,12 +122,30 @@ function SessionDebriefPage() {
           <TabsTrigger value="review" className="gap-1.5">
             <ClipboardList className="w-3.5 h-3.5" /> Engineering Review
           </TabsTrigger>
+          <TabsTrigger value="actions" className="gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Action Items
+          </TabsTrigger>
+          <TabsTrigger value="lessons" className="gap-1.5">
+            <Brain className="w-3.5 h-3.5" /> Lessons Learned
+          </TabsTrigger>
+          <TabsTrigger value="setup" className="gap-1.5">
+            <Wrench className="w-3.5 h-3.5" /> Setup Recommendations
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="feedback" className="mt-6">
           <DebriefPage />
         </TabsContent>
         <TabsContent value="review" className="mt-6">
+          <PostDebriefPage />
+        </TabsContent>
+        <TabsContent value="actions" className="mt-6">
+          <PostDebriefPage />
+        </TabsContent>
+        <TabsContent value="lessons" className="mt-6">
+          <PostDebriefPage />
+        </TabsContent>
+        <TabsContent value="setup" className="mt-6">
           <PostDebriefPage />
         </TabsContent>
       </Tabs>

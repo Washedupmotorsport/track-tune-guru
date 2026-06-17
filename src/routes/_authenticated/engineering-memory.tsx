@@ -498,7 +498,7 @@ function BackLinks({ entry }: { entry: Entry }) {
   if (entry.session_id) links.push({ to: "/sessions/$sessionId", params: { sessionId: entry.session_id }, label: "session", icon: FileText });
   if (entry.setup_id) links.push({ to: "/setups/$setupId", params: { setupId: entry.setup_id }, label: "setup", icon: Wrench });
   if (entry.setup_change_id) links.push({ to: "/iteration", label: "setup change", icon: Wrench });
-  if (entry.debrief_id) links.push({ to: "/post-debrief", label: "debrief", icon: FileText });
+  if (entry.debrief_id) links.push({ to: "/session-debrief", label: "debrief", icon: FileText });
   if (!links.length) return null;
   return (
     <div className="mt-2 flex flex-wrap gap-1.5">

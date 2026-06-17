@@ -448,7 +448,7 @@ function EngineerCockpit() {
           </Panel>
 
           <Panel icon={MessageSquare} title="Driver inbox" count={(inboxQ.data ?? []).length}
-                 action={{ to: "/debrief", label: "Debrief" }}>
+                 action={{ to: "/session-debrief", label: "Debrief" }}>
             {inboxQ.isLoading && <PanelEmpty>Loading…</PanelEmpty>}
             {!inboxQ.isLoading && (inboxQ.data ?? []).length === 0 && <PanelEmpty>No driver feedback yet.</PanelEmpty>}
             <ul className="divide-y divide-border">

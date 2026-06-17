@@ -138,7 +138,7 @@ function DriverHub() {
           <LensPanel
             title="Last debrief"
             blurb="What improved, what got worse, what still needs work. Close the loop before the next run."
-            primary={{ to: "/post-debrief", label: "Open post-session debrief" }}
+            primary={{ to: "/session-debrief", label: "Open session debrief" }}
             secondary={[
               { to: "/driver-hub", label: "Driver Hub" },
               { to: "/sympathy",   label: "Log driver feedback" },

@@ -45,7 +45,7 @@ function backLinks(e: TimelineEvt) {
   if (e.session_id) links.push({ to: "/sessions/$sessionId", params: { sessionId: e.session_id }, label: "session" });
   if (e.setup_id) links.push({ to: "/setups/$setupId", params: { setupId: e.setup_id }, label: "setup" });
   if (e.setup_change_id) links.push({ to: "/iteration", label: "setup change" });
-  if (e.debrief_id) links.push({ to: "/post-debrief", label: "debrief" });
+  if (e.debrief_id) links.push({ to: "/session-debrief", label: "debrief" });
   if (e.memory_id) links.push({ to: "/engineering-memory", label: "notebook" });
   if (e.tire_stint_id || e.tire_log_id) links.push({ to: "/tyres", label: "tyres" });
   return links;

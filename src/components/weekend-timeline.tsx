@@ -146,7 +146,7 @@ export function WeekendTimeline({
       title: headline, body: d.suggested_changes ?? undefined,
       meta: summary ? "AI summary attached" : undefined,
       sessionId: d.session_id ?? undefined,
-      href: d.session_id ? { to: "/sessions/$sessionId", params: { sessionId: d.session_id } } : { to: "/debrief" },
+      href: d.session_id ? { to: "/sessions/$sessionId", params: { sessionId: d.session_id } } : { to: "/session-debrief" },
     });
     if (summary) {
       items.push({
