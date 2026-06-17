@@ -310,6 +310,11 @@ const ALL_NAV_GROUPS = [
     items: [
       { to: "/calculators", label: "Calculators", icon: Calculator },
       { to: "/damage",      label: "Damage log",  icon: AlertTriangle },
+    ],
+  },
+  {
+    label: "Operations",
+    items: [
       { to: "/workshop",    label: "Workshop",    icon: HardHat },
       { to: "/maintenance", label: "Maintenance", icon: Wrench },
       { to: "/inventory",   label: "Inventory",   icon: Package },
