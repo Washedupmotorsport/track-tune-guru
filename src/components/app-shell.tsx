@@ -196,12 +196,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 function MobileTabBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = [
-    { to: "/garage",      label: "Garage",  icon: Warehouse, matches: ["/garage", "/cars", "/weekends", "/calendar", "/tracks"] },
-    { to: "/race-mode",   label: "Race",    icon: Radio,     matches: ["/race-mode", "/track-evolution", "/engineer"] },
-    { to: "/sessions",    label: "Sessions",icon: Timer,     matches: ["/sessions", "/timeline", "/analysis", "/session-debrief", "/debrief", "/post-debrief"] },
-    { to: "/tyres",       label: "Tyres",   icon: Disc,      matches: ["/tyres", "/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
-    { to: "/setup-library", label: "Setup", icon: Wand2,     matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
-    { to: "/driver-hub",  label: "Driver",  icon: Brain,     matches: ["/driver-hub", "/driver", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy", "/engineering-memory", "/notes"] },
+    { to: "/engineer",      label: "Cockpit",  icon: HardHat,    matches: ["/engineer"] },
+    { to: "/race-mode",     label: "Race",     icon: Radio,      matches: ["/race-mode", "/track-evolution"] },
+    { to: "/sessions",      label: "Sessions", icon: Timer,      matches: ["/sessions", "/timeline", "/analysis", "/session-debrief", "/debrief", "/post-debrief"] },
+    { to: "/tyres",         label: "Tyres",    icon: Disc,       matches: ["/tyres", "/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
+    { to: "/setup-library", label: "Setup",    icon: BookMarked, matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
+    { to: "/driver-hub",    label: "Driver",   icon: Brain,      matches: ["/driver-hub", "/driver", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy", "/engineering-memory", "/notes"] },
   ] as const;
   return (
     <nav
