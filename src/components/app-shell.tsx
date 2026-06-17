@@ -130,6 +130,12 @@ export function AppShell({ children }: { children: ReactNode }) {
                     <DropdownMenuSeparator />
                   </div>
                 ))}
+                <div>
+                  <DropdownMenuLabel className="font-medium text-xs text-primary">Settings</DropdownMenuLabel>
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings"><SettingsIcon className="w-4 h-4 mr-2" /> Settings</Link>
+                  </DropdownMenuItem>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
             <span className="hidden xl:block text-xs font-medium text-muted-foreground">
