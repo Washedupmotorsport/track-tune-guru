@@ -18,7 +18,7 @@ export function QuickLogFab() {
     { to: "/tyre-setup",  label: "Tyre pressures", icon: Gauge,         tone: "primary" },
     { to: "/sessions",    label: "New lap",        icon: Timer,         tone: "primary" },
     { to: "/tires",       label: "Tyre log",       icon: Disc,          tone: "default" },
-    { to: "/debrief",     label: "Driver debrief", icon: ClipboardList, tone: "default" },
+    { to: "/session-debrief", label: "Session debrief", icon: ClipboardList, tone: "default" },
     { to: "/notes",       label: "Quick note",     icon: NotebookPen,   tone: "default" },
     { to: "/engineering-memory", label: "Notebook entry", icon: Brain, tone: "default" },
     { to: "/race-mode",     label: "Race Mode",      icon: Radio,         tone: "default" },

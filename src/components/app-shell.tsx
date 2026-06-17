@@ -202,11 +202,11 @@ function MobileTabBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = [
     { to: "/weekends",      label: "Weekend",  icon: Flag,  matches: ["/weekends", "/calendar", "/garage", "/cars", "/tracks"] },
-    { to: "/sessions",      label: "Sessions", icon: Timer, matches: ["/sessions", "/timeline", "/analysis", "/debrief", "/post-debrief"] },
+    { to: "/sessions",      label: "Sessions", icon: Timer, matches: ["/sessions", "/timeline", "/analysis", "/debrief", "/post-debrief", "/session-debrief"] },
     { to: "/tyre-setup",    label: "Tyres",    icon: Disc,  matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
     { to: "/setup-library", label: "Setup",    icon: Wand2, matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
     { to: "/race-mode",     label: "Race",     icon: Radio, matches: ["/race-mode", "/track-evolution", "/engineer"] },
-    { to: "/debrief",       label: "Debrief",  icon: ClipboardList, matches: ["/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/driver-hub", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy"] },
+    { to: "/session-debrief", label: "Debrief", icon: ClipboardList, matches: ["/session-debrief", "/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/driver-hub", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy"] },
   ] as const;
   return (
     <nav
@@ -253,7 +253,7 @@ const WORKSPACES = [
   { key: "tyres",    label: "Tyres",    icon: Disc,          to: "/tyre-setup",     matches: ["/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
   { key: "setup",    label: "Setup",    icon: Wand2,         to: "/setup-library",  matches: ["/setup-library", "/setups", "/baseline", "/iteration"] },
   { key: "race",     label: "Race Mode", icon: Radio,        to: "/race-mode",      matches: ["/race-mode", "/track-evolution", "/engineer"], tooltip: "One race-day operating screen" },
-  { key: "debrief",  label: "Debrief",  icon: ClipboardList, to: "/debrief",        matches: ["/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/driver-hub", "/confidence", "/sympathy", "/philosophies", "/corners", "/known-behaviours"], tooltip: "Driver feedback & notes" },
+  { key: "debrief",  label: "Debrief",  icon: ClipboardList, to: "/session-debrief", matches: ["/session-debrief", "/debrief", "/post-debrief", "/engineering-memory", "/notes", "/driver", "/driver-hub", "/confidence", "/sympathy", "/philosophies", "/corners", "/known-behaviours"], tooltip: "Driver feedback & notes" },
 ] as const;
 
 const ALL_NAV_GROUPS = [
@@ -303,8 +303,7 @@ const ALL_NAV_GROUPS = [
     label: "Debrief",
     items: [
       { to: "/driver-hub",         label: "Driver Hub",         icon: Brain },
-      { to: "/debrief",            label: "Driver feedback",    icon: ClipboardList },
-      { to: "/post-debrief",       label: "Session debrief",    icon: ClipboardList },
+      { to: "/session-debrief",    label: "Session debrief",    icon: ClipboardList },
       { to: "/engineering-memory", label: "Engineering memory", icon: Brain },
       { to: "/notes",              label: "Engineer notes",     icon: NotebookPen },
     ],

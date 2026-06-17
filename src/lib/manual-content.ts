@@ -92,7 +92,7 @@ export const MANUAL_SECTIONS: ManualSection[] = [
     id: "debrief",
     title: "Session debrief",
     group: "Race Weekend",
-    route: "/post-debrief",
+    route: "/session-debrief",
     summary:
       "Structured post-session write-up: what improved, what got worse, what to try next. Can be AI-summarised.",
     whenToUse: "Within 30 minutes of coming off track.",
@@ -196,7 +196,7 @@ export const MANUAL_SECTIONS: ManualSection[] = [
     id: "debrief-driver",
     title: "Driver feedback",
     group: "Driver",
-    route: "/debrief",
+    route: "/session-debrief?tab=feedback",
     summary: "Free-form driver comments tagged by corner, phase and severity.",
     whenToUse: "During the debrief while the run is fresh.",
     keyActions: ["Tag the corner and phase (entry / mid / exit)."],
