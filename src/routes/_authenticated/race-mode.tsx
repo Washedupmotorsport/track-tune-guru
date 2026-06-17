@@ -211,20 +211,20 @@ function RaceModePage() {
   }, [swStart]);
 
   const logLap = useMutation({
-    mutationFn: async (ms: number) => {
+    mutationFn: async ({ ms, lapNumber }: { ms: number; lapNumber: number }) => {
       if (!session || !user) throw new Error("No active session");
       const payload = {
         session_id: session.id, car_id: session.car_id,
         setup_id: session.setup_id ?? null, user_id: user.id,
         lap_time_ms: Math.max(1, Math.round(ms)),
-        lap_number: (laps[laps.length - 1]?.lap_number ?? laps.length) + 1,
+        lap_number: lapNumber,
       };
       const { error } = await supabase.from("laps").insert(payload as never);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_, { ms, lapNumber }) => {
       qc.invalidateQueries({ queryKey: ["rm-laps", sessionId] });
-      toast.success("Lap logged");
+      toast.success(`Lap #${lapNumber} saved — ${formatLapTime(ms)}`);
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -330,7 +330,8 @@ function RaceModePage() {
                 onLogLap={() => {
                   const ms = swMs;
                   if (ms <= 0) return;
-                  logLap.mutate(ms);
+                  const lapNumber = (laps[laps.length - 1]?.lap_number ?? laps.length) + 1;
+                  logLap.mutate({ ms, lapNumber });
                   setSwStart(Date.now()); setSwFrozen(0);
                 }}
                 logging={logLap.isPending}
