@@ -604,7 +604,7 @@ function LogFeedbackDialog({ eventId, carId, userId, sessions, onSaved }: {
       if (!carId) throw new Error("This weekend has no car attached.");
       if (!desc.trim()) throw new Error("Description required.");
       const { error } = await supabase.from("driver_feedback").insert({
-        user_id: userId, car_id: carId, event_id: eventId,
+        user_id: userId, car_id: carId,
         session_id: sessionId || null,
         category: cat, severity: sev, balance: bal || null,
         description: desc.trim(), tags: ["weekend"],
