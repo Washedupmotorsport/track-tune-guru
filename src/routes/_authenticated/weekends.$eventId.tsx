@@ -585,6 +585,8 @@ function NewSessionButton({ eventId, carId, userId, defaultType, track, onCreate
       </DialogContent>
     </Dialog>
   );
+}
+
 function LogFeedbackDialog({ eventId, carId, userId, sessions, onSaved }: {
   eventId: string; carId: string | null; userId: string;
   sessions: { id: string; name: string; session_type: string }[];
