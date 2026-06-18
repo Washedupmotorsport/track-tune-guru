@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import {
   ArrowLeft, Flag, MapPin, Plus, Timer, Trophy, AlertTriangle, Disc,
   Droplet, Cloud, ClipboardCheck, ChevronRight, NotebookPen,
-  Brain, GitBranch, BookMarked, Sparkles,
+  Brain, GitBranch, BookMarked, Sparkles, MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
@@ -373,6 +373,13 @@ function WeekendHub() {
           <div className="rounded-sm border border-border bg-card p-3">
             <div className="font-display text-xs font-bold uppercase tracking-[0.15em] mb-2">Quick actions</div>
             <div className="grid gap-2">
+              <LogFeedbackDialog
+                eventId={eventId}
+                carId={e.car_id}
+                userId={user!.id}
+                sessions={sessions}
+                onSaved={() => qc.invalidateQueries({ queryKey: ["weekend-latest-feedback", eventId, sessionIds.join(",")] })}
+              />
               <Button variant="outline" size="sm" onClick={() => navigate({ to: "/sessions" })}>
                 <Timer className="w-4 h-4 mr-1" /> All sessions
               </Button>
@@ -574,6 +581,109 @@ function NewSessionButton({ eventId, carId, userId, defaultType, track, onCreate
         </div>
         <DialogFooter>
           <Button onClick={() => create.mutate()} disabled={create.isPending}>Create session</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function LogFeedbackDialog({ eventId, carId, userId, sessions, onSaved }: {
+  eventId: string; carId: string | null; userId: string;
+  sessions: { id: string; name: string; session_type: string }[];
+  onSaved: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [sessionId, setSessionId] = useState("");
+  const [desc, setDesc] = useState("");
+  const [cat, setCat] = useState("balance");
+  const [sev, setSev] = useState("info");
+  const [bal, setBal] = useState("");
+
+  const save = useMutation({
+    mutationFn: async () => {
+      if (!carId) throw new Error("This weekend has no car attached.");
+      if (!desc.trim()) throw new Error("Description required.");
+      const { error } = await supabase.from("driver_feedback").insert({
+        user_id: userId, car_id: carId,
+        session_id: sessionId || null,
+        category: cat, severity: sev, balance: bal || null,
+        description: desc.trim(), tags: ["weekend"],
+      } as never);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Feedback logged");
+      setOpen(false); setDesc(""); setSessionId(""); setBal(""); setSev("info"); setCat("balance");
+      onSaved();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm">
+          <MessageSquare className="w-4 h-4 mr-1" /> Log feedback
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Log driver feedback</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div>
+            <Label>Session (optional)</Label>
+            <Select value={sessionId} onValueChange={setSessionId}>
+              <SelectTrigger><SelectValue placeholder="General / no session" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">General / no session</SelectItem>
+                {sessions.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>{s.name} · {s.session_type}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Description</Label>
+            <Textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={3} placeholder="e.g. Understeer on throttle out of T3." />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Category</Label>
+              <Select value={cat} onValueChange={setCat}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {["balance","tyres","brakes","engine","aero","other"].map((c) => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Severity</Label>
+              <Select value={sev} onValueChange={setSev}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {["info","minor","major"].map((s) => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div>
+            <Label>Balance feel (optional)</Label>
+            <Select value={bal} onValueChange={setBal}>
+              <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">—</SelectItem>
+                {["understeer","neutral","oversteer"].map((b) => (
+                  <SelectItem key={b} value={b}>{b}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button onClick={() => save.mutate()} disabled={save.isPending || !desc.trim()}>Log feedback</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
