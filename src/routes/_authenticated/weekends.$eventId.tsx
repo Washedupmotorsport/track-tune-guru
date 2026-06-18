@@ -373,6 +373,13 @@ function WeekendHub() {
           <div className="rounded-sm border border-border bg-card p-3">
             <div className="font-display text-xs font-bold uppercase tracking-[0.15em] mb-2">Quick actions</div>
             <div className="grid gap-2">
+              <LogFeedbackDialog
+                eventId={eventId}
+                carId={e.car_id}
+                userId={user!.id}
+                sessions={sessions}
+                onSaved={() => qc.invalidateQueries({ queryKey: ["weekend-latest-feedback", eventId, sessionIds.join(",")] })}
+              />
               <Button variant="outline" size="sm" onClick={() => navigate({ to: "/sessions" })}>
                 <Timer className="w-4 h-4 mr-1" /> All sessions
               </Button>
