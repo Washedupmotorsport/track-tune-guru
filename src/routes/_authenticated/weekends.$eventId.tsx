@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import {
   ArrowLeft, Flag, MapPin, Plus, Timer, Trophy, AlertTriangle, Disc,
   Droplet, Cloud, ClipboardCheck, ChevronRight, NotebookPen,
-  Brain, GitBranch, BookMarked, Sparkles,
+  Brain, GitBranch, BookMarked, Sparkles, MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
