@@ -9,14 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { DISCIPLINES } from "@/lib/disciplines";
-import {
-  Plus, Car, Trash2, Users, Share2, Timer, FileText, Trophy,
-  Radio, Flag, ClipboardList, ChevronRight, Disc, Wand2, Camera, Loader2,
-} from "lucide-react";
+import { Plus, Car, Trash2, Users, Share2, Timer, FileText, Trophy, Radio, Flag, ClipboardList, ChevronRight, Disc, Wand as Wand2, Camera, Loader as Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { ShareDialog } from "@/components/share-dialog";
 import { formatLapTime } from "@/lib/lap-time";
+import { assertValidImageUpload, IMAGE_ACCEPT_ATTR } from "@/lib/upload-guard";
 
 export const Route = createFileRoute("/_authenticated/garage")({
   component: Garage,
@@ -274,9 +272,9 @@ function CarPhoto({ carId, photoPath, editable }: { carId: string; photoPath: st
   const onPick = async (file: File) => {
     setUploading(true);
     try {
-      const ext = file.name.split(".").pop() ?? "jpg";
+      const { contentType, ext } = assertValidImageUpload(file);
       const path = `${carId}/cover/${crypto.randomUUID()}.${ext}`;
-      const up = await supabase.storage.from("photos").upload(path, file, { contentType: file.type });
+      const up = await supabase.storage.from("photos").upload(path, file, { contentType });
       if (up.error) throw up.error;
       if (photoPath) await supabase.storage.from("photos").remove([photoPath]);
       const { error } = await supabase.from("cars").update({ photo_path: path }).eq("id", carId);
@@ -313,7 +311,7 @@ function CarPhoto({ carId, photoPath, editable }: { carId: string; photoPath: st
           <input
             ref={fileRef}
             type="file"
-            accept="image/*"
+            accept={IMAGE_ACCEPT_ATTR}
             className="hidden"
             onChange={(e) => { const f = e.target.files?.[0]; if (f) onPick(f); e.target.value = ""; }}
           />

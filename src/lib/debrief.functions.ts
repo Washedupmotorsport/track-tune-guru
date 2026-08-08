@@ -29,7 +29,10 @@ export const getDebrief = createServerFn({ method: "POST" })
       .select("id")
       .eq("id", data.carId)
       .maybeSingle();
-    if (carErr) throw new Error(carErr.message);
+    if (carErr) {
+      console.error("[getDebrief] car lookup failed", carErr);
+      throw new Error("Car not found or access denied");
+    }
     if (!car) throw new Error("Car not found or access denied");
     void userId;
 
@@ -37,7 +40,10 @@ export const getDebrief = createServerFn({ method: "POST" })
     if (data.sessionId) lapQ = lapQ.eq("session_id", data.sessionId);
     else if (data.setupId) lapQ = lapQ.eq("setup_id", data.setupId);
     const { data: laps, error: lapErr } = await lapQ.order("recorded_at");
-    if (lapErr) throw new Error(lapErr.message);
+    if (lapErr) {
+      console.error("[getDebrief] lap lookup failed", lapErr);
+      throw new Error("Could not load laps for this car");
+    }
 
     if (!laps || laps.length === 0) throw new Error("No laps to analyze");
 

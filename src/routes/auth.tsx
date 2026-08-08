@@ -48,8 +48,17 @@ function AuthPage() {
             data: { display_name: name || email.split("@")[0] },
           },
         });
-        if (error) throw error;
-        toast.success("Welcome to the paddock");
+        // Do not reveal whether this email already has an account: a distinct
+        // "already registered" error would let anyone enumerate our users.
+        // Suppress only the duplicate-account signal; genuine input problems
+        // (weak password, malformed email, rate limit) are still shown.
+        if (error) {
+          const revealsExistingAccount =
+            /already|registered|exists|taken|in use/i.test(error.message);
+          if (!revealsExistingAccount) throw error;
+          console.error("[signUp] suppressed account-existence error", error);
+        }
+        toast.success("Check your email to finish setting up your account");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;

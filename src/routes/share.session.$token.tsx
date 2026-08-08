@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { getPublicSession } from "@/lib/share.functions";
 import { formatLapTime } from "@/lib/lap-time";
-import { Trophy, Cloud, Loader2 } from "lucide-react";
+import { Trophy, Cloud, Loader as Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/share/session/$token")({
   component: PublicSessionView,
@@ -23,9 +23,11 @@ export const Route = createFileRoute("/share/session/$token")({
       This share link is invalid or has been revoked.
     </div>
   ),
-  errorComponent: ({ error }) => (
+  // Never render the raw error: this route is public, so error text would leak
+  // internal detail to unauthenticated visitors.
+  errorComponent: () => (
     <div className="min-h-screen flex items-center justify-center text-muted-foreground">
-      {error.message}
+      This share link is invalid or has been revoked.
     </div>
   ),
 });

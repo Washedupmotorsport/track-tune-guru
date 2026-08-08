@@ -23,7 +23,10 @@ export const summarizeSessionDebrief = createServerFn({ method: "POST" })
       .select("*")
       .eq("id", data.debriefId)
       .maybeSingle();
-    if (dErr) throw new Error(dErr.message);
+    if (dErr) {
+      console.error("[summarizeSessionDebrief] debrief lookup failed", dErr);
+      throw new Error("Debrief not found or access denied");
+    }
     if (!deb) throw new Error("Debrief not found or access denied");
 
     // Pull last 8 debriefs for the same car to detect recurring trends.

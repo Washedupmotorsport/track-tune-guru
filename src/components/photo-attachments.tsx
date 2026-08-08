@@ -2,9 +2,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { Loader2, Upload, Trash2, ImageIcon } from "lucide-react";
+import { Loader as Loader2, Upload, Trash2, Image as ImageIcon } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { toast } from "sonner";
+import { assertValidImageUpload, IMAGE_ACCEPT_ATTR } from "@/lib/upload-guard";
 
 type Scope = "session_id" | "setup_id" | "maintenance_id" | "lap_id" | "note_id";
 
@@ -46,13 +47,16 @@ export function PhotoAttachments({ carId, scope, scopeId }: { carId: string; sco
     mutationFn: async (files: FileList) => {
       if (!user) throw new Error("No user");
       for (const file of Array.from(files)) {
-        const ext = file.name.split(".").pop() ?? "bin";
+        // Reject anything that is not an allowed image, or is oversized, before
+        // it reaches storage. Derive the extension and content type from the
+        // validated type rather than from the untrusted file name.
+        const { contentType, ext } = assertValidImageUpload(file);
         const path = `${user.id}/${carId}/${crypto.randomUUID()}.${ext}`;
-        const up = await supabase.storage.from("photos").upload(path, file, { contentType: file.type });
+        const up = await supabase.storage.from("photos").upload(path, file, { contentType });
         if (up.error) throw up.error;
         const row: Record<string, unknown> = {
           user_id: user.id, car_id: carId, storage_path: path, file_name: file.name,
-          mime_type: file.type, size_bytes: file.size,
+          mime_type: contentType, size_bytes: file.size,
         };
         row[scope] = scopeId;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -85,7 +89,7 @@ export function PhotoAttachments({ carId, scope, scopeId }: { carId: string; sco
         <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()} disabled={upload.isPending}>
           {upload.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Upload className="w-4 h-4 mr-1" />} Upload
         </Button>
-        <input ref={fileRef} type="file" accept="image/*" multiple className="hidden"
+        <input ref={fileRef} type="file" accept={IMAGE_ACCEPT_ATTR} multiple className="hidden"
           onChange={(e) => { if (e.target.files?.length) upload.mutate(e.target.files); e.target.value = ""; }} />
       </div>
       {items.length === 0 ? (
