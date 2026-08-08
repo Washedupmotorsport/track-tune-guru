@@ -9,8 +9,10 @@ import type { Database } from './types'
 export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server(
   async ({ next }) => {
     
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+    // Public project connection values, safe to embed as a runtime fallback so
+    // server-side auth still works when the worker env is not configured.
+    const SUPABASE_URL = process.env.SUPABASE_URL || 'https://pvfauhqsaoskrmeukhgu.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2ZmF1aHFzYW9za3JtZXVraGd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzOTI5ODMsImV4cCI6MjA5Mzk2ODk4M30.UvXBe7-DQxvWxr8XsgBUCijP0Yfa_Vny2GLwAE3zmzA';
 
     if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
       const missing = [

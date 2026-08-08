@@ -2,11 +2,21 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
+// Public project connection values. These are safe to ship to the browser
+// (the anon key is protected by row-level security) and act as a fallback so
+// the app still connects when a build environment forgets to inject the vars.
+const FALLBACK_SUPABASE_URL = 'https://pvfauhqsaoskrmeukhgu.supabase.co';
+const FALLBACK_SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2ZmF1aHFzYW9za3JtZXVraGd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzOTI5ODMsImV4cCI6MjA5Mzk2ODk4M30.UvXBe7-DQxvWxr8XsgBUCijP0Yfa_Vny2GLwAE3zmzA';
+
+function readEnv(key: string): string | undefined {
+  return typeof process !== 'undefined' ? process.env?.[key] : undefined;
+}
+
 function createSupabaseClient() {
-  // Use import.meta.env for client-side (Vite build-time replacement)
-  // Fall back to process.env for SSR (server-side rendering)
-  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+  // Use import.meta.env for client-side (Vite build-time replacement),
+  // fall back to process.env for SSR, then to the baked-in public values.
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || readEnv('SUPABASE_URL') || FALLBACK_SUPABASE_URL;
+  const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || readEnv('SUPABASE_PUBLISHABLE_KEY') || FALLBACK_SUPABASE_PUBLISHABLE_KEY;
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
     const missing = [

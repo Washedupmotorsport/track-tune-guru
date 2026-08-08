@@ -6,7 +6,9 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 function createSupabaseAdminClient() {
-  const SUPABASE_URL = process.env.SUPABASE_URL;
+  // The site address is public and safe to embed as a fallback. The service-role
+  // key is a SECRET and must come from the environment — never hardcode it.
+  const SUPABASE_URL = process.env.SUPABASE_URL || 'https://pvfauhqsaoskrmeukhgu.supabase.co';
   const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
