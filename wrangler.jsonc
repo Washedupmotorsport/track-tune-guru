@@ -4,4 +4,13 @@
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
+  // Public Supabase connection values, read at runtime via process.env during
+  // server-side rendering. The URL and publishable (anon) key are safe to ship —
+  // they are already embedded in the browser bundle. The service-role key is a
+  // SECRET and must NOT live here; set it with `wrangler secret put
+  // SUPABASE_SERVICE_ROLE_KEY` (only the public share links need it).
+  "vars": {
+    "SUPABASE_URL": "https://pvfauhqsaoskrmeukhgu.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2ZmF1aHFzYW9za3JtZXVraGd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzOTI5ODMsImV4cCI6MjA5Mzk2ODk4M30.UvXBe7-DQxvWxr8XsgBUCijP0Yfa_Vny2GLwAE3zmzA"
+  }
 }
