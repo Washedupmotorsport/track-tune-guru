@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { TyreTabs } from "@/components/tyre-tabs";
-import jsPDF from "jspdf";
 
 export const Route = createFileRoute("/_authenticated/tyre-compare")({
   component: TyreComparePage,
@@ -139,7 +138,8 @@ function TyreComparePage() {
     return { lo, hi, temps };
   }, [sweepMinC, sweepMaxC]);
 
-  const downloadReport = () => {
+  const downloadReport = async () => {
+    const { default: jsPDF } = await import("jspdf");
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     const W = doc.internal.pageSize.getWidth();
     const M = 40;

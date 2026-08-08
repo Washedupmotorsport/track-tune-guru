@@ -1,4 +1,3 @@
-import jsPDF from "jspdf";
 import { formatLapTime } from "./lap-time";
 
 type Session = {
@@ -13,7 +12,8 @@ type Lap = {
   notes: string | null;
 };
 
-export function exportSessionPDF(session: Session, laps: Lap[]) {
+export async function exportSessionPDF(session: Session, laps: Lap[]) {
+  const { default: jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
   let y = 48;

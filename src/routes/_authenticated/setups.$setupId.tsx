@@ -185,7 +185,7 @@ function SetupDetail() {
           try {
             const { data: car } = await supabase.from("cars").select("name, make, model, year").eq("id", setupQ.data!.car_id).single();
             const { data: laps } = await supabase.from("laps").select("lap_number, lap_time_ms, sector_1_ms, sector_2_ms, sector_3_ms, conditions, notes").eq("setup_id", setupId).order("recorded_at");
-            exportSetupPdf({
+            await exportSetupPdf({
               setup: { ...setupQ.data!, ...meta, setup_data: data, updated_at: setupQ.data!.updated_at ?? new Date().toISOString() } as Parameters<typeof exportSetupPdf>[0]["setup"],
               car: car ?? null,
               laps: laps ?? [],

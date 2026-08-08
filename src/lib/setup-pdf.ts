@@ -1,5 +1,3 @@
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 import { getDiscipline } from "./disciplines";
 import { formatLapTime } from "./lap-time";
 
@@ -34,7 +32,9 @@ const RED: [number, number, number] = [227, 6, 19]; // #E30613
 const DARK: [number, number, number] = [20, 20, 20];
 const MUTED: [number, number, number] = [120, 120, 120];
 
-export function exportSetupPdf({ setup, car, laps }: { setup: Setup; car: Car | null; laps: Lap[] }) {
+export async function exportSetupPdf({ setup, car, laps }: { setup: Setup; car: Car | null; laps: Lap[] }) {
+  const { jsPDF } = await import("jspdf");
+  const { default: autoTable } = await import("jspdf-autotable");
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const disc = getDiscipline(setup.discipline);
   const pageW = doc.internal.pageSize.getWidth();

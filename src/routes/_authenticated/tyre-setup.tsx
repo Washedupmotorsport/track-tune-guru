@@ -8,7 +8,6 @@ import { useUnits } from "@/lib/units";
 import { Stepper } from "@/components/stepper";
 import { TyreTabs } from "@/components/tyre-tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
-import jsPDF from "jspdf";
 
 export const Route = createFileRoute("/_authenticated/tyre-setup")({
   component: TyreSetupPage,
@@ -88,8 +87,9 @@ function TyreSetupPage() {
     return "optimal";
   };
 
-  const downloadReport = () => {
+  const downloadReport = async () => {
     if (!recommendation || !base) return;
+    const { default: jsPDF } = await import("jspdf");
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     const W = doc.internal.pageSize.getWidth();
     let y = 56;
