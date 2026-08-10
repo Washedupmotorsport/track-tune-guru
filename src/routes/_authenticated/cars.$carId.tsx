@@ -11,6 +11,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { getDiscipline } from "@/lib/disciplines";
 import { ShareDialog } from "@/components/share-dialog";
+import { CarPhoto } from "@/components/car-photo";
 import { useCarAccess, canEdit } from "@/lib/use-car-access";
 import { formatLapTime } from "@/lib/lap-time";
 
@@ -115,6 +116,15 @@ function CarDetail() {
     onSuccess: () => { toast.success("Setup removed"); qc.invalidateQueries({ queryKey: ["setups", carId] }); },
   });
 
+  const deleteCar = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("cars").delete().eq("id", carId);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Car removed"); qc.invalidateQueries({ queryKey: ["cars"] }); navigate({ to: "/garage" }); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to delete car"),
+  });
+
   if (carQ.isLoading) return <div className="text-muted-foreground">Loading…</div>;
   if (!carQ.data) return <div>Not found</div>;
 
@@ -122,9 +132,25 @@ function CarDetail() {
 
   return (
     <div>
-      <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
-        <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
+          <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
+        </Link>
+        {isOwner && (
+          <button
+            onClick={() => { if (confirm("Delete this car and all its setups?")) deleteCar.mutate(); }}
+            disabled={deleteCar.isPending}
+            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-destructive transition-colors"
+          >
+            <Trash2 className="w-4 h-4" /> Delete car
+          </button>
+        )}
+      </div>
+
+      <div className="mt-4 rounded-sm border border-border bg-card overflow-hidden">
+        <CarPhoto carId={carId} photoPath={carQ.data.photo_path ?? null} editable={writable} />
+      </div>
+
       <div className="mt-4 flex items-end justify-between flex-wrap gap-4">
         <div>
           <div className="font-mono text-xs uppercase tracking-widest text-primary flex items-center gap-2">

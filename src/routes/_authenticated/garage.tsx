@@ -9,12 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { DISCIPLINES } from "@/lib/disciplines";
-import { Plus, Car, Trash2, Users, Share2, Timer, FileText, Trophy, Radio, Flag, ClipboardList, ChevronRight, Disc, Wand as Wand2, Camera, Loader as Loader2 } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { Plus, Car, Users, Share2, Timer, FileText, Trophy, Radio, Flag, ClipboardList, ChevronRight, Disc, Wand as Wand2 } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { ShareDialog } from "@/components/share-dialog";
+import { CarPhoto } from "@/components/car-photo";
 import { formatLapTime } from "@/lib/lap-time";
-import { assertValidImageUpload, IMAGE_ACCEPT_ATTR } from "@/lib/upload-guard";
 
 export const Route = createFileRoute("/_authenticated/garage")({
   component: Garage,
@@ -83,14 +83,6 @@ function Garage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
-  const del = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("cars").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => { toast.success("Car removed"); qc.invalidateQueries({ queryKey: ["cars"] }); },
-  });
-
   const statFor = (id: string) => statsQ.data?.[id] ?? { setups: 0, sessions: 0, lastOut: null as string | null, best: null as number | null };
   const fmtAgo = (iso: string | null) => {
     if (!iso) return "—";
@@ -154,8 +146,7 @@ function Garage() {
                 {owned.length > 0 && (
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {owned.map((c) => (
-                      <CarCard key={c.id} c={c} stat={statFor(c.id)} fmtAgo={fmtAgo}
-                        onDelete={() => { if (confirm("Delete this car and all its setups?")) del.mutate(c.id); }} />
+                      <CarCard key={c.id} c={c} stat={statFor(c.id)} fmtAgo={fmtAgo} />
                     ))}
                   </div>
                 )}
@@ -201,13 +192,13 @@ function EmptyState() {
 }
 
 type CarRow = { id: string; name: string; discipline: string; make: string | null; model: string | null; year: number | null };
-function CarCard({ c, stat, fmtAgo, shared, onDelete }: {
+function CarCard({ c, stat, fmtAgo, shared }: {
   c: CarRow & { photo_path?: string | null }; stat: { setups: number; sessions: number; lastOut: string | null; best: number | null };
-  fmtAgo: (s: string | null) => string; shared?: boolean; onDelete?: () => void;
+  fmtAgo: (s: string | null) => string; shared?: boolean;
 }) {
   return (
     <div className={`group relative rounded-sm border border-border bg-card transition-colors ${shared ? "hover:border-accent" : "hover:border-primary"}`}>
-      <CarPhoto carId={c.id} photoPath={c.photo_path ?? null} editable />
+      <CarPhoto carId={c.id} photoPath={c.photo_path ?? null} editable={false} />
       <div className="flex items-center justify-between px-3 py-2 border-b border-border/60 bg-muted/20">
         <div className="flex items-center gap-2 min-w-0">
           <Car className={`w-4 h-4 shrink-0 ${shared ? "text-accent" : "text-primary"}`} />
@@ -215,14 +206,9 @@ function CarCard({ c, stat, fmtAgo, shared, onDelete }: {
         </div>
         <div className="flex items-center gap-1">
           {shared && <span className="text-[10px] font-mono uppercase tracking-[0.15em] px-1.5 py-0.5 rounded-sm bg-accent/20 text-accent">Shared</span>}
-          {!shared && onDelete && (
-            <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-              <ShareDialog carId={c.id} carName={c.name}
-                trigger={<button className="text-muted-foreground hover:text-primary p-1"><Share2 className="w-4 h-4" /></button>} />
-              <button onClick={onDelete} className="text-muted-foreground hover:text-destructive p-1">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
+          {!shared && (
+            <ShareDialog carId={c.id} carName={c.name}
+              trigger={<button className="text-muted-foreground hover:text-primary p-1"><Share2 className="w-4 h-4" /></button>} />
           )}
           {shared && (
             <ShareDialog carId={c.id} carName={c.name}
@@ -253,74 +239,6 @@ function Stat({ icon, label, value, mono }: { icon?: React.ReactNode; label: str
         {icon}{label}
       </div>
       <div className={`mt-0.5 text-sm font-bold truncate ${mono ? "font-mono tabular-nums" : "font-display"}`}>{value}</div>
-    </div>
-  );
-}
-
-function CarPhoto({ carId, photoPath, editable }: { carId: string; photoPath: string | null; editable: boolean }) {
-  const qc = useQueryClient();
-  const fileRef = useRef<HTMLInputElement>(null);
-  const [url, setUrl] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (!photoPath) { setUrl(null); return; }
-    (async () => {
-      const { data } = await supabase.storage.from("photos").createSignedUrl(photoPath, 3600);
-      if (!cancelled) setUrl(data?.signedUrl ?? null);
-    })();
-    return () => { cancelled = true; };
-  }, [photoPath]);
-
-  const onPick = async (file: File) => {
-    setUploading(true);
-    try {
-      const { contentType, ext } = assertValidImageUpload(file);
-      const path = `${carId}/cover/${crypto.randomUUID()}.${ext}`;
-      const up = await supabase.storage.from("photos").upload(path, file, { contentType });
-      if (up.error) throw up.error;
-      if (photoPath) await supabase.storage.from("photos").remove([photoPath]);
-      const { error } = await supabase.from("cars").update({ photo_path: path }).eq("id", carId);
-      if (error) throw error;
-      toast.success("Photo updated");
-      qc.invalidateQueries({ queryKey: ["cars"] });
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Upload failed");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  return (
-    <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted/30 border-b border-border/60">
-      {url ? (
-        <img src={url} alt="Car" className="w-full h-full object-cover" loading="lazy" />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-          <Car className="w-10 h-10 opacity-30" />
-        </div>
-      )}
-      {editable && (
-        <>
-          <button
-            type="button"
-            onClick={(e) => { e.preventDefault(); fileRef.current?.click(); }}
-            disabled={uploading}
-            className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-sm bg-background/85 backdrop-blur px-2 py-1 text-[10px] font-mono uppercase tracking-[0.15em] border border-border hover:border-primary hover:text-primary transition-colors"
-          >
-            {uploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Camera className="w-3 h-3" />}
-            {url ? "Change" : "Add photo"}
-          </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept={IMAGE_ACCEPT_ATTR}
-            className="hidden"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) onPick(f); e.target.value = ""; }}
-          />
-        </>
-      )}
     </div>
   );
 }
