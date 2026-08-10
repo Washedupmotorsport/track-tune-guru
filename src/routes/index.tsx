@@ -67,8 +67,9 @@ function Landing() {
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/30 to-background" />
-        <img src="/image.jpg" alt="Race car banner" width={1920} height={1080}
-          className="absolute inset-0 w-full h-full object-cover z-10" style={{ objectPosition: "center 60%" }} />
+        <img src="/image.jpg" alt="Race car banner"
+          className="absolute inset-0 w-full h-full z-10"
+          style={{ objectFit: "cover", objectPosition: "center 60%" }} />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background z-20" />
         <div className="relative z-30 mx-auto max-w-6xl px-4 pt-24 pb-32">
           <h1 className="mt-6 font-display text-5xl md:text-7xl font-bold leading-tight max-w-3xl">
