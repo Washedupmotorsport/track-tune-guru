@@ -140,7 +140,7 @@ function CarDetail() {
           <button
             onClick={() => { if (confirm("Delete this car and all its setups?")) deleteCar.mutate(); }}
             disabled={deleteCar.isPending}
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-destructive transition-colors"
+            className="inline-flex items-center gap-1 text-sm text-destructive hover:text-destructive/80 transition-colors"
           >
             <Trash2 className="w-4 h-4" /> Delete car
           </button>
