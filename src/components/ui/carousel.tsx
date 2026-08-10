@@ -15,6 +15,8 @@ type CarouselProps = {
   plugins?: CarouselPlugin;
   orientation?: "horizontal" | "vertical";
   setApi?: (api: CarouselApi) => void;
+  /** Accessible name for the carousel region (e.g. "Featured sessions"). */
+  label?: string;
 };
 
 type CarouselContextProps = {
@@ -24,6 +26,8 @@ type CarouselContextProps = {
   scrollNext: () => void;
   canScrollPrev: boolean;
   canScrollNext: boolean;
+  currentIndex: number;
+  slideCount: number;
 } & CarouselProps;
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null);
@@ -41,7 +45,7 @@ function useCarousel() {
 const Carousel = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & CarouselProps
->(({ orientation = "horizontal", opts, setApi, plugins, className, children, ...props }, ref) => {
+>(({ orientation = "horizontal", opts, setApi, plugins, label, className, children, ...props }, ref) => {
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
@@ -51,6 +55,8 @@ const Carousel = React.forwardRef<
   );
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [slideCount, setSlideCount] = React.useState(0);
 
   const onSelect = React.useCallback((api: CarouselApi) => {
     if (!api) {
@@ -59,6 +65,8 @@ const Carousel = React.forwardRef<
 
     setCanScrollPrev(api.canScrollPrev());
     setCanScrollNext(api.canScrollNext());
+    setCurrentIndex(api.selectedScrollSnap());
+    setSlideCount(api.slideNodes().length);
   }, []);
 
   const scrollPrev = React.useCallback(() => {
@@ -69,17 +77,42 @@ const Carousel = React.forwardRef<
     api?.scrollNext();
   }, [api]);
 
+  const scrollTo = React.useCallback(
+    (index: number) => {
+      api?.scrollTo(index);
+    },
+    [api],
+  );
+
+  // Keydown on the region (not capture) so nested widgets (sliders, inputs)
+  // receive their own arrow keys first. Only handle arrows when the target is
+  // the carousel itself or a slide — not an interactive descendant.
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (event.key === "ArrowLeft") {
+      const target = event.target as HTMLElement;
+      const isInteractive =
+        target.closest('input, button, [role="slider"], [role="option"], a, textarea, select') != null;
+      if (isInteractive) return;
+
+      const isVertical = orientation === "vertical";
+      const prevKey = isVertical ? "ArrowUp" : "ArrowLeft";
+      const nextKey = isVertical ? "ArrowDown" : "ArrowRight";
+
+      if (event.key === prevKey) {
         event.preventDefault();
         scrollPrev();
-      } else if (event.key === "ArrowRight") {
+      } else if (event.key === nextKey) {
         event.preventDefault();
         scrollNext();
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        scrollTo(0);
+      } else if (event.key === "End") {
+        event.preventDefault();
+        scrollTo(slideCount - 1);
       }
     },
-    [scrollPrev, scrollNext],
+    [orientation, scrollPrev, scrollNext, scrollTo, slideCount],
   );
 
   React.useEffect(() => {
@@ -101,8 +134,13 @@ const Carousel = React.forwardRef<
 
     return () => {
       api?.off("select", onSelect);
+      api?.off("reInit", onSelect);
     };
   }, [api, onSelect]);
+
+  // Polite live region: screen readers announce position without interrupting.
+  const liveMessage =
+    slideCount > 0 ? `Slide ${currentIndex + 1} of ${slideCount}` : "";
 
   return (
     <CarouselContext.Provider
@@ -110,23 +148,31 @@ const Carousel = React.forwardRef<
         carouselRef,
         api: api,
         opts,
+        label,
         orientation: orientation || (opts?.axis === "y" ? "vertical" : "horizontal"),
         scrollPrev,
         scrollNext,
         canScrollPrev,
         canScrollNext,
+        currentIndex,
+        slideCount,
       }}
     >
       <div
         ref={ref}
-        onKeyDownCapture={handleKeyDown}
-        className={cn("relative", className)}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        className={cn("relative focus-visible:outline-none", className)}
         role="region"
         aria-roledescription="carousel"
+        aria-label={label || "Carousel"}
         {...props}
       >
         {children}
       </div>
+      <span className="sr-only" aria-live="polite" aria-atomic="true">
+        {liveMessage}
+      </span>
     </CarouselContext.Provider>
   );
 });
@@ -153,15 +199,15 @@ const CarouselContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HT
 );
 CarouselContent.displayName = "CarouselContent";
 
-const CarouselItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => {
-    const { orientation } = useCarousel();
-
+const CarouselItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { index?: number }>(
+  ({ className, index, ...props }, ref) => {
+    const { orientation, slideCount } = useCarousel();
     return (
       <div
         ref={ref}
         role="group"
         aria-roledescription="slide"
+        aria-label={typeof index === "number" && slideCount > 0 ? `${index + 1} of ${slideCount}` : undefined}
         className={cn(
           "min-w-0 shrink-0 grow-0 basis-full",
           orientation === "horizontal" ? "pl-4" : "pt-4",
@@ -184,7 +230,7 @@ const CarouselPrevious = React.forwardRef<HTMLButtonElement, React.ComponentProp
         variant={variant}
         size={size}
         className={cn(
-          "absolute  h-8 w-8 rounded-full",
+          "absolute h-8 w-8 rounded-full",
           orientation === "horizontal"
             ? "-left-12 top-1/2 -translate-y-1/2"
             : "-top-12 left-1/2 -translate-x-1/2 rotate-90",

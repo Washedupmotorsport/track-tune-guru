@@ -4,10 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator,
 } from "@/components/ui/command";
-import {
-  Timer, Disc, Wrench, Package, CalendarDays, Receipt, BarChart3,
-  Calculator, Wand2, NotebookPen, Car, Settings2, Flag, Brain, BookMarked,
-} from "lucide-react";
+import { Timer, Disc, Wrench, Package, CalendarDays, Receipt, ChartBar as BarChart3, Calculator, Wand as Wand2, NotebookPen, Car, Settings2, Flag, Brain, BookMarked } from "lucide-react";
 
 type Hit =
   | { kind: "car"; id: string; label: string }
@@ -16,22 +13,22 @@ type Hit =
   | { kind: "note"; id: string; label: string };
 
 const PAGES: { label: string; to: string; icon: React.ReactNode }[] = [
-  { label: "Garage", to: "/garage", icon: <Car className="w-4 h-4" /> },
-  { label: "Sessions", to: "/sessions", icon: <Timer className="w-4 h-4" /> },
-  { label: "Analysis", to: "/analysis", icon: <BarChart3 className="w-4 h-4" /> },
-  { label: "Tires", to: "/tires", icon: <Disc className="w-4 h-4" /> },
-  { label: "Maintenance", to: "/maintenance", icon: <Wrench className="w-4 h-4" /> },
-  { label: "Inventory", to: "/inventory", icon: <Package className="w-4 h-4" /> },
-  { label: "Calendar", to: "/calendar", icon: <CalendarDays className="w-4 h-4" /> },
-  { label: "Expenses", to: "/expenses", icon: <Receipt className="w-4 h-4" /> },
-  { label: "Calculators", to: "/calculators", icon: <Calculator className="w-4 h-4" /> },
-  { label: "Baseline", to: "/baseline", icon: <Wand2 className="w-4 h-4" /> },
-  { label: "Notes", to: "/notes", icon: <NotebookPen className="w-4 h-4" /> },
-  { label: "Engineering memory", to: "/engineering-memory", icon: <Brain className="w-4 h-4" /> },
-  { label: "Setup library", to: "/setup-library", icon: <BookMarked className="w-4 h-4" /> },
-  { label: "Post-session debrief", to: "/post-debrief", icon: <NotebookPen className="w-4 h-4" /> },
-  { label: "Flags", to: "/flags", icon: <Flag className="w-4 h-4" /> },
-  { label: "Pit lane mode", to: "/pitlane", icon: <Flag className="w-4 h-4" /> },
+  { label: "Garage", to: "/garage", icon: <Car className="w-4 h-4" aria-hidden /> },
+  { label: "Sessions", to: "/sessions", icon: <Timer className="w-4 h-4" aria-hidden /> },
+  { label: "Analysis", to: "/analysis", icon: <BarChart3 className="w-4 h-4" aria-hidden /> },
+  { label: "Tires", to: "/tires", icon: <Disc className="w-4 h-4" aria-hidden /> },
+  { label: "Maintenance", to: "/maintenance", icon: <Wrench className="w-4 h-4" aria-hidden /> },
+  { label: "Inventory", to: "/inventory", icon: <Package className="w-4 h-4" aria-hidden /> },
+  { label: "Calendar", to: "/calendar", icon: <CalendarDays className="w-4 h-4" aria-hidden /> },
+  { label: "Expenses", to: "/expenses", icon: <Receipt className="w-4 h-4" aria-hidden /> },
+  { label: "Calculators", to: "/calculators", icon: <Calculator className="w-4 h-4" aria-hidden /> },
+  { label: "Baseline", to: "/baseline", icon: <Wand2 className="w-4 h-4" aria-hidden /> },
+  { label: "Notes", to: "/notes", icon: <NotebookPen className="w-4 h-4" aria-hidden /> },
+  { label: "Engineering memory", to: "/engineering-memory", icon: <Brain className="w-4 h-4" aria-hidden /> },
+  { label: "Setup library", to: "/setup-library", icon: <BookMarked className="w-4 h-4" aria-hidden /> },
+  { label: "Post-session debrief", to: "/post-debrief", icon: <NotebookPen className="w-4 h-4" aria-hidden /> },
+  { label: "Flags", to: "/flags", icon: <Flag className="w-4 h-4" aria-hidden /> },
+  { label: "Pit lane mode", to: "/pitlane", icon: <Flag className="w-4 h-4" aria-hidden /> },
 ];
 
 export function CommandPalette() {
@@ -92,10 +89,10 @@ export function CommandPalette() {
                 else if (h.kind === "setup") go(`/setups/${h.id}`);
                 else go("/notes");
               }}>
-                {h.kind === "car" && <Car className="w-4 h-4 mr-2" />}
-                {h.kind === "session" && <Timer className="w-4 h-4 mr-2" />}
-                {h.kind === "setup" && <Settings2 className="w-4 h-4 mr-2" />}
-                {h.kind === "note" && <NotebookPen className="w-4 h-4 mr-2" />}
+                {h.kind === "car" && <Car className="w-4 h-4 mr-2" aria-hidden />}
+                {h.kind === "session" && <Timer className="w-4 h-4 mr-2" aria-hidden />}
+                {h.kind === "setup" && <Settings2 className="w-4 h-4 mr-2" aria-hidden />}
+                {h.kind === "note" && <NotebookPen className="w-4 h-4 mr-2" aria-hidden />}
                 <span>{h.label}</span>
                 {"sub" in h && h.sub && <span className="ml-auto text-xs text-muted-foreground">{h.sub}</span>}
                 <span className="ml-2 text-[10px] uppercase tracking-widest text-muted-foreground">{h.kind}</span>
