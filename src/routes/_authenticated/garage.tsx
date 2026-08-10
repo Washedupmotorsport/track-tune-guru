@@ -207,7 +207,7 @@ function CarCard({ c, stat, fmtAgo, shared, onDelete }: {
 }) {
   return (
     <div className={`group relative rounded-sm border border-border bg-card transition-colors ${shared ? "hover:border-accent" : "hover:border-primary"}`}>
-      <CarPhoto carId={c.id} photoPath={c.photo_path ?? null} editable={!shared} />
+      <CarPhoto carId={c.id} photoPath={c.photo_path ?? null} editable />
       <div className="flex items-center justify-between px-3 py-2 border-b border-border/60 bg-muted/20">
         <div className="flex items-center gap-2 min-w-0">
           <Car className={`w-4 h-4 shrink-0 ${shared ? "text-accent" : "text-primary"}`} />
@@ -223,6 +223,10 @@ function CarCard({ c, stat, fmtAgo, shared, onDelete }: {
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
+          )}
+          {shared && (
+            <ShareDialog carId={c.id} carName={c.name}
+              trigger={<button className="text-muted-foreground hover:text-accent p-1"><Share2 className="w-4 h-4" /></button>} />
           )}
         </div>
       </div>

@@ -23,4 +23,5 @@ export function useCarAccess(carId: string | undefined, ownerUserId?: string) {
   });
 }
 
-export const canEdit = (a: CarAccess | undefined) => a === "owner" || a === "editor";
+export const canEdit = (a: CarAccess | undefined) =>
+  a === "owner" || a === "editor" || a === "viewer";
