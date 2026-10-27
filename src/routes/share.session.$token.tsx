@@ -27,7 +27,7 @@ export const Route = createFileRoute("/share/session/$token")({
   ),
   errorComponent: ({ error }) => (
     <div className="min-h-screen flex items-center justify-center text-muted-foreground">
-      {error.message}
+      {error instanceof Error ? error.message : "Unable to load this shared session."}
     </div>
   ),
 });
