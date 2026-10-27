@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_daily_usage: {
+        Row: {
+          calls: number
+          usage_day: string
+          user_id: string
+        }
+        Insert: {
+          calls?: number
+          usage_day?: string
+          user_id: string
+        }
+        Update: {
+          calls?: number
+          usage_day?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       attachments: {
         Row: {
           caption: string | null
@@ -1644,6 +1662,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_ai_call: { Args: { p_user_id: string }; Returns: boolean }
+      delete_account_data: { Args: { p_user_id: string }; Returns: undefined }
       get_user_id_by_email: { Args: { _email: string }; Returns: string }
       has_car_access: {
         Args: {

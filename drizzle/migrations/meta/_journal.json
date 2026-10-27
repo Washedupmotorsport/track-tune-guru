@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793066654567,
+      "tag": "0000_prelaunch_account_cleanup_and_ai_quota",
+      "breakpoints": true
+    }
+  ]
+}
