@@ -80,9 +80,9 @@ function Landing() {
           className="absolute inset-0 w-full h-full object-cover z-10" style={{ objectPosition: "center 90%" }} />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background z-20" />
         <div className="relative z-30 mx-auto max-w-6xl px-4 pt-24 pb-32">
-          <h1 className="mt-6 font-display text-5xl md:text-7xl font-bold leading-tight max-w-3xl">
-            Dial in every <span className="text-primary text-glow">setup</span>.
-            <br />Win every <span className="text-accent">session</span>.
+          <h1 className="mt-6 font-display text-5xl md:text-7xl font-bold leading-tight max-w-3xl text-hero-white">
+            Dial in every <span className="text-hero-yellow">setup</span>.
+            <br />Win every <span className="text-hero-blue">session</span>.
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
             Your digital pit garage for circuit, drift, drag, autocross, rally and oval.
