@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { getDiscipline } from "./disciplines";
+import { EngineerInput } from "./launch-rules";
 
 const InputSchema = z.object({
   setupId: z.string().uuid(),
@@ -109,17 +110,6 @@ Respond with the JSON object only, no prose.`;
 // AI Engineer — recommendations grounded in real weekend data
 // ============================================================
 
-const EngineerInput = z.object({
-  eventId: z.string().uuid().nullable().optional(),
-  weather: z
-    .object({
-      air_temp_c: z.number().optional(),
-      weather: z.string().optional(),
-      wind_kph: z.number().optional(),
-    })
-    .nullable()
-    .optional(),
-});
 
 export type EngineerRelated = {
   session_id?: string | null;

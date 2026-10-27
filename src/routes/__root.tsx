@@ -14,6 +14,7 @@ import { AuthProvider } from "@/lib/auth-context";
 import { UnitsProvider } from "@/lib/units";
 import { ThemeProvider } from "@/lib/theme";
 import { useEffect } from "react";
+import { registerOfflineWorker } from "@/lib/pwa";
 
 function NotFoundComponent() {
   return (
@@ -81,16 +82,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "My Race Engineer" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-      { name: "theme-color", content: "#f7f7f5" },
-      { title: "Lovable App" },
-      { property: "og:title", content: "Lovable App" },
-      { name: "twitter:title", content: "Lovable App" },
-      { name: "description", content: "Race Ready Setup is a digital race engineering console for optimizing car performance." },
-      { property: "og:description", content: "Race Ready Setup is a digital race engineering console for optimizing car performance." },
-      { name: "twitter:description", content: "Race Ready Setup is a digital race engineering console for optimizing car performance." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ece682a0-5f54-4dc1-a3be-7f5903f67450/id-preview-b6114ac2--05a0664b-b381-4980-9a39-8d51edb3106a.lovable.app-1779954092144.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ece682a0-5f54-4dc1-a3be-7f5903f67450/id-preview-b6114ac2--05a0664b-b381-4980-9a39-8d51edb3106a.lovable.app-1779954092144.png" },
+      { name: "theme-color", content: "#1a3a5c" },
     ],
     links: [
       {
@@ -140,22 +132,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   useEffect(() => {
-    if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
-    // Only enable the offline shell on the published production origin.
-    // In preview / dev / lovable iframes, an active SW caches stale HTML that
-    // references old JS chunks, causing 404s and reload flashing.
-    const host = window.location.hostname;
-    const isProd = host === "track-tune-guru.lovable.app";
-    if (isProd) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
-    } else {
-      navigator.serviceWorker.getRegistrations().then((regs) => {
-        regs.forEach((r) => r.unregister().catch(() => {}));
-      }).catch(() => {});
-      if (window.caches) {
-        caches.keys().then((keys) => keys.forEach((k) => caches.delete(k))).catch(() => {});
-      }
-    }
+    void registerOfflineWorker().catch(() => {});
   }, []);
 
   return (

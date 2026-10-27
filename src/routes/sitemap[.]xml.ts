@@ -1,14 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
-// TODO: replace with your project URL once a custom domain is set.
-const BASE_URL = "";
+const BASE_URL = "https://track-tune-guru.lovable.app";
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const entries = [{ path: "/", changefreq: "weekly", priority: "1.0" }];
+        const entries = [
+          { path: "/", changefreq: "weekly", priority: "1.0" },
+          { path: "/terms", changefreq: "monthly", priority: "0.3" },
+          { path: "/privacy", changefreq: "monthly", priority: "0.3" },
+          { path: "/support", changefreq: "monthly", priority: "0.5" },
+        ];
         const urls = entries.map(
           (e) =>
             `  <url>\n    <loc>${BASE_URL}${e.path}</loc>\n    <changefreq>${e.changefreq}</changefreq>\n    <priority>${e.priority}</priority>\n  </url>`,
