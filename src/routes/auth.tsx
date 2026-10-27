@@ -185,7 +185,7 @@ function AuthPage() {
                   if (!email.trim()) return;
                   setBusy(true);
                   const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-                    redirectTo: window.location.origin + "/auth",
+                    redirectTo: window.location.origin + "/reset-password",
                   });
                   setBusy(false);
                   if (error) { toast.error(error.message); return; }
