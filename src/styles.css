@@ -39,6 +39,9 @@
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
+  --color-hero-yellow: oklch(0.88 0.18 95);
+  --color-hero-blue: oklch(0.68 0.16 244);
+  --color-hero-white: oklch(1 0 0);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
