@@ -273,7 +273,7 @@ function SetupDetail() {
           </div>
         </div>
         <div className="mt-3 text-[11px] text-muted-foreground">
-          Tagged setups appear in the <Link to="/setup-library" className="text-primary hover:underline">Setup library</Link> with their best lap, tyre behaviour, and driver confidence.
+          Tagged setups appear in the <Link to="/setup-library" search={{ tab: "baselines" }} className="text-primary hover:underline">Setup library</Link> with their best lap, tyre behaviour, and driver confidence.
         </div>
       </div>
 

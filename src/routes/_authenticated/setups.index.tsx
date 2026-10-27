@@ -11,6 +11,6 @@ export const Route = createFileRoute("/_authenticated/setups/")({
   ] }),
 
   beforeLoad: () => {
-    throw redirect({ to: "/setup-library" });
+    throw redirect({ to: "/setup-library", search: { tab: "baselines" } });
   },
 });

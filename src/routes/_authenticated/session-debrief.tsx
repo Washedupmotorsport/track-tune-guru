@@ -111,7 +111,7 @@ function SessionDebriefPage() {
           setTab(next);
           nav({
             to: "/session-debrief",
-            search: (prev: Search) => ({ ...prev, tab: next }),
+            search: { sessionId: search.sessionId, carId: search.carId, new: search.new, tab: next },
             replace: true,
           });
         }}

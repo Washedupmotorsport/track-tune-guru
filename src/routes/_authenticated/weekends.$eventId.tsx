@@ -398,7 +398,7 @@ function WeekendHub() {
                 </Button>
               )}
               <Button variant="outline" size="sm" asChild>
-                <Link to="/tyres">Tyre logs</Link>
+                <Link to="/tyres" search={{ tab: "pressures" }}>Tyre logs</Link>
               </Button>
             </div>
           </div>
