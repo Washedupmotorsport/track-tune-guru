@@ -9,7 +9,7 @@ import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 
 // Configuration
-const SITE_NAME = "Race Ready Setup"
+const SITE_NAME = "My Race Engineer"
 const SENDER_DOMAIN = "notify.myraceengineer.app"
 const ROOT_DOMAIN = "myraceengineer.app"
 const FROM_DOMAIN = "myraceengineer.app"
