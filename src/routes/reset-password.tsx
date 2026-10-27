@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ResetPasswordInput } from "@/lib/launch-rules";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({ meta: [
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/reset-password")({
 
 function ResetPasswordPage() {
   const navigate = useNavigate();
+  const { passwordRecovery } = useAuth();
   const [ready, setReady] = useState(false);
   const [checking, setChecking] = useState(true);
   const [password, setPassword] = useState("");
@@ -49,7 +51,7 @@ function ResetPasswordPage() {
       <div className="w-full max-w-sm space-y-5">
         <Link to="/" className="font-display text-primary font-bold">My Race Engineer</Link>
         <h1 className="text-3xl font-display font-bold">Reset password</h1>
-        {checking ? <p role="status">Checking reset link…</p> : !ready ? (
+        {checking && !passwordRecovery ? <p role="status">Checking reset link…</p> : !ready && !passwordRecovery ? (
           <div className="space-y-4">
             <p className="text-muted-foreground">This reset link is invalid or expired. Request a new link to continue.</p>
             <Button asChild><Link to="/auth">Request a new reset link</Link></Button>
