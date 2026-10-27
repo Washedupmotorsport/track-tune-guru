@@ -12,7 +12,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { AlertTriangle, Plus, ArrowLeft, Trash2, CheckCircle2, Wrench, Flame } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/damage")({ component: DamagePage });
+export const Route = createFileRoute("/_authenticated/damage")({
+  head: () => ({ meta: [
+    { title: "Damage | My Race Engineer" },
+    { name: "description", content: "Damage: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Damage | My Race Engineer" },
+    { property: "og:description", content: "Damage: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: DamagePage });
 
 type Car = { id: string; name: string };
 type Damage = {

@@ -6,10 +6,14 @@ export const Route = createFileRoute("/support")({
   component: SupportPage,
   head: () => ({
     meta: [
+      { property: "og:title", content: "Support — My Race Engineer" },
+      { property: "og:description", content: "Get help with My Race Engineer — contact support, browse the manual, and report issues." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Support — My Race Engineer" },
       { name: "description", content: "Get help with My Race Engineer — contact support, browse the manual, and report issues." },
     ],
-    links: [{ rel: "canonical", href: "/support" }],
+    links: [{ rel: "canonical", href: "https://track-tune-guru.lovable.app/support" }],
   }),
 });
 

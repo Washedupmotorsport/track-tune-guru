@@ -17,12 +17,14 @@ export const Route = createFileRoute("/_authenticated/driver-hub")({
     const t = typeof s.tab === "string" && (VALID as string[]).includes(s.tab) ? (s.tab as TabId) : undefined;
     return { tab: t };
   },
-  head: () => ({
-    meta: [
-      { title: "Driver Hub — My Race Engineer" },
-      { name: "description", content: "Driver Hub: confidence, feedback, corner notes, known behaviours and mechanical sympathy in one place." },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "Driver Hub | My Race Engineer" },
+    { name: "description", content: "Driver Hub: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Driver Hub | My Race Engineer" },
+    { property: "og:description", content: "Driver Hub: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: DriverHubPage,
 });
 

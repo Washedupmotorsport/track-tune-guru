@@ -24,6 +24,15 @@ import { Switch } from "@/components/ui/switch";
 import { BookMarked } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/setups/$setupId")({
+  head: () => ({ meta: [
+    { title: "Setup Details | My Race Engineer" },
+    { name: "description", content: "Setup Details: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Setup Details | My Race Engineer" },
+    { property: "og:description", content: "Setup Details: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: SetupDetail,
 });
 

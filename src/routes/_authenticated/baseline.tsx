@@ -18,6 +18,15 @@ import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
 import { useActiveWeekend } from "@/lib/active-weekend";
 
 export const Route = createFileRoute("/_authenticated/baseline")({
+  head: () => ({ meta: [
+    { title: "Baseline | My Race Engineer" },
+    { name: "description", content: "Baseline: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Baseline | My Race Engineer" },
+    { property: "og:description", content: "Baseline: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: () => {
     const nav = useNavigate();
     useEffect(() => { nav({ to: "/setup-library", search: { tab: "baselines" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);

@@ -10,13 +10,17 @@ export const Route = createFileRoute("/")({
   component: Landing,
   head: () => ({
     meta: [
+      { property: "og:image", content: "https://track-tune-guru.lovable.app/mre-share.jpg" },
+      { name: "twitter:image", content: "https://track-tune-guru.lovable.app/mre-share.jpg" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "My Race Engineer — Race Car Setup Manager" },
       { name: "description", content: "Your digital pit garage for circuit, drift, drag, autocross, rally and oval. Save baselines, log changes, win every session." },
       { property: "og:title", content: "My Race Engineer — Race Car Setup Manager" },
       { property: "og:description", content: "Your digital pit garage for circuit, drift, drag, autocross, rally and oval. Save baselines, log changes, win every session." },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: "https://track-tune-guru.lovable.app/" },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: "https://track-tune-guru.lovable.app/" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -72,7 +76,7 @@ function Landing() {
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/30 to-background" />
-        <img src="https://cdn.discordapp.com/attachments/1128623717677813821/1511262075366932510/IMG_3323.jpg?ex=6a1fcffc&is=6a1e7e7c&hm=2033391684d0a86e4ef4841ac65379fc7889619b5b3967921a2f426ad1790f48" alt="Race car banner" width={1920} height={1080}
+        <img src="/mre-share.jpg" alt="Race car banner" width={1920} height={1080}
           className="absolute inset-0 w-full h-full object-cover z-10" style={{ objectPosition: "center 90%" }} />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background z-20" />
         <div className="relative z-30 mx-auto max-w-6xl px-4 pt-24 pb-32">

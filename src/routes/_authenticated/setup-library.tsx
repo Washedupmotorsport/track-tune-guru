@@ -22,12 +22,14 @@ export const Route = createFileRoute("/_authenticated/setup-library")({
   validateSearch: (s: Record<string, unknown>) => ({
     tab: typeof s.tab === "string" && (VALID_TABS as string[]).includes(s.tab) ? (s.tab as TabId) : undefined,
   }),
-  head: () => ({
-    meta: [
-      { title: "Setup Library — My Race Engineer" },
-      { name: "description", content: "Single source of truth for setup engineering — baselines, iterations, presets, history and comparisons." },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "Setup Library | My Race Engineer" },
+    { name: "description", content: "Setup Library: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Setup Library | My Race Engineer" },
+    { property: "og:description", content: "Setup Library: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: SetupHub,
 });
 

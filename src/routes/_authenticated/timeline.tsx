@@ -15,12 +15,14 @@ import {
 
 export const Route = createFileRoute("/_authenticated/timeline")({
   component: TimelinePage,
-  head: () => ({
-    meta: [
-      { title: "Race Weekend Timeline — My Race Engineer" },
-      { name: "description", content: "Engineering notebook timeline for a race weekend: practice → qualifying → sprint → endurance, with setup revisions, tyre changes, weather shifts, confidence and lap improvements." },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "Timeline | My Race Engineer" },
+    { name: "description", content: "Timeline: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Timeline | My Race Engineer" },
+    { property: "og:description", content: "Timeline: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 // ---------------- Types ----------------

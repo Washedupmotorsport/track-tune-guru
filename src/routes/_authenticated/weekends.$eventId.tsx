@@ -20,7 +20,16 @@ import { formatLapTime } from "@/lib/lap-time";
 import { WeekendTimeline } from "@/components/weekend-timeline";
 import { TimelineFeed } from "@/components/timeline-feed";
 
-export const Route = createFileRoute("/_authenticated/weekends/$eventId")({ component: WeekendHub });
+export const Route = createFileRoute("/_authenticated/weekends/$eventId")({
+  head: () => ({ meta: [
+    { title: "Weekends.$Eventid | My Race Engineer" },
+    { name: "description", content: "Weekends.$Eventid: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Weekends.$Eventid | My Race Engineer" },
+    { property: "og:description", content: "Weekends.$Eventid: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: WeekendHub });
 
 type Evt = {
   id: string; user_id: string; car_id: string | null; title: string;

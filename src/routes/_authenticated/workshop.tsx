@@ -4,7 +4,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Wrench, AlertTriangle, Package, Disc, ChevronRight, Activity, Flame, CheckCircle2, Gauge } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/workshop")({ component: WorkshopPage });
+export const Route = createFileRoute("/_authenticated/workshop")({
+  head: () => ({ meta: [
+    { title: "Operations | My Race Engineer" },
+    { name: "description", content: "Operations: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Operations | My Race Engineer" },
+    { property: "og:description", content: "Operations: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: WorkshopPage });
 
 type Car = { id: string; name: string };
 type Item = {

@@ -7,12 +7,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Settings as SettingsIcon, Sun, Moon, LogOut, BookOpen, Mail, Shield, FileText } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/settings")({
-  head: () => ({
-    meta: [
-      { title: "Settings — My Race Engineer" },
-      { name: "description", content: "Units, theme, currency and account preferences." },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "Settings | My Race Engineer" },
+    { name: "description", content: "Settings: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Settings | My Race Engineer" },
+    { property: "og:description", content: "Settings: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: SettingsPage,
 });
 

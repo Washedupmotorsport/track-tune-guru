@@ -11,7 +11,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Wrench, Plus, ArrowLeft, Trash2, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/maintenance")({ component: MaintenancePage });
+export const Route = createFileRoute("/_authenticated/maintenance")({
+  head: () => ({ meta: [
+    { title: "Maintenance | My Race Engineer" },
+    { name: "description", content: "Maintenance: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Maintenance | My Race Engineer" },
+    { property: "og:description", content: "Maintenance: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: MaintenancePage });
 
 type Car = { id: string; name: string };
 type Item = {

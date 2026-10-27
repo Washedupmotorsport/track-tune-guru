@@ -5,10 +5,14 @@ export const Route = createFileRoute("/privacy")({
   component: PrivacyPage,
   head: () => ({
     meta: [
+      { property: "og:title", content: "Privacy Policy — My Race Engineer" },
+      { property: "og:description", content: "Privacy Policy for My Race Engineer." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Privacy Policy — My Race Engineer" },
       { name: "description", content: "Privacy Policy for My Race Engineer." },
     ],
-    links: [{ rel: "canonical", href: "/privacy" }],
+    links: [{ rel: "canonical", href: "https://track-tune-guru.lovable.app/privacy" }],
   }),
 });
 

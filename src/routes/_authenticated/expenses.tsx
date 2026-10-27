@@ -12,7 +12,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Receipt, Plus, ArrowLeft, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/expenses")({ component: ExpensesPage });
+export const Route = createFileRoute("/_authenticated/expenses")({
+  head: () => ({ meta: [
+    { title: "Expenses | My Race Engineer" },
+    { name: "description", content: "Expenses: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Expenses | My Race Engineer" },
+    { property: "og:description", content: "Expenses: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: ExpensesPage });
 
 type Car = { id: string; name: string };
 type Expense = { id: string; car_id: string | null; category: string; description: string | null; amount: number; currency: string; spent_on: string; };

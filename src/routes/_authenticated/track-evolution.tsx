@@ -16,12 +16,14 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/track-evolution")({
   component: TrackEvolutionPage,
-  head: () => ({
-    meta: [
-      { title: "Track Evolution — My Race Engineer" },
-      { name: "description", content: "Live track-state engineer: classify green vs rubbered-in vs greasy vs wet, and get setup, pressure and balance calls as the session evolves." },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "Track Evolution | My Race Engineer" },
+    { name: "description", content: "Track Evolution: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Track Evolution | My Race Engineer" },
+    { property: "og:description", content: "Track Evolution: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 // ------------------------------------------------------------

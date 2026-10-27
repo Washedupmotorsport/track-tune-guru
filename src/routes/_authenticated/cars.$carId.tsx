@@ -16,6 +16,15 @@ import { formatLapTime } from "@/lib/lap-time";
 import { Stepper } from "@/components/stepper";
 
 export const Route = createFileRoute("/_authenticated/cars/$carId")({
+  head: () => ({ meta: [
+    { title: "Car Details | My Race Engineer" },
+    { name: "description", content: "Car Details: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Car Details | My Race Engineer" },
+    { property: "og:description", content: "Car Details: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: CarDetail,
 });
 

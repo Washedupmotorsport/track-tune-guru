@@ -15,12 +15,14 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/race-mode")({
   component: RaceModePage,
-  head: () => ({
-    meta: [
-      { title: "Race Mode — My Race Engineer" },
-      { name: "description", content: "One race-day operating screen for engineers and drivers — live timing, tyres, fuel, driver feedback and engineering priorities." },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "Race Mode | My Race Engineer" },
+    { name: "description", content: "Race Mode: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Race Mode | My Race Engineer" },
+    { property: "og:description", content: "Race Mode: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 type TabKey = "live" | "tyres" | "fuel" | "feedback" | "priorities";

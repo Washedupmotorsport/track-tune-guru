@@ -9,14 +9,16 @@ export const Route = createFileRoute("/share/session/$token")({
   component: PublicSessionView,
   head: ({ params }) => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Shared session — My Race Engineer" },
       { name: "description", content: "View shared race session data: laps, sectors, weather and conditions." },
       { property: "og:title", content: "Shared session — My Race Engineer" },
       { property: "og:description", content: "View shared race session data: laps, sectors, weather and conditions." },
-      { property: "og:url", content: `/share/session/${params.token}` },
+      { property: "og:url", content: `https://track-tune-guru.lovable.app/share/session/${params.token}` },
       { name: "robots", content: "noindex" },
     ],
-    links: [{ rel: "canonical", href: `/share/session/${params.token}` }],
+    links: [{ rel: "canonical", href: `https://track-tune-guru.lovable.app/share/session/${params.token}` }],
   }),
   notFoundComponent: () => (
     <div className="min-h-screen flex items-center justify-center text-muted-foreground">

@@ -18,6 +18,15 @@ import { toast } from "sonner";
 import { summarizeSessionDebrief, type SessionDebriefAI } from "@/lib/session-debrief.functions";
 
 export const Route = createFileRoute("/_authenticated/post-debrief")({
+  head: () => ({ meta: [
+    { title: "Post Debrief | My Race Engineer" },
+    { name: "description", content: "Post Debrief: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Post Debrief | My Race Engineer" },
+    { property: "og:description", content: "Post Debrief: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   validateSearch: (s: Record<string, unknown>) => ({
     sessionId: typeof s.sessionId === "string" ? s.sessionId : undefined,
     carId: typeof s.carId === "string" ? s.carId : undefined,

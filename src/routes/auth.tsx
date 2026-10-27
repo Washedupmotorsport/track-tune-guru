@@ -13,13 +13,15 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Sign in — My Race Engineer" },
       { name: "description", content: "Sign in or create your My Race Engineer account to start logging setups, sessions, and laps." },
       { property: "og:title", content: "Sign in — My Race Engineer" },
       { property: "og:description", content: "Sign in or create your account to start logging setups, sessions, and laps." },
-      { property: "og:url", content: "/auth" },
+      { property: "og:url", content: "https://track-tune-guru.lovable.app/auth" },
     ],
-    links: [{ rel: "canonical", href: "/auth" }],
+    links: [{ rel: "canonical", href: "https://track-tune-guru.lovable.app/auth" }],
   }),
 });
 

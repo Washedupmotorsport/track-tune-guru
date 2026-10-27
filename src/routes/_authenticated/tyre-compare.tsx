@@ -10,6 +10,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import jsPDF from "jspdf";
 
 export const Route = createFileRoute("/_authenticated/tyre-compare")({
+  head: () => ({ meta: [
+    { title: "Tyre Compare | My Race Engineer" },
+    { name: "description", content: "Tyre Compare: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Tyre Compare | My Race Engineer" },
+    { property: "og:description", content: "Tyre Compare: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: () => {
     const nav = useNavigate();
     useEffect(() => { nav({ to: "/tyres", search: { tab: "compare" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);

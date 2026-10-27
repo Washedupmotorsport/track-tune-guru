@@ -16,6 +16,15 @@ import {
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/known-behaviours")({
+  head: () => ({ meta: [
+    { title: "Known Behaviours | My Race Engineer" },
+    { name: "description", content: "Known Behaviours: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Known Behaviours | My Race Engineer" },
+    { property: "og:description", content: "Known Behaviours: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: () => {
     const nav = useNavigate();
     useEffect(() => { nav({ to: "/driver-hub", search: { tab: "behaviours" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);

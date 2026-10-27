@@ -5,6 +5,15 @@ import {
   Activity, Disc, Gauge, Sparkles, ThumbsUp, ThumbsDown, ChevronRight,
 } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/philosophies")({
+  head: () => ({ meta: [
+    { title: "Philosophies | My Race Engineer" },
+    { name: "description", content: "Philosophies: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Philosophies | My Race Engineer" },
+    { property: "og:description", content: "Philosophies: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: () => {
     const nav = useNavigate();
     useEffect(() => { nav({ to: "/driver-hub", search: { tab: "feedback" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);

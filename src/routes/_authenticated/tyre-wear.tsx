@@ -11,6 +11,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { ArrowLeft, Disc, Plus, Trash2, TrendingDown, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/tyre-wear")({
+  head: () => ({ meta: [
+    { title: "Tyre Wear | My Race Engineer" },
+    { name: "description", content: "Tyre Wear: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Tyre Wear | My Race Engineer" },
+    { property: "og:description", content: "Tyre Wear: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: () => {
     const nav = useNavigate();
     useEffect(() => { nav({ to: "/tyres", search: { tab: "wear" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);

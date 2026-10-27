@@ -13,12 +13,14 @@ import { GuidedTour } from "@/components/guided-tour";
 import { AiEngineerPanel } from "@/components/ai-engineer-panel";
 
 export const Route = createFileRoute("/_authenticated/engineer")({
-  head: () => ({
-    meta: [
-      { title: "Cockpit — My Race Engineer" },
-      { name: "description", content: "Race engineer cockpit: session, setup, verdicts, tyres, confidence, memory and concerns on one screen." },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "Engineer Cockpit | My Race Engineer" },
+    { name: "description", content: "Engineer Cockpit: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Engineer Cockpit | My Race Engineer" },
+    { property: "og:description", content: "Engineer Cockpit: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: EngineerCockpit,
 });
 
