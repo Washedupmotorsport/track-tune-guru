@@ -61,10 +61,10 @@ import { Route as AuthenticatedWeekendsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedWorkshopRouteImport } from './routes/_authenticated/workshop'
 import { Route as AuthenticatedCarsCarIdRouteImport } from './routes/_authenticated/cars.$carId'
 import { Route as AuthenticatedSessionsSessionIdRouteImport } from './routes/_authenticated/sessions.$sessionId'
+import { Route as AuthenticatedSetupsIndexRouteImport } from './routes/_authenticated/setups.index'
 import { Route as AuthenticatedSetupsSetupIdRouteImport } from './routes/_authenticated/setups.$setupId'
 import { Route as AuthenticatedWeekendsEventIdRouteImport } from './routes/_authenticated/weekends.$eventId'
 import { Route as ShareSessionTokenRouteImport } from './routes/share.session.$token'
-import { Route as AuthenticatedSetupsIndexRouteImport } from './routes/_authenticated/setups.index'
 import { Route as AuthenticatedSessionsSessionIdPitboardRouteImport } from './routes/_authenticated/sessions.$sessionId.pitboard'
 
 const IndexRoute = IndexRouteImport.update({
@@ -337,6 +337,12 @@ const AuthenticatedSessionsSessionIdRoute =
     path: '/$sessionId',
     getParentRoute: () => AuthenticatedSessionsRoute,
   } as any)
+const AuthenticatedSetupsIndexRoute =
+  AuthenticatedSetupsIndexRouteImport.update({
+    id: '/setups/',
+    path: '/setups/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedSetupsSetupIdRoute =
   AuthenticatedSetupsSetupIdRouteImport.update({
     id: '/setups/$setupId',
@@ -354,12 +360,6 @@ const ShareSessionTokenRoute = ShareSessionTokenRouteImport.update({
   path: '/share/session/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedSetupsIndexRoute =
-  AuthenticatedSetupsIndexRouteImport.update({
-    id: '/setups/',
-    path: '/setups/',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedSessionsSessionIdPitboardRoute =
   AuthenticatedSessionsSessionIdPitboardRouteImport.update({
     id: '/pitboard',
@@ -1098,6 +1098,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSessionsSessionIdRouteImport
       parentRoute: typeof AuthenticatedSessionsRoute
     }
+    '/_authenticated/setups/': {
+      id: '/_authenticated/setups/'
+      path: '/setups'
+      fullPath: '/setups/'
+      preLoaderRoute: typeof AuthenticatedSetupsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/setups/$setupId': {
       id: '/_authenticated/setups/$setupId'
       path: '/setups/$setupId'
@@ -1118,13 +1125,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/share/session/$token'
       preLoaderRoute: typeof ShareSessionTokenRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/setups/': {
-      id: '/_authenticated/setups/'
-      path: '/setups'
-      fullPath: '/setups/'
-      preLoaderRoute: typeof AuthenticatedSetupsIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/sessions/$sessionId/pitboard': {
       id: '/_authenticated/sessions/$sessionId/pitboard'
