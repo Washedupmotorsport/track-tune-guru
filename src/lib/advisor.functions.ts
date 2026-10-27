@@ -69,6 +69,8 @@ ${JSON.stringify(fieldGuide, null, 2)}
 
 Respond with the JSON object only, no prose.`;
 
+    const { consumeAiCall } = await import("./ai-quota.server");
+    await consumeAiCall(context.userId);
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -401,6 +403,8 @@ ${JSON.stringify(ctx, null, 2)}
 
 Use the IDs verbatim when you cite "related". Output JSON only.`;
 
+    const { consumeAiCall } = await import("./ai-quota.server");
+    await consumeAiCall(context.userId);
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
