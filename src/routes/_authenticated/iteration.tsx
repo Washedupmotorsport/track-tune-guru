@@ -17,6 +17,15 @@ import { formatLapTime } from "@/lib/lap-time";
 import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
 
 export const Route = createFileRoute("/_authenticated/iteration")({
+  head: () => ({ meta: [
+    { title: "Iteration | My Race Engineer" },
+    { name: "description", content: "Iteration: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Iteration | My Race Engineer" },
+    { property: "og:description", content: "Iteration: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: () => {
     const nav = useNavigate();
     useEffect(() => { nav({ to: "/setup-library", search: { tab: "iterations" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);

@@ -12,7 +12,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { MapPin, Search, Plus, Pencil, Trash2, Flag, Compass, Ruler, Gauge } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/tracks")({ component: TracksPage });
+export const Route = createFileRoute("/_authenticated/tracks")({
+  head: () => ({ meta: [
+    { title: "Tracks | My Race Engineer" },
+    { name: "description", content: "Tracks: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Tracks | My Race Engineer" },
+    { property: "og:description", content: "Tracks: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: TracksPage });
 
 type Track = {
   id: string;

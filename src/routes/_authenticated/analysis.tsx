@@ -8,7 +8,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BarChart3, ArrowLeft, Trophy, GitCompare, TrendingUp, History } from "lucide-react";
 import { formatLapTime } from "@/lib/lap-time";
 
-export const Route = createFileRoute("/_authenticated/analysis")({ component: AnalysisPage });
+export const Route = createFileRoute("/_authenticated/analysis")({
+  head: () => ({ meta: [
+    { title: "Analysis | My Race Engineer" },
+    { name: "description", content: "Analysis: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Analysis | My Race Engineer" },
+    { property: "og:description", content: "Analysis: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: AnalysisPage });
 
 type Car = { id: string; name: string };
 type Setup = { id: string; name: string; car_id: string; setup_data: Record<string, string | number | null>; updated_at: string; created_at: string };

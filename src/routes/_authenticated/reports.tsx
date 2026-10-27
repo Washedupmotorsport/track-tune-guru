@@ -6,7 +6,16 @@ import { useAuth } from "@/lib/auth-context";
 import { Printer, FileText, Disc, ClipboardList, GitCompare, Timer, Download } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/reports")({ component: ReportsPage });
+export const Route = createFileRoute("/_authenticated/reports")({
+  head: () => ({ meta: [
+    { title: "Reports | My Race Engineer" },
+    { name: "description", content: "Reports: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Reports | My Race Engineer" },
+    { property: "og:description", content: "Reports: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: ReportsPage });
 
 type Car = { id: string; name: string; make: string | null; model: string | null; year: number | null };
 type Session = {

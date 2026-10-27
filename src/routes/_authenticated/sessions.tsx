@@ -16,7 +16,16 @@ import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
 import { GuidedTour } from "@/components/guided-tour";
 
-export const Route = createFileRoute("/_authenticated/sessions")({ component: SessionsPage });
+export const Route = createFileRoute("/_authenticated/sessions")({
+  head: () => ({ meta: [
+    { title: "Sessions | My Race Engineer" },
+    { name: "description", content: "Sessions: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Sessions | My Race Engineer" },
+    { property: "og:description", content: "Sessions: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: SessionsPage });
 
 type Car = { id: string; name: string };
 type Setup = { id: string; name: string; car_id: string };

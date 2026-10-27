@@ -13,12 +13,14 @@ import { GuidedTour } from "@/components/guided-tour";
 import { AiEngineerPanel } from "@/components/ai-engineer-panel";
 
 export const Route = createFileRoute("/_authenticated/engineer")({
-  head: () => ({
-    meta: [
-      { title: "Cockpit — My Race Engineer" },
-      { name: "description", content: "Race engineer cockpit: session, setup, verdicts, tyres, confidence, memory and concerns on one screen." },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "Engineer Cockpit | My Race Engineer" },
+    { name: "description", content: "Engineer Cockpit: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Engineer Cockpit | My Race Engineer" },
+    { property: "og:description", content: "Engineer Cockpit: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: EngineerCockpit,
 });
 
@@ -360,7 +362,7 @@ function EngineerCockpit() {
             {session?.track_temp_c != null && <span>track {session.track_temp_c}°</span>}
           </div>
           <div className="flex w-full md:w-auto md:ml-auto items-center gap-2 px-4 py-3 border-t border-border md:border-t-0">
-            <Link to="/driver-hub" className="text-xs font-medium text-muted-foreground hover:text-primary border border-border rounded-md px-3 py-1.5">
+            <Link to="/driver-hub" search={{ tab: "confidence" }} className="text-xs font-medium text-muted-foreground hover:text-primary border border-border rounded-md px-3 py-1.5">
               Driver Hub →
             </Link>
             <Link to="/race-mode" className="text-xs font-medium text-primary hover:underline border border-primary/40 bg-primary/10 rounded-md px-3 py-1.5">
@@ -597,7 +599,7 @@ function EngineerCockpit() {
       {/* SUPPORTING TOOLS (thin) */}
       <div className="pt-4 border-t border-border flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
         <span className="text-foreground/70 inline-flex items-center gap-1.5 font-medium"><HardHat className="w-3.5 h-3.5" /> Tools</span>
-        <Link to="/setup-library" className="hover:text-primary">Setup library</Link>
+        <Link to="/setup-library" search={{ tab: "baselines" }} className="hover:text-primary">Setup library</Link>
         <Link to="/setup-library" search={{ tab: "iterations" }} className="hover:text-primary">Iteration log</Link>
         <Link to="/driver-hub" search={{ tab: "corners" }} className="hover:text-primary">Corner balance</Link>
         <Link to="/analysis"      className="hover:text-primary">Session compare</Link>

@@ -4,7 +4,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { CalendarDays, MapPin, ChevronRight, Flag, Timer } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/weekends")({ component: WeekendsPage });
+export const Route = createFileRoute("/_authenticated/weekends")({
+  head: () => ({ meta: [
+    { title: "Weekends | My Race Engineer" },
+    { name: "description", content: "Weekends: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Weekends | My Race Engineer" },
+    { property: "og:description", content: "Weekends: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: WeekendsPage });
 
 type Evt = {
   id: string; title: string; event_type: string; status: string;

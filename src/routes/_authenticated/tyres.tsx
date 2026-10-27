@@ -14,12 +14,14 @@ export const Route = createFileRoute("/_authenticated/tyres")({
   validateSearch: (s: Record<string, unknown>) => ({
     tab: typeof s.tab === "string" && (VALID as string[]).includes(s.tab) ? (s.tab as TabId) : undefined,
   }),
-  head: () => ({
-    meta: [
-      { title: "Tyres — My Race Engineer" },
-      { name: "description", content: "Single source of truth for tyre management: pressures, wear, compound comparison, and tyre-set inventory." },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "Tyres | My Race Engineer" },
+    { name: "description", content: "Tyres: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Tyres | My Race Engineer" },
+    { property: "og:description", content: "Tyres: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: TyresHubPage,
 });
 

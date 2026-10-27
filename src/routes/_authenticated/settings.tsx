@@ -5,14 +5,25 @@ import { useTheme } from "@/lib/theme";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Settings as SettingsIcon, Sun, Moon, LogOut, BookOpen, Mail, Shield, FileText } from "lucide-react";
+import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
+import { deleteAccount } from "@/lib/account.functions";
+import { DeleteAccountInput } from "@/lib/launch-rules";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/settings")({
-  head: () => ({
-    meta: [
-      { title: "Settings — My Race Engineer" },
-      { name: "description", content: "Units, theme, currency and account preferences." },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "Settings | My Race Engineer" },
+    { name: "description", content: "Settings: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Settings | My Race Engineer" },
+    { property: "og:description", content: "Settings: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: SettingsPage,
 });
 
@@ -21,6 +32,11 @@ function SettingsPage() {
   const navigate = useNavigate();
   const { system, toggle, currency, setCurrency } = useUnits();
   const { theme, toggle: toggleTheme } = useTheme();
+  const removeAccount = useServerFn(deleteAccount);
+  const queryClient = useQueryClient();
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [confirmation, setConfirmation] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   return (
     <div>
@@ -77,6 +93,36 @@ function SettingsPage() {
           </ul>
         </Card>
       </div>
+      <section className="mt-8 border-t border-destructive/40 pt-6 space-y-3">
+        <h2 className="font-display font-bold text-destructive">Delete account</h2>
+        <p className="text-sm text-muted-foreground">Permanently remove your account, owned cars, sessions, setups, feedback and photos. Shared access to your cars will also end.</p>
+        <Button variant="destructive" onClick={() => { setConfirmation(""); setDeleteOpen(true); }}>Delete account</Button>
+      </section>
+      <Dialog open={deleteOpen} onOpenChange={(open) => { if (!deleting) setDeleteOpen(open); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete your account permanently?</DialogTitle>
+            <DialogDescription>This cannot be undone. All owned cars and their shared records will be deleted, including records contributed by team members. Tracks remain available to other racers.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2"><Label htmlFor="delete-confirmation">Type DELETE to confirm</Label>
+            <Input id="delete-confirmation" value={confirmation} onChange={(e) => setConfirmation(e.target.value)} autoComplete="off" disabled={deleting} /></div>
+          <DialogFooter>
+            <Button variant="outline" disabled={deleting} onClick={() => setDeleteOpen(false)}>Cancel</Button>
+            <Button variant="destructive" disabled={deleting || !DeleteAccountInput.safeParse({ confirmation }).success} onClick={async () => {
+              setDeleting(true);
+              try {
+                await removeAccount({ data: { confirmation: "DELETE" } });
+                await signOut();
+                queryClient.clear();
+                setDeleteOpen(false);
+                toast.success("Your account has been deleted");
+                await navigate({ to: "/auth", replace: true });
+              } catch (error) { toast.error(error instanceof Error ? error.message : "Unable to delete account"); }
+              finally { setDeleting(false); }
+            }}>{deleting ? "Deleting…" : "Permanently delete account"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -5,7 +5,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Trophy, Fuel, Timer as TimerIcon } from "lucide-react";
 import { formatLapTime } from "@/lib/lap-time";
 
-export const Route = createFileRoute("/_authenticated/sessions/$sessionId/pitboard")({ component: PitBoard });
+export const Route = createFileRoute("/_authenticated/sessions/$sessionId/pitboard")({
+  head: () => ({ meta: [
+    { title: "Session Pitboard | My Race Engineer" },
+    { name: "description", content: "Session Pitboard: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Session Pitboard | My Race Engineer" },
+    { property: "og:description", content: "Session Pitboard: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: PitBoard });
 
 type Session = {
   id: string; name: string; car_id: string; track: string | null;

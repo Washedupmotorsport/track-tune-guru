@@ -14,6 +14,15 @@ import { toast } from "sonner";
 import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
 
 export const Route = createFileRoute("/_authenticated/notes")({
+  head: () => ({ meta: [
+    { title: "Notes | My Race Engineer" },
+    { name: "description", content: "Notes: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Notes | My Race Engineer" },
+    { property: "og:description", content: "Notes: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: NotesPage,
 });
 

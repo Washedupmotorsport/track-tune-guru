@@ -11,12 +11,14 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/_authenticated/manual")({
   validateSearch: searchSchema,
-  head: () => ({
-    meta: [
-      { title: "Manual — My Race Engineer" },
-      { name: "description", content: "User manual and tutorials for My Race Engineer." },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "Manual | My Race Engineer" },
+    { name: "description", content: "Manual: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Manual | My Race Engineer" },
+    { property: "og:description", content: "Manual: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: ManualPage,
 });
 

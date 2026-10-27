@@ -12,6 +12,15 @@ import { Disc, Plus, ArrowLeft, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { PressureCalculator } from "@/components/pressure-calculator";
 export const Route = createFileRoute("/_authenticated/tires")({
+  head: () => ({ meta: [
+    { title: "Tyres | My Race Engineer" },
+    { name: "description", content: "Tyres: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Tyres | My Race Engineer" },
+    { property: "og:description", content: "Tyres: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: () => {
     const nav = useNavigate();
     useEffect(() => { nav({ to: "/tyres", search: { tab: "setup" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);

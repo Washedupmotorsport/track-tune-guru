@@ -24,7 +24,16 @@ import { SessionShareDialog } from "@/components/session-share-dialog";
 import { toCSV, downloadCSV } from "@/lib/csv";
 import { Stepper } from "@/components/stepper";
 
-export const Route = createFileRoute("/_authenticated/sessions/$sessionId")({ component: SessionDetail });
+export const Route = createFileRoute("/_authenticated/sessions/$sessionId")({
+  head: () => ({ meta: [
+    { title: "Session Details | My Race Engineer" },
+    { name: "description", content: "Session Details: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Session Details | My Race Engineer" },
+    { property: "og:description", content: "Session Details: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: SessionDetail });
 
 type Session = {
   id: string; name: string; session_type: string; car_id: string; setup_id: string | null;

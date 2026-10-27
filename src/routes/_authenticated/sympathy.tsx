@@ -15,6 +15,15 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/sympathy")({
+  head: () => ({ meta: [
+    { title: "Sympathy | My Race Engineer" },
+    { name: "description", content: "Sympathy: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Sympathy | My Race Engineer" },
+    { property: "og:description", content: "Sympathy: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: () => {
     const nav = useNavigate();
     useEffect(() => { nav({ to: "/driver-hub", search: { tab: "sympathy" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);

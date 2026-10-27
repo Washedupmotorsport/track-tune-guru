@@ -19,6 +19,15 @@ import {
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/engineering-memory")({
+  head: () => ({ meta: [
+    { title: "Engineering Memory | My Race Engineer" },
+    { name: "description", content: "Engineering Memory: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Engineering Memory | My Race Engineer" },
+    { property: "og:description", content: "Engineering Memory: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: EngineeringMemoryPage,
 });
 

@@ -10,6 +10,15 @@ import { Calculator, Gauge, Cog, Ruler, Scale, GitCommit, ArrowLeft, ArrowLeftRi
 import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/calculators")({
+  head: () => ({ meta: [
+    { title: "Calculators | My Race Engineer" },
+    { name: "description", content: "Calculators: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Calculators | My Race Engineer" },
+    { property: "og:description", content: "Calculators: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: CalculatorsPage,
 });
 

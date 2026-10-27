@@ -17,6 +17,15 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/tyre-setup")({
+  head: () => ({ meta: [
+    { title: "Tyre Setup | My Race Engineer" },
+    { name: "description", content: "Tyre Setup: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Tyre Setup | My Race Engineer" },
+    { property: "og:description", content: "Tyre Setup: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: () => {
     const nav = useNavigate();
     useEffect(() => { nav({ to: "/tyres", search: { tab: "pressures" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);

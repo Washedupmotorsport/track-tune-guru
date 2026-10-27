@@ -11,7 +11,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Package, Plus, ArrowLeft, Trash2, TriangleAlert as AlertTriangle, Minus } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/inventory")({ component: InventoryPage });
+export const Route = createFileRoute("/_authenticated/inventory")({
+  head: () => ({ meta: [
+    { title: "Inventory | My Race Engineer" },
+    { name: "description", content: "Inventory: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Inventory | My Race Engineer" },
+    { property: "og:description", content: "Inventory: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: InventoryPage });
 
 type Car = { id: string; name: string };
 type Part = {

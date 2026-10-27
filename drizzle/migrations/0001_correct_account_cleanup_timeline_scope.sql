@@ -1,0 +1,33 @@
+CREATE OR REPLACE FUNCTION public.delete_account_data(p_user_id uuid) RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE car_ids uuid[];
+BEGIN
+ SELECT coalesce(array_agg(id),'{}'::uuid[]) INTO car_ids FROM public.cars WHERE user_id=p_user_id;
+ DELETE FROM public.timeline_events WHERE user_id=p_user_id OR event_id IN (SELECT id FROM public.calendar_events WHERE user_id=p_user_id OR car_id=ANY(car_ids)) OR session_id IN (SELECT id FROM public.sessions WHERE user_id=p_user_id OR car_id=ANY(car_ids));
+ DELETE FROM public.attachments WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.session_shares WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.car_shares WHERE owner_id=p_user_id OR shared_with_user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.engineering_memory WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.driver_feedback WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.driver_confidence WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.driver_notes WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.known_behaviours WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.track_notes WHERE user_id=p_user_id;
+ DELETE FROM public.session_debriefs WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.incidents WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.laps WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.tire_logs WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.tire_stints WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.setup_changes WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.sessions WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.setups WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.damage_reports WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.maintenance_items WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.parts_inventory WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.expenses WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.calendar_events WHERE user_id=p_user_id OR car_id=ANY(car_ids);
+ DELETE FROM public.tutorial_progress WHERE user_id=p_user_id;
+ DELETE FROM public.ai_daily_usage WHERE user_id=p_user_id;
+ DELETE FROM public.cars WHERE user_id=p_user_id;
+END; $$;
+REVOKE ALL ON FUNCTION public.delete_account_data(uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.delete_account_data(uuid) TO service_role;

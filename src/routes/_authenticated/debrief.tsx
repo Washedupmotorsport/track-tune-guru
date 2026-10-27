@@ -13,6 +13,15 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/debrief")({
+  head: () => ({ meta: [
+    { title: "Debrief | My Race Engineer" },
+    { name: "description", content: "Debrief: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Debrief | My Race Engineer" },
+    { property: "og:description", content: "Debrief: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: () => {
     const nav = useNavigate();
     useEffect(() => { nav({ to: "/session-debrief", search: { tab: "feedback" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);

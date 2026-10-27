@@ -11,6 +11,15 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/confidence")({
+  head: () => ({ meta: [
+    { title: "Confidence | My Race Engineer" },
+    { name: "description", content: "Confidence: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Confidence | My Race Engineer" },
+    { property: "og:description", content: "Confidence: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: () => {
     const nav = useNavigate();
     useEffect(() => { nav({ to: "/driver-hub", search: { tab: "confidence" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);

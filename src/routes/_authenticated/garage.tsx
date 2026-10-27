@@ -21,6 +21,15 @@ import { ShareDialog } from "@/components/share-dialog";
 import { formatLapTime } from "@/lib/lap-time";
 
 export const Route = createFileRoute("/_authenticated/garage")({
+  head: () => ({ meta: [
+    { title: "Garage | My Race Engineer" },
+    { name: "description", content: "Garage: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Garage | My Race Engineer" },
+    { property: "og:description", content: "Garage: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: Garage,
 });
 

@@ -12,7 +12,16 @@ import { CalendarDays, Plus, ArrowLeft, Trash2, Clock, Flag } from "lucide-react
 import { toast } from "sonner";
 import { ReminderSettingsButton } from "@/components/reminder-settings";
 
-export const Route = createFileRoute("/_authenticated/calendar")({ component: CalendarPage });
+export const Route = createFileRoute("/_authenticated/calendar")({
+  head: () => ({ meta: [
+    { title: "Calendar | My Race Engineer" },
+    { name: "description", content: "Calendar: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Calendar | My Race Engineer" },
+    { property: "og:description", content: "Calendar: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: CalendarPage });
 
 type Car = { id: string; name: string };
 type Evt = {

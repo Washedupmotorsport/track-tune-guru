@@ -6,10 +6,14 @@ export const Route = createFileRoute("/support")({
   component: SupportPage,
   head: () => ({
     meta: [
+      { property: "og:title", content: "Support — My Race Engineer" },
+      { property: "og:description", content: "Get help with My Race Engineer — contact support, browse the manual, and report issues." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Support — My Race Engineer" },
       { name: "description", content: "Get help with My Race Engineer — contact support, browse the manual, and report issues." },
     ],
-    links: [{ rel: "canonical", href: "/support" }],
+    links: [{ rel: "canonical", href: "https://track-tune-guru.lovable.app/support" }],
   }),
 });
 
@@ -38,14 +42,14 @@ function SupportPage() {
 
           <div className="space-y-4">
             <a
-              href="mailto:support@my-race-engineer.app"
+              href="mailto:support@myraceengineer.app"
               className="block rounded-md border border-border bg-card p-4 hover:border-primary transition-colors"
             >
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-primary shrink-0" />
                 <div>
                   <div className="font-display font-bold">Email support</div>
-                  <div className="text-xs text-muted-foreground font-mono">support@my-race-engineer.app</div>
+                  <div className="text-xs text-muted-foreground font-mono">support@myraceengineer.app</div>
                 </div>
               </div>
             </a>
@@ -64,7 +68,7 @@ function SupportPage() {
             </Link>
 
             <a
-              href="mailto:support@my-race-engineer.app?subject=Feedback"
+              href="mailto:support@myraceengineer.app?subject=Feedback"
               className="block rounded-md border border-border bg-card p-4 hover:border-primary transition-colors"
             >
               <div className="flex items-center gap-3">

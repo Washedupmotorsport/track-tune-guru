@@ -24,12 +24,14 @@ export const Route = createFileRoute("/_authenticated/session-debrief")({
     carId: typeof s.carId === "string" ? s.carId : undefined,
     new: s.new === "1" || s.new === true ? true : undefined,
   }),
-  head: () => ({
-    meta: [
-      { title: "Session Debrief — My Race Engineer" },
-      { name: "description", content: "Unified post-session workflow: driver feedback, engineering review, action items and lessons stored in engineering memory." },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "Session Debrief | My Race Engineer" },
+    { name: "description", content: "Session Debrief: race-weekend tools and records for My Race Engineer." },
+    { property: "og:title", content: "Session Debrief | My Race Engineer" },
+    { property: "og:description", content: "Session Debrief: race-weekend tools and records for My Race Engineer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: SessionDebriefPage,
 });
 
@@ -109,7 +111,7 @@ function SessionDebriefPage() {
           setTab(next);
           nav({
             to: "/session-debrief",
-            search: (prev: Search) => ({ ...prev, tab: next }),
+            search: { sessionId: search.sessionId, carId: search.carId, new: search.new, tab: next },
             replace: true,
           });
         }}

@@ -5,10 +5,14 @@ export const Route = createFileRoute("/terms")({
   component: TermsPage,
   head: () => ({
     meta: [
+      { property: "og:title", content: "Terms of Service — My Race Engineer" },
+      { property: "og:description", content: "Terms of Service for My Race Engineer." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Terms of Service — My Race Engineer" },
       { name: "description", content: "Terms of Service for My Race Engineer." },
     ],
-    links: [{ rel: "canonical", href: "/terms" }],
+    links: [{ rel: "canonical", href: "https://track-tune-guru.lovable.app/terms" }],
   }),
 });
 

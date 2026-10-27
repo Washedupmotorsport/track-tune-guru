@@ -78,6 +78,8 @@ ${JSON.stringify(history ?? [])}
 
 Respond with JSON only.`;
 
+    const { consumeAiCall } = await import("./ai-quota.server");
+    await consumeAiCall(context.userId);
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey },
