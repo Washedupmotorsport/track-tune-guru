@@ -67,6 +67,8 @@ import { Route as AuthenticatedSetupsSetupIdRouteImport } from './routes/_authen
 import { Route as AuthenticatedWeekendsEventIdRouteImport } from './routes/_authenticated/weekends.$eventId'
 import { Route as ShareSessionTokenRouteImport } from './routes/share.session.$token'
 import { Route as AuthenticatedSessionsSessionIdPitboardRouteImport } from './routes/_authenticated/sessions.$sessionId.pitboard'
+import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
@@ -373,6 +375,16 @@ const AuthenticatedSessionsSessionIdPitboardRoute =
     path: '/pitboard',
     getParentRoute: () => AuthenticatedSessionsSessionIdRoute,
   } as any)
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/lovable/email/auth/preview',
+  path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
     id: '/lovable/email/transactional/preview',
@@ -438,6 +450,8 @@ export interface FileRoutesByFullPath {
   '/share/session/$token': typeof ShareSessionTokenRoute
   '/setups/': typeof AuthenticatedSetupsIndexRoute
   '/sessions/$sessionId/pitboard': typeof AuthenticatedSessionsSessionIdPitboardRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesByTo {
@@ -498,6 +512,8 @@ export interface FileRoutesByTo {
   '/share/session/$token': typeof ShareSessionTokenRoute
   '/setups': typeof AuthenticatedSetupsIndexRoute
   '/sessions/$sessionId/pitboard': typeof AuthenticatedSessionsSessionIdPitboardRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesById {
@@ -560,6 +576,8 @@ export interface FileRoutesById {
   '/share/session/$token': typeof ShareSessionTokenRoute
   '/_authenticated/setups/': typeof AuthenticatedSetupsIndexRoute
   '/_authenticated/sessions/$sessionId/pitboard': typeof AuthenticatedSessionsSessionIdPitboardRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRouteTypes {
@@ -622,6 +640,8 @@ export interface FileRouteTypes {
     | '/share/session/$token'
     | '/setups/'
     | '/sessions/$sessionId/pitboard'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -682,6 +702,8 @@ export interface FileRouteTypes {
     | '/share/session/$token'
     | '/setups'
     | '/sessions/$sessionId/pitboard'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
   id:
     | '__root__'
@@ -743,6 +765,8 @@ export interface FileRouteTypes {
     | '/share/session/$token'
     | '/_authenticated/setups/'
     | '/_authenticated/sessions/$sessionId/pitboard'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
 }
@@ -756,6 +780,8 @@ export interface RootRouteChildren {
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
   ShareSessionTokenRoute: typeof ShareSessionTokenRoute
+  LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
+  LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
@@ -1167,6 +1193,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSessionsSessionIdPitboardRouteImport
       parentRoute: typeof AuthenticatedSessionsSessionIdRoute
     }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
       path: '/lovable/email/transactional/preview'
@@ -1331,6 +1371,8 @@ const rootRouteChildren: RootRouteChildren = {
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
   ShareSessionTokenRoute: ShareSessionTokenRoute,
+  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
+  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport
