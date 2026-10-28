@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { sendSupportReplyNotification } from "./support-notifications";
 import {
   AssignmentInput,
   ReadInboxInput,
@@ -87,11 +88,32 @@ export const replyToSupport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => SupportReplyInput.parse(input))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase
+    const [role, request] = await Promise.all([
+      context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" }),
+      context.supabase.from("support_messages").select("id,user_id,email,name").eq("id", data.supportId).single(),
+    ]);
+    if (role.error || request.error || !request.data)
+      throw new Error("This support conversation is unavailable.");
+    if (!role.data && request.data.user_id !== context.userId)
+      throw new Error("You cannot reply to this support conversation.");
+    const { data: saved, error } = await context.supabase
       .from("support_replies")
-      .insert({ support_id: data.supportId, sender_id: context.userId, body: data.body });
-    if (error) throw new Error("Your reply could not be sent. Please try again.");
-    return { ok: true };
+      .insert({ support_id: data.supportId, sender_id: context.userId, body: data.body })
+      .select("id,body")
+      .single();
+    if (error || !saved) throw new Error("Your reply could not be saved. Please try again.");
+    // Recipient comes only from the RLS-accessible request, never browser input.
+    const isStaffReply = !!role.data && request.data.user_id !== context.userId;
+    const emailDelivery = await sendSupportReplyNotification(
+      async (...args) => {
+        const { sendTemplateEmail } = await import("./email-templates/send-email");
+        return sendTemplateEmail(...args);
+      },
+      { id: saved.id, supportId: request.data.id, body: saved.body },
+      request.data,
+      isStaffReply,
+    );
+    return { ok: true, emailDelivery };
   });
 
 export const assignSupportMessage = createServerFn({ method: "POST" })
