@@ -1,4 +1,5 @@
 # Pre-launch fixes
+- [ ] Team inbox: private crew conversations, personal support threads, assigned support requests, privacy tests and signed-in verification.
 - [x] Password recovery page and redirect (invalid-link state checked; emailed recovery completion awaits a real recovery link)
 - [x] Confirmed account deletion and data cleanup (disposable account verified end-to-end)
 - [x] Support address and page branding/metadata
