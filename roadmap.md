@@ -8,4 +8,5 @@
 - [ ] Ignore environment file — .gitignore is protected read-only by the platform
 - [x] Tests and live preview checks
 - [x] Support inbox — form on the support page stores messages and copies them to support@myraceengineer.app (verified end-to-end; test row removed)
-- [ ] Restrict profile access, publish support screens, and send a production support message (Proton inbox receipt requires owner confirmation).
+- [x] Restrict profile access, publish support screens, and send a production support message (live form, inbox readback, and email sent event verified).
+- [ ] Confirm production test receipt in Proton — waits on Duke checking Inbox/Spam for MRE-LIVE-SUPPORT-20261028.
