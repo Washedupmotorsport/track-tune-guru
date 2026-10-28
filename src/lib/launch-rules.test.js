@@ -1,5 +1,5 @@
 import { describe, test, expect } from "bun:test";
-import { AI_DAILY_LIMIT, EngineerInput, DeleteAccountInput, ResetPasswordInput } from "./launch-rules";
+import { AI_DAILY_LIMIT, EngineerInput, DeleteAccountInput, ResetPasswordInput, SupportMessageInput, AuthedSupportMessageInput, SupportStatusInput, SUPPORT_DAILY_LIMIT } from "./launch-rules";
 import { isPreviewHost } from "./pwa-policy";
 
 describe("pre-launch safety rules", () => {
@@ -25,5 +25,21 @@ describe("pre-launch safety rules", () => {
     expect(isPreviewHost("preview-2--app.gpt-eng.com")).toBe(true);
     expect(isPreviewHost("project--abc-dev.lovable.app")).toBe(true);
     expect(isPreviewHost("localhost")).toBe(true);
+  });
+  test("support message keeps to real bounds and one topic", () => {
+    const base = { email: "driver@example.com", message: "Brake pedal goes soft after three laps." };
+    expect(SUPPORT_DAILY_LIMIT).toBe(5);
+    expect(SupportMessageInput.safeParse(base).success).toBe(true);
+    expect(SupportMessageInput.safeParse(base).data.category).toBe("other");
+    expect(SupportMessageInput.safeParse({ ...base, email: "Driver@Example.COM" }).data.email).toBe("driver@example.com");
+    expect(SupportMessageInput.safeParse({ ...base, message: "too short" }).success).toBe(false);
+    expect(SupportMessageInput.safeParse({ ...base, message: "x".repeat(4001) }).success).toBe(false);
+    expect(SupportMessageInput.safeParse({ ...base, name: "n".repeat(101) }).success).toBe(false);
+    expect(SupportMessageInput.safeParse({ ...base, email: "not-an-email" }).success).toBe(false);
+    expect(SupportMessageInput.safeParse({ ...base, email: "a".repeat(250) + "@example.com" }).success).toBe(false);
+    expect(SupportMessageInput.safeParse({ ...base, category: "nonsense" }).success).toBe(false);
+    expect(AuthedSupportMessageInput.safeParse({ message: base.message }).success).toBe(true);
+    expect(SupportStatusInput.safeParse({ id: "not-a-uuid", status: "resolved" }).success).toBe(false);
+    expect(SupportStatusInput.safeParse({ id: "8f1c0b6a-2b3e-4a1f-9c7d-6e5f4a3b2c1d", status: "closed" }).success).toBe(false);
   });
 });
