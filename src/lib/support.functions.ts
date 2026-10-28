@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { sendSupportNotifications } from "./support-notifications";
 import {
   AuthedSupportMessageInput,
   SUPPORT_DAILY_LIMIT,
@@ -59,18 +60,11 @@ async function storeMessage(
 
   try {
     const { sendTemplateEmail } = await import("./email-templates/send-email");
-    await sendTemplateEmail("support-message", input.email, {
-      templateData: {
-        siteName: "My Race Engineer",
-        siteUrl: "https://myraceengineer.app",
-        senderEmail: input.email,
-        senderName: input.name ?? null,
-        category: input.category,
-        message: input.message,
-        createdAt: new Date().toISOString(),
-      },
-      idempotencyKey: `support-message-${data.id}`,
-      replyTo: input.email,
+    const results = await sendSupportNotifications(sendTemplateEmail, data.id, input);
+    results.forEach((result, index) => {
+      if (result.status === "rejected") {
+        console.error(index === 0 ? "Support mailbox notification failed" : "Support confirmation failed", result.reason instanceof Error ? result.reason.message : "Email send failed");
+      }
     });
   } catch (sendError) {
     console.error("Support mailbox notification failed", (sendError as Error).message);
@@ -112,6 +106,22 @@ export const listSupportMessages = createServerFn({ method: "GET" })
       .limit(200);
     if (error) throw new Error("We could not load the support inbox. Please try again.");
     return data;
+  });
+
+export const getSupportMessageAlerts = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: isAdmin, error: roleError } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId, _role: "admin",
+    });
+    if (roleError) throw new Error("Could not check support alerts.");
+    if (!isAdmin) return null;
+    const [open, recent] = await Promise.all([
+      context.supabase.from("support_messages").select("id", { count: "exact", head: true }).eq("status", "open"),
+      context.supabase.from("support_messages").select("id").order("created_at", { ascending: false }).limit(200),
+    ]);
+    if (open.error || recent.error) throw new Error("Could not refresh support alerts.");
+    return { openCount: open.count ?? 0, ids: (recent.data ?? []).map((message) => message.id) };
   });
 
 export const setSupportMessageStatus = createServerFn({ method: "POST" })
