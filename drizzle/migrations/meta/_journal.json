@@ -29,6 +29,13 @@
       "when": 1793155496709,
       "tag": "0003_restrict_profile_reads_to_self_and_owned_crew",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793174530130,
+      "tag": "0004_team_member_inboxes",
+      "breakpoints": true
     }
   ]
 }

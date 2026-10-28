@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/command";
 import {
   Timer, Disc, Wrench, CalendarDays, BarChart3,
-  Calculator, NotebookPen, Car, Settings2, Flag, Brain, BookMarked, HardHat, MapPin,
+  Calculator, NotebookPen, Car, Settings2, Flag, Brain, BookMarked, HardHat, MapPin, Inbox,
 } from "lucide-react";
 
 type Hit =
@@ -16,6 +16,7 @@ type Hit =
   | { kind: "note"; id: string; label: string };
 
 const PAGES: { label: string; to: string; icon: React.ReactNode }[] = [
+  { label: "Team inbox", to: "/inbox", icon: <Inbox className="w-4 h-4" /> },
   { label: "Settings", to: "/settings", icon: <Settings2 className="w-4 h-4" /> },
   { label: "Engineer Cockpit", to: "/engineer", icon: <HardHat className="w-4 h-4" /> },
   { label: "Race Mode", to: "/race-mode", icon: <Flag className="w-4 h-4" /> },

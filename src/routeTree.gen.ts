@@ -32,6 +32,7 @@ import { Route as AuthenticatedEngineeringMemoryRouteImport } from './routes/_au
 import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated/expenses'
 import { Route as AuthenticatedFlagsRouteImport } from './routes/_authenticated/flags'
 import { Route as AuthenticatedGarageRouteImport } from './routes/_authenticated/garage'
+import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedIterationRouteImport } from './routes/_authenticated/iteration'
 import { Route as AuthenticatedKnownBehavioursRouteImport } from './routes/_authenticated/known-behaviours'
@@ -186,6 +187,11 @@ const AuthenticatedFlagsRoute = AuthenticatedFlagsRouteImport.update({
 const AuthenticatedGarageRoute = AuthenticatedGarageRouteImport.update({
   id: '/garage',
   path: '/garage',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedInventoryRoute = AuthenticatedInventoryRouteImport.update({
@@ -422,6 +428,7 @@ export interface FileRoutesByFullPath {
   '/expenses': typeof AuthenticatedExpensesRoute
   '/flags': typeof AuthenticatedFlagsRoute
   '/garage': typeof AuthenticatedGarageRoute
+  '/inbox': typeof AuthenticatedInboxRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/iteration': typeof AuthenticatedIterationRoute
   '/known-behaviours': typeof AuthenticatedKnownBehavioursRoute
@@ -485,6 +492,7 @@ export interface FileRoutesByTo {
   '/expenses': typeof AuthenticatedExpensesRoute
   '/flags': typeof AuthenticatedFlagsRoute
   '/garage': typeof AuthenticatedGarageRoute
+  '/inbox': typeof AuthenticatedInboxRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/iteration': typeof AuthenticatedIterationRoute
   '/known-behaviours': typeof AuthenticatedKnownBehavioursRoute
@@ -550,6 +558,7 @@ export interface FileRoutesById {
   '/_authenticated/expenses': typeof AuthenticatedExpensesRoute
   '/_authenticated/flags': typeof AuthenticatedFlagsRoute
   '/_authenticated/garage': typeof AuthenticatedGarageRoute
+  '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
   '/_authenticated/iteration': typeof AuthenticatedIterationRoute
   '/_authenticated/known-behaviours': typeof AuthenticatedKnownBehavioursRoute
@@ -615,6 +624,7 @@ export interface FileRouteTypes {
     | '/expenses'
     | '/flags'
     | '/garage'
+    | '/inbox'
     | '/inventory'
     | '/iteration'
     | '/known-behaviours'
@@ -678,6 +688,7 @@ export interface FileRouteTypes {
     | '/expenses'
     | '/flags'
     | '/garage'
+    | '/inbox'
     | '/inventory'
     | '/iteration'
     | '/known-behaviours'
@@ -742,6 +753,7 @@ export interface FileRouteTypes {
     | '/_authenticated/expenses'
     | '/_authenticated/flags'
     | '/_authenticated/garage'
+    | '/_authenticated/inbox'
     | '/_authenticated/inventory'
     | '/_authenticated/iteration'
     | '/_authenticated/known-behaviours'
@@ -959,6 +971,13 @@ declare module '@tanstack/react-router' {
       path: '/garage'
       fullPath: '/garage'
       preLoaderRoute: typeof AuthenticatedGarageRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/inbox': {
+      id: '/_authenticated/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AuthenticatedInboxRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/inventory': {
@@ -1295,6 +1314,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRoute
   AuthenticatedFlagsRoute: typeof AuthenticatedFlagsRoute
   AuthenticatedGarageRoute: typeof AuthenticatedGarageRoute
+  AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
   AuthenticatedIterationRoute: typeof AuthenticatedIterationRoute
   AuthenticatedKnownBehavioursRoute: typeof AuthenticatedKnownBehavioursRoute
@@ -1345,6 +1365,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedExpensesRoute: AuthenticatedExpensesRoute,
   AuthenticatedFlagsRoute: AuthenticatedFlagsRoute,
   AuthenticatedGarageRoute: AuthenticatedGarageRoute,
+  AuthenticatedInboxRoute: AuthenticatedInboxRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
   AuthenticatedIterationRoute: AuthenticatedIterationRoute,
   AuthenticatedKnownBehavioursRoute: AuthenticatedKnownBehavioursRoute,
