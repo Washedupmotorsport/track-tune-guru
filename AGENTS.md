@@ -5,3 +5,4 @@
 - Offline support uses vite-plugin-pwa generateSW and one guarded registration wrapper; never register in development, preview, iframes, or localhost.
 - Keep branded page metadata on leaf routes; root holds only sitewide defaults.
 - Profile reads are limited to the caller's own profile and crew on cars they own; sharing must not expose unrelated profiles.
+- Support submissions send independent, event-deduplicated team and sender emails after durable storage; team alerts use authenticated role-checked polling so notifications cannot expose messages to other users.
