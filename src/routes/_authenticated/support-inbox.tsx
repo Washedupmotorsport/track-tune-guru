@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -92,6 +92,7 @@ function SupportInboxPage() {
       </p>
 
       <div className="flex flex-wrap items-center gap-2 mb-4">
+        <Button asChild variant="outline"><Link to="/inbox">Team inbox · replies & assignments</Link></Button>
         {FILTERS.map((f) => (
           <Button
             key={f.key}

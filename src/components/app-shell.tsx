@@ -292,6 +292,7 @@ const ALL_NAV_GROUPS = [
     items: [
       { to: "/manual",  label: "User manual",     icon: BookOpen },
       { to: "/support", label: "Support",         icon: BookOpen },
+      { to: "/inbox", label: "Team inbox", icon: Inbox },
       { to: "/support-inbox", label: "Support inbox", icon: Inbox },
     ] },
 ] as const;
