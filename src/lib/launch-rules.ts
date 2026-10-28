@@ -16,3 +16,27 @@ export const ResetPasswordInput = z.object({
 }).refine((value) => value.password === value.confirm, {
   message: "Passwords do not match", path: ["confirm"],
 });
+
+export const SUPPORT_CATEGORIES = ["bug", "account", "setup", "tyres", "feature", "other"] as const;
+export const SUPPORT_DAILY_LIMIT = 5;
+
+const supportEmail = z.string().trim().toLowerCase().email("Enter a valid email address").max(254);
+const supportMessage = z.string().trim()
+  .min(10, "Tell us a little more (at least 10 characters)")
+  .max(4000, "Keep your message under 4000 characters");
+
+export const SupportMessageInput = z.object({
+  email: supportEmail,
+  name: z.string().trim().max(100).optional(),
+  category: z.enum(SUPPORT_CATEGORIES).default("other"),
+  message: supportMessage,
+  source: z.enum(["web", "in_app"]).default("web"),
+  honeypot: z.string().max(200).optional(),
+});
+
+export const AuthedSupportMessageInput = SupportMessageInput.omit({ email: true });
+
+export const SupportStatusInput = z.object({
+  id: z.string().uuid(),
+  status: z.enum(["open", "resolved"]),
+});
