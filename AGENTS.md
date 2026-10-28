@@ -4,3 +4,4 @@
 - Account deletion uses an authenticated server function, derives the target from the verified caller, cleans storage and application data, then deletes the auth user; owned cars and their shared records are deleted, not transferred.
 - Offline support uses vite-plugin-pwa generateSW and one guarded registration wrapper; never register in development, preview, iframes, or localhost.
 - Keep branded page metadata on leaf routes; root holds only sitewide defaults.
+- Profile reads are limited to the caller's own profile and crew on cars they own; sharing must not expose unrelated profiles.
