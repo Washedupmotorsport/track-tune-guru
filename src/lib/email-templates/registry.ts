@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react'
+import { SupportMessageEmail } from './support-message'
 
 export interface TemplateEntry {
   component: ComponentType<any>
