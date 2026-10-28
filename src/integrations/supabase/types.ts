@@ -1257,8 +1257,42 @@ export type Database = {
           },
         ]
       }
+      support_inbox_reads: {
+        Row: {
+          seen_at: string
+          support_id: string
+          user_id: string
+        }
+        Insert: {
+          seen_at?: string
+          support_id: string
+          user_id: string
+        }
+        Update: {
+          seen_at?: string
+          support_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_inbox_reads_support_id_fkey"
+            columns: ["support_id"]
+            isOneToOne: false
+            referencedRelation: "support_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_inbox_reads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_messages: {
         Row: {
+          assigned_to: string | null
           category: string
           created_at: string
           email: string
@@ -1273,6 +1307,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          assigned_to?: string | null
           category?: string
           created_at?: string
           email: string
@@ -1287,6 +1322,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          assigned_to?: string | null
           category?: string
           created_at?: string
           email?: string
@@ -1300,7 +1336,96 @@ export type Database = {
           user_agent?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "support_messages_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_replies: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          sender_id: string
+          support_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          sender_id: string
+          support_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+          support_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_replies_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_replies_support_id_fkey"
+            columns: ["support_id"]
+            isOneToOne: false
+            referencedRelation: "support_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          read_at: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_messages_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       timeline_events: {
         Row: {
@@ -1745,6 +1870,13 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      inbox_crew_members: {
+        Args: never
+        Returns: {
+          display_name: string
+          id: string
+        }[]
       }
       is_car_owner: {
         Args: { _car_id: string; _user_id: string }
