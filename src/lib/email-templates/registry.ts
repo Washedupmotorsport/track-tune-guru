@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react'
+import { SupportMessageEmail } from './support-message'
 
 export interface TemplateEntry {
   component: ComponentType<any>
@@ -18,6 +19,19 @@ export interface TemplateEntry {
  *   // then add to TEMPLATES: 'welcome': welcomeTemplate
  */
 export const TEMPLATES: Record<string, TemplateEntry> = {
-  // Add templates here as they are created, e.g.:
-  // 'welcome': welcomeTemplate,
+  'support-message': {
+    component: SupportMessageEmail,
+    subject: (data) => `[Support] ${data.category ?? 'other'} — ${data.senderEmail ?? 'new message'}`,
+    displayName: 'New support message (team notification)',
+    to: 'support@myraceengineer.app',
+    previewData: {
+      siteName: 'My Race Engineer',
+      siteUrl: 'https://myraceengineer.app',
+      senderEmail: 'driver@example.com',
+      senderName: 'Alex Driver',
+      category: 'bug',
+      message: 'The lap timer stopped counting on the third lap of my session.',
+      createdAt: '2026-10-28 12:20 UTC',
+    },
+  },
 }

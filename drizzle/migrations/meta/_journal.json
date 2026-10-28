@@ -15,6 +15,13 @@
       "when": 1793066784884,
       "tag": "0001_correct_account_cleanup_timeline_scope",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793154195511,
+      "tag": "0002_add_support_inbox",
+      "breakpoints": true
     }
   ]
 }
