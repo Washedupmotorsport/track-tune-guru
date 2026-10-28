@@ -5,7 +5,8 @@ import { homedir } from "node:os";
 const fixtureIncoming = "72d00000-0000-4000-8000-000000000002";
 const fixturePrivate = "72d00000-0000-4000-8000-000000000003";
 
-test("members can read their incoming messages but not unrelated conversations", async () => {
+// Run with INBOX_TEST_FIXTURES=1 after installing disposable verification rows.
+test.skipIf(process.env.INBOX_TEST_FIXTURES !== "1")("members can read their incoming messages but not unrelated conversations", async () => {
   const { session } = JSON.parse(
     readFileSync(`${homedir()}/.cache/lovable-auth/session.json`, "utf8"),
   );
