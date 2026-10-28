@@ -1,4 +1,5 @@
 # Pre-launch fixes
+- [x] Fix website support reply delivery: stored team replies email the original sender; failures and suppression show warnings. Anonymous website request → signed-in team reply → saved readback and email sent event verified; 10 focused tests pass. Not yet published; Proton receipt not independently verified.
 - [x] Team inbox: private shared-car crew messaging, personal support threads, admin-only assignments and unread alerts. Signed-in incoming-message privacy, support reply readback, assignment and phone layout verified; 14 retained tests pass. New crew-message sending has not been exercised with a second signed-in crew account; not yet published.
 - [x] Password recovery page and redirect (invalid-link state checked; emailed recovery completion awaits a real recovery link)
 - [x] Confirmed account deletion and data cleanup (disposable account verified end-to-end)

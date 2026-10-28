@@ -89,11 +89,17 @@ function TeamInboxPage() {
         return submitSupport({ data: { message: body, category: "other", source: "in_app" } });
       return reply({ data: { supportId: selected ?? "", body } });
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       setBody("");
       setCompose(false);
       refresh();
-      toast.success("Message sent");
+      if ("emailDelivery" in result && result.emailDelivery === "failed") {
+        toast.warning("Reply saved, but the email could not be sent. Contact the sender at their email address.");
+      } else if ("emailDelivery" in result && result.emailDelivery === "suppressed") {
+        toast.warning("Reply saved, but email delivery is blocked for this sender. They were not emailed.");
+      } else {
+        toast.success("emailDelivery" in result && result.emailDelivery === "sent" ? "Reply saved and emailed to sender" : "Message sent");
+      }
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -335,6 +341,7 @@ function TeamInboxPage() {
                       </span>
                       {data?.isAdmin && (
                         <>
+                          <span className="text-sm text-muted-foreground break-all">{thread.email}</span>
                           <Select
                             value={thread.assigned_to ?? "unassigned"}
                             onValueChange={(id) =>

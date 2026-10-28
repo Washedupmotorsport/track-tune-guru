@@ -4,6 +4,28 @@ export type SupportSend = (
   options: { templateData: Record<string, unknown>; idempotencyKey: string; replyTo: string },
 ) => Promise<unknown>;
 
+export type SupportReplyDelivery = "sent" | "suppressed" | "failed" | "not_required";
+
+/** Only verified team replies are emailed, after the reply has been stored. */
+export async function sendSupportReplyNotification(
+  send: SupportSend,
+  reply: { id: string; supportId: string; body: string },
+  recipient: { email: string; name?: string | null },
+  isStaffReply: boolean,
+): Promise<SupportReplyDelivery> {
+  if (!isStaffReply) return "not_required";
+  try {
+    const result = await send("support-reply", recipient.email, {
+      templateData: { name: recipient.name ?? null, reference: reply.supportId, body: reply.body },
+      idempotencyKey: `support-reply-${reply.id}`,
+      replyTo: "support@myraceengineer.app",
+    });
+    return (result as { sent: boolean }).sent ? "sent" : "suppressed";
+  } catch {
+    return "failed";
+  }
+}
+
 export async function sendSupportNotifications(
   send: SupportSend,
   id: string,
