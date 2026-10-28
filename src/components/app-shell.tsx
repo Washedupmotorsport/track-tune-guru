@@ -3,7 +3,7 @@ import { useIsFetching, useIsMutating } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
-  LogOut, Calculator, Wand as Wand2, NotebookPen, Timer, Disc, Wrench, Package, CalendarDays, Receipt, ChartBar as BarChart3, Menu, Search, Sun, Moon, Flag, TriangleAlert as AlertTriangle, HardHat, Radio, ClipboardList, FileText, MapPin, CloudRain, Brain, BookMarked, BookOpen, Warehouse, Settings as SettingsIcon,
+  LogOut, Calculator, Wand as Wand2, NotebookPen, Timer, Disc, Wrench, Package, CalendarDays, Receipt, ChartBar as BarChart3, Menu, Search, Sun, Moon, Flag, TriangleAlert as AlertTriangle, HardHat, Radio, ClipboardList, FileText, MapPin, CloudRain, Brain, BookMarked, BookOpen, Warehouse, Settings as SettingsIcon, Inbox,
 } from "lucide-react";
 import React, { type ReactNode } from "react";
 import {
@@ -290,6 +290,7 @@ const ALL_NAV_GROUPS = [
     items: [
       { to: "/manual",  label: "User manual",     icon: BookOpen },
       { to: "/support", label: "Support",         icon: BookOpen },
+      { to: "/support-inbox", label: "Support inbox", icon: Inbox },
     ] },
 ] as const;
 
