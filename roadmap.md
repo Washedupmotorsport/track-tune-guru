@@ -7,3 +7,4 @@
 - [x] Engineer input bounds and daily AI quota (50 allowed, 51st denied in database)
 - [ ] Ignore environment file — .gitignore is protected read-only by the platform
 - [x] Tests and live preview checks
+- [x] Support inbox — form on the support page stores messages and copies them to support@myraceengineer.app (verified end-to-end; test row removed)
