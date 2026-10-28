@@ -12,7 +12,7 @@ import { DISCIPLINES } from "@/lib/disciplines";
 import {
   Plus, Car, Trash2, Users, Share2, Timer, FileText, Trophy,
   Radio, Flag, ClipboardList, ChevronRight, Disc, Wand2, Camera, Loader2,
-  HardHat, Wrench, Package, Receipt,
+  HardHat, Wrench, Package, Receipt, Inbox,
 } from "lucide-react";
 import { GuidedTour } from "@/components/guided-tour";
 import { useState, useRef, useEffect } from "react";
@@ -223,6 +223,7 @@ function OperationsStrip() {
     { to: "/inventory",   label: "Inventory",   icon: Package,        sub: "Parts & stock" },
     { to: "/expenses",    label: "Expenses",    icon: Receipt,        sub: "Spend tracking" },
     { to: "/reports",     label: "Reports",     icon: FileText,       sub: "Season totals" },
+    { to: "/support-inbox", label: "Support inbox", icon: Inbox,      sub: "Messages from users" },
   ] as const;
   return (
     <section className="mt-10">
@@ -233,7 +234,7 @@ function OperationsStrip() {
         </div>
         <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground">Admin & off-track</span>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
         {items.map((it) => {
           const Icon = it.icon;
           return (

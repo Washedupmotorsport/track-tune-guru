@@ -51,7 +51,7 @@ export const SupportMessageEmail = ({
         <Text style={meta}>
           <strong>Received:</strong> {createdAt}
         </Text>
-        <Text style={message}>{message}</Text>
+        <Text style={messageBox}>{message}</Text>
         <Text style={footer}>
           Reply directly to this email, or open the inbox at{' '}
           <Link href={`${siteUrl}/support-inbox`} style={link}>
@@ -80,7 +80,7 @@ const meta = {
   lineHeight: '1.5',
   margin: '0 0 8px',
 }
-const message = {
+const messageBox = {
   fontSize: '14px',
   color: '#000000',
   lineHeight: '1.6',
