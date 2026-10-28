@@ -22,6 +22,13 @@
       "when": 1793154195511,
       "tag": "0002_add_support_inbox",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793155496709,
+      "tag": "0003_restrict_profile_reads_to_self_and_owned_crew",
+      "breakpoints": true
     }
   ]
 }
