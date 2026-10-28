@@ -7,3 +7,4 @@
 - Profile reads are limited to the caller's own profile and crew on cars they own; sharing must not expose unrelated profiles.
 - Support submissions send independent, event-deduplicated team and sender emails after durable storage; team alerts use authenticated role-checked polling so notifications cannot expose messages to other users.
 - Personal inbox data uses participant-scoped RLS; crew discovery returns only names and IDs of shared-car members, while support assignment and the support roster require a verified admin role. Direct messages permit recipient-only read receipts, and support replies stay within their original request's access boundary.
+- Stored support team replies send one event-deduplicated email to the original request's recipient after verifying the caller's role; delivery failures and suppression must be distinguished from successful sends so staff do not mistake storage for delivery.
