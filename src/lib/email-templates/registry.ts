@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import { SupportMessageEmail } from './support-message'
+import { template as supportConfirmation } from './support-confirmation'
 
 export interface TemplateEntry {
   component: ComponentType<any>
@@ -19,6 +20,7 @@ export interface TemplateEntry {
  *   // then add to TEMPLATES: 'welcome': welcomeTemplate
  */
 export const TEMPLATES: Record<string, TemplateEntry> = {
+  'support-confirmation': supportConfirmation,
   'support-message': {
     component: SupportMessageEmail,
     subject: (data) => `[Support] ${data.category ?? 'other'} — ${data.senderEmail ?? 'new message'}`,

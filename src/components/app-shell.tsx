@@ -20,6 +20,7 @@ import { QuickLogFab } from "@/components/quick-log-fab";
 import { HelpButton } from "@/components/help-button";
 import { TracksideContext } from "@/components/trackside-context";
 import { ActiveWeekendSelector } from "@/components/active-weekend-selector";
+import { SupportMessageAlert } from "@/components/support-message-alert";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
@@ -48,6 +49,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
           <div className="flex items-center gap-1.5 justify-end shrink-0">
             <ConnectionStatus />
+            {user && <SupportMessageAlert key={user.id} userId={user.id} />}
             <button
               onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
               className="hidden md:inline-flex items-center gap-2 rounded-md border border-border bg-muted/30 h-8 px-2 text-xs text-muted-foreground hover:text-primary hover:border-primary/40"
