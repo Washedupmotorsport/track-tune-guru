@@ -2,7 +2,14 @@ import { test, expect } from "bun:test";
 import { supportIsUnread } from "./inbox-rules";
 
 test("a member's own support request is not an incoming message", () => {
-  expect(supportIsUnread({ created_at: "2026-10-28T06:00:00Z", user_id: "member" }, [], undefined, "member")).toBe(false);
+  expect(
+    supportIsUnread(
+      { created_at: "2026-10-28T06:00:00Z", user_id: "member" },
+      [],
+      undefined,
+      "member",
+    ),
+  ).toBe(false);
 });
 test("support replies notify the sender until read", () => {
   const thread = { created_at: "2026-10-28T06:00:00Z", user_id: "member" };
@@ -11,5 +18,12 @@ test("support replies notify the sender until read", () => {
   expect(supportIsUnread(thread, replies, "2026-10-28T06:03:00Z", "member")).toBe(false);
 });
 test("a request from someone else is unread for support staff", () => {
-  expect(supportIsUnread({ created_at: "2026-10-28T06:00:00Z", user_id: "member" }, [], undefined, "staff")).toBe(true);
+  expect(
+    supportIsUnread(
+      { created_at: "2026-10-28T06:00:00Z", user_id: "member" },
+      [],
+      undefined,
+      "staff",
+    ),
+  ).toBe(true);
 });
