@@ -10,4 +10,4 @@
 - [x] Support inbox — form on the support page stores messages and copies them to support@myraceengineer.app (verified end-to-end; test row removed)
 - [x] Restrict profile access, publish support screens, and send a production support message (live form, inbox readback, and email sent event verified).
 - [x] Confirm production test receipt in Proton — Duke confirmed receipt.
-- [ ] Add sender confirmation emails and team-only new-message alerts; verify support submission and inbox readback.
+- [x] Add sender confirmation emails and team-only new-message alerts — real signed-in submission, automatic alert, inbox readback, both email sent events, mobile layout, and 10 tests verified; not yet published.
