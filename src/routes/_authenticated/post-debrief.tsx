@@ -58,10 +58,9 @@ type Debrief = {
   created_at: string; updated_at: string;
 };
 
-export function PostDebriefPage() {
+export function PostDebriefPage({ search = {} }: { search?: { new?: boolean; sessionId?: string; carId?: string } }) {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const search = Route.useSearch();
   const [carFilter, setCarFilter] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);

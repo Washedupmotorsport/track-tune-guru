@@ -1,4 +1,5 @@
 # Pre-launch fixes
+- [ ] Fix audited race-day bugs: Engineering Review access, session switching, stopwatch/lap timing, and tyre-data flows; retain regression tests and verify signed-in workflows. Do not publish or change homepage.
 - [x] Publish interactive demo and send production setup support question — live controls and reset verified at myraceengineer.app; 11 focused tests pass; form showed Message sent and both team/confirmation sent events recorded at 2026-10-29T04:53:46Z.
 - [ ] Confirm MRE-DEMO-SETUP-20261029 arrived in Proton — awaiting Duke; managed email logs confirm sending, not inbox delivery.
 - [x] Make public landing demo interactive: local surface, temperature, pressure and front-bar controls, illustrative feedback and baseline/reset. Anonymous interactions verified at 390/838/1280 widths; 20 focused tests pass, focused lint clean and preview build OK. Not published.

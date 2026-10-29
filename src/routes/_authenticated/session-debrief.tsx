@@ -139,16 +139,16 @@ function SessionDebriefPage() {
           <DebriefPage />
         </TabsContent>
         <TabsContent value="review" className="mt-6">
-          <PostDebriefPage />
+          <PostDebriefPage search={search} />
         </TabsContent>
         <TabsContent value="actions" className="mt-6">
-          <PostDebriefPage />
+          <PostDebriefPage search={search} />
         </TabsContent>
         <TabsContent value="lessons" className="mt-6">
-          <PostDebriefPage />
+          <PostDebriefPage search={search} />
         </TabsContent>
         <TabsContent value="setup" className="mt-6">
-          <PostDebriefPage />
+          <PostDebriefPage search={search} />
         </TabsContent>
       </Tabs>
 
