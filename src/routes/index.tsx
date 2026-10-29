@@ -140,11 +140,11 @@ function Landing() {
           <div>
             <p className="text-sm font-semibold text-primary">Inside the race weekend</p>
             <h2 className="mt-2 font-display text-2xl md:text-3xl">
-              Every session. One clear record.
+              Explore a change. Compare the balance.
             </h2>
           </div>
           <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
-            A baseline, the change you tested, and what the driver felt — kept together.
+            Track conditions, tyre pressures and car balance — alongside a baseline.
           </p>
         </div>
         <LandingProductPreview />

@@ -1,5 +1,5 @@
 # Architecture rules
-- Keep the public product walkthrough read-only and isolated from authenticated workflow components; illustrative records must never touch real account data.
+- Keep the public product walkthrough isolated from authenticated workflow components; interactive demo state stays local and never touches real account data. Use a pure client-safe scenario model for illustrative responses, not real vehicle predictions.
 - Keep launch validation rules in a shared client-safe module so account confirmation and AI input limits can be tested independently.
 - All AI gateway calls consume the same atomic, service-role-only per-user UTC-day quota before sending a request; attempted calls count even if the provider fails.
 - Account deletion uses an authenticated server function, derives the target from the verified caller, cleans storage and application data, then deletes the auth user; owned cars and their shared records are deleted, not transferred.
