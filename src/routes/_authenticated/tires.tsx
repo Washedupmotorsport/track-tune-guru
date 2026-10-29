@@ -11,6 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Disc, Plus, ArrowLeft, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { PressureCalculator } from "@/components/pressure-calculator";
+import { useActiveWeekend } from "@/lib/active-weekend";
+import { sessionLogContext } from "@/lib/race-day-rules";
 export const Route = createFileRoute("/_authenticated/tires")({
   head: () => ({ meta: [
     { title: "Tyres | My Race Engineer" },
@@ -42,6 +44,7 @@ const empty4 = { fl: "", fr: "", rl: "", rr: "" };
 export function TiresPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { activeWeekend, activeSession } = useActiveWeekend();
   const [open, setOpen] = useState(false);
   const [carId, setCarId] = useState("");
   const [form, setForm] = useState({
@@ -75,9 +78,11 @@ export function TiresPage() {
   const create = useMutation({
     mutationFn: async () => {
       if (!carId) throw new Error("Pick a car");
+      if (!user) throw new Error("Sign in to save a tyre log");
       if (!form.tire_set) throw new Error("Tire set required");
       const { error } = await supabase.from("tire_logs").insert({
-        user_id: user!.id, car_id: carId, tire_set: form.tire_set,
+        user_id: user.id, car_id: carId, tire_set: form.tire_set,
+        ...sessionLogContext(carId, activeWeekend, activeSession),
         compound: form.compound || null, heat_cycles: form.heat_cycles ? parseInt(form.heat_cycles, 10) : 0,
         cold_fl: num(form.cold.fl), cold_fr: num(form.cold.fr), cold_rl: num(form.cold.rl), cold_rr: num(form.cold.rr),
         hot_fl: num(form.hot.fl), hot_fr: num(form.hot.fr), hot_rl: num(form.hot.rl), hot_rr: num(form.hot.rr),
@@ -91,6 +96,7 @@ export function TiresPage() {
       setOpen(false);
       setForm({ tire_set: "", compound: "", heat_cycles: "", cold: { ...empty4 }, hot: { ...empty4 }, tread: { ...empty4 }, ambient_c: "", track_c: "", notes: "" });
       qc.invalidateQueries({ queryKey: ["tire_logs"] });
+      qc.invalidateQueries({ queryKey: ["rm-tire"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
@@ -100,7 +106,7 @@ export function TiresPage() {
       const { error } = await supabase.from("tire_logs").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["tire_logs"] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["tire_logs"] }); qc.invalidateQueries({ queryKey: ["rm-tire"] }); },
   });
 
   const carName = (id: string) => carsQ.data?.find((c) => c.id === id)?.name ?? "—";
