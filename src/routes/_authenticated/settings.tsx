@@ -124,14 +124,14 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 
-function Row({ label, value, children }: { label: string; value: string; children: React.ReactNode }) {
+function Row({ label, value, children }: { label: string; value: string; children?: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-3 flex-wrap">
       <div className="min-w-0">
         <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">{label}</div>
         <div className="text-sm font-medium truncate">{value}</div>
       </div>
-      <div>{children}</div>
+      {children ? <div>{children}</div> : null}
     </div>
   );
 }
