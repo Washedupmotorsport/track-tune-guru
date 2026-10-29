@@ -19,7 +19,7 @@ function DemoSlider({ label, value, limits, unit, step = 1, onChange }: {
       <div className="flex items-center justify-between gap-3 text-sm">
         <span>{label}</span><output className="font-mono font-semibold text-primary">{value}{unit}</output>
       </div>
-      <Slider aria-label={label} className="h-8" min={limits[0]} max={limits[1]} step={step} value={[value]} onValueChange={([next]) => { if (next !== undefined) onChange(next); }} />
+      <Slider thumbLabel={label} className="h-8" min={limits[0]} max={limits[1]} step={step} value={[value]} onValueChange={([next]) => { if (next !== undefined) onChange(next); }} />
       <div className="flex justify-between font-mono text-xs text-muted-foreground"><span>{limits[0]}{unit}</span><span>{limits[1]}{unit}</span></div>
     </div>
   );
