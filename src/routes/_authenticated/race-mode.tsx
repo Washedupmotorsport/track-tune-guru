@@ -14,6 +14,7 @@ import {
   ChevronDown, Settings2, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { WeatherRadarLinks } from "@/components/weather-radar-links";
 
 export const Route = createFileRoute("/_authenticated/race-mode")({
   component: RaceModePage,
@@ -565,6 +566,10 @@ function LiveTab(props: {
         <Stat label="Air" value={session.air_temp_c != null ? `${session.air_temp_c.toFixed(0)}°` : "—"} />
         <Stat label="Track" value={session.track_temp_c != null ? `${session.track_temp_c.toFixed(0)}°` : "—"} />
         <Stat label="Weather" value={session.weather ?? "—"} />
+      </div>
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Weather radar</span>
+        <WeatherRadarLinks />
       </div>
     </div>
   );
