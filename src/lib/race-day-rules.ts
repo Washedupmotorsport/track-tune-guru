@@ -12,6 +12,5 @@ export function sessionLogContext(carId: string, weekend: { id: string; car_id: 
   const matchesSession = session?.car_id === carId && session.event_id === weekend?.id;
   return {
     session_id: matchesSession ? session.id : null,
-    event_id: matchesSession ? session.event_id : weekend?.car_id === carId ? weekend.id : null,
   };
 }

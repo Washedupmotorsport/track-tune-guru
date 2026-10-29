@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_authenticated/post-debrief")({
     carId: typeof s.carId === "string" ? s.carId : undefined,
     new: s.new === "1" || s.new === true ? true : undefined,
   }),
-  component: () => {
+  component: function LegacyPostDebriefRedirect() {
     const nav = useNavigate();
     const s = Route.useSearch();
     useEffect(() => {
@@ -41,8 +41,7 @@ export const Route = createFileRoute("/_authenticated/post-debrief")({
         search: { tab: "review", sessionId: s.sessionId, carId: s.carId, new: s.new },
         replace: true,
       });
-      /* eslint-disable-next-line react-hooks/exhaustive-deps */
-    }, []);
+    }, [nav, s.sessionId, s.carId, s.new]);
     return null;
   },
 });

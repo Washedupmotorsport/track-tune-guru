@@ -7,6 +7,7 @@ import { useActiveWeekend } from "@/lib/active-weekend";
 import { NoActiveWeekendEmpty } from "@/components/no-active-weekend-empty";
 import { formatLapTime } from "@/lib/lap-time";
 import { nextLapNumber, selectRaceSession } from "@/lib/race-day-rules";
+import { Button } from "@/components/ui/button";
 import {
   Radio, Flag, Disc, Fuel, MessageSquare, AlertTriangle,
   Timer as TimerIcon, Play, Square, Plus, Minus, Save, Maximize2, X,
@@ -368,6 +369,13 @@ function RaceModePage() {
           <div className="mt-6 -mx-3 px-3">
             <NoActiveWeekendEmpty hint="Race Mode locks onto your active weekend. Pick or create one to start." />
           </div>
+        ) : sessionsQ.isLoading ? (
+          <p className="text-muted-foreground">Loading sessions…</p>
+        ) : sessionsQ.isError ? (
+          <div role="alert" className="text-destructive">
+            Could not load sessions.
+            <Button variant="outline" onClick={() => sessionsQ.refetch()}>Retry</Button>
+          </div>
         ) : !session ? (
           <div className="mt-6 text-center text-white/60 text-sm">
             No session for this weekend yet.{" "}
@@ -582,7 +590,6 @@ function TyresTab({ session, tire, targets, userId, onSaved }: {
       const payload = {
         user_id: userId, car_id: session.car_id,
         session_id: session.id,
-        event_id: session.event_id ?? null,
         setup_id: session.setup_id ?? null,
         tire_set: tire?.tire_set ?? "Race mode log",
         compound: tire?.compound ?? null,

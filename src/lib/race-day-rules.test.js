@@ -14,7 +14,7 @@ test("lap numbering stays above backfilled and unnumbered laps", () => {
 test("tyre logs attach only to a matching car and active weekend session", () => {
   const weekend = { id: "weekend", car_id: "car" };
   const session = { id: "session", car_id: "car", event_id: "weekend" };
-  expect(sessionLogContext("car", weekend, session)).toEqual({ session_id: "session", event_id: "weekend" });
-  expect(sessionLogContext("other", weekend, session)).toEqual({ session_id: null, event_id: null });
-  expect(sessionLogContext("car", weekend, { ...session, event_id: "old" })).toEqual({ session_id: null, event_id: "weekend" });
+  expect(sessionLogContext("car", weekend, session)).toEqual({ session_id: "session" });
+  expect(sessionLogContext("other", weekend, session)).toEqual({ session_id: null });
+  expect(sessionLogContext("car", weekend, { ...session, event_id: "old" })).toEqual({ session_id: null });
 });

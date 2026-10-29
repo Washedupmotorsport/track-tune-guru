@@ -23,9 +23,9 @@ export const Route = createFileRoute("/_authenticated/tires")({
     { name: "twitter:card", content: "summary" },
   ] }),
 
-  component: () => {
+  component: function LegacyTiresRedirect() {
     const nav = useNavigate();
-    useEffect(() => { nav({ to: "/tyres", search: { tab: "setup" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    useEffect(() => { nav({ to: "/tyres", search: { tab: "setup" }, replace: true }); }, [nav]);
     return null;
   },
 });
