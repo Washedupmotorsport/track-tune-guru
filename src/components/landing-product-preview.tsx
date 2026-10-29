@@ -34,7 +34,9 @@ export function LandingProductPreview() {
             Illustrative demo data · not customer results
           </p>
         </div>
-        <p className="font-mono text-xs text-muted-foreground">Lakeside Park · Sat–Sun</p>
+        <p className="font-mono text-xs text-muted-foreground">
+          Queensland Raceway · Main Circuit · Sat–Sun
+        </p>
       </div>
 
       <div className="grid lg:grid-cols-[1fr_1.1fr_1fr]">
