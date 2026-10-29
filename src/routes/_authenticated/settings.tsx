@@ -3,7 +3,6 @@ import { useAuth } from "@/lib/auth-context";
 import { useUnits } from "@/lib/units";
 import { useTheme } from "@/lib/theme";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Settings as SettingsIcon, Sun, Moon, LogOut, BookOpen, Mail, Shield, FileText } from "lucide-react";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
