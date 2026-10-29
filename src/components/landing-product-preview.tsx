@@ -112,9 +112,7 @@ export function LandingProductPreview() {
                     {session.laps.map((lap) => (
                       <li
                         key={lap}
-                        className={
-                          lap === session.best ? "font-semibold text-primary" : undefined
-                        }
+                        className={lap === session.best ? "font-semibold text-primary" : undefined}
                       >
                         {lap}
                       </li>
