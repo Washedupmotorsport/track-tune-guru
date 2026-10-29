@@ -18,7 +18,6 @@ import {
   type DemoSetup,
   type DemoSurface,
 } from "@/lib/landing-demo";
-import heroCar from "@/assets/hero-car.jpg";
 
 const surfaces = [
   { value: "dry", label: "Dry", icon: Sun },
@@ -90,7 +89,7 @@ export function LandingProductPreview() {
   return (
     <div
       id="setup-demo"
-      className="overflow-hidden rounded-md border border-border bg-card text-card-foreground"
+      className="scroll-mt-20 overflow-hidden rounded-md border border-border bg-card text-card-foreground"
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-muted px-5 py-4">
         <div>
@@ -165,7 +164,7 @@ export function LandingProductPreview() {
         <div className="min-w-0 border-b border-border p-5 lg:border-b-0 lg:border-r">
           <p className="font-mono text-xs text-muted-foreground">CAR #27 · FORMULA CAR</p>
           <img
-            src={heroCar}
+            src="/mre-share.jpg"
             alt="Formula race car on circuit"
             className="mt-4 aspect-[4/3] w-full rounded-sm object-cover"
             loading="lazy"
