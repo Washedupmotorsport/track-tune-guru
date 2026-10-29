@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/auth-context";
 import { getCurrentWeather } from "@/lib/weather";
 import { Flag, Timer, MapPin, CloudSun } from "lucide-react";
 import { useActiveWeekend } from "@/lib/active-weekend";
+import { WeatherRadarLinks } from "@/components/weather-radar-links";
 
 export function TracksideContext() {
   const { user } = useAuth();
@@ -66,20 +67,23 @@ export function TracksideContext() {
         sub={weatherSub}
         to="/track-evolution"
         muted={!weather}
+        extra={<WeatherRadarLinks iconOnly />}
       />
     </div>
   );
 }
 
 function ContextCell({
-  icon: Icon, label, value, sub, to, muted,
+  icon: Icon, label, value, sub, to, muted, extra,
 }: {
   icon: typeof Flag; label: string; value: string; sub: string; to: string; muted?: boolean;
+  extra?: React.ReactNode;
 }) {
   return (
+    <div className="flex items-stretch min-w-0">
     <Link
       to={to}
-      className="group flex items-center gap-2 px-3 py-1.5 hover:bg-primary/5 transition-colors min-w-0"
+      className="group flex items-center gap-2 px-3 py-1.5 hover:bg-primary/5 transition-colors min-w-0 flex-1"
     >
       <Icon className={`w-3.5 h-3.5 shrink-0 ${muted ? "text-muted-foreground" : "text-primary"}`} />
       <div className="min-w-0 leading-tight">
@@ -90,6 +94,8 @@ function ContextCell({
       </div>
       <span className="hidden xl:block font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground/70 truncate max-w-[120px]">{sub}</span>
     </Link>
+    {extra && <div className="flex items-center gap-1 pr-2">{extra}</div>}
+    </div>
   );
 }
 
