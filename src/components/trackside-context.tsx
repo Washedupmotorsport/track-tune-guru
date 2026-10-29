@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { getCurrentWeather } from "@/lib/weather";
 import { Flag, Timer, MapPin, CloudSun } from "lucide-react";
@@ -77,7 +78,7 @@ function ContextCell({
   icon: Icon, label, value, sub, to, muted, extra,
 }: {
   icon: typeof Flag; label: string; value: string; sub: string; to: string; muted?: boolean;
-  extra?: React.ReactNode;
+  extra?: ReactNode;
 }) {
   return (
     <div className="flex items-stretch min-w-0">
