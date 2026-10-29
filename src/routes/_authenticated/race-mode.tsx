@@ -6,6 +6,8 @@ import { useAuth } from "@/lib/auth-context";
 import { useActiveWeekend } from "@/lib/active-weekend";
 import { NoActiveWeekendEmpty } from "@/components/no-active-weekend-empty";
 import { formatLapTime } from "@/lib/lap-time";
+import { nextLapNumber, selectRaceSession } from "@/lib/race-day-rules";
+import { Button } from "@/components/ui/button";
 import {
   Radio, Flag, Disc, Fuel, MessageSquare, AlertTriangle,
   Timer as TimerIcon, Play, Square, Plus, Minus, Save, Maximize2, X,
@@ -104,7 +106,7 @@ function RaceModePage() {
   const [manualSessionId, setManualSessionId] = useState<string | "">("");
   const [, setTick] = useState(0);
   // Undo queue: recently saved laps that can still be undone while the toast is alive
-  type RecentLap = { id: string; lapNumber: number; ms: number; savedAt: number };
+  type RecentLap = { id: string; sessionId: string; lapNumber: number; ms: number; savedAt: number };
   const recentLapsRef = useRef<RecentLap[]>([]);
   const undoToastIdRef = useRef<string | number | null>(null);
 
@@ -135,10 +137,11 @@ function RaceModePage() {
         action: {
           label: "Undo",
           onClick: async () => {
+            if (Date.now() - latest.savedAt >= 6000) { showUndoToast(); return; }
             const { error } = await supabase.from("laps").delete().eq("id", latest.id);
             if (error) { toast.error("Could not undo lap"); return; }
             recentLapsRef.current = recentLapsRef.current.filter((l) => l.id !== latest.id);
-            qc.invalidateQueries({ queryKey: ["rm-laps", sessionId] });
+            qc.invalidateQueries({ queryKey: ["rm-laps", latest.sessionId] });
             toast("Lap removed");
             showUndoToast();
           },
@@ -164,12 +167,13 @@ function RaceModePage() {
   });
   const sessions = sessionsQ.data ?? [];
   const session = useMemo<Sess | null>(() => {
-    if (manualSessionId) return sessions.find((s) => s.id === manualSessionId) ?? null;
-    if (activeSession?.id) return sessions.find((s) => s.id === activeSession.id) ?? sessions[0] ?? null;
-    return sessions[0] ?? null;
+    return selectRaceSession(sessions, manualSessionId, activeSession?.id);
   }, [sessions, manualSessionId, activeSession?.id]);
 
   const sessionId = session?.id ?? "";
+  useEffect(() => { setManualSessionId(""); }, [activeWeekend?.id, activeCar?.id]);
+  const selectedSessionRef = useRef(sessionId);
+  selectedSessionRef.current = sessionId;
   const [targets, setTargets] = useTargets(sessionId || null);
 
   // Live laps poll
@@ -239,6 +243,12 @@ function RaceModePage() {
   // ─────────── stopwatch + log lap ───────────
   const [swStart, setSwStart] = useState<number | null>(null);
   const [swFrozen, setSwFrozen] = useState(0);
+  const lapSaveBusy = useRef(false);
+  useEffect(() => {
+    setSwStart(null);
+    setSwFrozen(0);
+    setShowSettings(false);
+  }, [sessionId]);
   const swMs = swStart != null ? Date.now() - swStart : swFrozen;
 
   // Smooth re-render while the stopwatch is running so the tenths/hundredths
@@ -252,24 +262,30 @@ function RaceModePage() {
   }, [swStart]);
 
   const logLap = useMutation({
-    mutationFn: async ({ ms, lapNumber }: { ms: number; lapNumber: number }) => {
-      if (!session || !user) throw new Error("No active session");
+    mutationFn: async ({ ms, lapNumber, lapSession }: { ms: number; lapNumber: number; lapSession: Sess; loggedAt: number; running: boolean }) => {
+      if (!user) throw new Error("No active session");
       const payload = {
-        session_id: session.id, car_id: session.car_id,
-        setup_id: session.setup_id ?? null, user_id: user.id,
+        session_id: lapSession.id, car_id: lapSession.car_id,
+        setup_id: lapSession.setup_id ?? null, user_id: user.id,
         lap_time_ms: Math.max(1, Math.round(ms)),
         lap_number: lapNumber,
       };
-      const { data, error } = await supabase.from("laps").insert(payload as never).select("id").single();
+      const { data, error } = await supabase.from("laps").insert(payload as never).select("id,session_id,lap_time_ms,lap_number,recorded_at").single();
       if (error) throw error;
-      return data.id;
+      return data as Lap;
     },
-    onSuccess: (lapId, { ms, lapNumber }) => {
-      qc.invalidateQueries({ queryKey: ["rm-laps", sessionId] });
-      recentLapsRef.current.push({ id: lapId, lapNumber, ms, savedAt: Date.now() });
+    onSuccess: (lap, { ms, lapNumber, lapSession, loggedAt, running }) => {
+      qc.setQueryData<Lap[]>(["rm-laps", lapSession.id], (previous = []) => [...previous.filter((item) => item.id !== lap.id), lap]);
+      qc.invalidateQueries({ queryKey: ["rm-laps", lapSession.id] });
+      if (selectedSessionRef.current === lapSession.id) {
+        setSwStart(running ? loggedAt : null);
+        setSwFrozen(0);
+      }
+      recentLapsRef.current.push({ id: lap.id, sessionId: lapSession.id, lapNumber, ms, savedAt: Date.now() });
       showUndoToast();
     },
     onError: (e: Error) => toast.error(e.message),
+    onSettled: () => { lapSaveBusy.current = false; },
   });
 
   // ─────────── session countdown / fuel projection ───────────
@@ -353,6 +369,13 @@ function RaceModePage() {
           <div className="mt-6 -mx-3 px-3">
             <NoActiveWeekendEmpty hint="Race Mode locks onto your active weekend. Pick or create one to start." />
           </div>
+        ) : sessionsQ.isLoading ? (
+          <p className="text-muted-foreground">Loading sessions…</p>
+        ) : sessionsQ.isError ? (
+          <div role="alert" className="text-destructive">
+            Could not load sessions.
+            <Button variant="outline" onClick={() => sessionsQ.refetch()}>Retry</Button>
+          </div>
         ) : !session ? (
           <div className="mt-6 text-center text-white/60 text-sm">
             No session for this weekend yet.{" "}
@@ -367,30 +390,32 @@ function RaceModePage() {
                 remainingMs={remainingMs} sessionLenMin={targets.sessionLen}
                 swMs={swMs} swRunning={swStart != null}
                 onStartStop={() => {
+                  if (lapSaveBusy.current) return;
                   if (swStart == null) { setSwStart(Date.now()); setSwFrozen(0); }
                   else { setSwFrozen(Date.now() - swStart); setSwStart(null); }
                 }}
                 onLogLap={() => {
-                  const ms = swMs;
-                  if (ms <= 0) return;
-                  const lapNumber = (laps[laps.length - 1]?.lap_number ?? laps.length) + 1;
-                  logLap.mutate({ ms, lapNumber });
-                  setSwStart(Date.now()); setSwFrozen(0);
+                  if (lapSaveBusy.current) return;
+                  const loggedAt = Date.now();
+                  const ms = swStart != null ? loggedAt - swStart : swFrozen;
+                  if (ms <= 0 || lapsQ.isLoading || lapsQ.isError) return;
+                  lapSaveBusy.current = true;
+                  logLap.mutate({ ms, lapNumber: nextLapNumber(laps), lapSession: session, loggedAt, running: swStart != null });
                 }}
                 logging={logLap.isPending}
               />
             )}
             {tab === "tyres" && (
-              <TyresTab session={session} tire={tire ?? null} targets={targets} userId={user!.id}
-                        onSaved={() => qc.invalidateQueries({ queryKey: ["rm-tire"] })} />
+              user && <TyresTab key={sessionId} session={session} tire={tire ?? null} targets={targets} userId={user.id}
+                        onSaved={() => { qc.invalidateQueries({ queryKey: ["rm-tire"] }); qc.invalidateQueries({ queryKey: ["tire_logs"] }); }} />
             )}
             {tab === "fuel" && (
-              <FuelTab session={session} targets={targets} setTargets={setTargets}
+              <FuelTab key={sessionId} session={session} targets={targets} setTargets={setTargets}
                        lapsCount={laps.length} lapsRemaining={lapsRemaining}
                        onFuelStartChange={() => qc.invalidateQueries({ queryKey: ["rm-sessions"] })} />
             )}
             {tab === "feedback" && (
-              <FeedbackTab session={session} userId={user!.id}
+              user && <FeedbackTab key={sessionId} session={session} userId={user.id}
                            items={feedbackQ.data ?? []} loading={feedbackQ.isLoading}
                            onSaved={() => qc.invalidateQueries({ queryKey: ["rm-feedback", sessionId] })} />
             )}
@@ -556,10 +581,7 @@ function TyresTab({ session, tire, targets, userId, onSaved }: {
     hot_rr: tire?.hot_rr ?? targets.tyreTarget,
   }), [tire, targets.tyreTarget]);
   const [press, setPress] = useState<Record<string, number>>(initial);
-  const initRef = useRef(false);
   useEffect(() => {
-    if (initRef.current && tire == null) return;
-    initRef.current = true;
     setPress(initial);
   }, [initial, tire]);
 
@@ -568,7 +590,6 @@ function TyresTab({ session, tire, targets, userId, onSaved }: {
       const payload = {
         user_id: userId, car_id: session.car_id,
         session_id: session.id,
-        event_id: session.event_id ?? null,
         setup_id: session.setup_id ?? null,
         tire_set: tire?.tire_set ?? "Race mode log",
         compound: tire?.compound ?? null,

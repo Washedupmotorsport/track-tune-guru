@@ -17,7 +17,7 @@ export type ActiveWeekend = {
 
 export type ActiveCar = { id: string; name: string | null; year: number | null; make: string | null; model: string | null } | null;
 export type ActiveTrack = { id: string; name: string } | null;
-export type ActiveSession = { id: string; name: string; session_type: string; started_at: string; event_id: string | null } | null;
+export type ActiveSession = { id: string; name: string; session_type: string; started_at: string; event_id: string | null; car_id: string } | null;
 
 type Ctx = {
   loading: boolean;
@@ -131,15 +131,18 @@ export function ActiveWeekendProvider({ children }: { children: ReactNode }) {
   });
 
   const sessionQ = useQuery({
-    queryKey: ["active-weekend:session", activeWeekend?.id, user?.id],
+    queryKey: ["active-weekend:session", activeWeekend?.id, activeWeekend?.car_id, user?.id],
     queryFn: async () => {
       if (!activeWeekend) return null;
-      const { data } = await supabase
+      let query = supabase
         .from("sessions")
-        .select("id, name, session_type, started_at, event_id")
+        .select("id, name, session_type, started_at, event_id, car_id")
         .eq("event_id", activeWeekend.id)
         .order("started_at", { ascending: false })
         .limit(1);
+      if (activeWeekend.car_id) query = query.eq("car_id", activeWeekend.car_id);
+      const { data, error } = await query;
+      if (error) throw error;
       return ((data?.[0] as ActiveSession) ?? null);
     },
     enabled: !!user && !!activeWeekend,

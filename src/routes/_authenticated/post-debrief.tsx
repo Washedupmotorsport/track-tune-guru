@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_authenticated/post-debrief")({
     carId: typeof s.carId === "string" ? s.carId : undefined,
     new: s.new === "1" || s.new === true ? true : undefined,
   }),
-  component: () => {
+  component: function LegacyPostDebriefRedirect() {
     const nav = useNavigate();
     const s = Route.useSearch();
     useEffect(() => {
@@ -41,8 +41,7 @@ export const Route = createFileRoute("/_authenticated/post-debrief")({
         search: { tab: "review", sessionId: s.sessionId, carId: s.carId, new: s.new },
         replace: true,
       });
-      /* eslint-disable-next-line react-hooks/exhaustive-deps */
-    }, []);
+    }, [nav, s.sessionId, s.carId, s.new]);
     return null;
   },
 });
@@ -58,10 +57,9 @@ type Debrief = {
   created_at: string; updated_at: string;
 };
 
-export function PostDebriefPage() {
+export function PostDebriefPage({ search = {} }: { search?: { new?: boolean; sessionId?: string; carId?: string } }) {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const search = Route.useSearch();
   const [carFilter, setCarFilter] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);

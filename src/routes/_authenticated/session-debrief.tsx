@@ -57,7 +57,7 @@ function SessionDebriefPage() {
   // If we arrive with ?new=1&sessionId=..., land on the Engineering review tab.
   const initial: TabId = search.tab ?? (search.new ? "review" : "feedback");
   const [tab, setTab] = useState<TabId>(initial);
-  useEffect(() => { if (search.tab && search.tab !== tab) setTab(search.tab); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [search.tab]);
+  useEffect(() => { setTab(search.tab ?? (search.new ? "review" : "feedback")); }, [search.tab, search.new]);
 
   return (
     <div>
@@ -138,18 +138,9 @@ function SessionDebriefPage() {
         <TabsContent value="feedback" className="mt-6">
           <DebriefPage />
         </TabsContent>
-        <TabsContent value="review" className="mt-6">
-          <PostDebriefPage />
-        </TabsContent>
-        <TabsContent value="actions" className="mt-6">
-          <PostDebriefPage />
-        </TabsContent>
-        <TabsContent value="lessons" className="mt-6">
-          <PostDebriefPage />
-        </TabsContent>
-        <TabsContent value="setup" className="mt-6">
-          <PostDebriefPage />
-        </TabsContent>
+        <div hidden={tab === "feedback"} className="mt-6">
+          <PostDebriefPage search={search} />
+        </div>
       </Tabs>
 
       {/* STEP 5 — promote lessons to engineering memory. */}
