@@ -11,9 +11,8 @@ import {
   DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { CommandPalette } from "@/components/command-palette";
-import { useUnits, CURRENCIES, type CurrencyCode } from "@/lib/units";
+import { useUnits } from "@/lib/units";
 import { useTheme } from "@/lib/theme";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import logoMre from "@/assets/logo-mre.png";
 import { ConnectionStatus } from "@/lib/offline";
 import { QuickLogFab } from "@/components/quick-log-fab";
@@ -25,7 +24,7 @@ import { SupportMessageAlert } from "@/components/support-message-alert";
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const { system, toggle, currency, setCurrency } = useUnits();
+  const { system, toggle } = useUnits();
   const { theme, toggle: toggleTheme } = useTheme();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
@@ -76,21 +75,6 @@ export function AppShell({ children }: { children: ReactNode }) {
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               <span className="hidden xl:inline">{theme === "dark" ? "Light" : "Dark"}</span>
             </button>
-            <Select value={currency} onValueChange={(v) => setCurrency(v as CurrencyCode)}>
-              <SelectTrigger
-                aria-label="Currency"
-                className="hidden lg:flex h-8 w-[72px] rounded-md border border-border bg-muted/30 px-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/40"
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CURRENCIES.map((c) => (
-                  <SelectItem key={c.code} value={c.code} className="font-mono text-xs">
-                    {c.code} <span className="text-muted-foreground ml-2">{c.symbol}</span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
             <HelpButton />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -108,13 +92,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                   <DropdownMenuItem onClick={toggleTheme}>
                     {theme === "dark" ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
                     {theme === "dark" ? "Light mode" : "Dark mode"}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => {
-                    const codes = CURRENCIES.map(c => c.code);
-                    const idx = codes.indexOf(currency);
-                    setCurrency(codes[(idx + 1) % codes.length] as CurrencyCode);
-                  }}>
-                    <span className="text-xs">Currency: <span className="font-semibold">{currency}</span></span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </div>

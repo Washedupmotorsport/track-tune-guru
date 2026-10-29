@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
-import { useUnits, CURRENCIES, type CurrencyCode } from "@/lib/units";
+import { useUnits } from "@/lib/units";
 import { useTheme } from "@/lib/theme";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
 function SettingsPage() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const { system, toggle, currency, setCurrency } = useUnits();
+  const { system, toggle, currency } = useUnits();
   const { theme, toggle: toggleTheme } = useTheme();
   const removeAccount = useServerFn(deleteAccount);
   const queryClient = useQueryClient();
@@ -53,18 +53,7 @@ function SettingsPage() {
           <Row label="Measurement system" value={system === "metric" ? "SI (metric)" : "US (imperial)"}>
             <Button size="sm" variant="outline" onClick={toggle}>Switch to {system === "metric" ? "US" : "SI"}</Button>
           </Row>
-          <Row label="Currency" value={currency}>
-            <Select value={currency} onValueChange={(v) => setCurrency(v as CurrencyCode)}>
-              <SelectTrigger className="h-8 w-[110px]"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {CURRENCIES.map((c) => (
-                  <SelectItem key={c.code} value={c.code} className="font-mono text-xs">
-                    {c.code} <span className="text-muted-foreground ml-2">{c.symbol}</span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Row>
+          <Row label="Currency" value={`${currency} — set automatically from your location`} />
         </Card>
 
         <Card title="Appearance">

@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
-import { useUnits, CURRENCIES, type CurrencyCode } from "@/lib/units";
+import { useUnits } from "@/lib/units";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -118,12 +118,9 @@ function ExpensesPage() {
                 <div><Label>Amount *</Label><Input type="number" step="any" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
                 <div>
                   <Label>Currency</Label>
-                  <Select value={form.currency} onValueChange={(v) => setForm({ ...form, currency: v as CurrencyCode })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {CURRENCIES.map((c) => <SelectItem key={c.code} value={c.code}>{c.code} {c.symbol}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                  <div className="h-10 flex items-center px-3 rounded-md border border-border bg-muted/30 text-sm text-muted-foreground">
+                    {form.currency} <span className="ml-1.5 text-xs">(from your location)</span>
+                  </div>
                 </div>
               </div>
               <div>
