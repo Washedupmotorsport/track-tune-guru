@@ -11,7 +11,7 @@ import {
  * Radar link that recentres on the device position once it is known.
  * Falls back to the general radar map when location is unavailable.
  */
-export function useRadarHref(): string {
+function useRadarHref(): string {
   const [href, setHref] = useState(GENERAL_RADAR_URL);
 
   useEffect(() => {
