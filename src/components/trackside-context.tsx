@@ -95,7 +95,7 @@ function ContextCell({
       </div>
       <span className="hidden xl:block font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground/70 truncate max-w-[120px]">{sub}</span>
     </Link>
-    {extra && <div className="flex items-center gap-1 pr-2">{extra}</div>}
+    {extra && <div className="hidden xl:flex items-center gap-1 pr-2 shrink-0">{extra}</div>}
     </div>
   );
 }
