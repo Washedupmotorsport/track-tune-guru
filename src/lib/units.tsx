@@ -2,7 +2,6 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 
 export type UnitSystem = "metric" | "imperial";
 const KEY = "summit.units";
-const CUR_KEY = "summit.currency";
 
 export const CURRENCIES = [
   { code: "USD", symbol: "$" },
@@ -24,12 +23,30 @@ export const CURRENCIES = [
 
 export type CurrencyCode = (typeof CURRENCIES)[number]["code"];
 
+// Currency is derived from the device's locale region — there is no manual picker.
+const EUROZONE = new Set(["AT", "BE", "CY", "DE", "EE", "ES", "FI", "FR", "GR", "HR", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PT", "SI", "SK"]);
+const REGION_CURRENCY: Record<string, CurrencyCode> = {
+  US: "USD", GB: "GBP", JP: "JPY", AU: "AUD", CA: "CAD", CH: "CHF", NZ: "NZD",
+  SE: "SEK", NO: "NOK", DK: "DKK", ZA: "ZAR", BR: "BRL", MX: "MXN", AE: "AED",
+};
+
+export function currencyForLocale(locale?: string): CurrencyCode {
+  if (typeof navigator === "undefined" && !locale) return "USD";
+  try {
+    const region = new Intl.Locale(locale || navigator.language).maximize().region;
+    if (!region) return "USD";
+    if (EUROZONE.has(region)) return "EUR";
+    return REGION_CURRENCY[region] ?? "USD";
+  } catch {
+    return "USD";
+  }
+}
+
 type Ctx = {
   system: UnitSystem;
   setSystem: (s: UnitSystem) => void;
   toggle: () => void;
   currency: CurrencyCode;
-  setCurrency: (c: CurrencyCode) => void;
   currencySymbol: string;
   formatCurrency: (amount: number, code?: string) => string;
   // Temperature
@@ -67,18 +84,12 @@ export function UnitsProvider({ children }: { children: ReactNode }) {
     if (typeof window === "undefined") return;
     const stored = window.localStorage.getItem(KEY);
     if (stored === "metric" || stored === "imperial") setSystemState(stored);
-    const c = window.localStorage.getItem(CUR_KEY);
-    if (c && CURRENCIES.some((x) => x.code === c)) setCurrencyState(c as CurrencyCode);
+    setCurrencyState(currencyForLocale());
   }, []);
 
   const setSystem = useCallback((s: UnitSystem) => {
     setSystemState(s);
     if (typeof window !== "undefined") window.localStorage.setItem(KEY, s);
-  }, []);
-
-  const setCurrency = useCallback((c: CurrencyCode) => {
-    setCurrencyState(c);
-    if (typeof window !== "undefined") window.localStorage.setItem(CUR_KEY, c);
   }, []);
 
   const imperial = system === "imperial";
@@ -88,7 +99,6 @@ export function UnitsProvider({ children }: { children: ReactNode }) {
     setSystem,
     toggle: () => setSystem(imperial ? "metric" : "imperial"),
     currency,
-    setCurrency,
     currencySymbol: CURRENCIES.find((c) => c.code === currency)?.symbol ?? currency,
     formatCurrency: (amount, code) => {
       const cc = code || currency;
