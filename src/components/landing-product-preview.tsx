@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import demoCarAsset from "@/assets/demo-car-88.png.asset.json";
 import {
   DEMO_BASELINE,
   DEMO_LIMITS,
@@ -162,11 +163,11 @@ export function LandingProductPreview() {
           <p className="text-xs text-muted-foreground">1 · softer / 5 · stiffer</p>
         </div>
         <div className="min-w-0 border-b border-border p-5 lg:border-b-0 lg:border-r">
-          <p className="font-mono text-xs text-muted-foreground">CAR #27 · FORMULA CAR</p>
+          <p className="font-mono text-xs text-muted-foreground">CAR #88 · TIME ATTACK</p>
           <img
-            src="/mre-share.jpg"
-            alt="Formula race car on circuit"
-            className="mt-4 aspect-[4/3] w-full rounded-sm object-cover"
+            src={demoCarAsset.url}
+            alt="Blue My Race Engineer number 88 time attack car, shown from front and rear"
+            className="mt-4 aspect-[3/2] w-full rounded-sm object-contain"
             loading="lazy"
           />
           <div className="mt-5 flex flex-wrap items-baseline justify-between gap-2">
