@@ -1,6 +1,6 @@
 # Architecture rules
 - Race-day record context must match the selected car and weekend; reusable review pages receive route input through props, and lap mutations capture their session before asynchronous saves.
-- Keep the public product walkthrough isolated from authenticated workflow components; interactive demo state stays local and never touches real account data. Use a pure client-safe scenario model for illustrative responses, not real vehicle predictions.
+- Keep the public product walkthrough isolated from authenticated workflow components; the landing preview is static illustrative data only — never predictions of pressures, handling or lap times, and never real account data.
 - Keep launch validation rules in a shared client-safe module so account confirmation and AI input limits can be tested independently.
 - All AI gateway calls consume the same atomic, service-role-only per-user UTC-day quota before sending a request; attempted calls count even if the provider fails.
 - Account deletion uses an authenticated server function, derives the target from the verified caller, cleans storage and application data, then deletes the auth user; owned cars and their shared records are deleted, not transferred.

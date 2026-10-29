@@ -132,6 +132,10 @@ function Landing() {
               <a href="#walkthrough">See how it works</a>
             </Button>
           </div>
+          <p className="mt-4 max-w-lg text-sm leading-relaxed text-hero-white/80">
+            Free account — no payment details needed. Log your cars, race weekends, setups and
+            sessions. AI assistant questions are limited to 50 per day.
+          </p>
         </div>
       </section>
 
@@ -140,11 +144,12 @@ function Landing() {
           <div>
             <p className="text-sm font-semibold text-primary">Inside the race weekend</p>
             <h2 className="mt-2 font-display text-2xl md:text-3xl">
-              Explore a change. Compare the balance.
+              See what changed between sessions.
             </h2>
           </div>
           <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
-            Track conditions, tyre pressures and car balance — alongside a baseline.
+            Review your setup changes, tyre pressures and driver feedback alongside your session
+            results.
           </p>
         </div>
         <LandingProductPreview />
