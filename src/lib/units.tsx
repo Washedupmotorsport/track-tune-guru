@@ -1,3 +1,4 @@
+import { currencyForLocation } from "./currency-region";
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 
 export type UnitSystem = "metric" | "imperial";
@@ -30,16 +31,14 @@ const REGION_CURRENCY: Record<string, CurrencyCode> = {
   SE: "SEK", NO: "NOK", DK: "DKK", ZA: "ZAR", BR: "BRL", MX: "MXN", AE: "AED",
 };
 
-export function currencyForLocale(locale?: string): CurrencyCode {
-  if (typeof navigator === "undefined" && !locale) return "USD";
-  try {
-    const region = new Intl.Locale(locale || navigator.language).maximize().region;
-    if (!region) return "USD";
-    if (EUROZONE.has(region)) return "EUR";
-    return REGION_CURRENCY[region] ?? "USD";
-  } catch {
-    return "USD";
-  }
+void EUROZONE; void REGION_CURRENCY;
+
+// Location comes from the device time zone; language is only a fallback.
+export function currencyForLocale(): CurrencyCode {
+  if (typeof navigator === "undefined") return "USD";
+  let tz: string | undefined;
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch { tz = undefined; }
+  return currencyForLocation(tz, navigator.language);
 }
 
 type Ctx = {
