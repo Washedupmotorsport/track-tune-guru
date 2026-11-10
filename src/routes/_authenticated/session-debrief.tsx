@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { DebriefPage } from "./debrief";
 import { PostDebriefPage } from "./post-debrief";
+import { HandlingAssistant } from "@/components/handling-assistant";
 
 type TabId = "feedback" | "review" | "actions" | "lessons" | "setup";
 const VALID: TabId[] = ["feedback", "review", "actions", "lessons", "setup"];
@@ -138,7 +139,8 @@ function SessionDebriefPage() {
         <TabsContent value="feedback" className="mt-6">
           <DebriefPage />
         </TabsContent>
-        <div hidden={tab === "feedback"} className="mt-6">
+        <div hidden={tab === "feedback"} className="mt-6 space-y-6">
+          {tab === "setup" && <HandlingAssistant />}
           <PostDebriefPage search={search} />
         </div>
       </Tabs>

@@ -1,20 +1,10 @@
-# Pre-launch fixes
-- [x] Fix race-day bugs: review access and draft retention, session-switch fallback/reset, failed/duplicate lap saves and numbering, unsupported tyre event field, tyre-session attachment and history refresh. Signed-in temporary session → failed save → real lap/readback/undo → tyre save/history verified; test records removed. 25 tests pass, 1 unrelated integration test skipped; focused logic lint has 0 errors and 3 existing warnings, preview build OK. Homepage unchanged; not published.
-- [x] Publish interactive demo and send production setup support question — live controls and reset verified at myraceengineer.app; 11 focused tests pass; form showed Message sent and both team/confirmation sent events recorded at 2026-10-29T04:53:46Z.
-- [ ] Confirm MRE-DEMO-SETUP-20261029 arrived in Proton — awaiting Duke; managed email logs confirm sending, not inbox delivery.
-- [x] Make public landing demo interactive: local surface, temperature, pressure and front-bar controls, illustrative feedback and baseline/reset. Anonymous interactions verified at 390/838/1280 widths; 20 focused tests pass, focused lint clean and preview build OK. Not published.
-- [x] Improve public landing page: requested hero copy, labelled read-only product preview, four-step workflow, practical benefits, compact setup disciplines, and production canonical/social metadata. Start free, Sign in, walkthrough, Terms and Privacy verified; no overflow at 320/390/951/1280/1440 widths, light/dark checked, focused lint clean, 16 existing tests pass, preview build OK. Free-plan entitlements and hosted billing settings unverified, so no pricing/credit-card promises added; not published.
-- [x] Fix website support reply delivery: stored team replies email the original sender; failures and suppression show warnings. Anonymous website request → signed-in team reply → saved readback and email sent event verified; 10 focused tests pass. Not yet published; Proton receipt not independently verified.
-- [x] Team inbox: private shared-car crew messaging, personal support threads, admin-only assignments and unread alerts. Signed-in incoming-message privacy, support reply readback, assignment and phone layout verified; 14 retained tests pass. New crew-message sending has not been exercised with a second signed-in crew account; not yet published.
-- [x] Password recovery page and redirect (invalid-link state checked; emailed recovery completion awaits a real recovery link)
-- [x] Confirmed account deletion and data cleanup (disposable account verified end-to-end)
-- [x] Support address and page branding/metadata
-- [x] Production sitemap and branded share image
-- [x] Safe offline worker and maskable icon (PWA skill; published offline behavior requires publication)
-- [x] Engineer input bounds and daily AI quota (50 allowed, 51st denied in database)
-- [ ] Ignore environment file — .gitignore is protected read-only by the platform
-- [x] Tests and live preview checks
-- [x] Support inbox — form on the support page stores messages and copies them to support@myraceengineer.app (verified end-to-end; test row removed)
-- [x] Restrict profile access, publish support screens, and send a production support message (live form, inbox readback, and email sent event verified).
-- [x] Confirm production test receipt in Proton — Duke confirmed receipt.
-- [x] Add sender confirmation emails and team-only new-message alerts — real signed-in submission, automatic alert, inbox readback, both email sent events, mobile layout, and 10 tests verified; not yet published.
+# Roadmap
+
+## Handling-issue engineering assistant (uploaded brief)
+- [ ] Explore setup-library, session-debrief, session-compare, existing data shapes
+- [ ] Pure analysis module `src/lib/handling-assistant.ts` + tests (issues, causes, recommended test, expected result, missing data; safety-critical flagging)
+- [ ] Card component `src/components/handling-assistant.tsx` (HANDLING ISSUE / POSSIBLE CAUSES / RECOMMENDED TEST / EXPECTED RESULT / ACTUAL RESULT)
+- [ ] Wire into Setup Library + Session Debrief (no new nav section)
+- [ ] Save recommendation as proposed test; accept/reject/save; record actual adjustment separately; compare next session
+- [ ] Verify with mid-corner understeer scenario in Playwright (mobile too)
+- [ ] Run tests + build, commit

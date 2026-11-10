@@ -8,15 +8,16 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { BookMarked, Pin, Trophy, Gauge, Cloud, Flame, Shield, Zap, Wand2, Search, Star, GitBranch, Sparkles, History, GitCompare } from "lucide-react";
+import { BookMarked, Pin, Trophy, Gauge, Cloud, Flame, Shield, Zap, Wand2, Search, Star, GitBranch, Sparkles, History, GitCompare, Stethoscope } from "lucide-react";
+import { HandlingAssistant } from "@/components/handling-assistant";
 import { formatLapTime } from "@/lib/lap-time";
 import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
 import { GuidedTour } from "@/components/guided-tour";
 import { BaselinePage } from "./baseline";
 import { IterationPage } from "./iteration";
 
-type TabId = "baselines" | "iterations" | "presets" | "history" | "comparisons";
-const VALID_TABS: TabId[] = ["baselines", "iterations", "presets", "history", "comparisons"];
+type TabId = "baselines" | "iterations" | "presets" | "history" | "comparisons" | "assistant";
+const VALID_TABS: TabId[] = ["baselines", "iterations", "presets", "history", "comparisons", "assistant"];
 
 export const Route = createFileRoute("/_authenticated/setup-library")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -39,6 +40,7 @@ const TAB_DEFS: { id: TabId; label: string; icon: typeof Wand2; blurb: string }[
   { id: "presets",     label: "Presets",       icon: Sparkles,   blurb: "Tagged philosophies: qualifying, wet, endurance…" },
   { id: "history",     label: "Setup History", icon: History,    blurb: "All setups by recency" },
   { id: "comparisons", label: "Comparisons",   icon: GitCompare, blurb: "Best laps & confidence side-by-side" },
+  { id: "assistant",   label: "Assistant",     icon: Stethoscope, blurb: "Handling-issue analysis from your recorded data" },
 ];
 
 function SetupHub() {
@@ -80,6 +82,7 @@ function SetupHub() {
         <TabsContent value="presets"     className="mt-6"><SetupLibraryList mode="presets" /></TabsContent>
         <TabsContent value="history"     className="mt-6"><SetupLibraryList mode="history" /></TabsContent>
         <TabsContent value="comparisons" className="mt-6"><ComparisonsTab /></TabsContent>
+        <TabsContent value="assistant"   className="mt-6"><HandlingAssistant /></TabsContent>
       </Tabs>
     </div>
   );
