@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
 import { WeekendTimeline } from "@/components/weekend-timeline";
 import { TimelineFeed } from "@/components/timeline-feed";
+import { PreviousSetupBanner } from "@/components/previous-setup-banner";
 
 export const Route = createFileRoute("/_authenticated/weekends/$eventId")({
   head: () => ({ meta: [
@@ -33,7 +34,7 @@ export const Route = createFileRoute("/_authenticated/weekends/$eventId")({
 
 type Evt = {
   id: string; user_id: string; car_id: string | null; title: string;
-  event_type: string; status: string; track: string | null;
+  event_type: string; status: string; track: string | null; track_id: string | null;
   starts_at: string; ends_at: string | null; location: string | null;
   notes: string | null; checklist: Record<string, boolean> | null;
 };
@@ -70,6 +71,16 @@ function WeekendHub() {
       const { data, error } = await supabase.from("calendar_events").select("*").eq("id", eventId).single();
       if (error) throw error;
       return data as unknown as Evt;
+    },
+  });
+
+  const carQ = useQuery({
+    queryKey: ["weekend-car", evtQ.data?.car_id],
+    enabled: !!evtQ.data?.car_id,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("cars").select("id, name").eq("id", evtQ.data!.car_id!).maybeSingle();
+      if (error) throw error;
+      return data as { id: string; name: string } | null;
     },
   });
 
@@ -249,6 +260,17 @@ function WeekendHub() {
         <Stat icon={<Disc className="w-3 h-3" />} label="Tyre sets" value={String(uniqueSets)} mono />
         <Stat icon={<Droplet className="w-3 h-3" />} label="Fuel used" value={fuelUsed > 0 ? `${fuelUsed.toFixed(1)} L` : "—"} mono />
       </div>
+
+      {e.car_id && (
+        <div className="mt-3">
+          <PreviousSetupBanner
+            carId={e.car_id}
+            carName={carQ.data?.name ?? null}
+            track={e.track}
+            trackId={e.track_id}
+          />
+        </div>
+      )}
 
       <div className="mt-4 grid lg:grid-cols-[1fr_320px] gap-3">
         <div className="space-y-3">

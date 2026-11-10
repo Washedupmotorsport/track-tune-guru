@@ -11,6 +11,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { FirstTimeCallout } from "@/components/first-time-callout";
 import { GuidedTour } from "@/components/guided-tour";
 import { AiEngineerPanel } from "@/components/ai-engineer-panel";
+import { PreviousSetupBanner } from "@/components/previous-setup-banner";
 
 export const Route = createFileRoute("/_authenticated/engineer")({
   head: () => ({ meta: [
@@ -58,7 +59,7 @@ type DamageRow = { id: string; component: string; severity: string; status: stri
 function EngineerCockpit() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const { activeWeekend, activeSession } = useActiveWeekend();
+  const { activeWeekend, activeSession, activeCar } = useActiveWeekend();
 
   // live clock for countdown
   const [now, setNow] = useState(() => new Date());
@@ -306,6 +307,16 @@ function EngineerCockpit() {
         <NoActiveWeekendEmpty hint="Cockpit follows your active race weekend. Pick or create one to populate the panels." />
       )}
       <AiEngineerPanel />
+      {activeWeekend?.car_id && (
+        <PreviousSetupBanner
+          carId={activeWeekend.car_id}
+          carName={activeCar?.name ?? null}
+          track={activeWeekend.track}
+          trackId={activeWeekend.track_id}
+          weather={sessionQ.data?.weather ?? null}
+          trackTempC={sessionQ.data?.track_temp_c ?? null}
+        />
+      )}
       {/* ENGINEERING PRIORITIES — top of screen, race-weekend triage ===== */}
       <section className="rounded-xl border border-border bg-card overflow-hidden">
         <div className={`flex items-center gap-2 px-4 py-2.5 border-b ${criticalIssues > 0 ? "bg-destructive/10 border-destructive/40" : testingIssues > 0 ? "bg-accent/10 border-accent/40" : "bg-muted/30 border-border"}`}>

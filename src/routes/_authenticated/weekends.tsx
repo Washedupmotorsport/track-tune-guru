@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useMatches } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -13,7 +13,15 @@ export const Route = createFileRoute("/_authenticated/weekends")({
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
   ] }),
- component: WeekendsPage });
+ component: WeekendsLayout });
+
+// The weekends route is also the parent of /weekends/$eventId — render the
+// child detail page when one is matched, otherwise the list.
+function WeekendsLayout() {
+  const matches = useMatches();
+  const childMatched = matches.some((m) => m.routeId === "/_authenticated/weekends/$eventId");
+  return childMatched ? <Outlet /> : <WeekendsPage />;
+}
 
 type Evt = {
   id: string; title: string; event_type: string; status: string;
