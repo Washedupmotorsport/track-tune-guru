@@ -4,6 +4,21 @@ import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import type { QueryClient } from "@tanstack/react-query";
 import { WifiOff, CloudUpload, HardDrive } from "lucide-react";
+import { loadQueue } from "./offline-queue";
+
+/** Queued offline writes waiting to sync (polled lightly; queue is localStorage-backed). */
+function useQueuedWrites(): number {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const update = () => setCount(loadQueue(window.localStorage).length);
+    update();
+    const t = setInterval(update, 2000);
+    window.addEventListener("storage", update);
+    return () => { clearInterval(t); window.removeEventListener("storage", update); };
+  }, []);
+  return count;
+}
 
 /**
  * Client-only persister. Mounts the localStorage persister AFTER hydration so
@@ -62,6 +77,7 @@ export function ConnectionStatus() {
   const online = useOnline();
   const pending = useIsMutating();
   const restoring = useIsRestoring();
+  const queued = useQueuedWrites();
 
   if (restoring) {
     return (
@@ -72,8 +88,15 @@ export function ConnectionStatus() {
   }
   if (!online) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-md border border-destructive/60 bg-destructive/10 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-destructive" title="Offline — changes queued locally">
-        <WifiOff className="w-3 h-3" /> Offline{pending > 0 ? ` · ${pending}` : ""}
+      <span className="inline-flex items-center gap-1 rounded-md border border-destructive/60 bg-destructive/10 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-destructive" title="Offline — new records are saved on this device and sync when reception returns">
+        <WifiOff className="w-3 h-3" /> Offline{queued > 0 ? ` · ${queued} queued` : ""}
+      </span>
+    );
+  }
+  if (queued > 0) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-md border border-primary/60 bg-primary/10 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-primary animate-pulse" title="Syncing offline changes">
+        <CloudUpload className="w-3 h-3" /> Syncing · {queued}
       </span>
     );
   }

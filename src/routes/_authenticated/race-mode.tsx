@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useActiveWeekend } from "@/lib/active-weekend";
 import { NoActiveWeekendEmpty } from "@/components/no-active-weekend-empty";
 import { FuelCalculator } from "@/components/calculators";
+import { useOfflineInsert } from "@/lib/offline-sync";
 import { formatLapTime } from "@/lib/lap-time";
 import { nextLapNumber, selectRaceSession } from "@/lib/race-day-rules";
 import { Button } from "@/components/ui/button";
@@ -263,6 +264,7 @@ function RaceModePage() {
     return () => cancelAnimationFrame(raf);
   }, [swStart]);
 
+  const offlineInsert = useOfflineInsert();
   const logLap = useMutation({
     mutationFn: async ({ ms, lapNumber, lapSession }: { ms: number; lapNumber: number; lapSession: Sess; loggedAt: number; running: boolean }) => {
       if (!user) throw new Error("No active session");
@@ -272,9 +274,11 @@ function RaceModePage() {
         lap_time_ms: Math.max(1, Math.round(ms)),
         lap_number: lapNumber,
       };
-      const { data, error } = await supabase.from("laps").insert(payload as never).select("id,session_id,lap_time_ms,lap_number,recorded_at").single();
-      if (error) throw error;
-      return data as Lap;
+      const { id } = await offlineInsert("laps", payload);
+      return {
+        id, session_id: lapSession.id, lap_time_ms: payload.lap_time_ms,
+        lap_number: lapNumber, recorded_at: new Date().toISOString(),
+      } as Lap;
     },
     onSuccess: (lap, { ms, lapNumber, lapSession, loggedAt, running }) => {
       qc.setQueryData<Lap[]>(["rm-laps", lapSession.id], (previous = []) => [...previous.filter((item) => item.id !== lap.id), lap]);
@@ -591,6 +595,7 @@ function TyresTab({ session, tire, targets, userId, onSaved }: {
     setPress(initial);
   }, [initial, tire]);
 
+  const offlineInsert = useOfflineInsert();
   const save = useMutation({
     mutationFn: async () => {
       const payload = {
@@ -604,10 +609,10 @@ function TyresTab({ session, tire, targets, userId, onSaved }: {
         cold_rl: tire?.cold_rl ?? null, cold_rr: tire?.cold_rr ?? null,
         notes: "Logged from Race Mode",
       };
-      const { error } = await supabase.from("tire_logs").insert(payload as never);
-      if (error) throw error;
+      const { queued } = await offlineInsert("tire_logs", payload);
+      return queued;
     },
-    onSuccess: () => { toast.success("Pressures logged"); onSaved(); },
+    onSuccess: (queued) => { if (!queued) toast.success("Pressures logged"); onSaved(); },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -763,6 +768,7 @@ function FeedbackTab({ session, userId, items, loading, onSaved }: {
   const [sev, setSev] = useState<(typeof FB_SEVERITY)[number]>("info");
   const [bal, setBal] = useState<"" | (typeof FB_BALANCE)[number]>("");
 
+  const offlineInsert = useOfflineInsert();
   const save = useMutation({
     mutationFn: async () => {
       const text = desc.trim();
@@ -773,10 +779,10 @@ function FeedbackTab({ session, userId, items, loading, onSaved }: {
         category: cat, severity: sev, balance: bal || null,
         description: text, tags: ["race-mode"],
       };
-      const { error } = await supabase.from("driver_feedback").insert(payload as never);
-      if (error) throw error;
+      const { queued } = await offlineInsert("driver_feedback", payload);
+      return queued;
     },
-    onSuccess: () => { toast.success("Feedback logged"); setDesc(""); setBal(""); setSev("info"); onSaved(); },
+    onSuccess: (queued) => { if (!queued) toast.success("Feedback logged"); setDesc(""); setBal(""); setSev("info"); onSaved(); },
     onError: (e: Error) => toast.error(e.message),
   });
 

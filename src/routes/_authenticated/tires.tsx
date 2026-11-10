@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Disc, Plus, ArrowLeft, Trash2 } from "lucide-react";
+import { Disc, Plus, ArrowLeft, Trash2, Download } from "lucide-react";
 import { toast } from "sonner";
+import { exportTyrePdf } from "@/lib/tyre-pdf";
 import { PressureCalculator } from "@/components/pressure-calculator";
 import { TyreGarage } from "@/components/tyre-garage";
 import { useActiveWeekend } from "@/lib/active-weekend";
@@ -145,6 +146,21 @@ export function TiresPage() {
           <h1 className="font-display text-4xl font-bold mt-1">Tyre sets</h1>
           <p className="text-sm text-muted-foreground mt-1">Per-set log: cold/hot pressures, compound, heat cycles. Tracks set life and pressure delta over time.</p>
         </div>
+        <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          disabled={!logsQ.data?.length}
+          onClick={() => {
+            const logs = (logsQ.data ?? []).filter((l) => !carId || l.car_id === carId);
+            exportTyrePdf({
+              car: carId ? carName(carId) : "All cars",
+              track: activeWeekend?.track ?? null,
+              logs: logs as never,
+            });
+          }}
+        >
+          <Download className="w-4 h-4 mr-1" /> Export PDF
+        </Button>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild><Button className="shadow-glow"><Plus className="w-4 h-4 mr-1" /> New log</Button></DialogTrigger>
           <DialogContent className="max-w-2xl">
@@ -196,6 +212,7 @@ export function TiresPage() {
             <DialogFooter><Button onClick={() => create.mutate()} disabled={create.isPending}>Save log</Button></DialogFooter>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <div className="mt-6 space-y-3">

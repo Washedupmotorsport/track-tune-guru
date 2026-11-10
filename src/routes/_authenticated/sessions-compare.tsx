@@ -7,7 +7,8 @@ import { useActiveWeekend } from "@/lib/active-weekend";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, GitCompare, Save, TriangleAlert as AlertTriangle } from "lucide-react";
+import { ArrowLeft, GitCompare, Save, TriangleAlert as AlertTriangle, Download } from "lucide-react";
+import { exportComparisonPdf } from "@/lib/compare-pdf";
 import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
 import {
@@ -448,6 +449,17 @@ function CompareSessionsPage() {
               placeholder="e.g. Try front compression back at 4 with the higher pressures to separate the two changes."
               className="mt-3"
             />
+            <Button
+              variant="outline"
+              className="mt-3 mr-2"
+              disabled={!sessionA || !sessionB}
+              onClick={() => sessionA && sessionB && exportComparisonPdf({
+                nameA: sessionA.name, nameB: sessionB.name,
+                changes: changedRows, perf: perfDeltas, testNext: testNext.trim() || null,
+              })}
+            >
+              <Download className="w-4 h-4 mr-1" /> Export PDF
+            </Button>
             <Button onClick={() => save.mutate()} disabled={save.isPending} className="mt-3">
               <Save className="w-4 h-4 mr-1" /> Save comparison to session history
             </Button>

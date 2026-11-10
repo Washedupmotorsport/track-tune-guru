@@ -1,9 +1,11 @@
 # Roadmap
 
-## Engineering calculators (uploaded brief) — DONE
-- [x] `src/lib/calculators.ts` + 24 reference-value tests (fuel, tyre psi/kPa, suspension, gearing)
-- [x] `src/components/calculators.tsx` — tabs, formulas/assumptions, mobile inputs
-- [x] Gearbox/diff saved per car (`cars.gearbox` JSONB, migration 0006)
-- [x] Wired into Setup Library (Calculators tab) + Race Mode Fuel tab
-- [x] Playwright verified all four calculators + mobile, 111 tests pass, build clean
+## Offline reliability + PDF export (uploaded brief) — DONE
+- [x] Inspected existing offline/PDF code (query cache persistence, setup/session PDFs existed)
+- [x] Offline write queue `src/lib/offline-queue.ts` + sync hook `src/lib/offline-sync.tsx` (9 tests)
+- [x] Race Mode laps, tyre pressures, feedback queue offline; auto-sync on reconnect; dedupe via client UUIDs + ignoreDuplicates upsert
+- [x] Status chip shows Offline · N queued / Syncing
+- [x] New PDFs: tyre records, weekend debrief, setup comparison (branded)
+- [x] Validated: offline feedback → reconnect → synced → persists after refresh; exactly 1 DB row; PDFs render correctly
+- [x] 120 tests pass, typecheck + build clean
 - Not published — awaiting user go-ahead

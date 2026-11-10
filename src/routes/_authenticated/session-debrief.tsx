@@ -7,6 +7,7 @@ import {
 import { DebriefPage } from "./debrief";
 import { PostDebriefPage } from "./post-debrief";
 import { HandlingAssistant } from "@/components/handling-assistant";
+import { DebriefExportButton } from "@/components/debrief-export-button";
 
 type TabId = "feedback" | "review" | "actions" | "lessons" | "setup";
 const VALID: TabId[] = ["feedback", "review", "actions", "lessons", "setup"];
@@ -71,6 +72,9 @@ function SessionDebriefPage() {
           One workflow from the chequered flag to lessons learned — collect driver feedback,
           run the engineering review, agree on action items, then pin what matters into engineering memory.
         </p>
+        <div className="mt-3">
+          <DebriefExportButton sessionId={search.sessionId} carId={search.carId} />
+        </div>
       </div>
 
       {/* WORKFLOW STEPS */}

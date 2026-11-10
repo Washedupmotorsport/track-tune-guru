@@ -15,6 +15,7 @@ import { useUnits } from "@/lib/units";
 import { useTheme } from "@/lib/theme";
 import logoMre from "@/assets/logo-mre.png";
 import { ConnectionStatus } from "@/lib/offline";
+import { useOfflineSync } from "@/lib/offline-sync";
 import { QuickLogFab } from "@/components/quick-log-fab";
 import { HelpButton } from "@/components/help-button";
 import { TracksideContext } from "@/components/trackside-context";
@@ -27,6 +28,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { system, toggle } = useUnits();
   const { theme, toggle: toggleTheme } = useTheme();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useOfflineSync(); // flush queued offline writes when connectivity returns
   return (
     <div className="min-h-screen pb-[90px] text-foreground">
       <div className="h-[2px] w-full bg-primary" aria-hidden />
