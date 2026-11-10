@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
-import { ArrowLeft, Save, Loader as Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, TriangleAlert as AlertTriangle, Cloud, FileDown, Monitor, Table as TableIcon, ClipboardCheck, Square } from "lucide-react";
+import { ArrowLeft, Save, Loader as Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, TriangleAlert as AlertTriangle, Cloud, FileDown, Monitor, Table as TableIcon, ClipboardCheck, Square, GitCompare } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { parseLapTime, formatLapTime } from "@/lib/lap-time";
@@ -209,6 +209,9 @@ function SessionDetail() {
         <div className="flex items-center gap-2">
           <Link to="/sessions/$sessionId/pitboard" params={{ sessionId }}>
             <Button variant="outline" size="sm"><Monitor className="w-4 h-4 mr-1" /> Pit board</Button>
+          </Link>
+          <Link to="/sessions-compare" search={{ a: sessionId }}>
+            <Button variant="outline" size="sm"><GitCompare className="w-4 h-4 mr-1" /> Compare</Button>
           </Link>
           <Link
             to="/session-debrief"

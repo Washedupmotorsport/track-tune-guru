@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Timer, Plus, ArrowLeft, ChevronRight } from "lucide-react";
+import { Timer, Plus, ArrowLeft, ChevronRight, GitCompare } from "lucide-react";
 import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
 import { GuidedTour } from "@/components/guided-tour";
@@ -167,6 +167,10 @@ function SessionsPage() {
             {activeWeekend && <> Sessions you create are attached to <span className="text-primary">{activeWeekend.title}</span>.</>}
           </p>
         </div>
+        <div className="flex items-center gap-2">
+        <Link to="/sessions-compare" search={{}}>
+          <Button variant="outline"><GitCompare className="w-4 h-4 mr-1" /> Compare</Button>
+        </Link>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="shadow-glow" disabled={!activeWeekend}><Plus className="w-4 h-4 mr-1" /> New session</Button>
@@ -238,6 +242,7 @@ function SessionsPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <div className="mt-6 space-y-2">

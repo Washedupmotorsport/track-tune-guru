@@ -48,6 +48,7 @@ import { Route as AuthenticatedRacemodeRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedSessionDebriefRouteImport } from './routes/_authenticated/session-debrief'
 import { Route as AuthenticatedSessionsRouteImport } from './routes/_authenticated/sessions'
+import { Route as AuthenticatedSessionsCompareRouteImport } from './routes/_authenticated/sessions-compare'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSetupLibraryRouteImport } from './routes/_authenticated/setup-library'
 import { Route as AuthenticatedSupportInboxRouteImport } from './routes/_authenticated/support-inbox'
@@ -274,6 +275,12 @@ const AuthenticatedSessionsRoute = AuthenticatedSessionsRouteImport.update({
   path: '/sessions',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSessionsCompareRoute =
+  AuthenticatedSessionsCompareRouteImport.update({
+    id: '/sessions-compare',
+    path: '/sessions-compare',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -444,6 +451,7 @@ export interface FileRoutesByFullPath {
   '/reports': typeof AuthenticatedReportsRoute
   '/session-debrief': typeof AuthenticatedSessionDebriefRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
+  '/sessions-compare': typeof AuthenticatedSessionsCompareRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/setup-library': typeof AuthenticatedSetupLibraryRoute
   '/support-inbox': typeof AuthenticatedSupportInboxRoute
@@ -508,6 +516,7 @@ export interface FileRoutesByTo {
   '/reports': typeof AuthenticatedReportsRoute
   '/session-debrief': typeof AuthenticatedSessionDebriefRoute
   '/sessions': typeof AuthenticatedSessionsRouteWithChildren
+  '/sessions-compare': typeof AuthenticatedSessionsCompareRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/setup-library': typeof AuthenticatedSetupLibraryRoute
   '/support-inbox': typeof AuthenticatedSupportInboxRoute
@@ -574,6 +583,7 @@ export interface FileRoutesById {
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/session-debrief': typeof AuthenticatedSessionDebriefRoute
   '/_authenticated/sessions': typeof AuthenticatedSessionsRouteWithChildren
+  '/_authenticated/sessions-compare': typeof AuthenticatedSessionsCompareRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/setup-library': typeof AuthenticatedSetupLibraryRoute
   '/_authenticated/support-inbox': typeof AuthenticatedSupportInboxRoute
@@ -640,6 +650,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/session-debrief'
     | '/sessions'
+    | '/sessions-compare'
     | '/settings'
     | '/setup-library'
     | '/support-inbox'
@@ -704,6 +715,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/session-debrief'
     | '/sessions'
+    | '/sessions-compare'
     | '/settings'
     | '/setup-library'
     | '/support-inbox'
@@ -769,6 +781,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reports'
     | '/_authenticated/session-debrief'
     | '/_authenticated/sessions'
+    | '/_authenticated/sessions-compare'
     | '/_authenticated/settings'
     | '/_authenticated/setup-library'
     | '/_authenticated/support-inbox'
@@ -1085,6 +1098,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSessionsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/sessions-compare': {
+      id: '/_authenticated/sessions-compare'
+      path: '/sessions-compare'
+      fullPath: '/sessions-compare'
+      preLoaderRoute: typeof AuthenticatedSessionsCompareRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -1330,6 +1350,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSessionDebriefRoute: typeof AuthenticatedSessionDebriefRoute
   AuthenticatedSessionsRoute: typeof AuthenticatedSessionsRouteWithChildren
+  AuthenticatedSessionsCompareRoute: typeof AuthenticatedSessionsCompareRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSetupLibraryRoute: typeof AuthenticatedSetupLibraryRoute
   AuthenticatedSupportInboxRoute: typeof AuthenticatedSupportInboxRoute
@@ -1381,6 +1402,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSessionDebriefRoute: AuthenticatedSessionDebriefRoute,
   AuthenticatedSessionsRoute: AuthenticatedSessionsRouteWithChildren,
+  AuthenticatedSessionsCompareRoute: AuthenticatedSessionsCompareRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSetupLibraryRoute: AuthenticatedSetupLibraryRoute,
   AuthenticatedSupportInboxRoute: AuthenticatedSupportInboxRoute,
