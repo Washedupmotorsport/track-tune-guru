@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Disc, Plus, ArrowLeft, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { PressureCalculator } from "@/components/pressure-calculator";
+import { TyreGarage } from "@/components/tyre-garage";
 import { useActiveWeekend } from "@/lib/active-weekend";
 import { sessionLogContext } from "@/lib/race-day-rules";
 export const Route = createFileRoute("/_authenticated/tires")({
@@ -47,9 +48,11 @@ export function TiresPage() {
   const { activeWeekend, activeSession } = useActiveWeekend();
   const [open, setOpen] = useState(false);
   const [carId, setCarId] = useState("");
+  const [setId, setSetId] = useState("");
   const [form, setForm] = useState({
-    tire_set: "", compound: "", heat_cycles: "",
+    tire_set: "", compound: "", heat_cycles: "", laps: "",
     cold: { ...empty4 }, hot: { ...empty4 }, tread: { ...empty4 },
+    tempInner: { ...empty4 }, tempMid: { ...empty4 }, tempOuter: { ...empty4 },
     ambient_c: "", track_c: "", notes: "",
   });
 
@@ -73,6 +76,16 @@ export function TiresPage() {
     enabled: !!user,
   });
 
+  const setsQ = useQuery({
+    queryKey: ["tyre_sets", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("tyre_sets").select("id, car_id, name").order("created_at");
+      if (error) throw error;
+      return data as { id: string; car_id: string; name: string }[];
+    },
+    enabled: !!user,
+  });
+
   const num = (s: string) => s ? Number(s) : null;
 
   const create = useMutation({
@@ -82,11 +95,17 @@ export function TiresPage() {
       if (!form.tire_set) throw new Error("Tire set required");
       const { error } = await supabase.from("tire_logs").insert({
         user_id: user.id, car_id: carId, tire_set: form.tire_set,
+        tyre_set_id: setId || null,
         ...sessionLogContext(carId, activeWeekend, activeSession),
         compound: form.compound || null, heat_cycles: form.heat_cycles ? parseInt(form.heat_cycles, 10) : 0,
+        laps: form.laps ? parseInt(form.laps, 10) : null,
         cold_fl: num(form.cold.fl), cold_fr: num(form.cold.fr), cold_rl: num(form.cold.rl), cold_rr: num(form.cold.rr),
         hot_fl: num(form.hot.fl), hot_fr: num(form.hot.fr), hot_rl: num(form.hot.rl), hot_rr: num(form.hot.rr),
         tread_fl: num(form.tread.fl), tread_fr: num(form.tread.fr), tread_rl: num(form.tread.rl), tread_rr: num(form.tread.rr),
+        temp_fl_inner: num(form.tempInner.fl), temp_fl_mid: num(form.tempMid.fl), temp_fl_outer: num(form.tempOuter.fl),
+        temp_fr_inner: num(form.tempInner.fr), temp_fr_mid: num(form.tempMid.fr), temp_fr_outer: num(form.tempOuter.fr),
+        temp_rl_inner: num(form.tempInner.rl), temp_rl_mid: num(form.tempMid.rl), temp_rl_outer: num(form.tempOuter.rl),
+        temp_rr_inner: num(form.tempInner.rr), temp_rr_mid: num(form.tempMid.rr), temp_rr_outer: num(form.tempOuter.rr),
         ambient_c: num(form.ambient_c), track_c: num(form.track_c), notes: form.notes || null,
       });
       if (error) throw error;
@@ -94,8 +113,10 @@ export function TiresPage() {
     onSuccess: () => {
       toast.success("Tire log saved");
       setOpen(false);
-      setForm({ tire_set: "", compound: "", heat_cycles: "", cold: { ...empty4 }, hot: { ...empty4 }, tread: { ...empty4 }, ambient_c: "", track_c: "", notes: "" });
+      setSetId("");
+      setForm({ tire_set: "", compound: "", heat_cycles: "", laps: "", cold: { ...empty4 }, hot: { ...empty4 }, tread: { ...empty4 }, tempInner: { ...empty4 }, tempMid: { ...empty4 }, tempOuter: { ...empty4 }, ambient_c: "", track_c: "", notes: "" });
       qc.invalidateQueries({ queryKey: ["tire_logs"] });
+      qc.invalidateQueries({ queryKey: ["tire_logs_by_set"] });
       qc.invalidateQueries({ queryKey: ["rm-tire"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
@@ -138,12 +159,34 @@ export function TiresPage() {
                   </Select>
                 </div>
                 <div><Label>Tire set *</Label><Input value={form.tire_set} onChange={(e) => setForm({ ...form, tire_set: e.target.value })} placeholder="Set A" /></div>
+                <div>
+                  <Label>Registered set (optional)</Label>
+                  <Select value={setId} onValueChange={setSetId}>
+                    <SelectTrigger><SelectValue placeholder="Link to a set" /></SelectTrigger>
+                    <SelectContent>
+                      {(setsQ.data ?? []).filter((s) => !carId || s.car_id === carId).map((s) => (
+                        <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div><Label>Compound</Label><Input value={form.compound} onChange={(e) => setForm({ ...form, compound: e.target.value })} placeholder="Medium" /></div>
                 <div><Label>Heat cycles</Label><Input type="number" value={form.heat_cycles} onChange={(e) => setForm({ ...form, heat_cycles: e.target.value })} /></div>
+                <div><Label>Laps this run</Label><Input type="number" value={form.laps} onChange={(e) => setForm({ ...form, laps: e.target.value })} /></div>
               </div>
               <PressureGrid label="Cold pressures" value={form.cold} onChange={(v) => setForm({ ...form, cold: v })} />
               <PressureGrid label="Hot pressures" value={form.hot} onChange={(v) => setForm({ ...form, hot: v })} />
               <PressureGrid label="Tread (mm)" value={form.tread} onChange={(v) => setForm({ ...form, tread: v })} />
+              <details>
+                <summary className="cursor-pointer text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
+                  Tyre temps (inner / mid / outer, optional)
+                </summary>
+                <div className="mt-2 space-y-3">
+                  <PressureGrid label="Inner temps °C" value={form.tempInner} onChange={(v) => setForm({ ...form, tempInner: v })} />
+                  <PressureGrid label="Mid temps °C" value={form.tempMid} onChange={(v) => setForm({ ...form, tempMid: v })} />
+                  <PressureGrid label="Outer temps °C" value={form.tempOuter} onChange={(v) => setForm({ ...form, tempOuter: v })} />
+                </div>
+              </details>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Ambient °C</Label><Input type="number" step="any" value={form.ambient_c} onChange={(e) => setForm({ ...form, ambient_c: e.target.value })} /></div>
                 <div><Label>Track °C</Label><Input type="number" step="any" value={form.track_c} onChange={(e) => setForm({ ...form, track_c: e.target.value })} /></div>
@@ -156,6 +199,7 @@ export function TiresPage() {
       </div>
 
       <div className="mt-6 space-y-3">
+        <TyreGarage />
         <PressureCalculator />
         {(logsQ.data ?? []).length > 0 && (() => {
           const logs = logsQ.data!;

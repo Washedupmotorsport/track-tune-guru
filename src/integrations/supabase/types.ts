@@ -1571,22 +1571,37 @@ export type Database = {
           cold_rr: number | null
           compound: string | null
           created_at: string
+          distance_km: number | null
           heat_cycles: number | null
           hot_fl: number | null
           hot_fr: number | null
           hot_rl: number | null
           hot_rr: number | null
           id: string
+          laps: number | null
           notes: string | null
           recorded_at: string
           session_id: string | null
           setup_id: string | null
+          temp_fl_inner: number | null
+          temp_fl_mid: number | null
+          temp_fl_outer: number | null
+          temp_fr_inner: number | null
+          temp_fr_mid: number | null
+          temp_fr_outer: number | null
+          temp_rl_inner: number | null
+          temp_rl_mid: number | null
+          temp_rl_outer: number | null
+          temp_rr_inner: number | null
+          temp_rr_mid: number | null
+          temp_rr_outer: number | null
           tire_set: string
           track_c: number | null
           tread_fl: number | null
           tread_fr: number | null
           tread_rl: number | null
           tread_rr: number | null
+          tyre_set_id: string | null
           updated_at: string
           user_id: string
         }
@@ -1599,22 +1614,37 @@ export type Database = {
           cold_rr?: number | null
           compound?: string | null
           created_at?: string
+          distance_km?: number | null
           heat_cycles?: number | null
           hot_fl?: number | null
           hot_fr?: number | null
           hot_rl?: number | null
           hot_rr?: number | null
           id?: string
+          laps?: number | null
           notes?: string | null
           recorded_at?: string
           session_id?: string | null
           setup_id?: string | null
+          temp_fl_inner?: number | null
+          temp_fl_mid?: number | null
+          temp_fl_outer?: number | null
+          temp_fr_inner?: number | null
+          temp_fr_mid?: number | null
+          temp_fr_outer?: number | null
+          temp_rl_inner?: number | null
+          temp_rl_mid?: number | null
+          temp_rl_outer?: number | null
+          temp_rr_inner?: number | null
+          temp_rr_mid?: number | null
+          temp_rr_outer?: number | null
           tire_set: string
           track_c?: number | null
           tread_fl?: number | null
           tread_fr?: number | null
           tread_rl?: number | null
           tread_rr?: number | null
+          tyre_set_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1627,26 +1657,49 @@ export type Database = {
           cold_rr?: number | null
           compound?: string | null
           created_at?: string
+          distance_km?: number | null
           heat_cycles?: number | null
           hot_fl?: number | null
           hot_fr?: number | null
           hot_rl?: number | null
           hot_rr?: number | null
           id?: string
+          laps?: number | null
           notes?: string | null
           recorded_at?: string
           session_id?: string | null
           setup_id?: string | null
+          temp_fl_inner?: number | null
+          temp_fl_mid?: number | null
+          temp_fl_outer?: number | null
+          temp_fr_inner?: number | null
+          temp_fr_mid?: number | null
+          temp_fr_outer?: number | null
+          temp_rl_inner?: number | null
+          temp_rl_mid?: number | null
+          temp_rl_outer?: number | null
+          temp_rr_inner?: number | null
+          temp_rr_mid?: number | null
+          temp_rr_outer?: number | null
           tire_set?: string
           track_c?: number | null
           tread_fl?: number | null
           tread_fr?: number | null
           tread_rl?: number | null
           tread_rr?: number | null
+          tyre_set_id?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tire_logs_tyre_set_id_fkey"
+            columns: ["tyre_set_id"]
+            isOneToOne: false
+            referencedRelation: "tyre_sets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tire_stints: {
         Row: {
@@ -1664,6 +1717,7 @@ export type Database = {
           tread_fr: number | null
           tread_rl: number | null
           tread_rr: number | null
+          tyre_set_id: string | null
           updated_at: string
           user_id: string
         }
@@ -1682,6 +1736,7 @@ export type Database = {
           tread_fr?: number | null
           tread_rl?: number | null
           tread_rr?: number | null
+          tyre_set_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1700,10 +1755,19 @@ export type Database = {
           tread_fr?: number | null
           tread_rl?: number | null
           tread_rr?: number | null
+          tyre_set_id?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tire_stints_tyre_set_id_fkey"
+            columns: ["tyre_set_id"]
+            isOneToOne: false
+            referencedRelation: "tyre_sets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       track_notes: {
         Row: {
@@ -1826,6 +1890,107 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      tyre_assignments: {
+        Row: {
+          car_id: string
+          fitted_at: string
+          id: string
+          position: string
+          removed_at: string | null
+          tyre_set_id: string
+          tyre_slot: number
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          fitted_at?: string
+          id?: string
+          position: string
+          removed_at?: string | null
+          tyre_set_id: string
+          tyre_slot?: number
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          fitted_at?: string
+          id?: string
+          position?: string
+          removed_at?: string | null
+          tyre_set_id?: string
+          tyre_slot?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tyre_assignments_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "cars"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tyre_assignments_tyre_set_id_fkey"
+            columns: ["tyre_set_id"]
+            isOneToOne: false
+            referencedRelation: "tyre_sets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tyre_sets: {
+        Row: {
+          car_id: string
+          compound: string | null
+          created_at: string
+          id: string
+          manufacturer: string | null
+          model: string | null
+          name: string
+          notes: string | null
+          serial_no: string | null
+          size: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          compound?: string | null
+          created_at?: string
+          id?: string
+          manufacturer?: string | null
+          model?: string | null
+          name: string
+          notes?: string | null
+          serial_no?: string | null
+          size?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          compound?: string | null
+          created_at?: string
+          id?: string
+          manufacturer?: string | null
+          model?: string | null
+          name?: string
+          notes?: string | null
+          serial_no?: string | null
+          size?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tyre_sets_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "cars"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
