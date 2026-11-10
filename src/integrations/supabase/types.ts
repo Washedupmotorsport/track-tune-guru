@@ -185,6 +185,7 @@ export type Database = {
           created_at: string
           discipline: string
           fuel_tank_l: number | null
+          gearbox: Json | null
           id: string
           make: string | null
           model: string | null
@@ -199,6 +200,7 @@ export type Database = {
           created_at?: string
           discipline?: string
           fuel_tank_l?: number | null
+          gearbox?: Json | null
           id?: string
           make?: string | null
           model?: string | null
@@ -213,6 +215,7 @@ export type Database = {
           created_at?: string
           discipline?: string
           fuel_tank_l?: number | null
+          gearbox?: Json | null
           id?: string
           make?: string | null
           model?: string | null

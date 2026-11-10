@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { useActiveWeekend } from "@/lib/active-weekend";
 import { NoActiveWeekendEmpty } from "@/components/no-active-weekend-empty";
+import { FuelCalculator } from "@/components/calculators";
 import { formatLapTime } from "@/lib/lap-time";
 import { nextLapNumber, selectRaceSession } from "@/lib/race-day-rules";
 import { Button } from "@/components/ui/button";
@@ -718,6 +719,15 @@ function FuelTab({ session, targets, setTargets, lapsCount, lapsRemaining, onFue
         <FuelStepper label="Reserve (L)" value={targets.fuelReserve} step={0.5} fineStep={0.1}
                      onChange={(v) => setTargets({ ...targets, fuelReserve: Math.max(0, +v.toFixed(1)) })} fmt={(v) => v.toFixed(1)} />
       </div>
+
+      <details className="rounded-xl bg-white/[0.04] border border-white/10 p-3">
+        <summary className="text-[10px] font-mono uppercase tracking-[0.25em] text-white/50 cursor-pointer select-none">
+          Fuel calculator
+        </summary>
+        <div className="mt-3">
+          <FuelCalculator />
+        </div>
+      </details>
     </div>
   );
 }

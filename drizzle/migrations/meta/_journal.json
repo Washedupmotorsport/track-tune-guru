@@ -43,6 +43,13 @@
       "when": 1794291237390,
       "tag": "0005_tyre_sets_assignments_and_log_temps",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794292239285,
+      "tag": "0006_add_car_gearbox_spec",
+      "breakpoints": true
     }
   ]
 }

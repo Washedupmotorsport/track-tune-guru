@@ -1,0 +1,2 @@
+ALTER TABLE public.cars ADD COLUMN gearbox jsonb;
+COMMENT ON COLUMN public.cars.gearbox IS 'Vehicle-specific gearbox/differential info for the gearing calculator: { finalDrive, tyreDiameterMm, gears: [{ label, ratio }] }';
