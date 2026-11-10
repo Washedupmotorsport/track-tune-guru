@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { formatLapTime } from "@/lib/lap-time";
 import {
   rankHistoricalSetups,
+  circuitHistory,
   pickHighlights,
   type SetupHistoryEntry,
   type RankedSetup,
@@ -26,8 +27,13 @@ type Props = {
 
 type SetupRow = { id: string; name: string; track: string | null; updated_at: string };
 type SessionRow = {
-  id: string; setup_id: string | null; track: string | null; track_id: string | null;
-  weather: string | null; track_temp_c: number | null; started_at: string;
+  id: string;
+  setup_id: string | null;
+  track: string | null;
+  track_id: string | null;
+  weather: string | null;
+  track_temp_c: number | null;
+  started_at: string;
 };
 
 /**
@@ -35,7 +41,15 @@ type SessionRow = {
  * Ranks the car's historical setups at this circuit and offers view / copy / compare.
  * Copying always creates a new setup — the original is never touched.
  */
-export function PreviousSetupBanner({ carId, carName, track, trackId, weather, trackTempC, compound }: Props) {
+export function PreviousSetupBanner({
+  carId,
+  carName,
+  track,
+  trackId,
+  weather,
+  trackTempC,
+  compound,
+}: Props) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -43,7 +57,10 @@ export function PreviousSetupBanner({ carId, carName, track, trackId, weather, t
   const setupsQ = useQuery({
     queryKey: ["hist-setups", carId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("setups").select("id, name, track, updated_at").eq("car_id", carId);
+      const { data, error } = await supabase
+        .from("setups")
+        .select("id, name, track, updated_at")
+        .eq("car_id", carId);
       if (error) throw error;
       return data as SetupRow[];
     },
@@ -69,7 +86,10 @@ export function PreviousSetupBanner({ carId, carName, track, trackId, weather, t
     queryKey: ["hist-laps", carId, sessionIds.join(",")],
     enabled: sessionIds.length > 0,
     queryFn: async () => {
-      const { data, error } = await supabase.from("laps").select("session_id, lap_time_ms").in("session_id", sessionIds);
+      const { data, error } = await supabase
+        .from("laps")
+        .select("session_id, lap_time_ms")
+        .in("session_id", sessionIds);
       if (error) throw error;
       return data as { session_id: string; lap_time_ms: number }[];
     },
@@ -79,41 +99,25 @@ export function PreviousSetupBanner({ carId, carName, track, trackId, weather, t
     queryKey: ["hist-tires", carId, sessionIds.join(",")],
     enabled: sessionIds.length > 0,
     queryFn: async () => {
-      const { data, error } = await supabase.from("tire_logs").select("session_id, compound, recorded_at").in("session_id", sessionIds).not("compound", "is", null);
+      const { data, error } = await supabase
+        .from("tire_logs")
+        .select("session_id, compound, recorded_at")
+        .in("session_id", sessionIds)
+        .not("compound", "is", null);
       if (error) throw error;
       return data as { session_id: string; compound: string | null; recorded_at: string }[];
     },
   });
 
   const entries = useMemo<SetupHistoryEntry[]>(() => {
-    const setups = setupsQ.data ?? [];
-    const sessions = sessionsQ.data ?? [];
-    const laps = lapsQ.data ?? [];
-    const tires = tiresQ.data ?? [];
-    const bestLapBySession = new Map<string, number>();
-    for (const l of laps) {
-      const cur = bestLapBySession.get(l.session_id);
-      if (cur == null || l.lap_time_ms < cur) bestLapBySession.set(l.session_id, l.lap_time_ms);
-    }
-    return setups.map((s) => {
-      const used = sessions.filter((x) => x.setup_id === s.id);
-      const bestLaps = used.map((x) => bestLapBySession.get(x.id)).filter((v): v is number => v != null);
-      const latest = used[0]; // sessions sorted desc
-      const latestTire = latest ? tires.filter((t) => t.session_id === latest.id).sort((a, b) => b.recorded_at.localeCompare(a.recorded_at))[0] : null;
-      return {
-        setupId: s.id,
-        setupName: s.name,
-        carId,
-        track: latest?.track ?? s.track,
-        trackId: latest?.track_id ?? null,
-        bestLapMs: bestLaps.length ? Math.min(...bestLaps) : null,
-        lastUsedAt: latest?.started_at ?? s.updated_at,
-        weather: latest?.weather ?? null,
-        trackTempC: latest?.track_temp_c ?? null,
-        compound: latestTire?.compound ?? null,
-      };
-    });
-  }, [setupsQ.data, sessionsQ.data, lapsQ.data, tiresQ.data, carId]);
+    return circuitHistory(
+      setupsQ.data ?? [],
+      sessionsQ.data ?? [],
+      lapsQ.data ?? [],
+      tiresQ.data ?? [],
+      { carId, track, trackId },
+    );
+  }, [setupsQ.data, sessionsQ.data, lapsQ.data, tiresQ.data, carId, track, trackId]);
 
   const ranked = useMemo(
     () => rankHistoricalSetups(entries, { carId, track, trackId, weather, trackTempC, compound }),
@@ -124,7 +128,11 @@ export function PreviousSetupBanner({ carId, carName, track, trackId, weather, t
   const copySetup = useMutation({
     mutationFn: async (setupId: string) => {
       if (!user) throw new Error("Sign in required");
-      const { data: src, error: readErr } = await supabase.from("setups").select("*").eq("id", setupId).single();
+      const { data: src, error: readErr } = await supabase
+        .from("setups")
+        .select("*")
+        .eq("id", setupId)
+        .single();
       if (readErr) throw readErr;
       const { error } = await supabase.from("setups").insert({
         user_id: user.id,
@@ -161,18 +169,25 @@ export function PreviousSetupBanner({ carId, carName, track, trackId, weather, t
       <div className="rounded-lg border border-dashed border-border bg-card/60 p-4 flex items-start gap-3">
         <History className="w-4 h-4 mt-0.5 text-muted-foreground shrink-0" />
         <p className="text-sm text-muted-foreground">
-          No previous setups recorded at <span className="text-foreground font-medium">{circuit}</span> for this car yet.
-          Once you run a session here with a setup attached, it will show up here as a starting point.
+          No previous setups recorded at{" "}
+          <span className="text-foreground font-medium">{circuit}</span> for this car yet. Once you
+          run a session here with a setup attached, it will show up here as a starting point.
         </p>
       </div>
     );
   }
 
-  const best = highlights.fastest ?? highlights.bestMatch!;
+  const best = highlights.fastest ?? highlights.bestMatch;
+  if (!best) return null;
   const others = [
-    highlights.mostRecent && highlights.mostRecent.setupId !== best.setupId ? { label: "Most recent", r: highlights.mostRecent } : null,
-    highlights.bestMatch && highlights.bestMatch.setupId !== best.setupId && highlights.bestMatch.setupId !== highlights.mostRecent?.setupId
-      ? { label: "Best match for conditions", r: highlights.bestMatch } : null,
+    highlights.mostRecent && highlights.mostRecent.setupId !== best.setupId
+      ? { label: "Most recent", r: highlights.mostRecent }
+      : null,
+    highlights.bestMatch &&
+    highlights.bestMatch.setupId !== best.setupId &&
+    highlights.bestMatch.setupId !== highlights.mostRecent?.setupId
+      ? { label: "Best match for conditions", r: highlights.bestMatch }
+      : null,
   ].filter((x): x is { label: string; r: RankedSetup } => !!x);
 
   return (
@@ -181,16 +196,32 @@ export function PreviousSetupBanner({ carId, carName, track, trackId, weather, t
         <Trophy className="w-3.5 h-3.5" /> Previous best setup available
       </div>
       <div className="mt-2 grid sm:grid-cols-2 gap-x-6 gap-y-1 text-sm">
-        <div><span className="text-muted-foreground">Circuit:</span> <span className="font-medium">{circuit}</span></div>
-        {carName && <div><span className="text-muted-foreground">Vehicle:</span> <span className="font-medium">{carName}</span></div>}
+        <div>
+          <span className="text-muted-foreground">Circuit:</span>{" "}
+          <span className="font-medium">{circuit}</span>
+        </div>
+        {carName && (
+          <div>
+            <span className="text-muted-foreground">Vehicle:</span>{" "}
+            <span className="font-medium">{carName}</span>
+          </div>
+        )}
         <div>
           <span className="text-muted-foreground">Previous best lap:</span>{" "}
-          <span className="font-mono font-bold">{best.bestLapMs != null ? formatLapTime(best.bestLapMs) : "—"}</span>
+          <span className="font-mono font-bold">
+            {best.bestLapMs != null ? formatLapTime(best.bestLapMs) : "—"}
+          </span>
         </div>
         <div>
           <span className="text-muted-foreground">Conditions:</span>{" "}
           <span className="font-medium">
-            {[best.weather, best.trackTempC != null ? `track ${best.trackTempC}°C` : null, best.compound].filter(Boolean).join(" · ") || "not recorded"}
+            {[
+              best.weather,
+              best.trackTempC != null ? `track ${best.trackTempC}°C` : null,
+              best.compound,
+            ]
+              .filter(Boolean)
+              .join(" · ") || "not recorded"}
           </span>
         </div>
       </div>
@@ -206,7 +237,8 @@ export function PreviousSetupBanner({ carId, carName, track, trackId, weather, t
           </Link>
         </Button>
         <Button
-          size="sm" className="h-10 shadow-glow"
+          size="sm"
+          className="h-10 shadow-glow"
           disabled={copySetup.isPending || copiedId === best.setupId}
           onClick={() => copySetup.mutate(best.setupId)}
         >
@@ -226,7 +258,12 @@ export function PreviousSetupBanner({ carId, carName, track, trackId, weather, t
             <div key={r.setupId} className="flex items-center justify-between gap-2 text-xs">
               <span className="text-muted-foreground">
                 {label}: <span className="text-foreground">{r.setupName}</span>
-                {r.bestLapMs != null && <> · <span className="font-mono">{formatLapTime(r.bestLapMs)}</span></>}
+                {r.bestLapMs != null && (
+                  <>
+                    {" "}
+                    · <span className="font-mono">{formatLapTime(r.bestLapMs)}</span>
+                  </>
+                )}
                 {r.lastUsedAt && <> · {new Date(r.lastUsedAt).toLocaleDateString()}</>}
               </span>
               <button

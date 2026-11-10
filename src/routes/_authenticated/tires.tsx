@@ -6,8 +6,21 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Disc, Plus, ArrowLeft, Trash2, Download } from "lucide-react";
 import { toast } from "sonner";
 import { exportTyrePdf } from "@/lib/tyre-pdf";
@@ -16,29 +29,55 @@ import { TyreGarage } from "@/components/tyre-garage";
 import { useActiveWeekend } from "@/lib/active-weekend";
 import { sessionLogContext } from "@/lib/race-day-rules";
 export const Route = createFileRoute("/_authenticated/tires")({
-  head: () => ({ meta: [
-    { title: "Tyres | My Race Engineer" },
-    { name: "description", content: "Tyres: race-weekend tools and records for My Race Engineer." },
-    { property: "og:title", content: "Tyres | My Race Engineer" },
-    { property: "og:description", content: "Tyres: race-weekend tools and records for My Race Engineer." },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary" },
-  ] }),
+  head: () => ({
+    meta: [
+      { title: "Tyres | My Race Engineer" },
+      {
+        name: "description",
+        content: "Tyres: race-weekend tools and records for My Race Engineer.",
+      },
+      { property: "og:title", content: "Tyres | My Race Engineer" },
+      {
+        property: "og:description",
+        content: "Tyres: race-weekend tools and records for My Race Engineer.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
 
   component: function LegacyTiresRedirect() {
     const nav = useNavigate();
-    useEffect(() => { nav({ to: "/tyres", search: { tab: "setup" }, replace: true }); }, [nav]);
+    useEffect(() => {
+      nav({ to: "/tyres", search: { tab: "setup" }, replace: true });
+    }, [nav]);
     return null;
   },
 });
 
 type Car = { id: string; name: string };
 type TireLog = {
-  id: string; car_id: string; tire_set: string; compound: string | null; heat_cycles: number | null;
-  cold_fl: number | null; cold_fr: number | null; cold_rl: number | null; cold_rr: number | null;
-  hot_fl: number | null; hot_fr: number | null; hot_rl: number | null; hot_rr: number | null;
-  tread_fl: number | null; tread_fr: number | null; tread_rl: number | null; tread_rr: number | null;
-  ambient_c: number | null; track_c: number | null; notes: string | null; recorded_at: string;
+  id: string;
+  car_id: string;
+  tire_set: string;
+  compound: string | null;
+  heat_cycles: number | null;
+  cold_fl: number | null;
+  cold_fr: number | null;
+  cold_rl: number | null;
+  cold_rr: number | null;
+  hot_fl: number | null;
+  hot_fr: number | null;
+  hot_rl: number | null;
+  hot_rr: number | null;
+  tread_fl: number | null;
+  tread_fr: number | null;
+  tread_rl: number | null;
+  tread_rr: number | null;
+  ambient_c: number | null;
+  track_c: number | null;
+  notes: string | null;
+  recorded_at: string;
 };
 
 const empty4 = { fl: "", fr: "", rl: "", rr: "" };
@@ -51,10 +90,19 @@ export function TiresPage() {
   const [carId, setCarId] = useState("");
   const [setId, setSetId] = useState("");
   const [form, setForm] = useState({
-    tire_set: "", compound: "", heat_cycles: "", laps: "",
-    cold: { ...empty4 }, hot: { ...empty4 }, tread: { ...empty4 },
-    tempInner: { ...empty4 }, tempMid: { ...empty4 }, tempOuter: { ...empty4 },
-    ambient_c: "", track_c: "", notes: "",
+    tire_set: "",
+    compound: "",
+    heat_cycles: "",
+    laps: "",
+    cold: { ...empty4 },
+    hot: { ...empty4 },
+    tread: { ...empty4 },
+    tempInner: { ...empty4 },
+    tempMid: { ...empty4 },
+    tempOuter: { ...empty4 },
+    ambient_c: "",
+    track_c: "",
+    notes: "",
   });
 
   const carsQ = useQuery({
@@ -70,7 +118,10 @@ export function TiresPage() {
   const logsQ = useQuery({
     queryKey: ["tire_logs", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("tire_logs").select("*").order("recorded_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("tire_logs")
+        .select("*")
+        .order("recorded_at", { ascending: false });
       if (error) throw error;
       return data as TireLog[];
     },
@@ -80,34 +131,61 @@ export function TiresPage() {
   const setsQ = useQuery({
     queryKey: ["tyre_sets", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("tyre_sets").select("id, car_id, name").order("created_at");
+      const { data, error } = await supabase
+        .from("tyre_sets")
+        .select("id, car_id, name")
+        .order("created_at");
       if (error) throw error;
       return data as { id: string; car_id: string; name: string }[];
     },
     enabled: !!user,
   });
 
-  const num = (s: string) => s ? Number(s) : null;
+  const num = (s: string) => (s ? Number(s) : null);
 
   const create = useMutation({
     mutationFn: async () => {
       if (!carId) throw new Error("Pick a car");
       if (!user) throw new Error("Sign in to save a tyre log");
       if (!form.tire_set) throw new Error("Tire set required");
+      if (setId && !(setsQ.data ?? []).some((set) => set.id === setId && set.car_id === carId))
+        throw new Error("Select a tyre set belonging to this car");
       const { error } = await supabase.from("tire_logs").insert({
-        user_id: user.id, car_id: carId, tire_set: form.tire_set,
+        user_id: user.id,
+        car_id: carId,
+        tire_set: form.tire_set,
         tyre_set_id: setId || null,
         ...sessionLogContext(carId, activeWeekend, activeSession),
-        compound: form.compound || null, heat_cycles: form.heat_cycles ? parseInt(form.heat_cycles, 10) : 0,
+        compound: form.compound || null,
+        heat_cycles: form.heat_cycles ? parseInt(form.heat_cycles, 10) : 0,
         laps: form.laps ? parseInt(form.laps, 10) : null,
-        cold_fl: num(form.cold.fl), cold_fr: num(form.cold.fr), cold_rl: num(form.cold.rl), cold_rr: num(form.cold.rr),
-        hot_fl: num(form.hot.fl), hot_fr: num(form.hot.fr), hot_rl: num(form.hot.rl), hot_rr: num(form.hot.rr),
-        tread_fl: num(form.tread.fl), tread_fr: num(form.tread.fr), tread_rl: num(form.tread.rl), tread_rr: num(form.tread.rr),
-        temp_fl_inner: num(form.tempInner.fl), temp_fl_mid: num(form.tempMid.fl), temp_fl_outer: num(form.tempOuter.fl),
-        temp_fr_inner: num(form.tempInner.fr), temp_fr_mid: num(form.tempMid.fr), temp_fr_outer: num(form.tempOuter.fr),
-        temp_rl_inner: num(form.tempInner.rl), temp_rl_mid: num(form.tempMid.rl), temp_rl_outer: num(form.tempOuter.rl),
-        temp_rr_inner: num(form.tempInner.rr), temp_rr_mid: num(form.tempMid.rr), temp_rr_outer: num(form.tempOuter.rr),
-        ambient_c: num(form.ambient_c), track_c: num(form.track_c), notes: form.notes || null,
+        cold_fl: num(form.cold.fl),
+        cold_fr: num(form.cold.fr),
+        cold_rl: num(form.cold.rl),
+        cold_rr: num(form.cold.rr),
+        hot_fl: num(form.hot.fl),
+        hot_fr: num(form.hot.fr),
+        hot_rl: num(form.hot.rl),
+        hot_rr: num(form.hot.rr),
+        tread_fl: num(form.tread.fl),
+        tread_fr: num(form.tread.fr),
+        tread_rl: num(form.tread.rl),
+        tread_rr: num(form.tread.rr),
+        temp_fl_inner: num(form.tempInner.fl),
+        temp_fl_mid: num(form.tempMid.fl),
+        temp_fl_outer: num(form.tempOuter.fl),
+        temp_fr_inner: num(form.tempInner.fr),
+        temp_fr_mid: num(form.tempMid.fr),
+        temp_fr_outer: num(form.tempOuter.fr),
+        temp_rl_inner: num(form.tempInner.rl),
+        temp_rl_mid: num(form.tempMid.rl),
+        temp_rl_outer: num(form.tempOuter.rl),
+        temp_rr_inner: num(form.tempInner.rr),
+        temp_rr_mid: num(form.tempMid.rr),
+        temp_rr_outer: num(form.tempOuter.rr),
+        ambient_c: num(form.ambient_c),
+        track_c: num(form.track_c),
+        notes: form.notes || null,
       });
       if (error) throw error;
     },
@@ -115,7 +193,21 @@ export function TiresPage() {
       toast.success("Tire log saved");
       setOpen(false);
       setSetId("");
-      setForm({ tire_set: "", compound: "", heat_cycles: "", laps: "", cold: { ...empty4 }, hot: { ...empty4 }, tread: { ...empty4 }, tempInner: { ...empty4 }, tempMid: { ...empty4 }, tempOuter: { ...empty4 }, ambient_c: "", track_c: "", notes: "" });
+      setForm({
+        tire_set: "",
+        compound: "",
+        heat_cycles: "",
+        laps: "",
+        cold: { ...empty4 },
+        hot: { ...empty4 },
+        tread: { ...empty4 },
+        tempInner: { ...empty4 },
+        tempMid: { ...empty4 },
+        tempOuter: { ...empty4 },
+        ambient_c: "",
+        track_c: "",
+        notes: "",
+      });
       qc.invalidateQueries({ queryKey: ["tire_logs"] });
       qc.invalidateQueries({ queryKey: ["tire_logs_by_set"] });
       qc.invalidateQueries({ queryKey: ["rm-tire"] });
@@ -128,14 +220,20 @@ export function TiresPage() {
       const { error } = await supabase.from("tire_logs").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["tire_logs"] }); qc.invalidateQueries({ queryKey: ["rm-tire"] }); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["tire_logs"] });
+      qc.invalidateQueries({ queryKey: ["rm-tire"] });
+    },
   });
 
   const carName = (id: string) => carsQ.data?.find((c) => c.id === id)?.name ?? "—";
 
   return (
     <div>
-      <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
+      <Link
+        to="/garage"
+        className="inline-flex items-center text-sm text-muted-foreground hover:text-primary"
+      >
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
       <div className="mt-4 flex items-end justify-between flex-wrap gap-4">
@@ -144,95 +242,205 @@ export function TiresPage() {
             <Disc className="w-3 h-3" /> Sets
           </div>
           <h1 className="font-display text-4xl font-bold mt-1">Tyre sets</h1>
-          <p className="text-sm text-muted-foreground mt-1">Per-set log: cold/hot pressures, compound, heat cycles. Tracks set life and pressure delta over time.</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Per-set log: cold/hot pressures, compound, heat cycles. Tracks set life and pressure
+            delta over time.
+          </p>
         </div>
         <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          disabled={!logsQ.data?.length}
-          onClick={() => {
-            const logs = (logsQ.data ?? []).filter((l) => !carId || l.car_id === carId);
-            exportTyrePdf({
-              car: carId ? carName(carId) : "All cars",
-              track: activeWeekend?.track ?? null,
-              logs: logs as never,
-            });
-          }}
-        >
-          <Download className="w-4 h-4 mr-1" /> Export PDF
-        </Button>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild><Button className="shadow-glow"><Plus className="w-4 h-4 mr-1" /> New log</Button></DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader><DialogTitle>New tire log</DialogTitle></DialogHeader>
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
+          <Button
+            variant="outline"
+            disabled={!logsQ.data?.length}
+            onClick={() => {
+              const logs = (logsQ.data ?? []).filter((l) => !carId || l.car_id === carId);
+              exportTyrePdf({
+                car: carId ? carName(carId) : "All cars",
+                track: null,
+                logs: logs as never,
+              });
+            }}
+          >
+            <Download className="w-4 h-4 mr-1" /> Export PDF
+          </Button>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="shadow-glow">
+                <Plus className="w-4 h-4 mr-1" /> New log
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>New tire log</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Car *</Label>
+                    <Select value={carId} onValueChange={setCarId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pick a car" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(carsQ.data ?? []).map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Tire set *</Label>
+                    <Input
+                      value={form.tire_set}
+                      onChange={(e) => setForm({ ...form, tire_set: e.target.value })}
+                      placeholder="Set A"
+                    />
+                  </div>
+                  <div>
+                    <Label>Registered set (optional)</Label>
+                    <Select value={setId} onValueChange={setSetId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Link to a set" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(setsQ.data ?? [])
+                          .filter((s) => !carId || s.car_id === carId)
+                          .map((s) => (
+                            <SelectItem key={s.id} value={s.id}>
+                              {s.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Compound</Label>
+                    <Input
+                      value={form.compound}
+                      onChange={(e) => setForm({ ...form, compound: e.target.value })}
+                      placeholder="Medium"
+                    />
+                  </div>
+                  <div>
+                    <Label>Heat cycles</Label>
+                    <Input
+                      type="number"
+                      value={form.heat_cycles}
+                      onChange={(e) => setForm({ ...form, heat_cycles: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label>Laps this run</Label>
+                    <Input
+                      type="number"
+                      value={form.laps}
+                      onChange={(e) => setForm({ ...form, laps: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <PressureGrid
+                  label="Cold pressures"
+                  value={form.cold}
+                  onChange={(v) => setForm({ ...form, cold: v })}
+                />
+                <PressureGrid
+                  label="Hot pressures"
+                  value={form.hot}
+                  onChange={(v) => setForm({ ...form, hot: v })}
+                />
+                <PressureGrid
+                  label="Tread (mm)"
+                  value={form.tread}
+                  onChange={(v) => setForm({ ...form, tread: v })}
+                />
+                <details>
+                  <summary className="cursor-pointer text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
+                    Tyre temps (inner / mid / outer, optional)
+                  </summary>
+                  <div className="mt-2 space-y-3">
+                    <PressureGrid
+                      label="Inner temps °C"
+                      value={form.tempInner}
+                      onChange={(v) => setForm({ ...form, tempInner: v })}
+                    />
+                    <PressureGrid
+                      label="Mid temps °C"
+                      value={form.tempMid}
+                      onChange={(v) => setForm({ ...form, tempMid: v })}
+                    />
+                    <PressureGrid
+                      label="Outer temps °C"
+                      value={form.tempOuter}
+                      onChange={(v) => setForm({ ...form, tempOuter: v })}
+                    />
+                  </div>
+                </details>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Ambient °C</Label>
+                    <Input
+                      type="number"
+                      step="any"
+                      value={form.ambient_c}
+                      onChange={(e) => setForm({ ...form, ambient_c: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label>Track °C</Label>
+                    <Input
+                      type="number"
+                      step="any"
+                      value={form.track_c}
+                      onChange={(e) => setForm({ ...form, track_c: e.target.value })}
+                    />
+                  </div>
+                </div>
                 <div>
-                  <Label>Car *</Label>
-                  <Select value={carId} onValueChange={setCarId}>
-                    <SelectTrigger><SelectValue placeholder="Pick a car" /></SelectTrigger>
-                    <SelectContent>{(carsQ.data ?? []).map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
-                  </Select>
+                  <Label>Notes</Label>
+                  <Input
+                    value={form.notes}
+                    onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                  />
                 </div>
-                <div><Label>Tire set *</Label><Input value={form.tire_set} onChange={(e) => setForm({ ...form, tire_set: e.target.value })} placeholder="Set A" /></div>
-                <div>
-                  <Label>Registered set (optional)</Label>
-                  <Select value={setId} onValueChange={setSetId}>
-                    <SelectTrigger><SelectValue placeholder="Link to a set" /></SelectTrigger>
-                    <SelectContent>
-                      {(setsQ.data ?? []).filter((s) => !carId || s.car_id === carId).map((s) => (
-                        <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div><Label>Compound</Label><Input value={form.compound} onChange={(e) => setForm({ ...form, compound: e.target.value })} placeholder="Medium" /></div>
-                <div><Label>Heat cycles</Label><Input type="number" value={form.heat_cycles} onChange={(e) => setForm({ ...form, heat_cycles: e.target.value })} /></div>
-                <div><Label>Laps this run</Label><Input type="number" value={form.laps} onChange={(e) => setForm({ ...form, laps: e.target.value })} /></div>
               </div>
-              <PressureGrid label="Cold pressures" value={form.cold} onChange={(v) => setForm({ ...form, cold: v })} />
-              <PressureGrid label="Hot pressures" value={form.hot} onChange={(v) => setForm({ ...form, hot: v })} />
-              <PressureGrid label="Tread (mm)" value={form.tread} onChange={(v) => setForm({ ...form, tread: v })} />
-              <details>
-                <summary className="cursor-pointer text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary">
-                  Tyre temps (inner / mid / outer, optional)
-                </summary>
-                <div className="mt-2 space-y-3">
-                  <PressureGrid label="Inner temps °C" value={form.tempInner} onChange={(v) => setForm({ ...form, tempInner: v })} />
-                  <PressureGrid label="Mid temps °C" value={form.tempMid} onChange={(v) => setForm({ ...form, tempMid: v })} />
-                  <PressureGrid label="Outer temps °C" value={form.tempOuter} onChange={(v) => setForm({ ...form, tempOuter: v })} />
-                </div>
-              </details>
-              <div className="grid grid-cols-2 gap-3">
-                <div><Label>Ambient °C</Label><Input type="number" step="any" value={form.ambient_c} onChange={(e) => setForm({ ...form, ambient_c: e.target.value })} /></div>
-                <div><Label>Track °C</Label><Input type="number" step="any" value={form.track_c} onChange={(e) => setForm({ ...form, track_c: e.target.value })} /></div>
-              </div>
-              <div><Label>Notes</Label><Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
-            </div>
-            <DialogFooter><Button onClick={() => create.mutate()} disabled={create.isPending}>Save log</Button></DialogFooter>
-          </DialogContent>
-        </Dialog>
+              <DialogFooter>
+                <Button onClick={() => create.mutate()} disabled={create.isPending}>
+                  Save log
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
       <div className="mt-6 space-y-3">
         <TyreGarage />
         <PressureCalculator />
-        {(logsQ.data ?? []).length > 0 && (() => {
-          const logs = logsQ.data!;
-          const sets = new Set(logs.map((l) => `${l.car_id}|${l.tire_set}`)).size;
-          const cycles = logs.reduce((s, l) => s + (l.heat_cycles ?? 0), 0);
-          const allCold = logs.flatMap((l) => [l.cold_fl, l.cold_fr, l.cold_rl, l.cold_rr]).filter((v): v is number => v != null);
-          const avgCold = allCold.length ? (allCold.reduce((a, b) => a + b, 0) / allCold.length) : null;
-          return (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <SummaryTile label="Total logs" value={String(logs.length)} />
-              <SummaryTile label="Unique sets" value={String(sets)} />
-              <SummaryTile label="Heat cycles" value={String(cycles)} accent />
-              <SummaryTile label="Avg cold psi" value={avgCold != null ? avgCold.toFixed(1) : "—"} accent />
-            </div>
-          );
-        })()}
+        {(logsQ.data ?? []).length > 0 &&
+          (() => {
+            const logs = logsQ.data!;
+            const sets = new Set(logs.map((l) => `${l.car_id}|${l.tire_set}`)).size;
+            const cycles = logs.reduce((s, l) => s + (l.heat_cycles ?? 0), 0);
+            const allCold = logs
+              .flatMap((l) => [l.cold_fl, l.cold_fr, l.cold_rl, l.cold_rr])
+              .filter((v): v is number => v != null);
+            const avgCold = allCold.length
+              ? allCold.reduce((a, b) => a + b, 0) / allCold.length
+              : null;
+            return (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <SummaryTile label="Total logs" value={String(logs.length)} />
+                <SummaryTile label="Unique sets" value={String(sets)} />
+                <SummaryTile label="Heat cycles" value={String(cycles)} accent />
+                <SummaryTile
+                  label="Avg cold psi"
+                  value={avgCold != null ? avgCold.toFixed(1) : "—"}
+                  accent
+                />
+              </div>
+            );
+          })()}
         {logsQ.isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
         {!logsQ.isLoading && (logsQ.data ?? []).length === 0 && (
           <div className="rounded-lg border border-dashed border-border p-6 text-center">
@@ -244,11 +452,31 @@ export function TiresPage() {
           <div key={l.id} className="rounded-lg border border-border bg-card p-5 shadow-card">
             <div className="flex items-start justify-between">
               <div>
-                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{carName(l.car_id)} · {new Date(l.recorded_at).toLocaleDateString()}</div>
-                <div className="font-display text-xl font-bold mt-1">{l.tire_set} {l.compound && <span className="text-muted-foreground text-base font-normal">· {l.compound}</span>}</div>
-                <div className="text-xs text-muted-foreground">Heat cycles: {l.heat_cycles ?? 0}{l.ambient_c != null && ` · Ambient ${l.ambient_c}°C`}{l.track_c != null && ` · Track ${l.track_c}°C`}</div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  {carName(l.car_id)} · {new Date(l.recorded_at).toLocaleDateString()}
+                </div>
+                <div className="font-display text-xl font-bold mt-1">
+                  {l.tire_set}{" "}
+                  {l.compound && (
+                    <span className="text-muted-foreground text-base font-normal">
+                      · {l.compound}
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Heat cycles: {l.heat_cycles ?? 0}
+                  {l.ambient_c != null && ` · Ambient ${l.ambient_c}°C`}
+                  {l.track_c != null && ` · Track ${l.track_c}°C`}
+                </div>
               </div>
-              <button onClick={() => { if (confirm("Delete?")) del.mutate(l.id); }} className="text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></button>
+              <button
+                onClick={() => {
+                  if (confirm("Delete?")) del.mutate(l.id);
+                }}
+                className="text-muted-foreground hover:text-destructive"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
             <div className="mt-3 grid sm:grid-cols-3 gap-3 text-xs">
               <ReadGrid label="Cold" v={[l.cold_fl, l.cold_fr, l.cold_rl, l.cold_rr]} />
@@ -263,14 +491,31 @@ export function TiresPage() {
   );
 }
 
-function PressureGrid({ label, value, onChange }: { label: string; value: { fl: string; fr: string; rl: string; rr: string }; onChange: (v: { fl: string; fr: string; rl: string; rr: string }) => void }) {
+function PressureGrid({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: { fl: string; fr: string; rl: string; rr: string };
+  onChange: (v: { fl: string; fr: string; rl: string; rr: string }) => void;
+}) {
   return (
     <div>
-      <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">{label}</Label>
+      <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+        {label}
+      </Label>
       <div className="grid grid-cols-4 gap-2 mt-1">
-        {(["fl","fr","rl","rr"] as const).map((k) => (
-          <Input key={k} className="font-mono" placeholder={k.toUpperCase()} type="number" step="any"
-            value={value[k]} onChange={(e) => onChange({ ...value, [k]: e.target.value })} />
+        {(["fl", "fr", "rl", "rr"] as const).map((k) => (
+          <Input
+            key={k}
+            className="font-mono"
+            placeholder={k.toUpperCase()}
+            type="number"
+            step="any"
+            value={value[k]}
+            onChange={(e) => onChange({ ...value, [k]: e.target.value })}
+          />
         ))}
       </div>
     </div>
@@ -280,10 +525,14 @@ function PressureGrid({ label, value, onChange }: { label: string; value: { fl: 
 function ReadGrid({ label, v }: { label: string; v: (number | null)[] }) {
   return (
     <div className="rounded-md border border-border bg-background/50 p-3">
-      <div className="font-mono text-[10px] uppercase tracking-widest text-primary mb-1">{label}</div>
+      <div className="font-mono text-[10px] uppercase tracking-widest text-primary mb-1">
+        {label}
+      </div>
       <div className="grid grid-cols-2 gap-1 font-mono">
-        <div>FL: {v[0] ?? "—"}</div><div>FR: {v[1] ?? "—"}</div>
-        <div>RL: {v[2] ?? "—"}</div><div>RR: {v[3] ?? "—"}</div>
+        <div>FL: {v[0] ?? "—"}</div>
+        <div>FR: {v[1] ?? "—"}</div>
+        <div>RL: {v[2] ?? "—"}</div>
+        <div>RR: {v[3] ?? "—"}</div>
       </div>
     </div>
   );
@@ -292,8 +541,14 @@ function ReadGrid({ label, v }: { label: string; v: (number | null)[] }) {
 function SummaryTile({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div className="rounded-sm border border-border bg-card px-3 py-2">
-      <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-muted-foreground">{label}</div>
-      <div className={`mt-0.5 text-lg font-bold font-mono tabular-nums ${accent ? "text-primary" : ""}`}>{value}</div>
+      <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-muted-foreground">
+        {label}
+      </div>
+      <div
+        className={`mt-0.5 text-lg font-bold font-mono tabular-nums ${accent ? "text-primary" : ""}`}
+      >
+        {value}
+      </div>
     </div>
   );
 }

@@ -2050,6 +2050,15 @@ export type Database = {
         Args: { _car_id: string; _user_id: string }
         Returns: boolean
       }
+      replace_tyre_layout: {
+        Args: {
+          p_car_id: string
+          p_expected_ids: string[]
+          p_set_id: string
+          p_slots: number[]
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin"

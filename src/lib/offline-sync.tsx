@@ -2,12 +2,36 @@ import { useCallback, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "./auth-context";
 import {
-  buildWrite, dequeue, enqueue, loadQueue, partitionFlush,
-  type QueuedWrite, type StorageLike,
+  accountQueue,
+  buildWrite,
+  dequeue,
+  enqueue,
+  isRetryableWriteError,
+  type QueuedWrite,
+  type StorageLike,
 } from "./offline-queue";
 
 const storage = (): StorageLike => window.localStorage;
+export const QUEUE_CHANGED = "mre:queue-changed";
+const notifyQueue = () => window.dispatchEvent(new Event(QUEUE_CHANGED));
+const uploading = new Map<string, Promise<unknown>>();
+
+/** Cancel local work first, then wait for any in-flight upload before deleting. */
+export async function cancelOfflineLap(id: string, userId: string) {
+  const queued = accountQueue(storage(), userId).find((w) => w.id === id && w.table === "laps");
+  if (queued) {
+    dequeue(storage(), [id]);
+    notifyQueue();
+  }
+  const pending = uploading.get(id);
+  if (pending) await pending;
+  if (!queued || pending) {
+    const { error } = await supabase.from("laps").delete().eq("id", id).eq("user_id", userId);
+    if (error) throw error;
+  }
+}
 
 /**
  * Insert a row, queueing it locally when offline (or when the write fails
@@ -17,37 +41,49 @@ const storage = (): StorageLike => window.localStorage;
  */
 export function useOfflineInsert() {
   const qc = useQueryClient();
+  const { user } = useAuth();
   return useCallback(
     async (
       table: QueuedWrite["table"],
       payload: Record<string, unknown>,
     ): Promise<{ id: string; queued: boolean }> => {
+      if (!user || payload.user_id !== user.id) throw new Error("Sign in to save this record");
       const write = buildWrite(table, payload);
       if (navigator.onLine) {
-        const { error } = await supabase.from(table).insert(write.payload as never);
+        const { error, status } = await supabase.from(table).insert(write.payload as never);
         if (!error) return { id: write.id, queued: false };
-        // Fall through to queueing — a failed write is treated as offline work.
+        if (!isRetryableWriteError(error, status)) throw new Error(error.message);
       }
       enqueue(storage(), write);
-      toast.message("Saved offline", { description: "Will sync automatically when reception returns." });
+      notifyQueue();
+      toast.message("Saved offline", {
+        description: "Will sync automatically when reception returns.",
+      });
       qc.invalidateQueries({ queryKey: ["offline-queue-count"] });
       return { id: write.id, queued: true };
     },
-    [qc],
+    [qc, user?.id],
   );
 }
 
 /** Number of writes waiting to sync (reactive via the offline-queue-count key). */
 export function useOfflineQueueCount(): number {
   const [count, setCount] = useState(0);
+  const { user } = useAuth();
   useEffect(() => {
-    const update = () => setCount(loadQueue(storage()).length);
+    const update = () => setCount(accountQueue(storage(), user?.id).length);
     update();
     window.addEventListener("online", update);
     window.addEventListener("offline", update);
+    window.addEventListener(QUEUE_CHANGED, update);
     const t = setInterval(update, 3000);
-    return () => { window.removeEventListener("online", update); window.removeEventListener("offline", update); clearInterval(t); };
-  }, []);
+    return () => {
+      window.removeEventListener("online", update);
+      window.removeEventListener("offline", update);
+      window.removeEventListener(QUEUE_CHANGED, update);
+      clearInterval(t);
+    };
+  }, [user?.id]);
   return count;
 }
 
@@ -60,33 +96,66 @@ export function useOfflineQueueCount(): number {
  */
 export function useOfflineSync() {
   const qc = useQueryClient();
+  const { user } = useAuth();
   useEffect(() => {
+    if (!user) return;
     let running = false;
+    let disposed = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const schedule = () => {
+      clearTimeout(timer);
+      timer = setTimeout(flush, 1000);
+    };
     const flush = async () => {
-      if (running || !navigator.onLine) return;
-      const queue = loadQueue(storage());
+      if (disposed || running || !navigator.onLine) return;
+      const queue = accountQueue(storage(), user.id);
       if (!queue.length) return;
       running = true;
-      const outcomes: Record<string, boolean> = {};
-      for (const w of queue) {
-        const { error } = await supabase
-          .from(w.table)
-          .upsert(w.payload as never, { onConflict: "id", ignoreDuplicates: true });
-        outcomes[w.id] = !error;
+      let synced = 0;
+      try {
+        for (const w of queue) {
+          if (disposed) break;
+          if (!accountQueue(storage(), user.id).some((row) => row.id === w.id)) continue;
+          // Auth may have changed while waiting for an earlier upload.
+          const { data } = await supabase.auth.getSession();
+          if (data.session?.user.id !== user.id || disposed) break;
+          if (!accountQueue(storage(), user.id).some((row) => row.id === w.id)) continue;
+          const request = Promise.resolve(
+            supabase
+              .from(w.table)
+              .upsert(w.payload as never, { onConflict: "id", ignoreDuplicates: true }),
+          );
+          uploading.set(w.id, request);
+          try {
+            const { error } = await request;
+            if (!error) {
+              dequeue(storage(), [w.id]);
+              synced++;
+            }
+          } finally {
+            uploading.delete(w.id);
+          }
+        }
+        if (synced && !disposed) {
+          notifyQueue();
+          toast.success(`${synced} offline change${synced === 1 ? "" : "s"} synced`);
+          qc.invalidateQueries();
+        }
+      } catch {
+        // Transport exceptions leave records queued for the scheduled retry.
+      } finally {
+        running = false;
+        if (!disposed && accountQueue(storage(), user.id).length) timer = setTimeout(flush, 10000);
       }
-      const { synced, failed } = partitionFlush(queue, outcomes);
-      if (synced.length) {
-        dequeue(storage(), synced);
-        toast.success(`${synced.length} offline change${synced.length === 1 ? "" : "s"} synced`);
-        qc.invalidateQueries(); // refresh every list so synced records appear
-      }
-      if (failed.length) {
-        toast.error(`${failed.length} offline change${failed.length === 1 ? "" : "s"} could not sync yet — still queued`);
-      }
-      running = false;
     };
     flush();
     window.addEventListener("online", flush);
-    return () => window.removeEventListener("online", flush);
-  }, [qc]);
+    window.addEventListener(QUEUE_CHANGED, schedule);
+    return () => {
+      disposed = true;
+      clearTimeout(timer);
+      window.removeEventListener("online", flush);
+      window.removeEventListener(QUEUE_CHANGED, schedule);
+    };
+  }, [qc, user?.id]);
 }

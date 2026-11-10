@@ -2,7 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Gauge, TrendingDown, GitCompare, Disc } from "lucide-react";
-import { TyreSetupPage } from "./tyre-setup";
+import { TyreGarage } from "@/components/tyre-garage";
+import { TyreCalculator } from "@/components/calculators";
 import { TyreWearPage } from "./tyre-wear";
 import { TyreComparePage } from "./tyre-compare";
 import { TiresPage } from "./tires";
@@ -12,31 +13,65 @@ const VALID: TabId[] = ["pressures", "wear", "compare", "setup"];
 
 export const Route = createFileRoute("/_authenticated/tyres")({
   validateSearch: (s: Record<string, unknown>) => ({
-    tab: typeof s.tab === "string" && (VALID as string[]).includes(s.tab) ? (s.tab as TabId) : undefined,
+    tab:
+      typeof s.tab === "string" && (VALID as string[]).includes(s.tab)
+        ? (s.tab as TabId)
+        : undefined,
   }),
-  head: () => ({ meta: [
-    { title: "Tyres | My Race Engineer" },
-    { name: "description", content: "Tyres: race-weekend tools and records for My Race Engineer." },
-    { property: "og:title", content: "Tyres | My Race Engineer" },
-    { property: "og:description", content: "Tyres: race-weekend tools and records for My Race Engineer." },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary" },
-  ] }),
+  head: () => ({
+    meta: [
+      { title: "Tyres | My Race Engineer" },
+      {
+        name: "description",
+        content: "Tyres: race-weekend tools and records for My Race Engineer.",
+      },
+      { property: "og:title", content: "Tyres | My Race Engineer" },
+      {
+        property: "og:description",
+        content: "Tyres: race-weekend tools and records for My Race Engineer.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: TyresHubPage,
 });
 
 const TAB_DEFS: { id: TabId; label: string; icon: typeof Gauge; blurb: string }[] = [
-  { id: "pressures", label: "Pressures", icon: Gauge,         blurb: "Cold-pressure baseline & hot-pressure targets" },
-  { id: "wear",      label: "Wear",      icon: TrendingDown,  blurb: "Stint tracking, predicted life, change windows" },
-  { id: "compare",   label: "Compare",   icon: GitCompare,    blurb: "Grip, warm-up and longevity across compounds" },
-  { id: "setup",     label: "Setup",     icon: Disc,          blurb: "Tyre sets: cold/hot, heat cycles, pressure deltas" },
+  {
+    id: "pressures",
+    label: "Pressures",
+    icon: Gauge,
+    blurb: "Cold-pressure baseline & hot-pressure targets",
+  },
+  {
+    id: "wear",
+    label: "Wear",
+    icon: TrendingDown,
+    blurb: "Stint tracking, predicted life, change windows",
+  },
+  {
+    id: "compare",
+    label: "Compare",
+    icon: GitCompare,
+    blurb: "Grip, warm-up and longevity across compounds",
+  },
+  {
+    id: "setup",
+    label: "Setup",
+    icon: Disc,
+    blurb: "Tyre sets: cold/hot, heat cycles, pressure deltas",
+  },
 ];
 
 function TyresHubPage() {
   const search = Route.useSearch();
   const nav = useNavigate();
   const [tab, setTab] = useState<TabId>(search.tab ?? "pressures");
-  useEffect(() => { if (search.tab && search.tab !== tab) setTab(search.tab); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [search.tab]);
+  useEffect(() => {
+    if (search.tab && search.tab !== tab)
+      setTab(search.tab); /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [search.tab]);
 
   return (
     <div>
@@ -46,8 +81,8 @@ function TyresHubPage() {
         </div>
         <h1 className="font-display text-4xl font-bold mt-1">Tyres</h1>
         <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-          One place for everything tyres — set your cold pressures, track wear,
-          compare compounds for the conditions, and manage every set in inventory.
+          One place for everything tyres — set your cold pressures, track wear, compare compounds
+          for the conditions, and manage every set in inventory.
         </p>
       </div>
 
@@ -71,10 +106,19 @@ function TyresHubPage() {
           })}
         </TabsList>
 
-        <TabsContent value="pressures" className="mt-6"><TyreSetupPage /></TabsContent>
-        <TabsContent value="wear"      className="mt-6"><TyreWearPage /></TabsContent>
-        <TabsContent value="compare"   className="mt-6"><TyreComparePage /></TabsContent>
-        <TabsContent value="setup"     className="mt-6"><TiresPage /></TabsContent>
+        <TabsContent value="pressures" className="mt-6 space-y-6">
+          <TyreGarage />
+          <TyreCalculator />
+        </TabsContent>
+        <TabsContent value="wear" className="mt-6">
+          <TyreWearPage />
+        </TabsContent>
+        <TabsContent value="compare" className="mt-6">
+          <TyreComparePage />
+        </TabsContent>
+        <TabsContent value="setup" className="mt-6">
+          <TiresPage />
+        </TabsContent>
       </Tabs>
     </div>
   );

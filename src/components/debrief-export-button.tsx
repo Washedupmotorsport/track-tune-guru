@@ -16,21 +16,61 @@ export function DebriefExportButton({ sessionId, carId }: { sessionId?: string; 
   const [busy, setBusy] = useState(false);
 
   const exportPdf = async () => {
-    const car = carId ?? activeCar?.id;
+    let car = carId ?? activeCar?.id;
     const session = sessionId ?? activeSession?.id ?? null;
-    if (!car) { toast.error("Select a car first"); return; }
+    if (!car && !session) {
+      toast.error("Select a session first");
+      return;
+    }
     setBusy(true);
     try {
+      if (!session) throw new Error("Select a session to export its debrief");
+      const { data: selected, error: sessionError } = await supabase
+        .from("sessions")
+        .select("id,car_id,name,session_type,event_id")
+        .eq("id", session)
+        .single();
+      if (sessionError || !selected) throw new Error("The selected session is unavailable");
+      if (carId && carId !== selected.car_id)
+        throw new Error("Session does not belong to the selected car");
+      car = selected.car_id;
+      const { data: selectedCar } = await supabase
+        .from("cars")
+        .select("name")
+        .eq("id", car)
+        .single();
+      const weekend = selected.event_id
+        ? await supabase
+            .from("calendar_events")
+            .select("title")
+            .eq("id", selected.event_id)
+            .maybeSingle()
+        : null;
       const debriefQ = supabase
         .from("session_debriefs")
-        .select("improved,worsened,confidence_issue,tyre_issue,balance_issue,needs_work,suggested_changes,notes")
+        .select(
+          "improved,worsened,confidence_issue,tyre_issue,balance_issue,needs_work,suggested_changes,notes",
+        )
         .eq("car_id", car)
+        .eq("session_id", session)
         .order("updated_at", { ascending: false })
         .limit(1);
       const feedbackQ = session
-        ? supabase.from("driver_feedback").select("category,severity,description,corner").eq("session_id", session).order("recorded_at")
-        : supabase.from("driver_feedback").select("category,severity,description,corner").eq("car_id", car).order("recorded_at", { ascending: false }).limit(30);
-      const [{ data: debriefs, error: e1 }, { data: feedback, error: e2 }] = await Promise.all([debriefQ, feedbackQ]);
+        ? supabase
+            .from("driver_feedback")
+            .select("category,severity,description,corner")
+            .eq("session_id", session)
+            .order("recorded_at")
+        : supabase
+            .from("driver_feedback")
+            .select("category,severity,description,corner")
+            .eq("car_id", car)
+            .order("recorded_at", { ascending: false })
+            .limit(30);
+      const [{ data: debriefs, error: e1 }, { data: feedback, error: e2 }] = await Promise.all([
+        debriefQ,
+        feedbackQ,
+      ]);
       if (e1) throw e1;
       if (e2) throw e2;
       const d = debriefs?.[0] ?? null;
@@ -43,9 +83,14 @@ export function DebriefExportButton({ sessionId, carId }: { sessionId?: string; 
         d?.needs_work ? `Needs work: ${d.needs_work}` : null,
       ].filter((x): x is string => !!x);
       exportDebriefPdf({
-        weekend: activeWeekend?.title ?? activeCar?.name ?? "Race weekend",
-        session: activeSession ? `${activeSession.name} · ${activeSession.session_type}` : null,
-        feedback: (feedback ?? []) as { category: string; severity: string; description: string; corner?: string | null }[],
+        weekend: weekend?.data?.title ?? selectedCar?.name ?? "Session debrief",
+        session: `${selected.name} · ${selected.session_type}`,
+        feedback: (feedback ?? []) as {
+          category: string;
+          severity: string;
+          description: string;
+          corner?: string | null;
+        }[],
         actions: d?.suggested_changes ? [{ text: d.suggested_changes }] : [],
         lessons,
         notes: d?.notes ?? null,
@@ -59,7 +104,11 @@ export function DebriefExportButton({ sessionId, carId }: { sessionId?: string; 
 
   return (
     <Button variant="outline" size="sm" onClick={exportPdf} disabled={busy}>
-      {busy ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Download className="w-4 h-4 mr-1" />}
+      {busy ? (
+        <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+      ) : (
+        <Download className="w-4 h-4 mr-1" />
+      )}
       Export debrief PDF
     </Button>
   );

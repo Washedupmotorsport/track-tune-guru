@@ -6,8 +6,7 @@
 // - queued writes are INSERTS of new records (tyre logs, feedback, laps);
 //   flushing uses upsert with ignoreDuplicates, so a record that already
 //   exists on the server is never silently overwritten
-// - the queue is per-browser and only ever holds the signed-in user's own
-//   writes; it is cleared on sign-out by the caller
+// - retained writes are visible and flushable only by their original account
 // - pure helpers are exported for tests; storage access is injectable
 
 export type QueuedWrite = {
@@ -30,10 +29,13 @@ export function parseQueue(raw: string | null): QueuedWrite[] {
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(
       (w): w is QueuedWrite =>
-        !!w && typeof w === "object" &&
-        typeof w.id === "string" && w.id.length > 0 &&
+        !!w &&
+        typeof w === "object" &&
+        typeof w.id === "string" &&
+        w.id.length > 0 &&
         typeof w.table === "string" &&
-        !!w.payload && typeof w.payload === "object" &&
+        !!w.payload &&
+        typeof w.payload === "object" &&
         typeof w.queuedAt === "string",
     );
   } catch {
@@ -70,6 +72,23 @@ export function queueCount(storage: StorageLike): number {
   return loadQueue(storage).length;
 }
 
+export function accountQueue(
+  storage: StorageLike,
+  userId: string | null | undefined,
+): QueuedWrite[] {
+  return userId ? loadQueue(storage).filter((w) => w.payload.user_id === userId) : [];
+}
+
+/** Only transport failures and temporary server failures may be queued. */
+export function isRetryableWriteError(
+  error: { code?: string; message?: string },
+  status?: number,
+): boolean {
+  if (status === 408 || status === 429 || (status != null && status >= 500)) return true;
+  if (error.code) return false;
+  return /fetch|network|connection|timeout|load failed/i.test(error.message ?? "");
+}
+
 /**
  * Build a queued write. The generated id becomes the row's primary key, so a
  * later flush upserts the same row instead of inserting a duplicate.
@@ -82,7 +101,13 @@ export function buildWrite(
   now: () => string = () => new Date().toISOString(),
 ): QueuedWrite {
   const id = makeId();
-  return { id, table, payload: { ...payload, id }, queuedAt: now() };
+  const queuedAt = now();
+  return {
+    id,
+    table,
+    payload: { ...payload, id, recorded_at: payload.recorded_at ?? queuedAt },
+    queuedAt,
+  };
 }
 
 export type FlushResult = { synced: string[]; failed: string[] };
@@ -92,7 +117,10 @@ export type FlushResult = { synced: string[]; failed: string[] };
  * bookkeeping is testable: synced ids are dequeued, failed ids stay queued
  * for the next reconnect.
  */
-export function partitionFlush(queue: QueuedWrite[], outcomes: Record<string, boolean>): FlushResult {
+export function partitionFlush(
+  queue: QueuedWrite[],
+  outcomes: Record<string, boolean>,
+): FlushResult {
   const synced: string[] = [];
   const failed: string[] = [];
   for (const w of queue) (outcomes[w.id] ? synced : failed).push(w.id);

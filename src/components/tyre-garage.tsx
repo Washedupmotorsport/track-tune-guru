@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -15,35 +15,94 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { AlertTriangle, CheckCircle2, Disc, Gauge, Info, Plus, RefreshCw, Trash2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Disc,
+  Gauge,
+  Info,
+  Plus,
+  RefreshCw,
+  Trash2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 type Car = { id: string; name: string };
 type TyreSet = {
-  id: string; car_id: string; name: string;
-  manufacturer: string | null; model: string | null; compound: string | null;
-  size: string | null; serial_no: string | null; notes: string | null;
+  id: string;
+  car_id: string;
+  name: string;
+  manufacturer: string | null;
+  model: string | null;
+  compound: string | null;
+  size: string | null;
+  serial_no: string | null;
+  notes: string | null;
   created_at: string;
 };
 type Assignment = {
-  id: string; car_id: string; tyre_set_id: string; tyre_slot: number;
-  position: Corner; fitted_at: string; removed_at: string | null;
+  id: string;
+  car_id: string;
+  tyre_set_id: string;
+  tyre_slot: number;
+  position: Corner;
+  fitted_at: string;
+  removed_at: string | null;
 };
 type SetLog = {
-  id: string; tyre_set_id: string | null; recorded_at: string;
-  cold_fl: number | null; cold_fr: number | null; cold_rl: number | null; cold_rr: number | null;
-  hot_fl: number | null; hot_fr: number | null; hot_rl: number | null; hot_rr: number | null;
-  tread_fl: number | null; tread_fr: number | null; tread_rl: number | null; tread_rr: number | null;
-  temp_fl_inner: number | null; temp_fl_mid: number | null; temp_fl_outer: number | null;
-  temp_fr_inner: number | null; temp_fr_mid: number | null; temp_fr_outer: number | null;
-  temp_rl_inner: number | null; temp_rl_mid: number | null; temp_rl_outer: number | null;
-  temp_rr_inner: number | null; temp_rr_mid: number | null; temp_rr_outer: number | null;
-  laps: number | null; distance_km: number | null; heat_cycles: number | null;
+  id: string;
+  tyre_set_id: string | null;
+  recorded_at: string;
+  cold_fl: number | null;
+  cold_fr: number | null;
+  cold_rl: number | null;
+  cold_rr: number | null;
+  hot_fl: number | null;
+  hot_fr: number | null;
+  hot_rl: number | null;
+  hot_rr: number | null;
+  tread_fl: number | null;
+  tread_fr: number | null;
+  tread_rl: number | null;
+  tread_rr: number | null;
+  temp_fl_inner: number | null;
+  temp_fl_mid: number | null;
+  temp_fl_outer: number | null;
+  temp_fr_inner: number | null;
+  temp_fr_mid: number | null;
+  temp_fr_outer: number | null;
+  temp_rl_inner: number | null;
+  temp_rl_mid: number | null;
+  temp_rl_outer: number | null;
+  temp_rr_inner: number | null;
+  temp_rr_mid: number | null;
+  temp_rr_outer: number | null;
+  laps: number | null;
+  distance_km: number | null;
+  heat_cycles: number | null;
 };
 
-const cornerName: Record<Corner, string> = { fl: "Front left", fr: "Front right", rl: "Rear left", rr: "Rear right" };
+const cornerName: Record<Corner, string> = {
+  fl: "Front left",
+  fr: "Front right",
+  rl: "Rear left",
+  rr: "Rear right",
+};
 
 function logToReading(l: SetLog): TyreReading {
   return {
@@ -66,11 +125,25 @@ export function TyreGarage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
   const [rotateOpen, setRotateOpen] = useState(false);
-  const [form, setForm] = useState({ name: "", manufacturer: "", model: "", compound: "", size: "", serial_no: "", car_id: "" });
+  const [form, setForm] = useState({
+    name: "",
+    manufacturer: "",
+    model: "",
+    compound: "",
+    size: "",
+    serial_no: "",
+    car_id: "",
+  });
   const [quick, setQuick] = useState({ fl: "", fr: "", rl: "", rr: "", laps: "" });
   const [quickSetId, setQuickSetId] = useState("");
 
   const carId = activeCar?.id ?? "";
+  useEffect(() => {
+    setQuickSetId("");
+    setQuickOpen(false);
+    setRotateOpen(false);
+    setQuick({ fl: "", fr: "", rl: "", rr: "", laps: "" });
+  }, [carId, activeSession?.id]);
 
   const carsQ = useQuery({
     queryKey: ["cars-min", user?.id],
@@ -95,7 +168,10 @@ export function TyreGarage() {
   const assignmentsQ = useQuery({
     queryKey: ["tyre_assignments", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("tyre_assignments").select("*").is("removed_at", null);
+      const { data, error } = await supabase
+        .from("tyre_assignments")
+        .select("*")
+        .is("removed_at", null);
       if (error) throw error;
       return data as Assignment[];
     },
@@ -105,15 +181,25 @@ export function TyreGarage() {
   const setLogsQ = useQuery({
     queryKey: ["tire_logs_by_set", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("tire_logs").select("*").not("tyre_set_id", "is", null).order("recorded_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("tire_logs")
+        .select("*")
+        .not("tyre_set_id", "is", null)
+        .order("recorded_at", { ascending: false });
       if (error) throw error;
       return data as SetLog[];
     },
     enabled: !!user,
   });
 
-  const carSets = useMemo(() => (setsQ.data ?? []).filter((s) => !carId || s.car_id === carId), [setsQ.data, carId]);
-  const carAssignments = useMemo(() => (assignmentsQ.data ?? []).filter((a) => !carId || a.car_id === carId), [assignmentsQ.data, carId]);
+  const carSets = useMemo(
+    () => (setsQ.data ?? []).filter((s) => !carId || s.car_id === carId),
+    [setsQ.data, carId],
+  );
+  const carAssignments = useMemo(
+    () => (assignmentsQ.data ?? []).filter((a) => !carId || a.car_id === carId),
+    [assignmentsQ.data, carId],
+  );
   const slotAt = useMemo(() => {
     const map: Partial<Record<Corner, { set: TyreSet; slot: number }>> = {};
     for (const a of carAssignments) {
@@ -124,7 +210,11 @@ export function TyreGarage() {
   }, [carAssignments, setsQ.data]);
 
   const fittedSetId = carAssignments[0]?.tyre_set_id ?? null;
-  const effectiveQuickSet = quickSetId || fittedSetId || carSets[0]?.id || "";
+  const effectiveQuickSet =
+    (carSets.some((set) => set.id === quickSetId) ? quickSetId : "") ||
+    fittedSetId ||
+    carSets[0]?.id ||
+    "";
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["tyre_sets"] });
@@ -140,9 +230,13 @@ export function TyreGarage() {
       if (!targetCar) throw new Error("Pick a car");
       if (!form.name.trim()) throw new Error("Set name required");
       const { error } = await supabase.from("tyre_sets").insert({
-        user_id: user.id, car_id: targetCar, name: form.name.trim(),
-        manufacturer: form.manufacturer || null, model: form.model || null,
-        compound: form.compound || null, size: form.size || null,
+        user_id: user.id,
+        car_id: targetCar,
+        name: form.name.trim(),
+        manufacturer: form.manufacturer || null,
+        model: form.model || null,
+        compound: form.compound || null,
+        size: form.size || null,
         serial_no: form.serial_no || null,
       });
       if (error) throw error;
@@ -150,7 +244,15 @@ export function TyreGarage() {
     onSuccess: () => {
       toast.success("Tyre set registered");
       setCreateOpen(false);
-      setForm({ name: "", manufacturer: "", model: "", compound: "", size: "", serial_no: "", car_id: "" });
+      setForm({
+        name: "",
+        manufacturer: "",
+        model: "",
+        compound: "",
+        size: "",
+        serial_no: "",
+        car_id: "",
+      });
       invalidate();
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
@@ -161,7 +263,10 @@ export function TyreGarage() {
       const { error } = await supabase.from("tyre_sets").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Set removed"); invalidate(); },
+    onSuccess: () => {
+      toast.success("Set removed");
+      invalidate();
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
@@ -171,20 +276,23 @@ export function TyreGarage() {
       if (!user || !carId) throw new Error("Pick an active weekend with a car");
       const set = (setsQ.data ?? []).find((s) => s.id === setId);
       if (!set) throw new Error("Set not found");
-      const now = new Date().toISOString();
       const open = (assignmentsQ.data ?? []).filter((a) => a.car_id === carId);
-      if (open.length) {
-        const { error } = await supabase.from("tyre_assignments").update({ removed_at: now }).in("id", open.map((a) => a.id));
-        if (error) throw error;
-      }
-      const rows = CORNERS.map((pos, i) => ({
-        user_id: user.id, car_id: carId, tyre_set_id: setId, tyre_slot: i + 1, position: pos, fitted_at: now,
-      }));
-      const { error } = await supabase.from("tyre_assignments").insert(rows);
+      const { error } = await supabase.rpc("replace_tyre_layout", {
+        p_car_id: carId,
+        p_set_id: setId,
+        p_slots: [1, 2, 3, 4],
+        p_expected_ids: open.map((a) => a.id),
+      });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Set fitted to car"); invalidate(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onSuccess: () => {
+      toast.success("Set fitted to car");
+      invalidate();
+    },
+    onError: (e) => {
+      invalidate();
+      toast.error(e instanceof Error ? e.message : "Failed");
+    },
   });
 
   // Rotate: move slots between positions, closing and reopening assignments so history is preserved.
@@ -196,18 +304,28 @@ export function TyreGarage() {
       const current: Partial<Record<Corner, number>> = {};
       for (const a of open) current[a.position] = a.tyre_slot;
       const next = rotationPreset(current, preset);
-      const now = new Date().toISOString();
-      const { error: closeErr } = await supabase.from("tyre_assignments").update({ removed_at: now }).in("id", open.map((a) => a.id));
-      if (closeErr) throw closeErr;
-      const setId = open[0].tyre_set_id;
-      const rows = CORNERS.map((pos) => ({
-        user_id: user.id, car_id: carId, tyre_set_id: setId, tyre_slot: next[pos]!, position: pos, fitted_at: now,
-      }));
-      const { error } = await supabase.from("tyre_assignments").insert(rows);
+      const setId = open[0]?.tyre_set_id;
+      if (!setId || open.some((a) => a.tyre_set_id !== setId))
+        throw new Error("Fit a single complete set before rotating");
+      const slots = CORNERS.map((pos) => next[pos]);
+      if (slots.some((slot) => slot == null)) throw new Error("Fit all four tyre positions first");
+      const { error } = await supabase.rpc("replace_tyre_layout", {
+        p_car_id: carId,
+        p_set_id: setId,
+        p_slots: slots.filter((slot): slot is number => slot != null),
+        p_expected_ids: open.map((a) => a.id),
+      });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Tyres rotated — history preserved"); setRotateOpen(false); invalidate(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onSuccess: () => {
+      toast.success("Tyres rotated — history preserved");
+      setRotateOpen(false);
+      invalidate();
+    },
+    onError: (e) => {
+      invalidate();
+      toast.error(e instanceof Error ? e.message : "Failed");
+    },
   });
 
   // Quick hot-pressure entry: four taps + save, linked to the active session and set.
@@ -215,13 +333,19 @@ export function TyreGarage() {
     mutationFn: async () => {
       if (!user) throw new Error("Sign in required");
       if (!carId) throw new Error("Pick an active weekend with a car");
-      if (!effectiveQuickSet) throw new Error("Pick a tyre set");
+      if (!carSets.some((set) => set.id === effectiveQuickSet && set.car_id === carId))
+        throw new Error("Pick a tyre set belonging to this car");
       const num = (s: string) => (s ? Number(s) : null);
       const { error } = await supabase.from("tire_logs").insert({
-        user_id: user.id, car_id: carId, tyre_set_id: effectiveQuickSet,
+        user_id: user.id,
+        car_id: carId,
+        tyre_set_id: effectiveQuickSet,
         tire_set: (setsQ.data ?? []).find((s) => s.id === effectiveQuickSet)?.name ?? "Set",
         ...sessionLogContext(carId, activeWeekend, activeSession),
-        hot_fl: num(quick.fl), hot_fr: num(quick.fr), hot_rl: num(quick.rl), hot_rr: num(quick.rr),
+        hot_fl: num(quick.fl),
+        hot_fr: num(quick.fr),
+        hot_rl: num(quick.rl),
+        hot_rr: num(quick.rr),
         laps: quick.laps ? parseInt(quick.laps, 10) : null,
       });
       if (error) throw error;
@@ -253,18 +377,32 @@ export function TyreGarage() {
         <div className="flex gap-2 flex-wrap">
           <Dialog open={quickOpen} onOpenChange={setQuickOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" disabled={!carId} title={!carId ? "Pick an active weekend with a car" : "Log four hot pressures fast"}>
+              <Button
+                variant="outline"
+                disabled={!carId}
+                title={!carId ? "Pick an active weekend with a car" : "Log four hot pressures fast"}
+              >
                 <Gauge className="w-4 h-4 mr-1" /> Quick hot pressures
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-md">
-              <DialogHeader><DialogTitle>Hot pressures — quick entry</DialogTitle></DialogHeader>
+              <DialogHeader>
+                <DialogTitle>Hot pressures — quick entry</DialogTitle>
+              </DialogHeader>
               <div className="space-y-3">
                 <div>
                   <Label>Tyre set</Label>
                   <Select value={effectiveQuickSet} onValueChange={setQuickSetId}>
-                    <SelectTrigger><SelectValue placeholder="Pick a set" /></SelectTrigger>
-                    <SelectContent>{carSets.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pick a set" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {carSets.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
                   </Select>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -272,20 +410,33 @@ export function TyreGarage() {
                     <div key={c}>
                       <Label className="font-mono uppercase text-xs">{c}</Label>
                       <Input
-                        inputMode="decimal" type="number" step="any" autoFocus={c === "fl"}
+                        inputMode="decimal"
+                        type="number"
+                        step="any"
+                        autoFocus={c === "fl"}
                         className="h-14 text-2xl font-mono text-center"
-                        value={quick[c]} onChange={(e) => setQuick({ ...quick, [c]: e.target.value })}
+                        value={quick[c]}
+                        onChange={(e) => setQuick({ ...quick, [c]: e.target.value })}
                       />
                     </div>
                   ))}
                 </div>
                 <div>
                   <Label>Laps this run (optional)</Label>
-                  <Input inputMode="numeric" type="number" value={quick.laps} onChange={(e) => setQuick({ ...quick, laps: e.target.value })} />
+                  <Input
+                    inputMode="numeric"
+                    type="number"
+                    value={quick.laps}
+                    onChange={(e) => setQuick({ ...quick, laps: e.target.value })}
+                  />
                 </div>
               </div>
               <DialogFooter>
-                <Button onClick={() => quickSave.mutate()} disabled={quickSave.isPending} className="w-full h-12 text-base">
+                <Button
+                  onClick={() => quickSave.mutate()}
+                  disabled={quickSave.isPending}
+                  className="w-full h-12 text-base"
+                >
                   {quickSave.isPending ? "Saving…" : "Save hot pressures"}
                 </Button>
               </DialogFooter>
@@ -293,27 +444,90 @@ export function TyreGarage() {
           </Dialog>
 
           <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-            <DialogTrigger asChild><Button className="shadow-glow"><Plus className="w-4 h-4 mr-1" /> New set</Button></DialogTrigger>
+            <DialogTrigger asChild>
+              <Button className="shadow-glow">
+                <Plus className="w-4 h-4 mr-1" /> New set
+              </Button>
+            </DialogTrigger>
             <DialogContent className="max-w-lg">
-              <DialogHeader><DialogTitle>Register a tyre set</DialogTitle></DialogHeader>
+              <DialogHeader>
+                <DialogTitle>Register a tyre set</DialogTitle>
+              </DialogHeader>
               <div className="grid grid-cols-2 gap-3">
                 {!carId && (
                   <div className="col-span-2">
                     <Label>Car *</Label>
-                    <Select value={form.car_id} onValueChange={(v) => setForm({ ...form, car_id: v })}>
-                      <SelectTrigger><SelectValue placeholder="Pick a car" /></SelectTrigger>
-                      <SelectContent>{(carsQ.data ?? []).map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
+                    <Select
+                      value={form.car_id}
+                      onValueChange={(v) => setForm({ ...form, car_id: v })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pick a car" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(carsQ.data ?? []).map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
                     </Select>
                   </div>
                 )}
-                <div><Label>Set name *</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Set A" /></div>
-                <div><Label>Serial / ID number</Label><Input value={form.serial_no} onChange={(e) => setForm({ ...form, serial_no: e.target.value })} placeholder="e.g. D1234-56" /></div>
-                <div><Label>Manufacturer</Label><Input value={form.manufacturer} onChange={(e) => setForm({ ...form, manufacturer: e.target.value })} placeholder="Hoosier" /></div>
-                <div><Label>Model</Label><Input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} placeholder="A7" /></div>
-                <div><Label>Compound</Label><Input value={form.compound} onChange={(e) => setForm({ ...form, compound: e.target.value })} placeholder="Medium" /></div>
-                <div><Label>Size</Label><Input value={form.size} onChange={(e) => setForm({ ...form, size: e.target.value })} placeholder="245/40R17" /></div>
+                <div>
+                  <Label>Set name *</Label>
+                  <Input
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="Set A"
+                  />
+                </div>
+                <div>
+                  <Label>Serial / ID number</Label>
+                  <Input
+                    value={form.serial_no}
+                    onChange={(e) => setForm({ ...form, serial_no: e.target.value })}
+                    placeholder="e.g. D1234-56"
+                  />
+                </div>
+                <div>
+                  <Label>Manufacturer</Label>
+                  <Input
+                    value={form.manufacturer}
+                    onChange={(e) => setForm({ ...form, manufacturer: e.target.value })}
+                    placeholder="Hoosier"
+                  />
+                </div>
+                <div>
+                  <Label>Model</Label>
+                  <Input
+                    value={form.model}
+                    onChange={(e) => setForm({ ...form, model: e.target.value })}
+                    placeholder="A7"
+                  />
+                </div>
+                <div>
+                  <Label>Compound</Label>
+                  <Input
+                    value={form.compound}
+                    onChange={(e) => setForm({ ...form, compound: e.target.value })}
+                    placeholder="Medium"
+                  />
+                </div>
+                <div>
+                  <Label>Size</Label>
+                  <Input
+                    value={form.size}
+                    onChange={(e) => setForm({ ...form, size: e.target.value })}
+                    placeholder="245/40R17"
+                  />
+                </div>
               </div>
-              <DialogFooter><Button onClick={() => createSet.mutate()} disabled={createSet.isPending}>Register set</Button></DialogFooter>
+              <DialogFooter>
+                <Button onClick={() => createSet.mutate()} disabled={createSet.isPending}>
+                  Register set
+                </Button>
+              </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>
@@ -327,12 +541,19 @@ export function TyreGarage() {
               {(["fl", "fr", "rl", "rr"] as Corner[]).map((pos) => {
                 const fit = slotAt[pos];
                 return (
-                  <div key={pos} className={`w-24 rounded-lg border p-2 text-center ${fit ? "border-primary/50 bg-primary/5" : "border-dashed border-border"}`}>
+                  <div
+                    key={pos}
+                    className={`w-24 rounded-lg border p-2 text-center ${fit ? "border-primary/50 bg-primary/5" : "border-dashed border-border"}`}
+                  >
                     <div className="font-display font-bold uppercase text-xs">{pos}</div>
                     {fit ? (
                       <>
-                        <div className="font-mono text-sm font-bold mt-0.5 truncate">{fit.set.name}</div>
-                        <div className="font-mono text-[10px] text-muted-foreground">tyre #{fit.slot}</div>
+                        <div className="font-mono text-sm font-bold mt-0.5 truncate">
+                          {fit.set.name}
+                        </div>
+                        <div className="font-mono text-[10px] text-muted-foreground">
+                          tyre #{fit.slot}
+                        </div>
                       </>
                     ) : (
                       <div className="font-mono text-[10px] text-muted-foreground mt-1">empty</div>
@@ -341,7 +562,9 @@ export function TyreGarage() {
                 );
               })}
             </div>
-            <div className="mt-2 text-center font-mono text-[9px] uppercase tracking-[0.25em] text-muted-foreground">front ↑</div>
+            <div className="mt-2 text-center font-mono text-[9px] uppercase tracking-[0.25em] text-muted-foreground">
+              front ↑
+            </div>
           </div>
           <div className="mt-3 flex gap-2 justify-center">
             <Dialog open={rotateOpen} onOpenChange={setRotateOpen}>
@@ -351,18 +574,36 @@ export function TyreGarage() {
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-sm">
-                <DialogHeader><DialogTitle>Rotate tyres</DialogTitle></DialogHeader>
+                <DialogHeader>
+                  <DialogTitle>Rotate tyres</DialogTitle>
+                </DialogHeader>
                 <p className="text-sm text-muted-foreground">
-                  Moves each tyre to a new corner. The old positions are closed out and kept in history.
+                  Moves each tyre to a new corner. The old positions are closed out and kept in
+                  history.
                 </p>
                 <div className="grid gap-2 mt-2">
-                  <Button variant="outline" className="justify-start h-12" onClick={() => rotate.mutate("front-to-rear")} disabled={rotate.isPending}>
+                  <Button
+                    variant="outline"
+                    className="justify-start h-12"
+                    onClick={() => rotate.mutate("front-to-rear")}
+                    disabled={rotate.isPending}
+                  >
                     Front ↔ rear (straight)
                   </Button>
-                  <Button variant="outline" className="justify-start h-12" onClick={() => rotate.mutate("cross")} disabled={rotate.isPending}>
+                  <Button
+                    variant="outline"
+                    className="justify-start h-12"
+                    onClick={() => rotate.mutate("cross")}
+                    disabled={rotate.isPending}
+                  >
                     Cross (FL↔RR, FR↔RL)
                   </Button>
-                  <Button variant="outline" className="justify-start h-12" onClick={() => rotate.mutate("rear-to-front")} disabled={rotate.isPending}>
+                  <Button
+                    variant="outline"
+                    className="justify-start h-12"
+                    onClick={() => rotate.mutate("rear-to-front")}
+                    disabled={rotate.isPending}
+                  >
                     Left ↔ right swap
                   </Button>
                 </div>
@@ -378,7 +619,8 @@ export function TyreGarage() {
             <div className="rounded-lg border border-dashed border-border p-6 text-center">
               <Disc className="w-8 h-8 mx-auto text-muted-foreground" />
               <p className="mt-3 text-sm text-muted-foreground">
-                No tyre sets registered{carId ? " for this car" : ""} yet. Register one to start tracking its life across weekends.
+                No tyre sets registered{carId ? " for this car" : ""} yet. Register one to start
+                tracking its life across weekends.
               </p>
             </div>
           )}
@@ -394,19 +636,37 @@ export function TyreGarage() {
                   <div className="min-w-0">
                     <div className="font-display text-lg font-bold truncate">
                       {s.name}
-                      {fitted && <span className="ml-2 align-middle rounded-full bg-primary/15 text-primary px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest">on car</span>}
+                      {fitted && (
+                        <span className="ml-2 align-middle rounded-full bg-primary/15 text-primary px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest">
+                          on car
+                        </span>
+                      )}
                     </div>
                     <div className="text-xs text-muted-foreground mt-0.5">
-                      {[s.manufacturer, s.model, s.compound, s.size].filter(Boolean).join(" · ") || "No spec recorded"}
+                      {[s.manufacturer, s.model, s.compound, s.size].filter(Boolean).join(" · ") ||
+                        "No spec recorded"}
                       {s.serial_no && ` · ID ${s.serial_no}`}
                     </div>
                   </div>
                   <div className="flex gap-1">
                     {carId && !fitted && (
-                      <Button size="sm" variant="outline" onClick={() => fitSet.mutate(s.id)} disabled={fitSet.isPending}>Fit to car</Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => fitSet.mutate(s.id)}
+                        disabled={fitSet.isPending}
+                      >
+                        Fit to car
+                      </Button>
                     )}
-                    <button onClick={() => { if (confirm(`Delete ${s.name}? Its logs stay but lose the set link.`)) deleteSet.mutate(s.id); }}
-                      className="p-2 text-muted-foreground hover:text-destructive" aria-label={`Delete ${s.name}`}>
+                    <button
+                      onClick={() => {
+                        if (confirm(`Delete ${s.name}? Its logs stay but lose the set link.`))
+                          deleteSet.mutate(s.id);
+                      }}
+                      className="p-2 text-muted-foreground hover:text-destructive"
+                      aria-label={`Delete ${s.name}`}
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -414,19 +674,34 @@ export function TyreGarage() {
 
                 <div className="mt-3 grid grid-cols-3 gap-2">
                   <MiniStat label="Total laps" value={String(totals.laps)} />
-                  <MiniStat label="Distance" value={totals.distanceKm ? `${totals.distanceKm.toFixed(0)} km` : "—"} />
+                  <MiniStat
+                    label="Distance"
+                    value={totals.distanceKm ? `${totals.distanceKm.toFixed(0)} km` : "—"}
+                  />
                   <MiniStat label="Heat cycles" value={String(totals.heatCycles)} />
                 </div>
 
                 {obs.length > 0 && (
                   <div className="mt-3 space-y-1.5">
-                    <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Observations from latest reading</div>
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                      Observations from latest reading
+                    </div>
                     {obs.map((o, i) => (
-                      <div key={i} className={`flex items-start gap-2 rounded-md border px-3 py-2 text-xs ${
-                        o.severity === "flag" ? "border-destructive/40 bg-destructive/10" : "border-border bg-card"}`}>
-                        {o.severity === "flag" ? <AlertTriangle className="w-3.5 h-3.5 mt-0.5 text-destructive shrink-0" />
-                          : o.severity === "watch" ? <Info className="w-3.5 h-3.5 mt-0.5 text-primary shrink-0" />
-                          : <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 text-chart-3 shrink-0" />}
+                      <div
+                        key={i}
+                        className={`flex items-start gap-2 rounded-md border px-3 py-2 text-xs ${
+                          o.severity === "flag"
+                            ? "border-destructive/40 bg-destructive/10"
+                            : "border-border bg-card"
+                        }`}
+                      >
+                        {o.severity === "flag" ? (
+                          <AlertTriangle className="w-3.5 h-3.5 mt-0.5 text-destructive shrink-0" />
+                        ) : o.severity === "watch" ? (
+                          <Info className="w-3.5 h-3.5 mt-0.5 text-primary shrink-0" />
+                        ) : (
+                          <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 text-chart-3 shrink-0" />
+                        )}
                         <span>{o.text}</span>
                       </div>
                     ))}
@@ -440,9 +715,15 @@ export function TyreGarage() {
                     </summary>
                     <div className="mt-2 space-y-1.5">
                       {logs.map((l) => (
-                        <div key={l.id} className="rounded-md border border-border bg-card px-3 py-2 text-xs font-mono">
-                          <span className="text-muted-foreground">{new Date(l.recorded_at).toLocaleDateString()}</span>
-                          {" · "}hot {l.hot_fl ?? "—"}/{l.hot_fr ?? "—"}/{l.hot_rl ?? "—"}/{l.hot_rr ?? "—"}
+                        <div
+                          key={l.id}
+                          className="rounded-md border border-border bg-card px-3 py-2 text-xs font-mono"
+                        >
+                          <span className="text-muted-foreground">
+                            {new Date(l.recorded_at).toLocaleDateString()}
+                          </span>
+                          {" · "}hot {l.hot_fl ?? "—"}/{l.hot_fr ?? "—"}/{l.hot_rl ?? "—"}/
+                          {l.hot_rr ?? "—"}
                           {l.laps != null && ` · ${l.laps} laps`}
                           {l.heat_cycles != null && l.heat_cycles > 0 && ` · ${l.heat_cycles} HC`}
                         </div>
@@ -457,7 +738,8 @@ export function TyreGarage() {
       </div>
       {!carId && (
         <p className="mt-4 text-xs text-muted-foreground">
-          Tip: pick an active weekend with a car to fit sets, rotate and quick-log pressures against the live session.
+          Tip: pick an active weekend with a car to fit sets, rotate and quick-log pressures against
+          the live session.
         </p>
       )}
       <div className="sr-only">{setName(fittedSetId)}</div>
@@ -468,7 +750,9 @@ export function TyreGarage() {
 function MiniStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-sm border border-border bg-card px-3 py-2">
-      <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-muted-foreground">{label}</div>
+      <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-muted-foreground">
+        {label}
+      </div>
       <div className="mt-0.5 text-lg font-bold font-mono tabular-nums">{value}</div>
     </div>
   );

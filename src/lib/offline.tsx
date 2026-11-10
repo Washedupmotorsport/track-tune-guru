@@ -4,20 +4,11 @@ import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import type { QueryClient } from "@tanstack/react-query";
 import { WifiOff, CloudUpload, HardDrive } from "lucide-react";
-import { loadQueue } from "./offline-queue";
+import { useOfflineQueueCount } from "./offline-sync";
 
 /** Queued offline writes waiting to sync (polled lightly; queue is localStorage-backed). */
 function useQueuedWrites(): number {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const update = () => setCount(loadQueue(window.localStorage).length);
-    update();
-    const t = setInterval(update, 2000);
-    window.addEventListener("storage", update);
-    return () => { clearInterval(t); window.removeEventListener("storage", update); };
-  }, []);
-  return count;
+  return useOfflineQueueCount();
 }
 
 /**
@@ -26,7 +17,13 @@ function useQueuedWrites(): number {
  * IsRestoringProvider so components can show a "loading cache" state during
  * the brief restore step.
  */
-export function OfflinePersistGate({ client, children }: { client: QueryClient; children: React.ReactNode }) {
+export function OfflinePersistGate({
+  client,
+  children,
+}: {
+  client: QueryClient;
+  children: React.ReactNode;
+}) {
   const [isRestoring, setIsRestoring] = useState(true);
 
   useEffect(() => {
@@ -81,28 +78,40 @@ export function ConnectionStatus() {
 
   if (restoring) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/30 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-muted-foreground" title="Loading cached data">
+      <span
+        className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/30 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-muted-foreground"
+        title="Loading cached data"
+      >
         <HardDrive className="w-3 h-3" /> Cache
       </span>
     );
   }
   if (!online) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-md border border-destructive/60 bg-destructive/10 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-destructive" title="Offline — new records are saved on this device and sync when reception returns">
+      <span
+        className="inline-flex items-center gap-1 rounded-md border border-destructive/60 bg-destructive/10 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-destructive"
+        title="Offline — new records are saved on this device and sync when reception returns"
+      >
         <WifiOff className="w-3 h-3" /> Offline{queued > 0 ? ` · ${queued} queued` : ""}
       </span>
     );
   }
   if (queued > 0) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-md border border-primary/60 bg-primary/10 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-primary animate-pulse" title="Syncing offline changes">
-        <CloudUpload className="w-3 h-3" /> Syncing · {queued}
+      <span
+        className="inline-flex items-center gap-1 rounded-md border border-primary/60 bg-primary/10 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-primary animate-pulse"
+        title="Syncing offline changes"
+      >
+        <CloudUpload className="w-3 h-3" /> Queued · {queued}
       </span>
     );
   }
   if (pending > 0) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-md border border-primary/60 bg-primary/10 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-primary animate-pulse" title="Syncing changes">
+      <span
+        className="inline-flex items-center gap-1 rounded-md border border-primary/60 bg-primary/10 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-primary animate-pulse"
+        title="Syncing changes"
+      >
         <CloudUpload className="w-3 h-3" /> Sync · {pending}
       </span>
     );

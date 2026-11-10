@@ -5,12 +5,25 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Wand2, ArrowLeft, Save } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { generateBaseline, type BaselineInput, type Drivetrain, type TireType, type Surface, type Grip } from "@/lib/baseline";
+import {
+  generateBaseline,
+  type BaselineInput,
+  type Drivetrain,
+  type TireType,
+  type Surface,
+  type Grip,
+} from "@/lib/baseline";
 import type { DisciplineId } from "@/lib/disciplines";
 import { DISCIPLINES } from "@/lib/disciplines";
 import { useUnits } from "@/lib/units";
@@ -18,18 +31,32 @@ import { SetupWorkspaceNav } from "@/components/setup-workspace-nav";
 import { useActiveWeekend } from "@/lib/active-weekend";
 
 export const Route = createFileRoute("/_authenticated/baseline")({
-  head: () => ({ meta: [
-    { title: "Baseline | My Race Engineer" },
-    { name: "description", content: "Baseline: race-weekend tools and records for My Race Engineer." },
-    { property: "og:title", content: "Baseline | My Race Engineer" },
-    { property: "og:description", content: "Baseline: race-weekend tools and records for My Race Engineer." },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary" },
-  ] }),
+  head: () => ({
+    meta: [
+      { title: "Baseline | My Race Engineer" },
+      {
+        name: "description",
+        content: "Baseline: race-weekend tools and records for My Race Engineer.",
+      },
+      { property: "og:title", content: "Baseline | My Race Engineer" },
+      {
+        property: "og:description",
+        content: "Baseline: race-weekend tools and records for My Race Engineer.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
 
-  component: () => {
+  component: function BaselineRedirect() {
     const nav = useNavigate();
-    useEffect(() => { nav({ to: "/setup-library", search: { tab: "baselines" }, replace: true }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+    useEffect(() => {
+      nav({
+        to: "/setup-library",
+        search: { tab: "baselines" },
+        replace: true,
+      }); /* eslint-disable-next-line react-hooks/exhaustive-deps */
+    }, []);
     return null;
   },
 });
@@ -59,7 +86,10 @@ export function BaselinePage() {
   const carsQ = useQuery({
     queryKey: ["cars", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("cars").select("id,name,discipline,user_id").order("created_at");
+      const { data, error } = await supabase
+        .from("cars")
+        .select("id,name,discipline,user_id")
+        .order("created_at");
       if (error) throw error;
       return data as (Car & { user_id: string })[];
     },
@@ -71,7 +101,9 @@ export function BaselinePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tracks")
-        .select("id,name,country,length_m,corner_count,layout_notes,gearing_notes,brake_bias_start,tyre_pressure_notes,camber_toe_notes,setup_tips,weather_sensitivity")
+        .select(
+          "id,name,country,length_m,corner_count,layout_notes,gearing_notes,brake_bias_start,tyre_pressure_notes,camber_toe_notes,setup_tips,weather_sensitivity",
+        )
         .order("name");
       if (error) throw error;
       return data as Track[];
@@ -103,7 +135,10 @@ export function BaselinePage() {
   })();
   const setAmbientDisplay = (v: string) => {
     const n = parseFloat(v);
-    if (isNaN(n)) { setAmbientC(""); return; }
+    if (isNaN(n)) {
+      setAmbientC("");
+      return;
+    }
     const c = units.fromDisplayTemp(n);
     setAmbientC(c == null ? "" : String(Math.round(c * 10) / 10));
   };
@@ -126,17 +161,20 @@ export function BaselinePage() {
   const isOwner = car && user && car.user_id === user.id;
   const track = tracksQ.data?.find((t) => t.id === trackId) ?? null;
 
-  const input: BaselineInput = useMemo(() => ({
-    discipline,
-    drivetrain,
-    weightKg: Number(weightKg) || 1300,
-    frontBiasPct: Number(frontBiasPct) || 50,
-    tire,
-    surface,
-    grip,
-    ambientC: Number(ambientC) || 20,
-    aero,
-  }), [discipline, drivetrain, weightKg, frontBiasPct, tire, surface, grip, ambientC, aero]);
+  const input: BaselineInput = useMemo(
+    () => ({
+      discipline,
+      drivetrain,
+      weightKg: Number(weightKg) || 1300,
+      frontBiasPct: Number(frontBiasPct) || 50,
+      tire,
+      surface,
+      grip,
+      ambientC: Number(ambientC) || 20,
+      aero,
+    }),
+    [discipline, drivetrain, weightKg, frontBiasPct, tire, surface, grip, ambientC, aero],
+  );
 
   const generated = useMemo(() => generateBaseline(input), [input]);
 
@@ -151,7 +189,11 @@ export function BaselinePage() {
         const v = Math.min(80, Math.max(40, parseFloat(m[1])));
         const i = rows.findIndex((r) => r.key === "brake_bias");
         if (i >= 0) {
-          rows[i] = { ...rows[i], value: String(Math.round(v)), rationale: `Track suggestion (${track.name})` };
+          rows[i] = {
+            ...rows[i],
+            value: String(Math.round(v)),
+            rationale: `Track suggestion (${track.name})`,
+          };
           setupData.brake_bias = String(Math.round(v));
         }
       }
@@ -161,18 +203,22 @@ export function BaselinePage() {
 
   const save = useMutation({
     mutationFn: async () => {
-      if (!carId) throw new Error("Pick a car first");
+      if (!carId || !user) throw new Error("Pick a car and sign in first");
       const name = `Baseline · ${new Date().toLocaleDateString()}`;
-      const { data, error } = await supabase.from("setups").insert({
-        user_id: user!.id,
-        car_id: carId,
-        name,
-        discipline,
-        track: track?.name ?? null,
-        conditions: `${ambientC}°C · ${surface} · ${grip} grip · ${tire}`,
-        setup_data: setupData,
-        notes: `Generated baseline for ${drivetrain} ${weightKg}kg, ${frontBiasPct}% F bias${track ? ` at ${track.name}` : ""}.`,
-      }).select().single();
+      const { data, error } = await supabase
+        .from("setups")
+        .insert({
+          user_id: user.id,
+          car_id: carId,
+          name,
+          discipline,
+          track: track?.name ?? null,
+          conditions: `${ambientC}°C · ${surface} · ${grip} grip · ${tire}`,
+          setup_data: setupData,
+          notes: `Generated baseline for ${drivetrain} ${weightKg}kg, ${frontBiasPct}% F bias${track ? ` at ${track.name}` : ""}.`,
+        })
+        .select()
+        .single();
       if (error) throw error;
       return data;
     },
@@ -186,7 +232,10 @@ export function BaselinePage() {
   return (
     <div>
       <SetupWorkspaceNav />
-      <Link to="/garage" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
+      <Link
+        to="/garage"
+        className="inline-flex items-center text-sm text-muted-foreground hover:text-primary"
+      >
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to garage
       </Link>
       <div className="mt-4">
@@ -195,7 +244,8 @@ export function BaselinePage() {
         </div>
         <h1 className="font-display text-4xl font-bold mt-1">Baseline Setup</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          A starting point for tire pressures, alignment, springs, dampers and bias — tuned to your car, discipline and conditions.
+          A starting point for tire pressures, alignment, springs, dampers and bias — tuned to your
+          car, discipline and conditions.
         </p>
       </div>
 
@@ -203,12 +253,18 @@ export function BaselinePage() {
         <Section title="Inputs">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Car</Label>
+              <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+                Car
+              </Label>
               <Select value={carId} onValueChange={setCarId}>
-                <SelectTrigger className="mt-1"><SelectValue placeholder="Select a car" /></SelectTrigger>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Select a car" />
+                </SelectTrigger>
                 <SelectContent>
                   {(carsQ.data ?? []).map((c) => (
-                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -216,56 +272,107 @@ export function BaselinePage() {
 
             <div className="col-span-2">
               <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-                Track <span className="text-muted-foreground/60 normal-case">(optional — applies track-specific tips)</span>
+                Track{" "}
+                <span className="text-muted-foreground/60 normal-case">
+                  (optional — applies track-specific tips)
+                </span>
               </Label>
-              <Select value={trackId || "__none"} onValueChange={(v) => setTrackId(v === "__none" ? "" : v)}>
-                <SelectTrigger className="mt-1"><SelectValue placeholder="No track" /></SelectTrigger>
+              <Select
+                value={trackId || "__none"}
+                onValueChange={(v) => setTrackId(v === "__none" ? "" : v)}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="No track" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__none">No track</SelectItem>
                   {(tracksQ.data ?? []).map((t) => (
                     <SelectItem key={t.id} value={t.id}>
-                      {t.name}{t.country ? ` · ${t.country}` : ""}
+                      {t.name}
+                      {t.country ? ` · ${t.country}` : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
-            <SelField label="Discipline" value={discipline} onChange={(v) => setDiscipline(v as DisciplineId)}
-              options={DISCIPLINES.map((d) => ({ value: d.id, label: d.label }))} />
-            <SelField label="Drivetrain" value={drivetrain} onChange={(v) => setDrivetrain(v as Drivetrain)}
-              options={[{value:"FWD",label:"FWD"},{value:"RWD",label:"RWD"},{value:"AWD",label:"AWD"}]} />
+            <SelField
+              label="Discipline"
+              value={discipline}
+              onChange={(v) => setDiscipline(v as DisciplineId)}
+              options={DISCIPLINES.map((d) => ({ value: d.id, label: d.label }))}
+            />
+            <SelField
+              label="Drivetrain"
+              value={drivetrain}
+              onChange={(v) => setDrivetrain(v as Drivetrain)}
+              options={[
+                { value: "FWD", label: "FWD" },
+                { value: "RWD", label: "RWD" },
+                { value: "AWD", label: "AWD" },
+              ]}
+            />
 
-            <NumField label="Weight" unit={units.massUnit} value={weightDisplay} onChange={setWeightDisplay} />
+            <NumField
+              label="Weight"
+              unit={units.massUnit}
+              value={weightDisplay}
+              onChange={setWeightDisplay}
+            />
             <NumField label="Front bias" unit="%" value={frontBiasPct} onChange={setFrontBiasPct} />
 
-            <SelField label="Tire type" value={tire} onChange={(v) => setTire(v as TireType)}
+            <SelField
+              label="Tire type"
+              value={tire}
+              onChange={(v) => setTire(v as TireType)}
               options={[
-                {value:"street",label:"Street"},
-                {value:"semi_slick",label:"Semi-slick"},
-                {value:"slick",label:"Slick"},
-                {value:"wet",label:"Wet"},
-                {value:"drag_radial",label:"Drag radial"},
-                {value:"rally_gravel",label:"Rally gravel"},
-                {value:"rally_tarmac",label:"Rally tarmac"},
-              ]} />
-            <SelField label="Surface" value={surface} onChange={(v) => setSurface(v as Surface)}
+                { value: "street", label: "Street" },
+                { value: "semi_slick", label: "Semi-slick" },
+                { value: "slick", label: "Slick" },
+                { value: "wet", label: "Wet" },
+                { value: "drag_radial", label: "Drag radial" },
+                { value: "rally_gravel", label: "Rally gravel" },
+                { value: "rally_tarmac", label: "Rally tarmac" },
+              ]}
+            />
+            <SelField
+              label="Surface"
+              value={surface}
+              onChange={(v) => setSurface(v as Surface)}
               options={[
-                {value:"smooth",label:"Smooth track"},
-                {value:"bumpy",label:"Bumpy track"},
-                {value:"street",label:"Street"},
-                {value:"loose",label:"Loose / dirt"},
-                {value:"dirt",label:"Dirt"},
-              ]} />
+                { value: "smooth", label: "Smooth track" },
+                { value: "bumpy", label: "Bumpy track" },
+                { value: "street", label: "Street" },
+                { value: "loose", label: "Loose / dirt" },
+                { value: "dirt", label: "Dirt" },
+              ]}
+            />
 
-            <SelField label="Grip level" value={grip} onChange={(v) => setGrip(v as Grip)}
-              options={[{value:"low",label:"Low"},{value:"medium",label:"Medium"},{value:"high",label:"High"}]} />
-            <NumField label="Ambient" unit={units.tempUnit} value={ambientDisplay} onChange={setAmbientDisplay} />
+            <SelField
+              label="Grip level"
+              value={grip}
+              onChange={(v) => setGrip(v as Grip)}
+              options={[
+                { value: "low", label: "Low" },
+                { value: "medium", label: "Medium" },
+                { value: "high", label: "High" },
+              ]}
+            />
+            <NumField
+              label="Ambient"
+              unit={units.tempUnit}
+              value={ambientDisplay}
+              onChange={setAmbientDisplay}
+            />
 
             <div className="col-span-2 flex items-center justify-between rounded-md border border-border px-3 py-2">
               <div>
-                <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Significant aero</div>
-                <div className="text-xs text-muted-foreground">Wing / splitter / diffuser stiffens springs and lowers ride.</div>
+                <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+                  Significant aero
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Wing / splitter / diffuser stiffens springs and lowers ride.
+                </div>
               </div>
               <Switch checked={aero} onCheckedChange={setAero} />
             </div>
@@ -274,7 +381,9 @@ export function BaselinePage() {
           {track && (
             <div className="mt-5 rounded-md border border-border/70 bg-muted/30 p-4">
               <div className="flex items-center justify-between gap-3">
-                <div className="font-display text-sm font-bold uppercase tracking-wider">{track.name}</div>
+                <div className="font-display text-sm font-bold uppercase tracking-wider">
+                  {track.name}
+                </div>
                 <div className="text-[11px] font-mono text-muted-foreground">
                   {track.length_m ? `${(track.length_m / 1000).toFixed(2)} km` : ""}
                   {track.corner_count ? ` · ${track.corner_count} corners` : ""}
@@ -298,8 +407,14 @@ export function BaselinePage() {
             {rows.map((r, i) => (
               <div key={i} className="py-2 flex items-baseline justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">{r.label}</div>
-                  {r.rationale && <div className="text-[11px] text-muted-foreground/80 truncate">{r.rationale}</div>}
+                  <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+                    {r.label}
+                  </div>
+                  {r.rationale && (
+                    <div className="text-[11px] text-muted-foreground/80 truncate">
+                      {r.rationale}
+                    </div>
+                  )}
                 </div>
                 <div className="font-display text-lg font-bold whitespace-nowrap">
                   {displayRow(r.value, r.unit, units)}
@@ -309,16 +424,23 @@ export function BaselinePage() {
           </div>
 
           <div className="mt-5 flex gap-2">
-            <Button onClick={() => save.mutate()} disabled={!carId || save.isPending || !isOwner} className="shadow-glow">
+            <Button
+              onClick={() => save.mutate()}
+              disabled={!carId || save.isPending || !isOwner}
+              className="shadow-glow"
+            >
               <Save className="w-4 h-4 mr-1" />
               {save.isPending ? "Saving…" : "Save as new setup"}
             </Button>
           </div>
           {!isOwner && carId && (
-            <p className="text-xs text-muted-foreground mt-2">Only the car owner can save a setup to it.</p>
+            <p className="text-xs text-muted-foreground mt-2">
+              Only the car owner can save a setup to it.
+            </p>
           )}
           <p className="text-xs text-muted-foreground mt-3">
-            These are starting values — always verify against your chassis manual and tune from real data.
+            These are starting values — always verify against your chassis manual and tune from real
+            data.
           </p>
         </Section>
       </div>
@@ -328,7 +450,7 @@ export function BaselinePage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-5 shadow-card">
+    <div className="min-w-0 rounded-lg border border-border bg-card p-3 sm:p-5 shadow-card [&_button]:min-w-0 [&_input]:min-w-0 [&_label]:break-words">
       <div className="flex items-center gap-3 mb-4">
         <div className="h-px flex-1 bg-border" />
         <h2 className="font-display text-lg font-bold uppercase tracking-wider">{title}</h2>
@@ -339,27 +461,60 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function NumField({ label, unit, value, onChange }: { label: string; unit?: string; value: string; onChange: (v: string) => void }) {
+function NumField({
+  label,
+  unit,
+  value,
+  onChange,
+}: {
+  label: string;
+  unit?: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
   return (
     <div>
       <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-        {label}{unit && <span className="text-primary"> ({unit})</span>}
+        {label}
+        {unit && <span className="text-primary"> ({unit})</span>}
       </Label>
-      <Input type="number" inputMode="decimal" value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 font-mono" />
+      <Input
+        type="number"
+        inputMode="decimal"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-1 font-mono"
+      />
     </div>
   );
 }
 
-function SelField({ label, value, onChange, options }: {
-  label: string; value: string; onChange: (v: string) => void; options: { value: string; label: string }[];
+function SelField({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
 }) {
   return (
     <div>
-      <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">{label}</Label>
+      <Label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+        {label}
+      </Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+        <SelectTrigger className="mt-1">
+          <SelectValue />
+        </SelectTrigger>
         <SelectContent>
-          {options.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+          {options.map((o) => (
+            <SelectItem key={o.value} value={o.value}>
+              {o.label}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>
@@ -370,7 +525,9 @@ function TrackNote({ label, value }: { label: string; value: string | null }) {
   if (!value) return null;
   return (
     <div>
-      <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">{label}</div>
+      <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+        {label}
+      </div>
       <div className="text-foreground/90 whitespace-pre-wrap">{value}</div>
     </div>
   );
@@ -380,17 +537,40 @@ function displayRow(value: string, unit: string | undefined, units: ReturnType<t
   if (!unit) return <>{value}</>;
   const n = parseFloat(value);
   if (isNaN(n)) {
-    return <>{value}<span className="text-primary text-xs font-mono ml-1">{unit}</span></>;
+    return (
+      <>
+        {value}
+        <span className="text-primary text-xs font-mono ml-1">{unit}</span>
+      </>
+    );
   }
   if (unit === "mm") {
     const decimals = Math.abs(n) < 10 ? 2 : 0;
     const converted = units.system === "imperial" ? n / 25.4 : n;
     const imperialDecimals = Math.abs(n) < 10 ? 3 : 2;
-    const shown = units.system === "imperial" ? converted.toFixed(imperialDecimals) : converted.toFixed(decimals);
-    return <>{shown}<span className="text-primary text-xs font-mono ml-1">{units.lengthShortUnit}</span></>;
+    const shown =
+      units.system === "imperial"
+        ? converted.toFixed(imperialDecimals)
+        : converted.toFixed(decimals);
+    return (
+      <>
+        {shown}
+        <span className="text-primary text-xs font-mono ml-1">{units.lengthShortUnit}</span>
+      </>
+    );
   }
   if (unit === "psi") {
-    return <>{units.toDisplayPressure(n)}<span className="text-primary text-xs font-mono ml-1">{units.pressureUnit}</span></>;
+    return (
+      <>
+        {units.toDisplayPressure(n)}
+        <span className="text-primary text-xs font-mono ml-1">{units.pressureUnit}</span>
+      </>
+    );
   }
-  return <>{value}<span className="text-primary text-xs font-mono ml-1">{unit}</span></>;
+  return (
+    <>
+      {value}
+      <span className="text-primary text-xs font-mono ml-1">{unit}</span>
+    </>
+  );
 }

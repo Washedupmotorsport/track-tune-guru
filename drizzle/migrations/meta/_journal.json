@@ -50,6 +50,13 @@
       "when": 1794292239285,
       "tag": "0006_add_car_gearbox_spec",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794348892635,
+      "tag": "0007_atomic_tyre_layout",
+      "breakpoints": true
     }
   ]
 }
