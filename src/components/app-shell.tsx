@@ -239,6 +239,7 @@ const PRIMARY_NAV: { to: string; label: string; icon: typeof Radio; matches?: st
   { to: "/tyres",              label: "Tyres",              icon: Disc,         matches: ["/tyres", "/tyre-setup", "/tyre-wear", "/tyre-compare", "/tires"] },
   { to: "/driver-hub",         label: "Driver Hub",         icon: Brain,        matches: ["/driver-hub", "/driver", "/confidence", "/corners", "/known-behaviours", "/philosophies", "/sympathy", "/flags"] },
   { to: "/engineering-memory", label: "Engineering Memory", icon: Brain,        matches: ["/engineering-memory"] },
+  { to: "/calendar",           label: "Calendar",           icon: CalendarDays, matches: ["/calendar", "/weekends"] },
   { to: "/tracks",             label: "Tracks",             icon: MapPin },
   { to: "/garage",             label: "Garage",             icon: Warehouse,    matches: ["/garage", "/cars"] },
   { to: "/workshop",           label: "Operations",         icon: Wrench,       matches: ["/workshop", "/maintenance", "/inventory", "/expenses", "/reports", "/damage", "/calculators"] },
