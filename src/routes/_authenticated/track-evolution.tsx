@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -153,7 +153,7 @@ function uid() { return Math.random().toString(36).slice(2, 10); }
 
 function TrackEvolutionPage() {
   const { user } = useAuth();
-  const { pressureUnit, tempUnit, system, toDisplayPressure } = useUnits();
+  const { pressureUnit, tempUnit, system, toDisplayPressure, toDisplayTemp, fromDisplayTemp } = useUnits();
 
   const sessionsQ = useQuery({
     queryKey: ["te-sessions", user?.id],
@@ -186,21 +186,36 @@ function TrackEvolutionPage() {
   const [startAt] = useState(() => Date.now());
 
   // Draft snapshot inputs
-  const [air, setAir] = useState("22");
-  const [track, setTrack] = useState("28");
+  const [air, setAir] = useState("");
+  const [track, setTrack] = useState("");
+  const manualAir = useRef(false);
+  const manualTrack = useRef(false);
+  const previousSystem = useRef(system);
   const [hotAvg, setHotAvg] = useState("");
   const [grip, setGrip] = useState(6);
   const [surface, setSurface] = useState<Snap["surface"]>("dry");
   const [laps, setLaps] = useState("0");
   const [note, setNote] = useState("");
 
-  // Auto-fill from latest session + tire log
+  useEffect(() => {
+    if (previousSystem.current === system) return;
+    const convert = (value: string) => {
+      if (!value.trim() || !Number.isFinite(Number(value))) return value;
+      const c = previousSystem.current === "imperial" ? (Number(value) - 32) * 5 / 9 : Number(value);
+      return String(Math.round((system === "imperial" ? c * 9 / 5 + 32 : c) * 10) / 10);
+    };
+    setAir(convert(air));
+    setTrack(convert(track));
+    previousSystem.current = system;
+  }, [system, air, track]);
+
+  // Recorded values may prefill untouched fields, never replace manual readings.
   useEffect(() => {
     const s = sessionsQ.data?.[0];
     const tl = tireLogsQ.data?.[0];
     if (s) {
-      if (s.air_temp_c != null) setAir(String(s.air_temp_c));
-      if (s.track_temp_c != null) setTrack(String(s.track_temp_c));
+      if (s.air_temp_c != null && !manualAir.current) setAir(String(toDisplayTemp(s.air_temp_c)));
+      if (s.track_temp_c != null && !manualTrack.current) setTrack(String(toDisplayTemp(s.track_temp_c)));
       if (s.weather?.toLowerCase().includes("rain")) setSurface("wet");
     }
     if (tl) {
@@ -210,8 +225,8 @@ function TrackEvolutionPage() {
   }, [sessionsQ.data, tireLogsQ.data]);
 
   const addSnap = () => {
-    const a = parseFloat(air), t = parseFloat(track);
-    if (isNaN(a) || isNaN(t)) { toast.error("Enter air + track temperature"); return; }
+    const a = fromDisplayTemp(Number(air)), t = fromDisplayTemp(Number(track));
+    if (!air.trim() || !track.trim() || a == null || t == null || !Number.isFinite(a) || !Number.isFinite(t)) { toast.error("Enter air + track temperature"); return; }
     const now = Date.now();
     setSnaps((prev) => [
       ...prev,
@@ -235,7 +250,8 @@ function TrackEvolutionPage() {
   const pullWeather = async () => {
     try {
       const w = await getCurrentWeather();
-      setAir(String(w.air_temp_c));
+      manualAir.current = true;
+      setAir(String(toDisplayTemp(w.air_temp_c)));
       toast.success(`Weather: ${w.weather}, ${w.air_temp_c}°C, ${w.wind_kph} kph wind`);
       if (w.weather.toLowerCase().match(/rain|drizzle|shower|t-storm/)) setSurface("wet");
     } catch (e: any) {
@@ -277,9 +293,9 @@ function TrackEvolutionPage() {
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3 text-center min-w-[300px]">
-            <Stat label="Track" value={last ? `${last.track}°${tempUnit.replace("°","")}` : "—"} />
-            <Stat label="Air" value={last ? `${last.air}°${tempUnit.replace("°","")}` : "—"} />
-            <Stat label="Trend" value={`${classification.deltaC > 0 ? "+" : ""}${classification.deltaC}°`} tone={classification.trend === "warming" ? "text-chart-3" : classification.trend === "cooling" ? "text-chart-2" : "text-muted-foreground"} />
+            <Stat label="Track" value={last ? `${toDisplayTemp(last.track)}${tempUnit}` : "—"} />
+            <Stat label="Air" value={last ? `${toDisplayTemp(last.air)}${tempUnit}` : "—"} />
+            <Stat label="Trend" value={`${classification.deltaC > 0 ? "+" : ""}${+(classification.deltaC * (system === "imperial" ? 1.8 : 1)).toFixed(1)}°`} tone={classification.trend === "warming" ? "text-chart-3" : classification.trend === "cooling" ? "text-chart-2" : "text-muted-foreground"} />
           </div>
         </div>
         <p className="mt-3 text-sm text-muted-foreground">{Meta.blurb}</p>
@@ -302,12 +318,12 @@ function TrackEvolutionPage() {
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label className="text-xs">Air ({tempUnit})</Label>
-              <Input className="font-mono" type="number" value={air} onChange={(e) => setAir(e.target.value)} />
+              <Label htmlFor="snapshot-air" className="text-xs">Air temperature ({tempUnit})</Label>
+              <Input id="snapshot-air" className="font-mono h-12 text-base" type="number" inputMode="decimal" step="any" placeholder="—" value={air} onChange={(e) => { manualAir.current = true; setAir(e.target.value); }} />
             </div>
             <div>
-              <Label className="text-xs">Track ({tempUnit})</Label>
-              <Input className="font-mono" type="number" value={track} onChange={(e) => setTrack(e.target.value)} />
+              <Label htmlFor="snapshot-track" className="text-xs">Track temperature ({tempUnit})</Label>
+              <Input id="snapshot-track" className="font-mono h-12 text-base" type="number" inputMode="decimal" step="any" placeholder="—" value={track} onChange={(e) => { manualTrack.current = true; setTrack(e.target.value); }} />
             </div>
             <div>
               <Label className="text-xs">Hot avg ({pressureUnit})</Label>
@@ -412,8 +428,8 @@ function TrackEvolutionPage() {
                   {snaps.map((s) => (
                     <tr key={s.id} className="border-b border-border/50">
                       <td className="py-2 pr-3">{s.minute}</td>
-                      <td className="py-2 pr-3">{s.air}°</td>
-                      <td className="py-2 pr-3">{s.track}°</td>
+                      <td className="py-2 pr-3">{toDisplayTemp(s.air)}{tempUnit}</td>
+                      <td className="py-2 pr-3">{toDisplayTemp(s.track)}{tempUnit}</td>
                       <td className="py-2 pr-3">{displayPsi(s.hotAvg)}</td>
                       <td className="py-2 pr-3">{s.grip}</td>
                       <td className="py-2 pr-3">{s.surface}</td>
