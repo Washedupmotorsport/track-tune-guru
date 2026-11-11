@@ -1,5 +1,19 @@
 import { test, expect } from "bun:test";
-import { currencyForLocation } from "./currency-region";
+import { currencyForLocation, parseCurrencyOverride, resolveCurrency } from "./currency-region";
+
+test("manual AUD overrides a US device time zone", () => {
+  expect(resolveCurrency("AUD", currencyForLocation("America/New_York", "en-US"))).toBe("AUD");
+});
+test("manual USD overrides an Australian device time zone", () => {
+  expect(resolveCurrency("USD", currencyForLocation("Australia/Brisbane", "en"))).toBe("USD");
+});
+test("clearing the override restores device currency", () => {
+  expect(resolveCurrency(null, currencyForLocation("Australia/Brisbane", "en-US"))).toBe("AUD");
+});
+test("invalid stored overrides fall back to automatic detection", () => {
+  expect(parseCurrencyOverride("INVALID")).toBeNull();
+  expect(resolveCurrency("INVALID", "GBP")).toBe("GBP");
+});
 
 test("Brisbane device with US English browser gets AUD", () => {
   expect(currencyForLocation("Australia/Brisbane", "en-US")).toBe("AUD");

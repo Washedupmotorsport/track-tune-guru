@@ -119,7 +119,7 @@ function ExpensesPage() {
                 <div>
                   <Label>Currency</Label>
                   <div className="h-10 flex items-center px-3 rounded-md border border-border bg-muted/30 text-sm text-muted-foreground">
-                    {form.currency} <span className="ml-1.5 text-xs">(from your location)</span>
+                    {form.currency} <span className="ml-1.5 text-xs">({units.currencyOverride ? "Settings override" : "device location"})</span>
                   </div>
                 </div>
               </div>

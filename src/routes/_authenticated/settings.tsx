@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
-import { useUnits } from "@/lib/units";
+import { CURRENCIES, useUnits } from "@/lib/units";
+import { parseCurrencyOverride } from "@/lib/currency-region";
 import { useTheme } from "@/lib/theme";
 import { Button } from "@/components/ui/button";
 import { Settings as SettingsIcon, Sun, Moon, LogOut, BookOpen, Mail, Shield, FileText } from "lucide-react";
@@ -11,6 +12,7 @@ import { deleteAccount } from "@/lib/account.functions";
 import { DeleteAccountInput } from "@/lib/launch-rules";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
@@ -29,7 +31,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
 function SettingsPage() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const { system, toggle, currency } = useUnits();
+  const { system, toggle, currency, currencyOverride, setCurrencyOverride } = useUnits();
   const { theme, toggle: toggleTheme } = useTheme();
   const removeAccount = useServerFn(deleteAccount);
   const queryClient = useQueryClient();
@@ -52,7 +54,21 @@ function SettingsPage() {
           <Row label="Measurement system" value={system === "metric" ? "SI (metric)" : "US (imperial)"}>
             <Button size="sm" variant="outline" onClick={toggle}>Switch to {system === "metric" ? "US" : "SI"}</Button>
           </Row>
-          <Row label="Currency" value={`${currency} — set automatically from your location`} />
+          <Row label="Currency" value={`${currency} — ${currencyOverride ? "manual override" : "automatic"}`}>
+            <Select value={currencyOverride ?? "automatic"} onValueChange={(value) => {
+              try {
+                setCurrencyOverride(parseCurrencyOverride(value));
+                toast.success("Currency preference saved");
+              } catch { toast.error("Unable to save currency preference on this device"); }
+            }}>
+              <SelectTrigger aria-label="Race currency" className="w-52 max-w-full"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="automatic">Automatic (device location)</SelectItem>
+                {CURRENCIES.map(({ code, symbol }) => <SelectItem key={code} value={code}>{code} — {symbol}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </Row>
+          <p className="text-xs text-muted-foreground">Saved on this device for new expenses. Existing expenses keep their recorded currency.</p>
         </Card>
 
         <Card title="Appearance">

@@ -2,6 +2,16 @@
 // language region only when the time zone is unknown.
 export type RegionCurrency = "USD" | "EUR" | "GBP" | "JPY" | "AUD" | "CAD" | "CHF" | "NZD" | "SEK" | "NOK" | "DKK" | "ZAR" | "BRL" | "MXN" | "AED";
 
+export const CURRENCY_CODES: readonly RegionCurrency[] = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD", "SEK", "NOK", "DKK", "ZAR", "BRL", "MXN", "AED"];
+
+export function parseCurrencyOverride(value: string | null): RegionCurrency | null {
+  return CURRENCY_CODES.find((code) => code === value) ?? null;
+}
+
+export function resolveCurrency(override: string | null, detected: RegionCurrency): RegionCurrency {
+  return parseCurrencyOverride(override) ?? detected;
+}
+
 const EUROZONE = new Set(["AT", "BE", "CY", "DE", "EE", "ES", "FI", "FR", "GR", "HR", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PT", "SI", "SK"]);
 const REGION_CURRENCY: Record<string, RegionCurrency> = {
   US: "USD", GB: "GBP", JP: "JPY", AU: "AUD", CA: "CAD", CH: "CHF", NZ: "NZD",

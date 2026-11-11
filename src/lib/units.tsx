@@ -1,8 +1,9 @@
-import { currencyForLocation } from "./currency-region";
+import { currencyForLocation, parseCurrencyOverride, resolveCurrency } from "./currency-region";
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 
 export type UnitSystem = "metric" | "imperial";
 const KEY = "summit.units";
+const CURRENCY_KEY = "summit.currency-override";
 
 export const CURRENCIES = [
   { code: "USD", symbol: "$" },
@@ -24,15 +25,6 @@ export const CURRENCIES = [
 
 export type CurrencyCode = (typeof CURRENCIES)[number]["code"];
 
-// Currency is derived from the device's locale region — there is no manual picker.
-const EUROZONE = new Set(["AT", "BE", "CY", "DE", "EE", "ES", "FI", "FR", "GR", "HR", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PT", "SI", "SK"]);
-const REGION_CURRENCY: Record<string, CurrencyCode> = {
-  US: "USD", GB: "GBP", JP: "JPY", AU: "AUD", CA: "CAD", CH: "CHF", NZ: "NZD",
-  SE: "SEK", NO: "NOK", DK: "DKK", ZA: "ZAR", BR: "BRL", MX: "MXN", AE: "AED",
-};
-
-void EUROZONE; void REGION_CURRENCY;
-
 // Location comes from the device time zone; language is only a fallback.
 export function currencyForLocale(): CurrencyCode {
   if (typeof navigator === "undefined") return "USD";
@@ -46,6 +38,8 @@ type Ctx = {
   setSystem: (s: UnitSystem) => void;
   toggle: () => void;
   currency: CurrencyCode;
+  currencyOverride: CurrencyCode | null;
+  setCurrencyOverride: (code: CurrencyCode | null) => void;
   currencySymbol: string;
   formatCurrency: (amount: number, code?: string) => string;
   // Temperature
@@ -77,13 +71,15 @@ const round = (n: number, d = 1) => {
 
 export function UnitsProvider({ children }: { children: ReactNode }) {
   const [system, setSystemState] = useState<UnitSystem>("metric");
-  const [currency, setCurrencyState] = useState<CurrencyCode>("USD");
+  const [detectedCurrency, setDetectedCurrency] = useState<CurrencyCode>("USD");
+  const [currencyOverride, setCurrencyOverrideState] = useState<CurrencyCode | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const stored = window.localStorage.getItem(KEY);
     if (stored === "metric" || stored === "imperial") setSystemState(stored);
-    setCurrencyState(currencyForLocale());
+    setDetectedCurrency(currencyForLocale());
+    setCurrencyOverrideState(parseCurrencyOverride(window.localStorage.getItem(CURRENCY_KEY)));
   }, []);
 
   const setSystem = useCallback((s: UnitSystem) => {
@@ -91,13 +87,23 @@ export function UnitsProvider({ children }: { children: ReactNode }) {
     if (typeof window !== "undefined") window.localStorage.setItem(KEY, s);
   }, []);
 
+  const setCurrencyOverride = useCallback((code: CurrencyCode | null) => {
+    const validated = parseCurrencyOverride(code);
+    if (validated) window.localStorage.setItem(CURRENCY_KEY, validated);
+    else window.localStorage.removeItem(CURRENCY_KEY);
+    setCurrencyOverrideState(validated);
+  }, []);
+
   const imperial = system === "imperial";
+  const currency = resolveCurrency(currencyOverride, detectedCurrency);
 
   const value: Ctx = {
     system,
     setSystem,
     toggle: () => setSystem(imperial ? "metric" : "imperial"),
     currency,
+    currencyOverride,
+    setCurrencyOverride,
     currencySymbol: CURRENCIES.find((c) => c.code === currency)?.symbol ?? currency,
     formatCurrency: (amount, code) => {
       const cc = code || currency;

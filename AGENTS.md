@@ -1,4 +1,5 @@
 # Architecture rules
+- Currency overrides are validated in the client-safe currency module and persisted through UnitsProvider in device storage; automatic detection remains the fallback so new expenses share one effective currency without rewriting historical records.
 - Race-day record context must match the selected car and weekend; reusable review pages receive route input through props, and lap mutations capture their session before asynchronous saves.
 - Keep the public product walkthrough isolated from authenticated workflow components; the landing preview is static illustrative data only — never predictions of pressures, handling or lap times, and never real account data.
 - Keep launch validation rules in a shared client-safe module so account confirmation and AI input limits can be tested independently.
