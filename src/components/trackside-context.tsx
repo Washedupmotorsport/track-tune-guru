@@ -17,7 +17,7 @@ export function TracksideContext() {
     enabled: !!user,
     refetchInterval: 5 * 60_000,
     staleTime: 2 * 60_000,
-    retry: 1,
+    retry: false,
   });
 
   const event = activeWeekend;
@@ -27,10 +27,10 @@ export function TracksideContext() {
   const weather = weatherQ.data;
   const weatherValue = weather
     ? `${weather.air_temp_c}°C  ${weather.weather}`
-    : "—";
+    : weatherQ.isFetching ? "Loading…" : weatherQ.isError ? "Unavailable" : "—";
   const weatherSub = weather
     ? `${weather.wind_kph} kph wind`
-    : "Tap to log";
+    : weatherQ.isError ? "Tap to retry / log" : "Tap to log";
 
   return (
     <div className="hidden md:flex items-stretch gap-0 rounded-md border border-border bg-card/40 overflow-hidden">

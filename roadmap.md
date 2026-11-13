@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Current requests
+- [x] Weather now shows loading and actionable persistent errors instead of blank fields. Verified signed-in phone location-denied → allow/retry → live Queensland air reading, preserved manual track reading and offline feedback; 11 tests pass and preview build OK. Radar map responds; BOM blocks automated access, so its destination remains externally unverified. Not published.
 - [x] Track Evolution temperature snapshots use the offline queue with selected session context and capture timestamps. Phone-sized offline → reconnect → second browser → reload verified with 26.5°C/34.5°C; exactly one saved row, test rows removed. 15 regression tests pass. Not published.
 - [x] Trace Session Detail → Tyres; added session-bound shortcut using existing TyreGarage form, plus missing Sessions outlet required to reach details.
 - [x] Validated at 390×844 with temporary VL Commodore Practice 2/Practice 1 records: correct hot corners, cold preservation, unchanged control, failed-save retry and missing-session guard; temporary records removed. Two regression tests pass; preview build OK.

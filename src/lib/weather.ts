@@ -39,10 +39,14 @@ export const GENERAL_RADAR_URL = "https://www.rainviewer.com/map.html?radar=1&an
 export function getPosition(): Promise<GeolocationPosition> {
   return new Promise((resolve, reject) => {
     if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
-      reject(new Error("No geolocation"));
+      reject(new Error("Location is unavailable. Enter temperatures manually or open the radar map."));
       return;
     }
-    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 });
+    navigator.geolocation.getCurrentPosition(resolve, (error) => {
+      reject(new Error(error.code === 1
+        ? "Location is blocked. Allow location for this site in your browser, then retry. You can still enter temperatures manually."
+        : "Could not find your location. Retry outdoors or enter temperatures manually."));
+    }, { timeout: 8000, maximumAge: 5 * 60_000 });
   });
 }
 
@@ -54,13 +58,24 @@ export function radarMapUrl(latitude: number, longitude: number): string {
 }
 
 export async function getCurrentWeather(): Promise<WeatherSnap> {
+  if (typeof navigator !== "undefined" && navigator.onLine === false) {
+    throw new Error("Weather needs an internet connection. You can still enter temperatures manually.");
+  }
   const pos = await getPosition();
   const { latitude, longitude } = pos.coords;
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code,wind_speed_10m&wind_speed_unit=kmh`;
-  const r = await fetch(url);
-  if (!r.ok) throw new Error("Weather fetch failed");
+  let r: Response;
+  try {
+    r = await fetch(url, { signal: AbortSignal.timeout(12000) });
+  } catch {
+    throw new Error("Weather is unavailable. Check your connection and retry, or enter temperatures manually.");
+  }
+  if (!r.ok) throw new Error("Weather service is unavailable. Retry shortly or enter temperatures manually.");
   const j = await r.json();
   const c = j.current;
+  if (!c || !Number.isFinite(c.temperature_2m) || !Number.isFinite(c.wind_speed_10m) || !Number.isFinite(c.weather_code)) {
+    throw new Error("Weather service returned no current reading. Retry or enter temperatures manually.");
+  }
   return {
     air_temp_c: Math.round(c.temperature_2m),
     weather: CODE[c.weather_code] ?? "Unknown",

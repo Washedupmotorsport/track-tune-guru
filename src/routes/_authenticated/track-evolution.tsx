@@ -289,15 +289,24 @@ function TrackEvolutionPage() {
     } catch (e) { toast.error(e instanceof Error ? e.message : "Could not remove snapshot"); }
   };
 
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const [weatherError, setWeatherError] = useState<string | null>(null);
   const pullWeather = async () => {
+    if (weatherLoading) return;
+    setWeatherLoading(true);
+    setWeatherError(null);
     try {
       const w = await getCurrentWeather();
       manualAir.current = true;
       setAir(String(toDisplayTemp(w.air_temp_c)));
       toast.success(`Weather: ${w.weather}, ${w.air_temp_c}°C, ${w.wind_kph} kph wind`);
       if (w.weather.toLowerCase().match(/rain|drizzle|shower|t-storm/)) setSurface("wet");
-    } catch (e: any) {
-      toast.error(e?.message ?? "Weather fetch failed");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Weather is unavailable. Retry or enter temperatures manually.";
+      setWeatherError(message);
+      toast.error(message);
+    } finally {
+      setWeatherLoading(false);
     }
   };
 
@@ -351,13 +360,14 @@ function TrackEvolutionPage() {
               <Plus className="w-4 h-4 text-primary" /> Log snapshot
             </h2>
             <div className="flex items-center gap-1">
-              <Button variant="ghost" size="sm" onClick={pullWeather} className="text-xs">
-                <CloudSun className="w-4 h-4 mr-1" /> Auto
+              <Button variant="ghost" size="sm" onClick={pullWeather} disabled={weatherLoading} aria-busy={weatherLoading} className="text-xs">
+                <CloudSun className="w-4 h-4 mr-1" /> {weatherLoading ? "Loading…" : "Auto"}
               </Button>
               <WeatherRadarLinks iconOnly />
             </div>
           </div>
 
+          {weatherError && <p role="alert" className="text-sm text-destructive">{weatherError}</p>}
           <div>
             <Label>Session</Label>
             <Select value={sessionId} onValueChange={setSelectedSessionId}>
