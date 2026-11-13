@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { useUnits } from "@/lib/units";
@@ -14,6 +14,10 @@ import { CloudRain, Thermometer, Wind, Activity, Gauge, Disc, AlertTriangle, Spa
 import { getCurrentWeather } from "@/lib/weather";
 import { WeatherRadarLinks } from "@/components/weather-radar-links";
 import { toast } from "sonner";
+import { useActiveWeekend } from "@/lib/active-weekend";
+import { useOfflineInsert, QUEUE_CHANGED } from "@/lib/offline-sync";
+import { accountQueue, dequeue } from "@/lib/offline-queue";
+import { temperatureSnapshotPayload, readTemperatureSnapshot } from "@/lib/temperature-snapshot";
 
 export const Route = createFileRoute("/_authenticated/track-evolution")({
   component: TrackEvolutionPage,
@@ -153,17 +157,23 @@ function uid() { return Math.random().toString(36).slice(2, 10); }
 
 function TrackEvolutionPage() {
   const { user } = useAuth();
+  const qc = useQueryClient();
+  const insertOffline = useOfflineInsert();
+  const { activeSession } = useActiveWeekend();
+  const [selectedSessionId, setSelectedSessionId] = useState("");
+  const sessionId = selectedSessionId || activeSession?.id || "";
   const { pressureUnit, tempUnit, system, toDisplayPressure, toDisplayTemp, fromDisplayTemp } = useUnits();
 
   const sessionsQ = useQuery({
     queryKey: ["te-sessions", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("sessions")
-        .select("id,name,started_at,track,air_temp_c,track_temp_c,weather")
+        .select("id,name,car_id,started_at,track,air_temp_c,track_temp_c,weather")
         .order("started_at", { ascending: false })
         .limit(20);
+      if (error) throw error;
       return data ?? [];
     },
   });
@@ -172,17 +182,37 @@ function TrackEvolutionPage() {
     queryKey: ["te-tirelogs", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("tire_logs")
         .select("id,session_id,hot_fl,hot_fr,hot_rl,hot_rr,recorded_at")
         .order("recorded_at", { ascending: false })
         .limit(50);
+      if (error) throw error;
       return data ?? [];
     },
   });
 
-  // Local snapshot timeline — this page is the engineer's pad, not a DB record.
-  const [snaps, setSnaps] = useState<Snap[]>([]);
+  const [queuedSnaps, setQueuedSnaps] = useState<Snap[]>([]);
+  const snapshotsQ = useQuery({
+    queryKey: ["temperature-snapshots", user?.id, sessionId],
+    enabled: !!user && !!sessionId,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("timeline_events").select("id,metadata")
+        .eq("session_id", sessionId).eq("type", "temperature_snapshot").order("occurred_at");
+      if (error) throw error;
+      return (data ?? []).map(readTemperatureSnapshot).filter((s): s is Snap => s !== null);
+    },
+  });
+  useEffect(() => {
+    const update = () => setQueuedSnaps(accountQueue(window.localStorage, user?.id)
+      .filter((w) => w.table === "timeline_events" && w.payload.session_id === sessionId && w.payload.type === "temperature_snapshot")
+      .map((w) => readTemperatureSnapshot({ id: w.id, metadata: w.payload.metadata }))
+      .filter((s): s is Snap => s !== null));
+    update();
+    window.addEventListener(QUEUE_CHANGED, update);
+    return () => window.removeEventListener(QUEUE_CHANGED, update);
+  }, [sessionId, user?.id]);
+  const snaps = useMemo(() => Array.from(new Map([...(snapshotsQ.data ?? []), ...queuedSnaps].map((s) => [s.id, s])).values()).sort((a,b) => a.t - b.t), [snapshotsQ.data, queuedSnaps]);
   const [startAt] = useState(() => Date.now());
 
   // Draft snapshot inputs
@@ -211,8 +241,8 @@ function TrackEvolutionPage() {
 
   // Recorded values may prefill untouched fields, never replace manual readings.
   useEffect(() => {
-    const s = sessionsQ.data?.[0];
-    const tl = tireLogsQ.data?.[0];
+    const s = sessionsQ.data?.find((s) => s.id === sessionId);
+    const tl = tireLogsQ.data?.find((l) => l.session_id === sessionId);
     if (s) {
       if (s.air_temp_c != null && !manualAir.current) setAir(String(toDisplayTemp(s.air_temp_c)));
       if (s.track_temp_c != null && !manualTrack.current) setTrack(String(toDisplayTemp(s.track_temp_c)));
@@ -222,15 +252,15 @@ function TrackEvolutionPage() {
       const a = avg([tl.hot_fl, tl.hot_fr, tl.hot_rl, tl.hot_rr]);
       if (a != null) setHotAvg(a.toFixed(1));
     }
-  }, [sessionsQ.data, tireLogsQ.data]);
+  }, [sessionsQ.data, tireLogsQ.data, sessionId]);
 
-  const addSnap = () => {
+  const addSnapshot = useMutation({ mutationFn: async () => {
+    const selected = sessionsQ.data?.find((s) => s.id === sessionId);
+    if (!user || !selected) throw new Error("Choose a loaded session before saving temperatures");
     const a = fromDisplayTemp(Number(air)), t = fromDisplayTemp(Number(track));
-    if (!air.trim() || !track.trim() || a == null || t == null || !Number.isFinite(a) || !Number.isFinite(t)) { toast.error("Enter air + track temperature"); return; }
+    if (!air.trim() || !track.trim() || a == null || t == null || !Number.isFinite(a) || !Number.isFinite(t)) throw new Error("Enter air + track temperature");
     const now = Date.now();
-    setSnaps((prev) => [
-      ...prev,
-      {
+    const snap: Snap = {
         id: uid(),
         t: now,
         minute: Math.round((now - startAt) / 60000),
@@ -240,12 +270,24 @@ function TrackEvolutionPage() {
         surface,
         laps: parseInt(laps) || 0,
         note: note.trim(),
-      },
-    ]);
+      };
+    const result = await insertOffline("timeline_events", temperatureSnapshotPayload(user.id, selected.id, selected.car_id, snap));
+    if (!result.queued) toast.success("Temperatures saved");
+    void qc.invalidateQueries({ queryKey: ["temperature-snapshots", user.id, selected.id] });
+  }, onSuccess: () => {
     setNote("");
-  };
+  }, onError: (e) => toast.error(e instanceof Error ? e.message : "Temperature save failed") });
 
-  const removeSnap = (id: string) => setSnaps((s) => s.filter((x) => x.id !== id));
+  const removeSnap = async (id: string) => {
+    try {
+      if (!navigator.onLine) throw new Error("Reconnect before removing a saved snapshot");
+      const { error } = await supabase.from("timeline_events").delete().eq("id", id).eq("session_id", sessionId);
+      if (error) throw error;
+      dequeue(window.localStorage, [id]);
+      window.dispatchEvent(new Event(QUEUE_CHANGED));
+      qc.invalidateQueries({ queryKey: ["temperature-snapshots"] });
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Could not remove snapshot"); }
+  };
 
   const pullWeather = async () => {
     try {
@@ -316,6 +358,14 @@ function TrackEvolutionPage() {
             </div>
           </div>
 
+          <div>
+            <Label>Session</Label>
+            <Select value={sessionId} onValueChange={setSelectedSessionId}>
+              <SelectTrigger aria-label="Temperature session"><SelectValue placeholder="Choose a session" /></SelectTrigger>
+              <SelectContent>{(sessionsQ.data ?? []).map((s) => <SelectItem key={s.id} value={s.id}>{s.name} · {s.track ?? "No circuit"}</SelectItem>)}</SelectContent>
+            </Select>
+            {sessionsQ.isError && <p role="alert" className="text-destructive text-sm">Could not load sessions. Reconnect and retry.</p>}
+          </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
               <Label htmlFor="snapshot-air" className="text-xs">Air temperature ({tempUnit})</Label>
@@ -360,7 +410,7 @@ function TrackEvolutionPage() {
             <Textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. T7 going greasy on exit" />
           </div>
 
-          <Button onClick={addSnap} className="w-full">
+          <Button onClick={() => addSnapshot.mutate()} disabled={addSnapshot.isPending || !sessionsQ.data?.some((s) => s.id === sessionId)} className="w-full">
             <Plus className="w-4 h-4 mr-2" /> Add snapshot
           </Button>
         </div>
@@ -405,7 +455,7 @@ function TrackEvolutionPage() {
           </div>
         </div>
         {snaps.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No snapshots yet. Log your first reading above.</p>
+          <p className="text-sm text-muted-foreground">{snapshotsQ.isPending && sessionId ? "Loading snapshots…" : snapshotsQ.isError ? "Could not load snapshots. Reconnect to retry." : "No snapshots yet. Log your first reading above."}</p>
         ) : (
           <>
             <TrendChart snaps={snaps} />

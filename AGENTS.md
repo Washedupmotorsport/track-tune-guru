@@ -1,4 +1,5 @@
 # Architecture rules
+- Track Evolution snapshots are immutable session-scoped timeline events queued through the shared offline insert path; store Celsius and capture time, and merge pending UUIDs with recorded history for cross-device readback.
 - Session Detail hot-pressure entry reuses TyreGarage with explicit session input; verify that context before saving and patch only hot fields on the latest session reading so cold readings remain intact.
 - Currency overrides are validated in the client-safe currency module and persisted through UnitsProvider in device storage; automatic detection remains the fallback so new expenses share one effective currency without rewriting historical records.
 - Race-day record context must match the selected car and weekend; reusable review pages receive route input through props, and lap mutations capture their session before asynchronous saves.

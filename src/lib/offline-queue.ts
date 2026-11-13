@@ -12,7 +12,7 @@
 export type QueuedWrite = {
   /** Client-generated UUID, also used as the row's primary key. */
   id: string;
-  table: "tire_logs" | "driver_feedback" | "laps";
+  table: "tire_logs" | "driver_feedback" | "laps" | "timeline_events";
   payload: Record<string, unknown>;
   queuedAt: string;
 };
@@ -105,7 +105,13 @@ export function buildWrite(
   return {
     id,
     table,
-    payload: { ...payload, id, recorded_at: payload.recorded_at ?? queuedAt },
+    payload: {
+      ...payload,
+      id,
+      ...(table === "timeline_events"
+        ? { occurred_at: payload.occurred_at ?? queuedAt }
+        : { recorded_at: payload.recorded_at ?? queuedAt }),
+    },
     queuedAt,
   };
 }
