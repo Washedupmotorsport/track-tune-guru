@@ -9,6 +9,7 @@ import { FuelCalculator } from "@/components/calculators";
 import { cancelOfflineLap, useOfflineInsert } from "@/lib/offline-sync";
 import { accountQueue } from "@/lib/offline-queue";
 import { formatLapTime } from "@/lib/lap-time";
+import { resetStopwatch } from "@/lib/stopwatch";
 import { nextLapNumber, selectRaceSession } from "@/lib/race-day-rules";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +30,7 @@ import {
   ChevronDown,
   Settings2,
   Loader2,
+  RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { WeatherRadarLinks } from "@/components/weather-radar-links";
@@ -592,6 +594,12 @@ function RaceModePage() {
                 sessionLenMin={targets.sessionLen}
                 swMs={swMs}
                 swRunning={swStart != null}
+                onReset={() => {
+                  if (lapSaveBusy.current) return;
+                  const reset = resetStopwatch();
+                  setSwStart(reset.startedAt);
+                  setSwFrozen(reset.elapsedMs);
+                }}
                 onStartStop={() => {
                   if (lapSaveBusy.current) return;
                   if (swStart == null) {
@@ -730,6 +738,7 @@ function LiveTab(props: {
   swMs: number;
   swRunning: boolean;
   onStartStop: () => void;
+  onReset: () => void;
   onLogLap: () => void;
   logging: boolean;
 }) {
@@ -745,6 +754,7 @@ function LiveTab(props: {
     swMs,
     swRunning,
     onStartStop,
+    onReset,
     onLogLap,
     logging,
   } = props;
@@ -871,6 +881,16 @@ function LiveTab(props: {
             )}
           </button>
         </div>
+        <Button
+          variant="outline"
+          className="h-12 w-full"
+          aria-label="Reset stopwatch"
+          title="Reset stopwatch"
+          disabled={logging || (!swRunning && swMs <= 0)}
+          onClick={onReset}
+        >
+          <RotateCcw className="h-5 w-5" /> Reset
+        </Button>
       </div>
 
       {/* Weather strip */}
