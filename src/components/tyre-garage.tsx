@@ -41,6 +41,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { hotPressureValues } from "@/lib/hot-pressure-entry";
 
 type Car = { id: string; name: string };
 type TyreSet = {
@@ -118,12 +119,15 @@ function logToReading(l: SetLog): TyreReading {
   };
 }
 
-export function TyreGarage() {
+export function TyreGarage({
+  sessionId,
+  onHotSaved,
+}: { sessionId?: string; onHotSaved?: () => void } = {}) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const { activeWeekend, activeCar, activeSession } = useActiveWeekend();
   const [createOpen, setCreateOpen] = useState(false);
-  const [quickOpen, setQuickOpen] = useState(false);
+  const [quickOpen, setQuickOpen] = useState(!!sessionId);
   const [rotateOpen, setRotateOpen] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -137,13 +141,33 @@ export function TyreGarage() {
   const [quick, setQuick] = useState({ fl: "", fr: "", rl: "", rr: "", laps: "" });
   const [quickSetId, setQuickSetId] = useState("");
 
-  const carId = activeCar?.id ?? "";
+  const sessionQ = useQuery({
+    queryKey: ["hot-pressure-session", sessionId],
+    enabled: !!sessionId,
+    retry: false,
+    queryFn: async () => {
+      const { data: session, error } = await supabase
+        .from("sessions")
+        .select("id, name, car_id")
+        .eq("id", sessionId ?? "")
+        .single();
+      if (error) throw error;
+      const { data: car, error: carError } = await supabase
+        .from("cars")
+        .select("id, name")
+        .eq("id", session.car_id)
+        .single();
+      if (carError) throw carError;
+      return { ...session, carName: car.name };
+    },
+  });
+  const carId = sessionId ? (sessionQ.data?.car_id ?? "") : (activeCar?.id ?? "");
   useEffect(() => {
     setQuickSetId("");
-    setQuickOpen(false);
+    setQuickOpen(!!sessionId);
     setRotateOpen(false);
     setQuick({ fl: "", fr: "", rl: "", rr: "", laps: "" });
-  }, [carId, activeSession?.id]);
+  }, [carId, activeSession?.id, sessionId]);
 
   const carsQ = useQuery({
     queryKey: ["cars-min", user?.id],
@@ -332,6 +356,46 @@ export function TyreGarage() {
   const quickSave = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Sign in required");
+      if (sessionId) {
+        // Never fall back to global active context for a Session Detail shortcut.
+        const { data: context } = await sessionQ.refetch({ throwOnError: true });
+        if (!context || context.id !== sessionId || context.car_id !== carId)
+          throw new Error("The correct session could not be loaded. Please retry.");
+        const pressures = hotPressureValues(quick);
+        const { data: previous, error: readError } = await supabase
+          .from("tire_logs")
+          .select("id")
+          .eq("session_id", context.id)
+          .eq("car_id", context.car_id)
+          .order("recorded_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (readError) throw readError;
+        const result = previous
+          ? await supabase
+              .from("tire_logs")
+              .update(pressures)
+              .eq("id", previous.id)
+              .eq("session_id", context.id)
+              .eq("car_id", context.car_id)
+              .select("id")
+              .single()
+          : await supabase
+              .from("tire_logs")
+              .insert({
+                user_id: user.id,
+                car_id: context.car_id,
+                session_id: context.id,
+                tyre_set_id: effectiveQuickSet || null,
+                tire_set:
+                  carSets.find((s) => s.id === effectiveQuickSet)?.name ?? "Session pressures",
+                ...pressures,
+              })
+              .select("id")
+              .single();
+        if (result.error) throw result.error;
+        return;
+      }
       if (!carId) throw new Error("Pick an active weekend with a car");
       if (!carSets.some((set) => set.id === effectiveQuickSet && set.car_id === carId))
         throw new Error("Pick a tyre set belonging to this car");
@@ -355,6 +419,7 @@ export function TyreGarage() {
       setQuickOpen(false);
       setQuick({ fl: "", fr: "", rl: "", rr: "", laps: "" });
       invalidate();
+      onHotSaved?.();
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
@@ -389,31 +454,57 @@ export function TyreGarage() {
               <DialogHeader>
                 <DialogTitle>Hot pressures — quick entry</DialogTitle>
               </DialogHeader>
-              <div className="space-y-3">
-                <div>
-                  <Label>Tyre set</Label>
-                  <Select value={effectiveQuickSet} onValueChange={setQuickSetId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pick a set" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {carSets.map((s) => (
-                        <SelectItem key={s.id} value={s.id}>
-                          {s.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              {sessionId && (
+                <div className="space-y-1">
+                  {sessionQ.isPending && <p role="status">Loading session…</p>}
+                  {sessionQ.isError && (
+                    <div role="alert" className="text-destructive">
+                      Could not load this session and car. Saving is disabled.
+                      <Button variant="outline" onClick={() => sessionQ.refetch()}>
+                        Retry session
+                      </Button>
+                    </div>
+                  )}
+                  {sessionQ.data && (
+                    <>
+                      <p className="font-display text-lg font-bold break-words">
+                        {sessionQ.data.carName}
+                      </p>
+                      <p className="text-sm font-semibold break-words">{sessionQ.data.name}</p>
+                    </>
+                  )}
                 </div>
+              )}
+              <div className="space-y-3">
+                {!sessionId && (
+                  <div>
+                    <Label>Tyre set</Label>
+                    <Select value={effectiveQuickSet} onValueChange={setQuickSetId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pick a set" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {carSets.map((s) => (
+                          <SelectItem key={s.id} value={s.id}>
+                            {s.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-3">
                   {CORNERS.map((c) => (
                     <div key={c}>
-                      <Label className="font-mono uppercase text-xs">{c}</Label>
+                      <Label htmlFor={`quick-hot-${c}`} className="font-mono uppercase text-xs">
+                        {cornerName[c]} (psi)
+                      </Label>
                       <Input
+                        id={`quick-hot-${c}`}
                         inputMode="decimal"
                         type="number"
                         step="any"
-                        autoFocus={c === "fl"}
+                        autoFocus={!sessionId && c === "fl"}
                         className="h-14 text-2xl font-mono text-center"
                         value={quick[c]}
                         onChange={(e) => setQuick({ ...quick, [c]: e.target.value })}
@@ -421,20 +512,25 @@ export function TyreGarage() {
                     </div>
                   ))}
                 </div>
-                <div>
-                  <Label>Laps this run (optional)</Label>
-                  <Input
-                    inputMode="numeric"
-                    type="number"
-                    value={quick.laps}
-                    onChange={(e) => setQuick({ ...quick, laps: e.target.value })}
-                  />
-                </div>
+                {!sessionId && (
+                  <div>
+                    <Label>Laps this run (optional)</Label>
+                    <Input
+                      inputMode="numeric"
+                      type="number"
+                      value={quick.laps}
+                      onChange={(e) => setQuick({ ...quick, laps: e.target.value })}
+                    />
+                  </div>
+                )}
               </div>
               <DialogFooter>
                 <Button
                   onClick={() => quickSave.mutate()}
-                  disabled={quickSave.isPending}
+                  disabled={
+                    quickSave.isPending ||
+                    (!!sessionId && (!sessionQ.data || sessionQ.isError || sessionQ.isFetching))
+                  }
                   className="w-full h-12 text-base"
                 >
                   {quickSave.isPending ? "Saving…" : "Save hot pressures"}

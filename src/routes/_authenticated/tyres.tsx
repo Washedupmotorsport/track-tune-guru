@@ -12,11 +12,12 @@ type TabId = "pressures" | "wear" | "compare" | "setup";
 const VALID: TabId[] = ["pressures", "wear", "compare", "setup"];
 
 export const Route = createFileRoute("/_authenticated/tyres")({
-  validateSearch: (s: Record<string, unknown>) => ({
+  validateSearch: (s: Record<string, unknown>): { tab?: TabId; sessionId?: string } => ({
     tab:
       typeof s.tab === "string" && (VALID as string[]).includes(s.tab)
         ? (s.tab as TabId)
         : undefined,
+    sessionId: typeof s.sessionId === "string" ? s.sessionId : undefined,
   }),
   head: () => ({
     meta: [
@@ -72,6 +73,17 @@ function TyresHubPage() {
     if (search.tab && search.tab !== tab)
       setTab(search.tab); /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [search.tab]);
+
+  if (search.sessionId)
+    return (
+      <TyreGarage
+        key={search.sessionId}
+        sessionId={search.sessionId}
+        onHotSaved={() =>
+          nav({ to: "/sessions/$sessionId", params: { sessionId: search.sessionId ?? "" } })
+        }
+      />
+    );
 
   return (
     <div>

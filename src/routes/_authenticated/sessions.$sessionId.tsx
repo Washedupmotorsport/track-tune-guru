@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
-import { ArrowLeft, Save, Loader as Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, TriangleAlert as AlertTriangle, Cloud, FileDown, Monitor, Table as TableIcon, ClipboardCheck, Square, GitCompare } from "lucide-react";
+import { ArrowLeft, Save, Loader as Loader2, Trash2, Plus, Trophy, Fuel, Sparkles, TriangleAlert as AlertTriangle, Cloud, FileDown, Monitor, Table as TableIcon, ClipboardCheck, Square, GitCompare, Gauge } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { parseLapTime, formatLapTime } from "@/lib/lap-time";
@@ -206,7 +206,10 @@ function SessionDetail() {
           <Input value={meta.name ?? ""} onChange={(e) => setMeta({ ...meta, name: e.target.value })}
             className="mt-1 font-display !text-3xl font-bold !h-auto !py-2 !px-3 bg-transparent border-transparent hover:border-border focus-visible:border-primary" />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center flex-wrap gap-2">
+          <Button variant="outline" className="h-12" onClick={() => navigate({ to: "/tyres", search: { tab: "pressures", sessionId } })}>
+            <Gauge className="w-4 h-4 mr-1" /> Log hot pressures
+          </Button>
           <Link to="/sessions/$sessionId/pitboard" params={{ sessionId }}>
             <Button variant="outline" size="sm"><Monitor className="w-4 h-4 mr-1" /> Pit board</Button>
           </Link>

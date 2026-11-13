@@ -1,5 +1,10 @@
 # Roadmap
 
+## Current requests
+- [x] Trace Session Detail → Tyres; added session-bound shortcut using existing TyreGarage form, plus missing Sessions outlet required to reach details.
+- [x] Validated at 390×844 with temporary VL Commodore Practice 2/Practice 1 records: correct hot corners, cold preservation, unchanged control, failed-save retry and missing-session guard; temporary records removed. Two regression tests pass; preview build OK.
+- [ ] Complete the requested calendar publish after security review (previous publish was cancelled).
+
 ## Audit fixes
 - [x] Offline: cancellable queued laps, retry transient failures, reject permanent failures, account isolation and capture timestamps
 - [x] Correct assistant car/session inputs, stale analysis and saved recommendation filtering
