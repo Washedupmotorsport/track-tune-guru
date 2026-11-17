@@ -41,7 +41,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { hotPressureValues } from "@/lib/hot-pressure-entry";
+import { newHotPressureReading } from "@/lib/hot-pressure-entry";
 
 type Car = { id: string; name: string };
 type TyreSet = {
@@ -358,41 +358,32 @@ export function TyreGarage({
       if (!user) throw new Error("Sign in required");
       if (sessionId) {
         // Never fall back to global active context for a Session Detail shortcut.
-        const { data: context } = await sessionQ.refetch({ throwOnError: true });
+        const { data: context, error: contextError } = await supabase
+          .from("sessions")
+          .select("id, car_id")
+          .eq("id", sessionId)
+          .single();
+        if (contextError) throw contextError;
         if (!context || context.id !== sessionId || context.car_id !== carId)
           throw new Error("The correct session could not be loaded. Please retry.");
-        const pressures = hotPressureValues(quick);
-        const { data: previous, error: readError } = await supabase
+        // Each run is a new reading; never replace earlier hot or cold values.
+        const result = await supabase
           .from("tire_logs")
-          .select("id")
-          .eq("session_id", context.id)
-          .eq("car_id", context.car_id)
-          .order("recorded_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        if (readError) throw readError;
-        const result = previous
-          ? await supabase
-              .from("tire_logs")
-              .update(pressures)
-              .eq("id", previous.id)
-              .eq("session_id", context.id)
-              .eq("car_id", context.car_id)
-              .select("id")
-              .single()
-          : await supabase
-              .from("tire_logs")
-              .insert({
+          .insert(
+            newHotPressureReading(
+              {
                 user_id: user.id,
                 car_id: context.car_id,
                 session_id: context.id,
                 tyre_set_id: effectiveQuickSet || null,
                 tire_set:
                   carSets.find((s) => s.id === effectiveQuickSet)?.name ?? "Session pressures",
-                ...pressures,
-              })
-              .select("id")
-              .single();
+              },
+              quick,
+            ),
+          )
+          .select("id")
+          .single();
         if (result.error) throw result.error;
         return;
       }

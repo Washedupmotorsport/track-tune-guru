@@ -7,3 +7,16 @@ export function hotPressureValues(values: { fl: string; fr: string; rl: string; 
   }
   return { hot_fl: numbers[0], hot_fr: numbers[1], hot_rl: numbers[2], hot_rr: numbers[3] };
 }
+
+export function newHotPressureReading(
+  context: {
+    user_id: string;
+    car_id: string;
+    session_id: string;
+    tyre_set_id: string | null;
+    tire_set: string;
+  },
+  values: { fl: string; fr: string; rl: string; rr: string },
+) {
+  return { ...context, ...hotPressureValues(values) };
+}
