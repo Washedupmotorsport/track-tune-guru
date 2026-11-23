@@ -7,6 +7,7 @@
 - [x] Trace Session Detail → Tyres; added session-bound shortcut using existing TyreGarage form, plus missing Sessions outlet required to reach details.
 - [x] Validated at 390×844 with temporary VL Commodore Practice 2/Practice 1 records: correct hot corners, cold preservation, unchanged control, failed-save retry and missing-session guard; temporary records removed. Two regression tests pass; preview build OK.
 - [x] Calendar and hot-pressure shortcut publishing requested for myraceengineer.app; security review has no critical findings. Deployment completion not verified.
+- [x] Hot-pressure shortcut now inserts a new reading per save instead of replacing the latest. Phone-sized checks confirmed earlier hot and cold readings intact; 3 tests pass. Publishing requested for myraceengineer.app; deployment completion not confirmed.
 
 ## Audit fixes
 - [x] Offline: cancellable queued laps, retry transient failures, reject permanent failures, account isolation and capture timestamps
