@@ -18,7 +18,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "Race Ready Setup"
+const SITE_NAME = "My Race Engineer"
 const ROOT_DOMAIN = "myraceengineer.app"
 
 // Sample data for preview mode ONLY (not used in actual email sending).
